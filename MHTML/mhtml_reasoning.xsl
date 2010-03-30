@@ -14,7 +14,7 @@
   <xsl:template match="Proposition">
     <xsl:if test="$proof_links&gt;0">
       <xsl:element name="a">
-        <xsl:attribute name="NAME">
+        <xsl:attribute name="name">
           <xsl:call-template name="propname">
             <xsl:with-param name="n" select="@propnr"/>
             <xsl:with-param name="pl" select="@plevel"/>
@@ -649,7 +649,7 @@
                 </xsl:call-template>
               </xsl:variable>
               <xsl:element name="a">
-                <xsl:attribute name="NAME">
+                <xsl:attribute name="name">
                   <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
                 </xsl:attribute>
               </xsl:element>
@@ -696,7 +696,7 @@
                     </xsl:call-template>
                   </xsl:variable>
                   <xsl:element name="a">
-                    <xsl:attribute name="NAME">
+                    <xsl:attribute name="name">
                       <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
                     </xsl:attribute>
                   </xsl:element>
@@ -814,7 +814,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:element name="a">
-        <xsl:attribute name="NAME">
+        <xsl:attribute name="name">
           <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
         </xsl:attribute>
       </xsl:element>
@@ -987,7 +987,7 @@
       <xsl:variable name="nr1" select="$j + $p1 - 1"/>
       <xsl:if test="$const_links&gt;0">
         <xsl:element name="a">
-          <xsl:attribute name="NAME">
+          <xsl:attribute name="name">
             <xsl:value-of select="concat(&quot;c&quot;,$nr1,$addpl)"/>
           </xsl:attribute>
         </xsl:element>
@@ -1024,7 +1024,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:element name="a">
-        <xsl:attribute name="NAME">
+        <xsl:attribute name="name">
           <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
         </xsl:attribute>
       </xsl:element>

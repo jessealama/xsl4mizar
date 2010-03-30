@@ -33,7 +33,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="1 + count(preceding::RCluster)"/>
     <xsl:element name="a">
-      <xsl:attribute name="NAME">
+      <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;RC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -84,7 +84,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="1 + count(preceding::CCluster)"/>
     <xsl:element name="a">
-      <xsl:attribute name="NAME">
+      <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;CC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -141,7 +141,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="1 + count(preceding::FCluster)"/>
     <xsl:element name="a">
-      <xsl:attribute name="NAME">
+      <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;FC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -199,7 +199,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="1 + count(preceding::*[name() = $iname])"/>
     <xsl:element name="a">
-      <xsl:attribute name="NAME">
+      <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;IY&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -421,7 +421,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:element name="a">
-      <xsl:attribute name="NAME">
+      <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;T&quot;, $nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pcomment0">
@@ -541,7 +541,7 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
         <xsl:element name="PARAM">
-          <xsl:attribute name="NAME">
+          <xsl:attribute name="name">
             <xsl:text>URL</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="VALUE">
@@ -724,7 +724,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:text> </xsl:text>
-    <!-- <a { @NAME=`concat("D",$nr1)`; -->
+    <!-- <a { @name=`concat("D",$nr1)`; -->
     <xsl:if test="@constrkind">
       <xsl:text>  defines </xsl:text>
       <xsl:call-template name="abs">
@@ -927,7 +927,7 @@
   <xsl:template name="sd">
     <xsl:element name="div">
       <xsl:element name="a">
-        <xsl:attribute name="NAME">
+        <xsl:attribute name="name">
           <xsl:value-of select="concat(&quot;S&quot;,@schemenr)"/>
         </xsl:attribute>
         <xsl:call-template name="pkeyword">
@@ -1017,7 +1017,7 @@
         </xsl:variable>
         <xsl:for-each select="Pattern">
           <xsl:element name="a">
-            <xsl:attribute name="NAME">
+            <xsl:attribute name="name">
               <xsl:value-of select="concat(&quot;NM&quot;, @nr)"/>
             </xsl:attribute>
             <xsl:call-template name="pkeyword">
@@ -1217,7 +1217,7 @@
           <xsl:text>: </xsl:text>
         </xsl:if>
         <xsl:element name="a">
-          <xsl:attribute name="NAME">
+          <xsl:attribute name="name">
             <xsl:value-of select="concat(&quot;D&quot;, @defnr)"/>
           </xsl:attribute>
           <xsl:call-template name="pcomment">
@@ -1638,7 +1638,7 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
         <xsl:element name="PARAM">
-          <xsl:attribute name="NAME">
+          <xsl:attribute name="name">
             <xsl:text>URL</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="VALUE">
@@ -1815,7 +1815,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:element name="a">
-          <xsl:attribute name="NAME">
+          <xsl:attribute name="name">
             <xsl:value-of select="concat(@kind,@nr)"/>
           </xsl:attribute>
           <xsl:call-template name="pkeyword">
@@ -1943,7 +1943,7 @@
     </xsl:variable>
     <xsl:variable name="argtypes" select="../Let/Typ"/>
     <xsl:element name="a">
-      <xsl:attribute name="NAME">
+      <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;N&quot;,@kind,@nr)"/>
       </xsl:attribute>
       <xsl:choose>

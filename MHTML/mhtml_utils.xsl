@@ -882,7 +882,7 @@
       <xsl:variable name="nr1" select="$j+position()"/>
       <xsl:if test="$const_links&gt;0">
         <xsl:element name="a">
-          <xsl:attribute name="NAME">
+          <xsl:attribute name="name">
             <xsl:value-of select="concat(&quot;c&quot;,$nr1,$addpl)"/>
           </xsl:attribute>
         </xsl:element>
