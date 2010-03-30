@@ -337,24 +337,12 @@
           <xsl:attribute name="class">
             <xsl:text>lab</xsl:text>
           </xsl:attribute>
-          <xsl:choose>
-            <xsl:when test="$colored = &quot;1&quot;">
-              <xsl:element name="font">
-                <xsl:attribute name="color">
-                  <xsl:value-of select="$labcolor"/>
-                </xsl:attribute>
-                <xsl:if test="$titles=&quot;1&quot;">
-                  <xsl:attribute name="title">
-                    <xsl:value-of select="concat(&quot;E&quot;,$nr)"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:value-of select="$nm"/>
-              </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$nm"/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:if test="$titles=&quot;1&quot;">
+            <xsl:attribute name="title">
+              <xsl:value-of select="concat(&quot;E&quot;,$nr)"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:value-of select="$nm"/>
         </xsl:element>
       </xsl:when>
       <xsl:otherwise>
@@ -381,21 +369,8 @@
       <xsl:attribute name="class">
         <xsl:text>lab</xsl:text>
       </xsl:attribute>
-      <xsl:choose>
-        <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$labcolor"/>
-            </xsl:attribute>
-            <xsl:text>E</xsl:text>
-            <xsl:value-of select="$nr"/>
-          </xsl:element>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>E</xsl:text>
-          <xsl:value-of select="$nr"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:text>E</xsl:text>
+      <xsl:value-of select="$nr"/>
     </xsl:element>
   </xsl:template>
 
@@ -406,21 +381,8 @@
       <xsl:attribute name="class">
         <xsl:text>lab</xsl:text>
       </xsl:attribute>
-      <xsl:choose>
-        <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$labcolor"/>
-            </xsl:attribute>
-            <xsl:value-of select="$txt"/>
-            <xsl:value-of select="$nr"/>
-          </xsl:element>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$txt"/>
-          <xsl:value-of select="$nr"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:value-of select="$txt"/>
+      <xsl:value-of select="$nr"/>
     </xsl:element>
   </xsl:template>
 
@@ -440,21 +402,8 @@
       <xsl:attribute name="class">
         <xsl:text>comment</xsl:text>
       </xsl:attribute>
-      <xsl:choose>
-        <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$commentcolor"/>
-            </xsl:attribute>
-            <xsl:text>:: </xsl:text>
-            <xsl:value-of select="$str"/>
-          </xsl:element>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>:: </xsl:text>
-          <xsl:value-of select="$str"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:text>:: </xsl:text>
+      <xsl:value-of select="$str"/>
     </xsl:element>
   </xsl:template>
 

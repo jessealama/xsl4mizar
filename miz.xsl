@@ -788,24 +788,12 @@
           <xsl:attribute name="class">
             <xsl:text>lab</xsl:text>
           </xsl:attribute>
-          <xsl:choose>
-            <xsl:when test="$colored = &quot;1&quot;">
-              <xsl:element name="font">
-                <xsl:attribute name="color">
-                  <xsl:value-of select="$labcolor"/>
-                </xsl:attribute>
-                <xsl:if test="$titles=&quot;1&quot;">
-                  <xsl:attribute name="title">
-                    <xsl:value-of select="concat(&quot;E&quot;,$nr)"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:value-of select="$nm"/>
-              </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$nm"/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:if test="$titles=&quot;1&quot;">
+            <xsl:attribute name="title">
+              <xsl:value-of select="concat(&quot;E&quot;,$nr)"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:value-of select="$nm"/>
         </xsl:element>
       </xsl:when>
       <xsl:otherwise>
@@ -832,21 +820,8 @@
       <xsl:attribute name="class">
         <xsl:text>lab</xsl:text>
       </xsl:attribute>
-      <xsl:choose>
-        <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$labcolor"/>
-            </xsl:attribute>
-            <xsl:text>E</xsl:text>
-            <xsl:value-of select="$nr"/>
-          </xsl:element>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>E</xsl:text>
-          <xsl:value-of select="$nr"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:text>E</xsl:text>
+      <xsl:value-of select="$nr"/>
     </xsl:element>
   </xsl:template>
 
@@ -857,21 +832,8 @@
       <xsl:attribute name="class">
         <xsl:text>lab</xsl:text>
       </xsl:attribute>
-      <xsl:choose>
-        <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$labcolor"/>
-            </xsl:attribute>
-            <xsl:value-of select="$txt"/>
-            <xsl:value-of select="$nr"/>
-          </xsl:element>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$txt"/>
-          <xsl:value-of select="$nr"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:value-of select="$txt"/>
+      <xsl:value-of select="$nr"/>
     </xsl:element>
   </xsl:template>
 
@@ -891,21 +853,8 @@
       <xsl:attribute name="class">
         <xsl:text>comment</xsl:text>
       </xsl:attribute>
-      <xsl:choose>
-        <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$commentcolor"/>
-            </xsl:attribute>
-            <xsl:text>:: </xsl:text>
-            <xsl:value-of select="$str"/>
-          </xsl:element>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>:: </xsl:text>
-          <xsl:value-of select="$str"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:text>:: </xsl:text>
+      <xsl:value-of select="$str"/>
     </xsl:element>
   </xsl:template>
 
@@ -8216,96 +8165,10 @@
                   <xsl:attribute name="type">
                     <xsl:text>text/javascript</xsl:text>
                   </xsl:attribute>
-                  <xsl:text>
-&lt;!-- 
-function hs(obj)
-{
-// document.getElementById(&apos;myimage&apos;).nextSibling.style.display = &apos;block&apos;;
-if (obj.nextSibling.style.display == &apos;inline&apos;)
- { obj.nextSibling.style.display = &apos;none&apos;; }
-else { if (obj.nextSibling.style.display == &apos;none&apos;)
- { obj.nextSibling.style.display = &apos;inline&apos;; }
- else { obj.nextSibling.style.display = &apos;inline&apos;;  }}
-return false;
-}
-
-function hs2(obj)
-{
-if (obj.nextSibling.style.display == &apos;block&apos;)
- { obj.nextSibling.style.display = &apos;none&apos;; }
-else { if (obj.nextSibling.style.display == &apos;none&apos;)
- { obj.nextSibling.style.display = &apos;block&apos;; }
- else { obj.nextSibling.style.display = &apos;none&apos;;  }}
-return false;
-}
-function hsNdiv(obj)
-{
-var ndiv = obj;
-while (ndiv.nextSibling.nodeName != &apos;DIV&apos;) { ndiv = ndiv.nextSibling; }
-return hs2(ndiv);
-}
-
-// explorer7 implements XMLHttpRequest in some strange way
-function makeRequest(obj,url) {
-        var http_request = false;
-        if (window.XMLHttpRequest &amp;&amp; !(window.ActiveXObject)) { // Mozilla, Safari,...
-            http_request = new XMLHttpRequest();
-            if (http_request.overrideMimeType) {
-                http_request.overrideMimeType(&apos;text/xml&apos;);
-            }
-        } else if (window.ActiveXObject) { // IE
-            try {
-                http_request = new ActiveXObject(&apos;Msxml2.XMLHTTP&apos;);
-            } catch (e) {
-                try {
-                    http_request = new ActiveXObject(&apos;Microsoft.XMLHTTP&apos;);
-                } catch (e) {}
-            }
-        }
-        if (!http_request) {
-            alert(&apos;Giving up :( Cannot create an XMLHTTP instance&apos;);
-            return false;
-        }
-        http_request.onreadystatechange = function() { insertRequest(obj,http_request); };
-        http_request.open(&apos;GET&apos;, url, true);
-        http_request.send(null);
-    }
-// commented the 200 state to have local requests too
-function insertRequest(obj,http_request) {
-        if (http_request.readyState == 4) {
-//            if (http_request.status == 200) {
-	    var ndiv = obj;
-	    while (ndiv.nodeName != &apos;SPAN&apos;) { ndiv = ndiv.nextSibling; }
-	    ndiv.innerHTML = http_request.responseText;
-	    obj.onclick = function(){ return hs2(obj) };
-//            } else {
-//                alert(&apos;There was a problem with the request.&apos;);
-//		alert(http_request.status);
-//            }
-	    }}
-// End --&gt;
-</xsl:text>
+                  <xsl:attribute name="src">
+                    <xsl:text>article.js</xsl:text>
+                  </xsl:attribute>
                 </xsl:element>
-                <xsl:if test="$idv&gt;0">
-                  <xsl:element name="script">
-                    <xsl:attribute name="type">
-                      <xsl:text>text/javascript</xsl:text>
-                    </xsl:attribute>
-                    <xsl:text>
-&lt;!--
-var tstp_dump;
-function openSoTSTP (dump) {
-var tstp_url = &apos;http://www.cs.miami.edu/~tptp/cgi-bin/SystemOnTSTP&apos;;
-var tstp_browser = window.open(tstp_url, &apos;_blank&apos;);
-tstp_dump = dump;
-}
-function getTSTPDump () {
-return tstp_dump;
-}
-// End --&gt;
-</xsl:text>
-                  </xsl:element>
-                </xsl:if>
                 <xsl:element name="base">
                   <xsl:attribute name="target">
                     <xsl:value-of select="$default_target"/>
