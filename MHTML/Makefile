@@ -22,7 +22,7 @@ miz.xsltxt: $(MIZXSLDEPS) mhtml_main.xsl
 
 
 %.xsl: %.xsltxt
-	$(JAVA) -jar $(XSLTXT) toXSL $*.xsltxt | sed -e 's/<!\-\- *\(<\/*xsl:document.*\) *\-\->/\1/g' > $*.xsl
+	$(JAVA) -jar $(XSLTXT) toXSL $*.xsltxt | sed -e 's/<!\-\- *\(<\/*xsl:document.*\) *\-\->/\1/g' -e 's/NAME/name/g' > $*.xsl
 
 TAGS: $(MIZXSLTXTDEPS)
 	etags   --language=none  --regex='/^tpl *\[? *\([^]({\n]+\) *\]?.*/\1/' $(MIZXSLTXTDEPS)
