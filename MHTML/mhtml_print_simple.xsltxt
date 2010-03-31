@@ -124,20 +124,12 @@ tpl pplab(#nr, #vid, #txt)
 
        $nm = { get_vid_name(#vid = $vid); }
 
-       <span 
-       {
-          @class="lab";
-          if [$colored = "1"] 
-	  { 
-	     <font 
+	     <span 
 	     { 
-	        @color = $labcolor; 
+	        @class = "label"; 
 	        if [$titles="1"] { @title=`concat("E",$nr)`; } 
 	        $nm; 
              } 
-          }
-	  else { $nm;}
-       }
     }
     else 
     {
@@ -154,8 +146,7 @@ tpl plab(#nr)
    <span
    {  
       @class="lab";
-      if [$colored="1"] { <font { @color=$labcolor; "E"; $nr;} }  
-      else { "E"; $nr;} 
+      "E"; $nr;
    } 
 }
 
@@ -164,15 +155,13 @@ tpl plab1(#nr,#txt)
    <span
    {  
       @class="lab";
-      if [$colored="1"] { <font { @color=$labcolor; $txt; $nr;} }  
-      else { $txt; $nr;} 
+      $txt; $nr;
    } 
 }
 
 tpl pkeyword(#str) { <span { @class = "kw"; $str; } }
 
-tpl pcomment0(#str) { <span { @class="comment"; if [$colored="1"] {
-<font {@color=$commentcolor; ":: "; $str;}} else { ":: "; $str;}}}
+tpl pcomment0(#str) { <span { @class="comment"; ":: "; $str; }}
 
 tpl pcomment(#str) { pcomment0(#str=$str); <br;}
 
