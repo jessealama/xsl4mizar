@@ -35,19 +35,12 @@ tpl pqvar(#nr, #vid)
     {
        $nm = { get_vid_name(#vid = $vid); }
 
-       if [$colored = "1"] 
-       { 
-	  <font 
+	  <span
 	  { 
-	     @color = $varcolor; 
+	     @class = "variable"; 
 	     if [$titles="1"] { @title=`concat("b",$nr)`; } 
 	     $nm; 
           }
-       }
-       else 
-       { 
-          $nm;
-       }
     }
     else 
     { 
@@ -56,8 +49,7 @@ tpl pqvar(#nr, #vid)
 }
 
 
-tpl pvar(#nr) { if [$colored="1"] { <font { @color=$varcolor; 
-    "b"; <sub { $nr;} } } else { "b"; <sub { $nr;} } }
+tpl pvar(#nr) { <span { @class = "variable"; "b"; <sub { $nr;} } }
 
 tpl pconst(#nr) {  if [$colored="1"] { <font { @color=$constcolor; 
     "c"; <sub { $nr;} } } else { "c"; <sub { $nr;} } }
