@@ -86,25 +86,17 @@
 
   <xsl:template name="pconst">
     <xsl:param name="nr"/>
-    <xsl:choose>
-      <xsl:when test="$colored=&quot;1&quot;">
-        <xsl:element name="font">
-          <xsl:attribute name="color">
-            <xsl:value-of select="$constcolor"/>
-          </xsl:attribute>
-          <xsl:text>c</xsl:text>
-          <xsl:element name="sub">
-            <xsl:value-of select="$nr"/>
-          </xsl:element>
-        </xsl:element>
-      </xsl:when>
-      <xsl:otherwise>
+    <xsl:if test="$colored=&quot;1&quot;">
+      <xsl:element name="span">
+        <xsl:attribute name="class">
+          <xsl:text>constant</xsl:text>
+        </xsl:attribute>
         <xsl:text>c</xsl:text>
         <xsl:element name="sub">
           <xsl:value-of select="$nr"/>
         </xsl:element>
-      </xsl:otherwise>
-    </xsl:choose>
+      </xsl:element>
+    </xsl:if>
   </xsl:template>
 
   <!-- #pl gives the optional proof level -->
@@ -142,9 +134,9 @@
               <xsl:attribute name="href">
                 <xsl:value-of select="concat(&quot;#&quot;,$ctarget)"/>
               </xsl:attribute>
-              <xsl:element name="font">
-                <xsl:attribute name="color">
-                  <xsl:value-of select="$constcolor"/>
+              <xsl:element name="span">
+                <xsl:attribute name="class">
+                  <xsl:text>constant</xsl:text>
                 </xsl:attribute>
                 <xsl:if test="$titles=&quot;1&quot;">
                   <xsl:attribute name="title">
@@ -156,24 +148,17 @@
             </xsl:element>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:choose>
-              <xsl:when test="$colored = &quot;1&quot;">
-                <xsl:element name="font">
-                  <xsl:attribute name="color">
-                    <xsl:value-of select="$constcolor"/>
-                  </xsl:attribute>
-                  <xsl:if test="$titles=&quot;1&quot;">
-                    <xsl:attribute name="title">
-                      <xsl:value-of select="$ctarget"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:value-of select="$nm"/>
-                </xsl:element>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$nm"/>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:element name="span">
+              <xsl:attribute name="class">
+                <xsl:text>constant</xsl:text>
+              </xsl:attribute>
+              <xsl:if test="$titles=&quot;1&quot;">
+                <xsl:attribute name="title">
+                  <xsl:value-of select="$ctarget"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:value-of select="$nm"/>
+            </xsl:element>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>

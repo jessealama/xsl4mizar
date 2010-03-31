@@ -99,7 +99,7 @@ else {
 	        <li {  <a { @href=`concat($lgitwebcgi,"?p=",$lgitproject,";a=history;f=mml/",$anamelc,".miz")`; "History"; } }
 		<li {  <a { @href=`concat($lgitwebcgi,"?p=",$lgitproject,";a=blob_plain;f=mml/",$anamelc,".miz")`; @rel="nofollow"; "Raw"; } }
 		<li {  <a { @href=`concat("../discussion/",$anamelc, ".html")`; "Discussion"; } }
-		<li {  <a { @href="../index.html"; "Index"; } }
+		<li {  <a { @href="../"; "Index"; } }
 		<li {  <a { @href=`concat($lgitwebcgi,"?p=",$lgitproject)`; "Gitweb"; } }
 //		<li {  "Clone:"; $lgitclone; <br; }
                }

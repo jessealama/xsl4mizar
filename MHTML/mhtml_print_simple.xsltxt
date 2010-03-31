@@ -35,19 +35,12 @@ tpl pqvar(#nr, #vid)
     {
        $nm = { get_vid_name(#vid = $vid); }
 
-       if [$colored = "1"] 
-       { 
-	  <font 
+	  <span
 	  { 
-	     @color = $varcolor; 
+	     @class = "variable"; 
 	     if [$titles="1"] { @title=`concat("b",$nr)`; } 
 	     $nm; 
           }
-       }
-       else 
-       { 
-          $nm;
-       }
     }
     else 
     { 
@@ -56,11 +49,9 @@ tpl pqvar(#nr, #vid)
 }
 
 
-tpl pvar(#nr) { if [$colored="1"] { <font { @color=$varcolor; 
-    "b"; <sub { $nr;} } } else { "b"; <sub { $nr;} } }
+tpl pvar(#nr) { <span { @class = "variable"; "b"; <sub { $nr;} } }
 
-tpl pconst(#nr) {  if [$colored="1"] { <span { @class="constant"; 
-    "c"; <sub { $nr;} } } }
+tpl pconst(#nr) {  <span { @class="constant"; "c"; <sub { $nr;} } }
 
 // #pl gives the optional proof level
 tpl ppconst(#nr, #vid, #pl) 
@@ -83,7 +74,7 @@ tpl ppconst(#nr, #vid, #pl)
 	      @href  = `concat("#",$ctarget)`;
 	      <span
 	      { 
-	         @class="constant"; 
+	         @class = "constant"; 
 		 if [$titles="1"] { @title = $ctarget; } 
 		 $nm; 
 	      } 
@@ -114,21 +105,15 @@ tpl pploci(#nr)
     }
 }
 
-tpl ploci(#nr) {  if [$colored="1"] { <font { @color=$locicolor; 
-    "a"; <sub { $nr;} } } else { "a"; <sub { $nr;} } }
+tpl ploci(#nr) { <span { @class="locus"; "a"; <sub { $nr;} } }
 
-tpl pschpvar(#nr) {  if [$colored="1"] { <font { @color=$schpcolor; 
-    "P"; <sub { $nr;} } } else { "P"; <sub { $nr;} } }
+tpl pschpvar(#nr) { <span { @class="pred-scheme"; "P"; <sub { $nr;} } }
 
-tpl pschfvar(#nr) {  if [$colored="1"] { <font { @color=$schfcolor; 
-    "F"; <sub { $nr;} } } else { "F"; <sub { $nr;} } }
+tpl pschfvar(#nr) { <span { @class="func-scheme"; "F"; <sub { $nr;} } }
 
-tpl pppred(#nr) {  if [$colored="1"] { <font { @color=$ppcolor; 
-    "S"; <sub { $nr;} } } else { "S"; <sub { $nr;} } }
+tpl pppred(#nr) { <span { @class="p-pred"; "S"; <sub { $nr;} } }
 
-tpl ppfunc(#nr) {  if [$colored="1"] { <font { @color=$pfcolor; 
-    "H"; <sub { $nr;} } } else { "H"; <sub { $nr;} } }
-
+tpl ppfunc(#nr) { <span { @class="f-pred"; "H"; <sub { $nr;} } }
 
 tpl pplab(#nr, #vid, #txt)
 { 
@@ -174,7 +159,7 @@ tpl plab1(#nr,#txt)
 
 tpl pkeyword(#str) { <span { @class = "kw"; $str; } }
 
-tpl pcomment0(#str) { <span { @class="comment"; ":: "; $str;}}
+tpl pcomment0(#str) { <span { @class="comment"; ":: "; $str; }}
 
 tpl pcomment(#str) { pcomment0(#str=$str); <br;}
 
