@@ -13,16 +13,23 @@
   <!-- License: GPL (GNU GENERAL PUBLIC LICENSE) -->
   <!-- Registrations -->
   <xsl:template match="RCluster">
-    <xsl:variable name="nr1" select="1 + count(preceding::RCluster)"/>
     <xsl:choose>
-      <xsl:when test="$generate_items&gt;0">
-        <xsl:document href="proofhtml/exreg/{$anamelc}.{$nr1}" format="html"> 
-        <xsl:call-template name="rc"/>
-        </xsl:document> 
-        <xsl:variable name="bogus" select="1"/>
+      <xsl:when test="Presentation/RCluster">
+        <xsl:apply-templates select="Presentation/RCluster"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="rc"/>
+        <xsl:variable name="nr1" select="@nr"/>
+        <xsl:choose>
+          <xsl:when test="$generate_items&gt;0">
+            <xsl:document href="proofhtml/exreg/{$anamelc}.{$nr1}" format="html"> 
+            <xsl:call-template name="rc"/>
+            </xsl:document> 
+            <xsl:variable name="bogus" select="1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="rc"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -31,7 +38,7 @@
     <xsl:if test="($mml=&quot;1&quot;) or ($generate_items&gt;0)">
       <xsl:apply-templates select="ArgTypes"/>
     </xsl:if>
-    <xsl:variable name="nr1" select="1 + count(preceding::RCluster)"/>
+    <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
       <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;RC&quot;,$nr1)"/>
@@ -64,16 +71,23 @@
   </xsl:template>
 
   <xsl:template match="CCluster">
-    <xsl:variable name="nr1" select="1 + count(preceding::CCluster)"/>
     <xsl:choose>
-      <xsl:when test="$generate_items&gt;0">
-        <xsl:document href="proofhtml/condreg/{$anamelc}.{$nr1}" format="html"> 
-        <xsl:call-template name="cc"/>
-        </xsl:document> 
-        <xsl:variable name="bogus" select="1"/>
+      <xsl:when test="Presentation/CCluster">
+        <xsl:apply-templates select="Presentation/CCluster"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="cc"/>
+        <xsl:variable name="nr1" select="@nr"/>
+        <xsl:choose>
+          <xsl:when test="$generate_items&gt;0">
+            <xsl:document href="proofhtml/condreg/{$anamelc}.{$nr1}" format="html"> 
+            <xsl:call-template name="cc"/>
+            </xsl:document> 
+            <xsl:variable name="bogus" select="1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="cc"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -82,7 +96,7 @@
     <xsl:if test="($mml=&quot;1&quot;) or ($generate_items&gt;0)">
       <xsl:apply-templates select="ArgTypes"/>
     </xsl:if>
-    <xsl:variable name="nr1" select="1 + count(preceding::CCluster)"/>
+    <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
       <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;CC&quot;,$nr1)"/>
@@ -121,16 +135,23 @@
   </xsl:template>
 
   <xsl:template match="FCluster">
-    <xsl:variable name="nr1" select="1 + count(preceding::FCluster)"/>
     <xsl:choose>
-      <xsl:when test="$generate_items&gt;0">
-        <xsl:document href="proofhtml/funcreg/{$anamelc}.{$nr1}" format="html"> 
-        <xsl:call-template name="fc"/>
-        </xsl:document> 
-        <xsl:variable name="bogus" select="1"/>
+      <xsl:when test="Presentation/FCluster">
+        <xsl:apply-templates select="Presentation/FCluster"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="fc"/>
+        <xsl:variable name="nr1" select="@nr"/>
+        <xsl:choose>
+          <xsl:when test="$generate_items&gt;0">
+            <xsl:document href="proofhtml/funcreg/{$anamelc}.{$nr1}" format="html"> 
+            <xsl:call-template name="fc"/>
+            </xsl:document> 
+            <xsl:variable name="bogus" select="1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="fc"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -139,7 +160,7 @@
     <xsl:if test="($mml=&quot;1&quot;) or ($generate_items&gt;0)">
       <xsl:apply-templates select="ArgTypes"/>
     </xsl:if>
-    <xsl:variable name="nr1" select="1 + count(preceding::FCluster)"/>
+    <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
       <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;FC&quot;,$nr1)"/>
@@ -175,7 +196,7 @@
   <xsl:template match="IdentifyWithExp|Identify">
     <xsl:variable name="iname" select="name()"/>
     <!-- to deal with both versions -->
-    <xsl:variable name="nr1" select="1 + count(preceding::*[name() = $iname])"/>
+    <xsl:variable name="nr1" select="@nr"/>
     <xsl:choose>
       <xsl:when test="$generate_items&gt;0">
         <xsl:document href="proofhtml/idreg/{$anamelc}.{$nr1}" format="html"> 
@@ -197,7 +218,7 @@
         <xsl:with-param name="el" select="Typ"/>
       </xsl:call-template>
     </xsl:if>
-    <xsl:variable name="nr1" select="1 + count(preceding::*[name() = $iname])"/>
+    <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
       <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;IY&quot;,$nr1)"/>
@@ -439,6 +460,36 @@
           <xsl:with-param name="nr" select="$nr1"/>
         </xsl:call-template>
       </xsl:if>
+      <xsl:if test="$wiki_sections = 1">
+        <xsl:variable name="endpos">
+          <xsl:choose>
+            <xsl:when test="Proof">
+              <xsl:value-of select="Proof[1]/EndPosition[1]/@line"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="By|From">
+                  <xsl:value-of select="*[2]/@line"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>0</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:if test="$endpos &gt; 0">
+          <xsl:text> </xsl:text>
+          <xsl:call-template name="wiki_edit_section_for">
+            <xsl:with-param name="k">
+              <xsl:text>t</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="nr" select="$nr1"/>
+            <xsl:with-param name="line1" select="Proposition[1]/@line"/>
+            <xsl:with-param name="line2" select="$endpos"/>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:if>
       <xsl:if test="$thms_tptp_links = 1">
         <xsl:call-template name="tptp_for_thm">
           <xsl:with-param name="line" select="Proposition[1]/@line"/>
@@ -678,6 +729,26 @@
         <xsl:value-of select="concat($ltmpftptpcgi,&quot;?file=&quot;,$thm_file,&quot;&amp;tmp=&quot;,$lbytmpdir)"/>
       </xsl:attribute>
       <xsl:text>[edit]</xsl:text>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template name="wiki_edit_section_for">
+    <xsl:param name="k"/>
+    <xsl:param name="nr"/>
+    <xsl:param name="line1"/>
+    <xsl:param name="line2"/>
+    <xsl:variable name="section" select="concat($k,$nr,&quot;_&quot;,$line1,&quot;_&quot;,$line2)"/>
+    <xsl:element name="a">
+      <xsl:attribute name="href">
+        <xsl:value-of select="concat($lmwikicgi,&quot;?p=&quot;,$lgitproject,&quot;;a=edit;f=mml/&quot;,$anamelc,&quot;.miz;s=&quot;,$section)"/>
+      </xsl:attribute>
+      <xsl:attribute name="rel">
+        <xsl:text>nofollow</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="class">
+        <xsl:text>edit</xsl:text>
+      </xsl:attribute>
+      <xsl:text> [edit]</xsl:text>
     </xsl:element>
   </xsl:template>
 
@@ -1756,7 +1827,7 @@
   <!-- environmental constructors, or constructor retrieved from other file -->
   <!-- #argt is explicit list of argument types, useful for -->
   <!-- getting the @vid (identifier numbers) of loci -->
-  <!-- #nrt tells not to showthe result type(s) -->
+  <!-- #nrt tells not to show the result type(s) -->
   <!-- #old says that the constructor is from a redefinition and not new, -->
   <!-- so an anchor should not be created -->
   <xsl:template match="Constructor">

@@ -76,6 +76,15 @@
   <xsl:variable name="print_identifiers">
     <xsl:text>1</xsl:text>
   </xsl:variable>
+  <!-- new brackets: trying to print brackets as mizar does - -->
+  <!-- when two or more arguments of a functor - now default -->
+  <xsl:param name="mizar_brackets">
+    <xsl:text>1</xsl:text>
+  </xsl:param>
+  <!-- no spaces around functor symbols -->
+  <xsl:param name="funcs_no_spaces">
+    <xsl:text>0</xsl:text>
+  </xsl:param>
   <!-- print label identifiers  instead of normalized names -->
   <!-- this is kept separate from $print_identifiers, because -->
   <!-- it should be turned off for item generating -->
@@ -158,6 +167,10 @@
   <!-- add editing, history, and possibly other links for wiki -->
   <!-- the namespace for the scripts is taken from #ltptproot -->
   <xsl:param name="wiki_links">
+    <xsl:text>0</xsl:text>
+  </xsl:param>
+  <!-- add buttons for editing wiki sections -->
+  <xsl:param name="wiki_sections">
     <xsl:text>0</xsl:text>
   </xsl:param>
   <!-- domain name of the "wiki" server -->
@@ -348,7 +361,7 @@
     <xsl:text>Green</xsl:text>
   </xsl:param>
   <xsl:param name="commentcolor">
-    <xsl:text>Red</xsl:text>
+    <xsl:text>firebrick</xsl:text>
   </xsl:param>
   <!-- use spans for brackets -->
   <xsl:param name="parenspans">
@@ -364,5 +377,71 @@
   <!-- debugging message -->
   <xsl:param name="dbgmsg">
     <xsl:text>zzzzzzzzz</xsl:text>
+  </xsl:param>
+  <!-- relative nr of the first expandable mode -->
+  <!-- #first_exp = { `//Pattern[(@constrkind='M') and (@constrnr=0)][1]/@relnr`; } -->
+  <!-- symbols, should be overloaded with different (eg tex, mathml) presentations -->
+  <xsl:param name="for_s">
+    <xsl:text> for </xsl:text>
+  </xsl:param>
+  <xsl:param name="ex_s">
+    <xsl:text> ex </xsl:text>
+  </xsl:param>
+  <xsl:param name="not_s">
+    <xsl:text> not </xsl:text>
+  </xsl:param>
+  <xsl:param name="non_s">
+    <xsl:text> non </xsl:text>
+  </xsl:param>
+  <xsl:param name="and_s">
+    <xsl:text> &amp; </xsl:text>
+  </xsl:param>
+  <xsl:param name="imp_s">
+    <xsl:text> implies </xsl:text>
+  </xsl:param>
+  <xsl:param name="equiv_s">
+    <xsl:text> iff </xsl:text>
+  </xsl:param>
+  <xsl:param name="or_s">
+    <xsl:text> or </xsl:text>
+  </xsl:param>
+  <xsl:param name="holds_s">
+    <xsl:text> holds </xsl:text>
+  </xsl:param>
+  <xsl:param name="being_s">
+    <xsl:text> being </xsl:text>
+  </xsl:param>
+  <xsl:param name="be_s">
+    <xsl:text> be </xsl:text>
+  </xsl:param>
+  <xsl:param name="st_s">
+    <xsl:text> st </xsl:text>
+  </xsl:param>
+  <xsl:param name="is_s">
+    <xsl:text> is </xsl:text>
+  </xsl:param>
+  <xsl:param name="fraenkel_start">
+    <xsl:text> { </xsl:text>
+  </xsl:param>
+  <xsl:param name="fraenkel_end">
+    <xsl:text> } </xsl:text>
+  </xsl:param>
+  <xsl:param name="of_sel_s">
+    <xsl:text> of </xsl:text>
+  </xsl:param>
+  <xsl:param name="of_typ_s">
+    <xsl:text> of </xsl:text>
+  </xsl:param>
+  <xsl:param name="the_sel_s">
+    <xsl:text> the </xsl:text>
+  </xsl:param>
+  <xsl:param name="choice_s">
+    <xsl:text> the </xsl:text>
+  </xsl:param>
+  <xsl:param name="lbracket_s">
+    <xsl:text>(</xsl:text>
+  </xsl:param>
+  <xsl:param name="rbracket_s">
+    <xsl:text>)</xsl:text>
   </xsl:param>
 </xsl:stylesheet>

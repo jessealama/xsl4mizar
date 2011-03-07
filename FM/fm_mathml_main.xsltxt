@@ -1,0 +1,726 @@
+stylesheet "1.0";
+// extension-element-prefixes = "m"
+// extension-element-prefixes = "dc";
+xmlns m "http://www.w3.org/1998/Math/MathML";
+xmlns dc "http://purl.org/dc/elements/1.1/";
+xmlns "http://www.w3.org/1999/xhtml";
+
+// the import directive is useful because anything 
+// imported can be later overrriden - we'll use it for
+// the pretty-printing funcs
+import ../MHTML/mhtml_block_top.xsl;  // ##INCLUDE HERE
+
+output method=xml
+doctype-public="-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"
+doctype-system="http://www.w3c.org/TR/MathML2/dtd/xhtml-math11-f.dtd"
+ media-type="application/xhtml+xml"
+encoding="utf-8";
+
+
+// output omit-xml-declaration="no";
+ 
+
+// $Revision: 1.4 $
+//
+// File: fm_main.xsltxt - TeX-ization of Mizar XML, main file
+//
+// Author: Josef Urban
+//
+// License: GPL (GNU GENERAL PUBLIC LICENSE)
+
+// XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking 
+// XML terms, formulas and types to FM format.
+
+// To produce standard XSLT from this do e.g.: 
+// java -jar ../xsltxt.jar toXSL fm_mathml_main.xsltxt >fm_mathml_main.xsl
+
+
+// include fm_print_complex.xsl;
+
+// include mhtml_block_top.xsl;  // ##INCLUDE HERE
+
+// the FM specific code:
+
+// XML file containing FM formats
+#fmformats=  { "file:///home/urban/gr/xsl4mizar/FM/mathml_formats.fmx"; }
+
+// .bxx file with the bibtex info in xml (see article_bib.rnc)
+#bibtex=  { `concat($anamelc, '.bbx')`; }
+
+// lookup of the FMFormat based on the symbol, kind,argnr and leftargnr - 
+// TODO: add the rightsymbol too (otherwise probably not unique)
+key "FM" [FMFormatMap] `concat( @symbol, "::", @kind, ':', @argnr, ':', @leftargnr)`;
+
+
+#mspace_width = { "0.5ex"; }
+
+// symbols, overloaded for mathml presentation
+#for_s = { <m:mo { " &#x02200; "; } <m:mspace {@width=$mspace_width;} }
+#ex_s = { <m:mo { " &#x02203; "; } <m:mspace {@width=$mspace_width;} }
+#not_s = { <m:mo { " &#x000AC; "; } <m:mspace {@width=$mspace_width;} }
+#non_s = { <m:mo { " non "; } <m:mspace {@width=$mspace_width;} }
+#and_s = { <m:mo { " &#x02227; "; } <m:mspace {@width=$mspace_width;} }
+#imp_s = { <m:mo { " &#x021D2; "; } <m:mspace {@width=$mspace_width;} }
+#equiv_s = { <m:mo { " &#x021D4; "; } <m:mspace {@width=$mspace_width;} }
+#or_s = { <m:mo { " &#x02228; "; } <m:mspace {@width=$mspace_width;} }
+#holds_s = { <m:mo { " holds "; } <m:mspace {@width=$mspace_width;} }
+#being_s = { <m:mo { " : "; } <m:mspace {@width=$mspace_width;} }
+#be_s = { <m:mo { " be "; } <m:mspace {@width=$mspace_width;} }
+#st_s = { <m:mo { " st  "; } <m:mspace {@width=$mspace_width;} }
+#is_s = { <m:mo { " is "; } <m:mspace {@width=$mspace_width;} }
+#fraenkel_start = { <m:mo { " { "; } }
+#fraenkel_end = { <m:mo { " } "; } <m:mspace {@width=$mspace_width;} }
+#of_sel_s = { <m:mo { " of "; } <m:mspace {@width=$mspace_width;} }
+#of_typ_s = { <m:mo { " of "; } <m:mspace {@width=$mspace_width;} }
+#the_sel_s = { <m:mo { " the "; } <m:mspace {@width=$mspace_width;} }
+#choice_s = { <m:mo { " the "; } <m:mspace {@width=$mspace_width;} }
+#lbracket_s = { <m:mo { "("; } }
+#rbracket_s = { <m:mo { ")"; } <m:mspace {@width=$mspace_width;} }
+
+
+
+// overloading of identifiers to print m:mi
+tpl pqvar(#nr, #vid) 
+{ 
+    if [($print_identifiers > 0) and ($vid > 0)] 
+    {
+       $nm = { get_vid_name(#vid = $vid); }
+
+       <m:mi
+       {
+
+       if [$colored = "1"] 
+       { 
+	  <font 
+	  { 
+	     @color = $varcolor; 
+	     if [$titles="1"] { @title=`concat("b",$nr)`; } 
+	     $nm; 
+          }
+       }
+       else 
+       { 
+          $nm;
+       }
+       }
+    }
+    else 
+    { 
+       pvar(#nr = $nr); 
+    }
+}
+
+
+tpl pvar(#nr) { <m:mi { if [$colored="1"] { <font { @color=$varcolor; 
+    "b"; <sub { $nr;} } } else { "b"; <sub { $nr;} } } }
+
+tpl pconst(#nr) {  <m:mi { if [$colored="1"] { <font { @color=$constcolor; 
+    "c"; <sub { $nr;} } } else { "c"; <sub { $nr;} } } }
+
+// #pl gives the optional proof level
+tpl ppconst(#nr, #vid, #pl) 
+{ 
+    if [($print_identifiers > 0) and ($vid > 0)] 
+    {
+       $ctarget = 
+       { 
+         if [($const_links>0) and  ($pl)] { "c"; $nr; addp(#pl=$pl); } 
+	 else { `concat("c",$nr)`; }
+       }
+
+       $nm = { get_vid_name(#vid = $vid); }
+
+       <m:mi
+       { 
+
+       if [($const_links=2)] // const_links imply colored here
+       {
+	  <a 
+	  { 
+	      @class = "txt"; 
+	      @href  = `concat("#",$ctarget)`;
+	      <font 
+	      { 
+	         @color = $constcolor; 
+		 if [$titles="1"] { @title = $ctarget; } 
+		 $nm; 
+	      } 
+          } 
+       }       
+       else { if [$colored = "1"] 
+       { 
+	  <font 
+	  { 
+	     @color = $constcolor; 
+	     if [$titles="1"] { @title = $ctarget; } 
+	     $nm; 
+          } 
+       }
+       else { $nm;} } 
+       }
+    }
+    else { pconst(#nr = $nr); }
+}
+
+tpl pploci(#nr) 
+{ 
+    if [($print_identifiers > 0) and ($proof_links>0)]
+    {
+      $pl = get_nearest_level(#el = `..`); 
+      absconst(#nr = `@nr`, #pl = $pl);
+    }
+    else 
+    { 
+       pconst(#nr=`@nr`); 
+    }
+}
+
+tpl ploci(#nr) {  <m:mi { if [$colored="1"] { <font { @color=$locicolor; 
+    "a"; <sub { $nr;} } } else { "a"; <sub { $nr;} } } }
+
+tpl pschpvar(#nr) {  <m:mi { if [$colored="1"] { <font { @color=$schpcolor; 
+    "P"; <sub { $nr;} } } else { "P"; <sub { $nr;} } } }
+
+tpl pschfvar(#nr) {  <m:mi { if [$colored="1"] { <font { @color=$schfcolor; 
+    "F"; <sub { $nr;} } } else { "F"; <sub { $nr;} } } }
+
+tpl pppred(#nr) {  <m:mi { if [$colored="1"] { <font { @color=$ppcolor; 
+    "S"; <sub { $nr;} } } else { "S"; <sub { $nr;} } } }
+
+tpl ppfunc(#nr) {  <m:mi { if [$colored="1"] { <font { @color=$pfcolor; 
+    "H"; <sub { $nr;} } } else { "H"; <sub { $nr;} } } }
+
+
+
+// Get symbol of kind #sk and number #nr .
+// If $sk is K and $r=1, get the rightbracketsymbol with #rsnr instead.
+tpl get_vocsymbol(#sk, #snr, #r, #rsnr)
+{
+   $dkey = `concat('D_',$sk)`;
+
+   for-each [document($vocs,/)] 
+   {
+      if [key($dkey,$snr)] 
+      {
+          for-each [key($dkey,$snr)] 
+          { 
+             if [($sk='K') and ($r='1')] 
+             { 
+                for-each [key('D_L',$rsnr)] { `@name`; } 
+             }
+             else 
+             {  
+                `@name`; 
+             }
+          } 
+      }
+      // try the built-in symbols
+      else 
+      { 
+          choose 
+          { 
+             when [($snr='1') and ($sk='M')] { "set"; }
+             when [($snr='1') and ($sk='R')] { "="; }
+             when [($snr='1') and ($sk='K')] 
+             { 
+                if [$r='1'] { "]"; } else { "["; } 
+             } 
+             when [($snr='2') and ($sk='K')] 
+             { 
+                if [$r='1'] { "}"; } else { "{"; } 
+             }
+	     otherwise { `concat("FAILEDVOC:",$k,$nr)`; }
+          } 
+      }
+   }
+}
+
+// given an aticle-relative format number #fnr, return
+// the lookup key for the corresponding FMFormatMap
+tpl get_fmformat_key(#fnr)
+{
+  for-each [document($formats,/)] 
+  {
+      for-each [key('F',$fnr)] 
+      {
+          $snr  = `@symbolnr`; 
+	  $sk1  = `@kind`; 
+	  $sk   = { if [$sk1="L"] { "G";} else { $sk1; } }
+          $rsnr = { if [$sk='K'] { `@rightsymbolnr`; } }
+	  $sym  = { get_vocsymbol(#sk = $sk, #snr = $snr); }
+	  `concat($sym, '::', $sk1, ':', @argnr, ':', @leftargnr)`;
+      }
+  }
+}
+
+// rudimentary pp2 version for TeX (see mhtml_print_complex for the pretty 
+// printing equivalent html stuff, which this overrides)
+// currently just prints the strings and arguments given 
+// by their order in FMTranslPattern corresponding to format #fnr
+// TODO: how is texmode used? what are the rules of its application to arguments?
+tpl pp2(#k, #nr, #i, #vis, #la, #loci, #args, #np, #rsym, #parenth, #fnr, #pid)
+{
+   $fmkey = { get_fmformat_key(#fnr = $fnr); }
+
+   if [starts-with($fmkey,'FAILEDVOC')]  { $fmkey; }
+   else
+   {
+     // ":#"; $fmkey; ":#";
+     for-each [document($fmformats,/)] 
+     {
+        for-each [key('FM',$fmkey)] 
+        {
+          for-each [FMTranslPattern/*]
+	  {
+	     if [name()="Str"] 
+	     { 
+	        <m:mo 
+		{ 
+		   // if [not($parenth>0) or ($la>0)] { " "; } 
+		   abs(#k=$k, #nr=$nr, #sym=`@s`); 
+      		   " "; 
+		}
+		<m:mspace {@width=$mspace_width;}
+	     }
+	     else
+	     {
+	        // TODO: do the numbering of arguments in FMTranslPattern refer 
+		//       to only visible arguments, or all?? -taking visible now:
+                $x = `@x`;
+		$y = `$vis[position() = $x]/@x`;
+		apply[$args[position() = $y]](#p = $np, #i = $i);
+	     }
+	  }
+        }
+     }
+   }
+}
+
+tpl [Adjective](#i) 
+{ 
+     $pi    = { patt_info(#k="V", #nr=`@nr`, #pid =`@pid`); }
+     $fnr   = car(#l = $pi);
+     $anto  = cadr(#l = $pi);
+     $plink = third(#l = $pi);
+
+     $pid   = { if [$plink="1"] { `@pid`; } else { "0";} }
+     $neg   = { if [@value="false"] { `($anto + 1) mod 2`; } else { `$anto mod 2`; }}
+
+     if [$neg="1"] 
+     { 
+        copy-of $non_s;
+     }
+
+     pp2(#k = "V", #nr=`@nr`, #i=$i, #vis="", #la="", #args="", #np="0", #fnr=$fnr, #pid=`@pid`);
+//     abs(#k="V", #nr=`@nr`, 
+//         #sym=abs1(#k="V", #nr=`@nr`, #fnr=$fnr, #pid=$pid), #pid = $pid); 
+}
+
+
+tpl pp1(#k,#nr,#args,#vis,#fnr,#parenth,#loci,#pid,#i) 
+{
+    $la = { if [($k='M') or ($k='G') or ($k='L')] {  "0"; } 
+            else { for-each [document($formats,/)] {
+                     for-each [key('F',$fnr)] 
+		     { 
+		       choose
+		       { 
+		         when [@kind="V"] { `@argnr - 1`;}
+                         when [@leftargnr] { `@leftargnr`;} 
+			 otherwise { "0";} 
+                       }
+                     }}} 
+          }
+    // try if right bracket - returns '' if not
+    $rsym = { if [($k='K') and ($la='0')] { abs1(#k=$k, #nr=$nr, #r="1"); } }
+    $np = { if [not($vis) or ($k='G')] { "0"; } else {
+               if [$parenth>0] { $parenth; } else { 
+                  if [not($rsym='')] { "1"; } else { "0";} } } }
+    $paren_color = `$np mod $pcolors_nr`;
+
+    // print spanned paranthesis or left bracket
+    if [($parenspans = 1) and ($np > 0)] 
+    { 
+       <span 
+       { 
+          @class=`concat("p",$paren_color)`;
+
+	  <m:mo 
+	  { 
+	  if [$rsym=''] 
+	  { 
+	     "("; 
+	  } 
+	  else 
+	  { 
+             abs(#k=$k, #nr=$nr, #sym=abs1(#k=$k, #nr=$nr, #fnr=$fnr), #pid=$pid); 
+	  }
+	  }
+
+	  <span 
+	  { 
+             @class="default";
+	     pp2(#k = $k, #nr = $nr, #i = $i, #vis = $vis, #la = $la, #loci = $loci, #args = $args, 
+	         #np = $np, #rsym = $rsym, #parenth = $parenth, #fnr = $fnr, #pid = $pid);
+          }
+
+	  <m:mo { if [$rsym=''] { ")"; } else { abs(#k=$k, #nr=$nr, #sym=$rsym, #pid=$pid); } } 
+       }
+    } 
+    else 
+    {
+       if[($np > 0)]
+       {
+          <m:mo
+	  { 
+          if [$rsym=''] { "("; }  
+	  else 
+	  { 
+             abs(#k=$k, #nr=$nr, #sym=abs1(#k=$k, #nr=$nr, #fnr=$fnr), #pid=$pid); 
+	  }
+	  }
+       }
+
+       pp2(#k = $k, #nr = $nr, #i = $i, #vis = $vis, #la = $la, #loci = $loci, #args = $args, 
+           #np = $np, #rsym = $rsym, #parenth = $parenth, #fnr = $fnr, #pid = $pid);
+
+       if[($np > 0)]
+       {
+          <m:mo { if [$rsym=''] { ")"; } else { abs(#k=$k, #nr=$nr, #sym=$rsym, #pid=$pid); } }
+       }
+    }
+}
+
+
+tpl [Proposition] 
+{ 
+    if [following-sibling::*[1][(name()="By") and (@linked="true")]] 
+    { 
+       if [not((name(..) = "Consider") or (name(..) = "Reconsider") 
+           or (name(..) = "Conclusion"))] 
+       { 
+          "then ";
+       }
+    }
+
+    if [@nr>0] 
+    { 
+       if [($proof_links>0) and ($print_lab_identifiers = 0) 
+            and not(string-length(@plevel)>0)]
+       { 
+	  plab1(#nr=`@nr`,#txt="Lemma"); 
+       }
+       else { pplab(#nr=`@nr`, #vid = `@vid`); }
+
+       ": ";
+    }
+
+    <m:math { <m:mrow { apply; " "; } }
+}
+
+tpl add_hs_attrs { }
+
+tpl add_hs2_attrs { }
+
+tpl add_hsNdiv_attrs { }
+
+tpl add_ajax_attrs(#u) { }
+
+tpl mkref(#aid, #nr, #k, #c, #nm) 
+{
+  $mk  =  { refkind(#kind = $k); }
+  $alc =  { lc(#s = $aid); }
+
+      if [$nm] 
+      { 
+        $nm; 
+      }
+      else 
+      {
+        $aid; ":";
+
+        if [not($k="T")] 
+	{
+          $mk; " ";
+        }
+
+        $nr;
+      }
+
+}
+
+
+
+
+// add the constructor/pattern href, $c tells if it is from current article
+// #sym is optional Mizar symbol
+// #pid links to  patterns instead of constructors
+// tpl absref(#elems, #c, #sym, #pid)
+// { 
+//    $n1 = { if [($pid > 0)] { "N"; } else { ""; } }
+
+//    for-each [$elems] 
+//    { 
+//       $mk0  = mkind(#kind = `@kind`); 
+//       $mk   = { if [($pid > 0)] { `concat($mk0, "not")`; } else { $mk0; } }
+//       $alc  = lc(#s=`@aid`);
+
+
+// 	 if [$sym] 
+// 	 { 
+// 	    $sym; 
+// 	 }
+// 	 else 
+// 	 { 
+// 	    if [$relnames > 0]
+// 	    { 
+// 	       $n1; `@kind`; `@relnr`; 
+// 	    }
+// 	    else 
+// 	    { 
+// 	       $n1; `@kind`; `@nr`; "_"; `@aid`;  
+// 	    } 
+// 	 }
+      
+//    } 
+// }
+
+tpl [AUTHOR|TITLE|ACKNOWLEDGEMENT|SUMMARY|NOTE|ADDRESS]
+{ 
+  pcomment(#str=`text()`); 
+  apply;
+}
+
+
+
+tpl [DATE]
+{ 
+  pcomment(#str=`concat("Received ", @month," ", @day, ", ", @year)`); 
+}
+
+
+tpl [ARTICLE_BIB] { apply; }
+
+
+
+// Default
+// tpl [/] { 
+
+// for-each [document($bibtex,/)] 
+//      {
+//         apply[ARTICLE_BIB];
+//      }
+
+
+// first read the keys for imported stuff
+//          apply[document($constrs,/)/Constructors/Constructor]; 
+//          apply[document($thms,/)/Theorems/Theorem]; 
+//          apply[document($schms,/)/Schemes/Scheme];
+ 
+// then process the whole document
+//          apply; 
+
+tpl [/] { if [$generate_items = "1"] { 
+    apply[/*/JustifiedTheorem|/*/DefTheorem|/*/SchemeBlock];
+    apply[//RCluster|//CCluster|//FCluster|//Definition|//IdentifyWithExp];
+// top-level lemmas
+   for-each [/*/Proposition] 
+   {
+// <xsl:document href="proofhtml/lemma/{$anamelc}.{@propnr}" format="html">
+      apply[`.`];
+// </xsl:document>
+   $bogus=`1`;
+   } 
+}
+
+else { 
+if [$body_only = "0"] { 
+    <html { 
+    
+
+// output the css defaults for div and p (for indenting)
+        <style { @type="text/css";  "
+div { padding: 0 0 0 0; margin: 0 0 0 0; } 
+div.add { padding-left: 3mm; padding-bottom: 0mm;  margin: 0 0 0 0; } 
+div.box { border-width:thin; border-color:blue; border-style:solid; }
+p { margin: 0 0 0 0; } 
+body {font-family: monospace; margin: 0px;}
+a {text-decoration:none} a:hover { color: red; } 
+a.ref { font-size:x-small; }
+a.ref:link { color:green; } 
+a.ref:hover { color: red; } 
+a.txt:link { color:black; } 
+a.txt:hover { color: red; } 
+.wikiactions ul { background-color: DarkSeaGreen ; color:blue; margin: 0; padding: 6px; list-style-type: none; border-bottom: 1px solid #000; }
+.wikiactions li { display: inline; padding: .2em .4em; }
+.wikiactions a {text-decoration:underline;} 
+span.kw {font-weight: bold; }
+span.lab {font-style: italic; }
+span.comment {font-style: italic; }
+span.hide { display: none; }
+span.p1:hover { color : inherit; background-color : #BAFFFF; } 
+span.p2:hover { color : inherit; background-color : #FFCACA; }
+span.p3:hover { color : inherit; background-color : #FFFFBA; }
+span.p4:hover { color : inherit; background-color : #CACAFF; }
+span.p5:hover { color : inherit; background-color : #CAFFCA; }
+span.p0:hover { color : inherit; background-color : #FFBAFF; }
+.default { background-color: white; color: black; } 
+.default:hover { background-color: white; color: black; }
+:target { background: ##5D9BF7; border: solid 1px #aaa;}
+";
+	                } 
+        <head {  
+<title { 
+  if [$mk_header > 0]
+  {
+     $aname; ": "; for-each [document($hdr,/)/Header/dc:title] { `text()`; }
+  }
+  else { $aname; }}
+<script { @type="text/javascript";
+"
+<!-- 
+function hs(obj)
+{
+// document.getElementById('myimage').nextSibling.style.display = 'block';
+if (obj.nextSibling.style.display == 'inline')
+ { obj.nextSibling.style.display = 'none'; }
+else { if (obj.nextSibling.style.display == 'none')
+ { obj.nextSibling.style.display = 'inline'; }
+ else { obj.nextSibling.style.display = 'inline';  }}
+return false;
+}
+
+function hs2(obj)
+{
+if (obj.nextSibling.style.display == 'block')
+ { obj.nextSibling.style.display = 'none'; }
+else { if (obj.nextSibling.style.display == 'none')
+ { obj.nextSibling.style.display = 'block'; }
+ else { obj.nextSibling.style.display = 'none';  }}
+return false;
+}
+function hsNdiv(obj)
+{
+var ndiv = obj;
+while (ndiv.nextSibling.nodeName != 'DIV') { ndiv = ndiv.nextSibling; }
+return hs2(ndiv);
+}
+
+// explorer7 implements XMLHttpRequest in some strange way
+function makeRequest(obj,url) {
+        var http_request = false;
+        if (window.XMLHttpRequest && !(window.ActiveXObject)) { // Mozilla, Safari,...
+            http_request = new XMLHttpRequest();
+            if (http_request.overrideMimeType) {
+                http_request.overrideMimeType('text/xml');
+            }
+        } else if (window.ActiveXObject) { // IE
+            try {
+                http_request = new ActiveXObject('Msxml2.XMLHTTP');
+            } catch (e) {
+                try {
+                    http_request = new ActiveXObject('Microsoft.XMLHTTP');
+                } catch (e) {}
+            }
+        }
+        if (!http_request) {
+            alert('Giving up :( Cannot create an XMLHTTP instance');
+            return false;
+        }
+        http_request.onreadystatechange = function() { insertRequest(obj,http_request); };
+        http_request.open('GET', url, true);
+        http_request.send(null);
+    }
+// commented the 200 state to have local requests too
+function insertRequest(obj,http_request) {
+        if (http_request.readyState == 4) {
+//            if (http_request.status == 200) {
+	    var ndiv = obj;
+	    while (ndiv.nodeName != 'SPAN') { ndiv = ndiv.nextSibling; }
+	    ndiv.innerHTML = http_request.responseText;
+	    obj.onclick = function(){ return hs2(obj) };
+//            } else {
+//                alert('There was a problem with the request.');
+//		alert(http_request.status);
+//            }
+	    }}
+// End -->
+"; }
+if [$idv>0]
+{
+<script { @type="text/javascript";
+"
+<!--
+var tstp_dump;
+function openSoTSTP (dump) {
+var tstp_url = 'http://www.cs.miami.edu/~tptp/cgi-bin/SystemOnTSTP';
+var tstp_browser = window.open(tstp_url, '_blank');
+tstp_dump = dump;
+}
+function getTSTPDump () {
+return tstp_dump;
+}
+// End -->
+";
+}}
+<base { @target=$default_target; }
+// if [$linking = "s"] { @target="_self"; } else { @target="mmlquery";} } 
+// <!-- 
+// var browse_url = \"http://merak.pb.bialystok.pl/mmlquery/fillin.php?entry=\"
+// function l1(c) { location = browse_url + c }
+// // End -->
+// "; }
+}
+        <body {  
+
+	if[$wiki_links=1]
+	{
+	   <div 
+	   {  
+	      @class="wikiactions";
+	      <ul
+	      {
+	        <li {  <a { @href=`concat($lmwikicgi,"?p=",$lgitproject,";a=edit;f=mml/",$anamelc,".miz")`; @rel="nofollow"; "Edit"; } }
+	        <li {  <a { @href=`concat($lmwikicgi,"?p=",$lgitproject,";a=history;f=mml/",$anamelc,".miz")`; "History"; } }
+		<li {  <a { @href=`concat($lmwikicgi,"?p=",$lgitproject,";a=blob_plain;f=mml/",$anamelc,".miz")`; @rel="nofollow"; "Raw"; } }
+//		<li {  <a { @href=`concat("../discussion/",$anamelc, ".html")`; "Discussion"; } }
+		<li {  <a { @href=$lmwikiindex; "Index"; } }
+		<li {  <a { @href=`concat($lmwikicgi,"?p=",$lgitproject,";a=gitweb")`; "Gitweb"; } }
+//		<li {  "Clone:"; $lgitclone; <br; }
+               }
+            }
+        }
+
+	if[$mk_header > 0] { apply[document($hdr,/)/Header/*]; <br; }
+
+// first read the keys for imported stuff
+//          apply[document($constrs,/)/Constructors/Constructor]; 
+//          apply[document($thms,/)/Theorems/Theorem]; 
+//          apply[document($schms,/)/Schemes/Scheme];
+ 
+// then process the whole document
+          apply; }}}
+  
+     // $body_only > 0
+     else 
+     {
+       if[$mk_header > 0] { apply[document($hdr,/)/Header/*]; <br; }
+       apply;
+     }
+  }
+}
+  
+// tpl [*] { copy { apply [@*]; apply; } }
+// tpl [@*] { copy-of `.`; }
+
+// Header rules
+tpl [dc:title] { pcomment(#str=`text()`); }
+tpl [dc:creator] { pcomment(#str=`concat("by ", text())`); pcomment(#str=""); }
+tpl [dc:date] { pcomment(#str=`concat("Received ", text())`); }
+tpl [dc:rights] { pcomment(#str=`concat("Copyright ", text())`); }
+
+
+  
+// tpl [*] { copy { apply [@*]; apply; } }
+// tpl [@*] { copy-of `.`; }
+

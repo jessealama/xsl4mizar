@@ -624,6 +624,20 @@
     <xsl:param name="parenth"/>
     <xsl:param name="fnr"/>
     <xsl:param name="pid"/>
+    <xsl:variable name="visnr" select="count($vis)"/>
+    <xsl:variable name="dofuncbrackets">
+      <xsl:choose>
+        <xsl:when test="($rsym=&apos;&apos;) and ($mizar_brackets &gt; 0) and ($k = &quot;K&quot;)">
+          <xsl:text>1</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="($dofuncbrackets&gt;0) and ($la&gt;1)">
+      <xsl:text>(</xsl:text>
+    </xsl:if>
     <!-- print left args -->
     <xsl:for-each select="$vis">
       <xsl:if test="position() &lt;= $la">
@@ -656,10 +670,24 @@
         </xsl:if>
       </xsl:if>
     </xsl:for-each>
+    <xsl:if test="($dofuncbrackets&gt;0) and ($la&gt;1)">
+      <xsl:text>)</xsl:text>
+    </xsl:if>
     <!-- print symbol -->
     <xsl:if test="$rsym=&apos;&apos;">
+      <!-- only consider printing space if $parenth was not printed or there were left args -->
+      <!-- there were left arg(s), and $dofuncbrackets>0 (we are inside a functor), the left arg(s) will have brackets -->
+      <!-- then if $funcs_no_spaces>0 don't do the space -->
       <xsl:if test="not($parenth&gt;0) or ($la&gt;0)">
-        <xsl:text> </xsl:text>
+        <!-- do not print space if either: -->
+        <!-- opening parenth was printed and no left args exist -->
+        <!-- or -->
+        <!-- $la>1 and we do func brackets (that means a closing bracket of args was printed) -->
+        <!-- or $la=1 and the left arg got its own parenth (this si implied by $parenth>0) -->
+        <xsl:if test="not(($k=&apos;K&apos;) and ($parenth&gt;0) and ($la=0)) 
+      	  and not(($funcs_no_spaces&gt;0) and ($dofuncbrackets&gt;0) and ($la&gt;0))">
+          <xsl:text> </xsl:text>
+        </xsl:if>
       </xsl:if>
       <xsl:call-template name="abs">
         <xsl:with-param name="k" select="$k"/>
@@ -676,7 +704,17 @@
       <xsl:if test="$k=&apos;G&apos;">
         <xsl:text>(#</xsl:text>
       </xsl:if>
-      <xsl:text> </xsl:text>
+      <!-- do not print space if either: -->
+      <!-- closing parenth will be printed and no right args exist -->
+      <!-- or -->
+      <!-- $ra>1 and we do func brackets (that means an opening bracket of args will be printed) -->
+      <xsl:if test="not(($k=&apos;K&apos;) and ($parenth&gt;0) and (($visnr - $la)=0)) 
+          and not(($funcs_no_spaces&gt;0) and ($dofuncbrackets&gt;0) and (($visnr - $la)&gt;0))">
+        <xsl:text> </xsl:text>
+      </xsl:if>
+    </xsl:if>
+    <xsl:if test="($dofuncbrackets&gt;0) and (($visnr - $la)&gt;1)">
+      <xsl:text>(</xsl:text>
     </xsl:if>
     <!-- print right args preceded by "of" for types -->
     <xsl:for-each select="$vis">
@@ -715,6 +753,9 @@
     </xsl:for-each>
     <xsl:if test="$k=&apos;G&apos;">
       <xsl:text> #)</xsl:text>
+    </xsl:if>
+    <xsl:if test="($dofuncbrackets&gt;0) and (($visnr - $la)&gt;1)">
+      <xsl:text>)</xsl:text>
     </xsl:if>
   </xsl:template>
 
