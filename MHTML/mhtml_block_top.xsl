@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <xsl:include href="mhtml_reasoning.xsl"/>
 
   <!-- $Revision: 1.19 $ -->
@@ -1657,11 +1657,7 @@
   <!-- separate top-level items by additional newline -->
   <xsl:template match="Article">
     <xsl:element name="div">
-      <xsl:if test="not($mk_header &gt; 0)">
-        <xsl:call-template name="pcomment0">
-          <xsl:with-param name="str" select="concat($aname, &quot;  semantic presentation&quot;)"/>
-        </xsl:call-template>
-      </xsl:if>
+      <xsl:if test="not($mk_header &gt; 0)"/>
       <xsl:if test="$idv &gt; 0">
         <xsl:call-template name="idv_for_top"/>
       </xsl:if>
@@ -1675,14 +1671,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template match="Section">
-    <xsl:call-template name="pkeyword">
-      <xsl:with-param name="str">
-        <xsl:text>begin</xsl:text>
-      </xsl:with-param>
-    </xsl:call-template>
-    <xsl:element name="br"/>
-  </xsl:template>
+  <xsl:template match="Section"/>
 
   <!-- processing of imported documents -->
   <xsl:template match="Theorem">
@@ -1756,7 +1745,7 @@
   <!-- environmental constructors, or constructor retrieved from other file -->
   <!-- #argt is explicit list of argument types, useful for -->
   <!-- getting the @vid (identifier numbers) of loci -->
-  <!-- #nrt tells not to showthe result type(s) -->
+  <!-- #nrt tells not to show the result type(s) -->
   <!-- #old says that the constructor is from a redefinition and not new, -->
   <!-- so an anchor should not be created -->
   <xsl:template match="Constructor">

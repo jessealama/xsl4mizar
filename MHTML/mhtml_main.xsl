@@ -2,9 +2,9 @@
 
 <xsl:stylesheet version="1.0" extension-element-prefixes="dc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="xml"/>
-  <xsl:output doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"/>
-  <xsl:output doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>
-  <xsl:output omit-xml-declaration="no"/>
+  <xsl:output doctype-public=""/>
+  <xsl:output doctype-system=""/>
+  <xsl:output omit-xml-declaration="yes"/>
   <!-- $Revision: 1.8 $ -->
   <!--  -->
   <!-- File: mhtml_main.xsltxt - html-ization of Mizar XML, main file -->
@@ -74,6 +74,7 @@ a.txt:link { color:black; }
 a.txt:hover { color: red; } 
 .wikiactions ul { background-color: DarkSeaGreen ; color:blue; margin: 0; padding: 6px; list-style-type: none; border-bottom: 1px solid #000; }
 .wikiactions li { display: inline; padding: .2em .4em; }
+.wikiactions a {text-decoration:underline;} 
 span.kw {font-weight: bold; }
 span.lab {font-style: italic; }
 span.comment {font-style: italic; }
@@ -223,7 +224,7 @@ return tstp_dump;
                       <xsl:element name="li">
                         <xsl:element name="a">
                           <xsl:attribute name="href">
-                            <xsl:value-of select="concat($lgitwebcgi,&quot;?p=&quot;,$lgitproject,&quot;;a=history;f=mml/&quot;,$anamelc,&quot;.miz&quot;)"/>
+                            <xsl:value-of select="concat($lmwikicgi,&quot;?p=&quot;,$lgitproject,&quot;;a=history;f=mml/&quot;,$anamelc,&quot;.miz&quot;)"/>
                           </xsl:attribute>
                           <xsl:text>History</xsl:text>
                         </xsl:element>
@@ -231,7 +232,7 @@ return tstp_dump;
                       <xsl:element name="li">
                         <xsl:element name="a">
                           <xsl:attribute name="href">
-                            <xsl:value-of select="concat($lgitwebcgi,&quot;?p=&quot;,$lgitproject,&quot;;a=blob_plain;f=mml/&quot;,$anamelc,&quot;.miz&quot;)"/>
+                            <xsl:value-of select="concat($lmwikicgi,&quot;?p=&quot;,$lgitproject,&quot;;a=blob_plain;f=mml/&quot;,$anamelc,&quot;.miz&quot;)"/>
                           </xsl:attribute>
                           <xsl:attribute name="rel">
                             <xsl:text>nofollow</xsl:text>
@@ -239,18 +240,11 @@ return tstp_dump;
                           <xsl:text>Raw</xsl:text>
                         </xsl:element>
                       </xsl:element>
+                      <!-- <li {  <a { @href=`concat("../discussion/",$anamelc, ".html")`; "Discussion"; } } -->
                       <xsl:element name="li">
                         <xsl:element name="a">
                           <xsl:attribute name="href">
-                            <xsl:value-of select="concat(&quot;../discussion/&quot;,$anamelc, &quot;.html&quot;)"/>
-                          </xsl:attribute>
-                          <xsl:text>Discussion</xsl:text>
-                        </xsl:element>
-                      </xsl:element>
-                      <xsl:element name="li">
-                        <xsl:element name="a">
-                          <xsl:attribute name="href">
-                            <xsl:text>../index.html</xsl:text>
+                            <xsl:value-of select="$lmwikiindex"/>
                           </xsl:attribute>
                           <xsl:text>Index</xsl:text>
                         </xsl:element>
@@ -258,7 +252,7 @@ return tstp_dump;
                       <xsl:element name="li">
                         <xsl:element name="a">
                           <xsl:attribute name="href">
-                            <xsl:value-of select="concat($lgitwebcgi,&quot;?p=&quot;,$lgitproject)"/>
+                            <xsl:value-of select="concat($lmwikicgi,&quot;?p=&quot;,$lgitproject,&quot;;a=gitweb&quot;)"/>
                           </xsl:attribute>
                           <xsl:text>Gitweb</xsl:text>
                         </xsl:element>
