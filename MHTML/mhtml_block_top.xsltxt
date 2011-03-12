@@ -252,7 +252,7 @@ tpl jt
     }
     else 
     { 
-       for-each [Proposition[@nr > 0]] { pplab(#nr=`@nr`, #vid=`@vid`); ": "; }
+       for-each [Proposition[@nr > 0]] { }
     }
 
     <a 
