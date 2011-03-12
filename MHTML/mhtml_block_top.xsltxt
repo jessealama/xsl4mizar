@@ -280,7 +280,7 @@ tpl jt
 
     if [Proof] 
     { 
-       <div { @class="mhtml,add"; apply[*[1]/*[1]]; } 
+       <div { @class="mhtml add"; apply[*[1]/*[1]]; } 
        if [not($generate_items>0) or ($generate_items_proofs>0)]
        {
          apply[*[2]]; 
@@ -290,7 +290,7 @@ tpl jt
     { 
        <div 
        { 
-          @class="mhtml,add"; 
+          @class="mhtml add"; 
 
           if [Proposition/Verum] 
 	  { 
@@ -383,7 +383,7 @@ tpl add_ar_iconif(#line,#col)
             if[$ajax_by > 0] { add_ajax_attrs(#u=$byurl); }
 	    else
 	    {
-	       @href=$byurl; @class="mhtml,txt"; 
+	       @href=$byurl; @class="mhtml txt"; 
 	       if[$linkbytoself > 0] {@target="_self"; } else {@target="byATP";} 
             }
 	    $txt = { mk_by_title(#line=$line,#col=$col); }
@@ -446,7 +446,7 @@ tpl [JustifiedProperty]
      
    }
 
-   <span { @class="mhtml,hide"; <br; apply[*[2]]; }
+   <span { @class="mhtml hide"; <br; apply[*[2]]; }
    apply[*[position()>2]]; 
 }
 
@@ -460,7 +460,7 @@ tpl [UnknownCorrCond|Coherence|Compatibility|Consistency|Existence|Uniqueness]
       pkeyword(#str=$nm); " ";
    }
 
-   <span { @class="mhtml,hide"; <br; apply[*[1]]; }
+   <span { @class="mhtml hide"; <br; apply[*[1]]; }
    if [count(*)>1] { apply[*[position()>1]];  } else { ";"; <br; }
 }
 
@@ -468,7 +468,7 @@ tpl [UnknownCorrCond|Coherence|Compatibility|Consistency|Existence|Uniqueness]
 tpl [Correctness] { 
 <a { add_hs_attrs(); pkeyword(#str="correctness "); }
 // apply to subconditions , skip their conjunction
-<span { @class="mhtml,hide"; <br; apply[*[position()<(last()-1)]]; }
+<span { @class="mhtml hide"; <br; apply[*[position()<(last()-1)]]; }
 apply[*[position()=last()]]; }
 
 tpl [Canceled] { pkeyword(#str="canceled;"); <br; }
@@ -519,13 +519,13 @@ tpl sd
     "{ ";
     list(#separ=", ", #elems=`SchemeFuncDecl|SchemePredDecl`); 
     " } :"; <br;
-    <div { @class="mhtml,add"; apply[Proposition]; } 
+    <div { @class="mhtml add"; apply[Proposition]; } 
     if [SchemePremises/Proposition] 
     { 
        pkeyword(#str="provided");
        <div 
        { 
-          @class="mhtml,add"; 
+          @class="mhtml add"; 
 	  andlist(#elems=`SchemePremises/Proposition`); 
        } 
     }
@@ -716,7 +716,7 @@ tpl [DefinitionBlock]
    { 
       @class="mhtml";
       pkeyword(#str="definition");
-      <div { @class="mhtml,add"; apply[*[not(name()='EndPosition')]]; }
+      <div { @class="mhtml add"; apply[*[not(name()='EndPosition')]]; }
       pkeyword(#str="end;");
    }
 }
@@ -732,14 +732,14 @@ tpl [IdentifyRegistration] { apply; }
 tpl [RegistrationBlock] 
 {
     <div { @class="mhtml"; pkeyword(#str="registration");
-    <div { @class="mhtml,add"; apply[*[not(name()='EndPosition')]]; }
+    <div { @class="mhtml add"; apply[*[not(name()='EndPosition')]]; }
     pkeyword(#str="end;"); }  
 } 
 
 tpl [NotationBlock] 
 {
     <div { @class="mhtml"; pkeyword(#str="notation");
-    <div { @class="mhtml,add"; apply[*[not(name()='EndPosition')]]; }
+    <div { @class="mhtml add"; apply[*[not(name()='EndPosition')]]; }
     pkeyword(#str="end;"); }  
 } 
 
@@ -753,7 +753,7 @@ tpl [CaseBlock]
 { 
     <div { @class="mhtml"; <a { @class="mhtml"; add_hsNdiv_attrs(); if [$proof_links>0] { @title=`@newlevel`; } pkeyword(#str="case "); }
     apply[Case];
-    <div { @class="mhtml,add"; apply[*[not(name()='Case')]]; }
+    <div { @class="mhtml add"; apply[*[not(name()='Case')]]; }
     pkeyword(#str="end;"); } 
 }
 
@@ -761,7 +761,7 @@ tpl [SupposeBlock]
 {
     <div { @class="mhtml"; <a { @class="mhtml"; add_hsNdiv_attrs(); if [$proof_links>0] { @title=`@newlevel`; } pkeyword(#str="suppose "); } 
     apply[Suppose];
-    <div { @class="mhtml,add"; apply[*[not(name()='Suppose')]]; }
+    <div { @class="mhtml add"; apply[*[not(name()='Suppose')]]; }
     pkeyword(#str="end;"); } 
 }
 
@@ -786,7 +786,7 @@ tpl [PerCasesReasoning]
 
        <div 
        { 
-          @class="mhtml,add"; apply[BlockThesis];
+          @class="mhtml add"; apply[BlockThesis];
 	  apply[Thesis];
 	  apply[CaseBlock | SupposeBlock]; 
        }
@@ -812,7 +812,7 @@ tpl [Proof/Proof | Now/Proof | Conclusion/Proof | CaseBlock/Proof | SupposeBlock
 	  pkeyword(#str="proof "); 
        }
 //       add_ar_iconif(#line=`EndPosition[1]/@line`, #col=`EndPosition[1]/@col`);
-       <div { @class="mhtml,add"; apply; }
+       <div { @class="mhtml add"; apply; }
        pkeyword(#str="end;"); 
     } 
 }
@@ -835,11 +835,11 @@ tpl [Proof] {
 //	  add_ar_iconif(#line=`EndPosition[1]/@line`, #col=`EndPosition[1]/@col`); 
          if [$ajax_proofs>0]	{ <span { if[$ajax_proofs=2] {@filebasedproofinsert=`@newlevel`;}} 
 // <xsl:document href="{$ajax_proof_dir}/{$anamelc}/{@newlevel}" format="html">
-	    <div { @class="mhtml,add"; apply; }
+	    <div { @class="mhtml add"; apply; }
 // </xsl:document>
    $bogus=`1`;
  }
-	 else { <div { @class="mhtml,add"; apply; } }
+	 else { <div { @class="mhtml add"; apply; } }
 	 pkeyword(#str="end;"); 
 	 } 
      }
@@ -878,7 +878,7 @@ tpl now_body
 {
    <div 
    { 
-      @class="mhtml,add"; 
+      @class="mhtml add"; 
       apply[BlockThesis];
       apply[*[not(name()='BlockThesis')]]; 
    } 

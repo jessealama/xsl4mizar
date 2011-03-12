@@ -82,7 +82,7 @@ tpl linkbyif(#line,#col,#by)
             if[$ajax_by > 0] { add_ajax_attrs(#u=$byurl); }
 	    else
 	    {
-	       @href=$byurl; @class="mhtml,txt"; 
+	       @href=$byurl; @class="mhtml txt"; 
 	       if[$linkbytoself > 0] {@target="_self"; } else {@target="byATP";} 
             }
 	    if [$by_titles>0] { @title=mk_by_title(#line=$line,#col=$col); }
@@ -101,7 +101,7 @@ tpl [By	](#nbr)
    if [(count(Ref)>0)] 
    { 
       linkbyif(#line = `@line`, #col = `@col`,#by = "by");
-      <span { @class="mhtml,lab"; list(#separ = ", ", #elems = `Ref`); } 
+      <span { @class="mhtml lab"; list(#separ = ", ", #elems = `Ref`); } 
       ";"; 
    }
    else 
@@ -115,13 +115,13 @@ tpl [By	](#nbr)
 
 tpl [IterStep/By] { if [(count(Ref)>0)] { 
       linkbyif(#line=`@line`,#col=`@col`,#by="by");
-      <span { @class="mhtml,lab"; list(#separ=", ", #elems=`Ref`); } }}
+      <span { @class="mhtml lab"; list(#separ=", ", #elems=`Ref`); } }}
 tpl [From](#nbr) 
 { 
     linkbyif(#line=`@line`,#col=`@col`,#by="from");
     <span 
     { 
-        @class="mhtml,lab";
+        @class="mhtml lab";
         getref(#k="S", #anr=`@articlenr`, #nr=`@nr`); "(";
 	list(#separ=", ", #elems=`Ref`); ")"; ";"; 
 	if [not($nbr="1")] { <br;  } 
@@ -130,7 +130,7 @@ tpl [From](#nbr)
 tpl [IterStep/From] 
 { 
    linkbyif(#line=`@line`,#col=`@col`,#by="from");
-   <span { @class="mhtml,lab"; getref(#k="S", #anr=`@articlenr`, #nr=`@nr`); "(";
+   <span { @class="mhtml lab"; getref(#k="S", #anr=`@articlenr`, #nr=`@nr`); "(";
         list(#separ=", ", #elems=`Ref`); ")"; } 
 }
 
@@ -159,7 +159,7 @@ tpl top_propname(#el)
 
 	 <a 
 	 { 
-	    @class = "mhtml,txt"; 
+	    @class = "mhtml txt"; 
 	    @href  = `concat($anamelc, ".", $ext, "#","E",$k2)`;  
 	    if [($print_lab_identifiers > 0) and ($el/@vid > 0)] 
 	    { 
@@ -185,7 +185,7 @@ tpl privname(#nr,#pl) {
 	      $txt= { propname(#n = `@propnr`, #pl = $pl); } 
 	      <a 
 	      { 
-	         @class = "mhtml,txt"; 
+	         @class = "mhtml txt"; 
 //		 @href  = `concat($anamelc, ".", $ext, "#",$txt)`;
 		 @href  = `concat("#",$txt)`;
 		 pplab(#nr=`@nr`, #vid = `@vid`); 
@@ -549,7 +549,7 @@ tpl do_thesis(#nd)
 	  pcomment0(#str=" thesis: ");      
 	}
 
-	<span { @class="mhtml,hide"; " "; apply[*[1]]; }
+	<span { @class="mhtml hide"; " "; apply[*[1]]; }
   }
 }
 
@@ -637,7 +637,7 @@ tpl [PerCases]
 
   <span 
   {
-    @class = "mhtml,hide";
+    @class = "mhtml hide";
     apply [*[1]];
   }
 

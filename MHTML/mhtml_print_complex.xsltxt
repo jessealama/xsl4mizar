@@ -24,7 +24,7 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
   $mk  =  { refkind(#kind = $k); }
   $alc =  { lc(#s = $aid); }
   <a {
-      @class = "mhtml,ref";
+      @class = "mhtml ref";
 
       if [($linking = 'q') or (($linking = 'm') and not($c))] 
       {
@@ -295,7 +295,7 @@ tpl pp1(#k,#nr,#args,#vis,#fnr,#parenth,#loci,#pid,#i)
 
 	  <span 
 	  { 
-             @class="mhtml,default";
+             @class="mhtml default";
 	     pp2(#k = $k, #nr = $nr, #i = $i, #vis = $vis, #la = $la, #loci = $loci, #args = $args, 
 	         #np = $np, #rsym = $rsym, #parenth = $parenth, #fnr = $fnr, #pid = $pid);
           }
