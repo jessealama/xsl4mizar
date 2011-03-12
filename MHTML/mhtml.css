@@ -1,114 +1,114 @@
-div {
+div.mhtml {
 	padding: 0 0 0 0;
 	margin: 0 0 0 0;
 }
 
-div.add {
+div.mhtml.add {
 	padding-left: 3mm;
 	padding-bottom: 0mm;
 	margin: 0 0 0 0;
 }
 
-div.box {
+div.mhtml.box {
 	border-width: thin;
 	border-color: blue;
 	border-style: solid;
 }
 
-p {
+p.mhtml {
 	margin: 0 0 0 0;
 }
 
-body {
+body.mhtml {
 	font-family: monospace;
 	margin: 0px;
 }
 
-a {
+a.mhtml {
 	text-decoration: none
 }
 
-a:hover {
+a.mhtml:hover {
 	color: red;
 }
 
-a.ref {
+a.mhtml.ref {
 	font-size: x-small;
 }
 
-a.ref:link {
+a.mhtml.ref:link {
 	color: green;
 }
 
-a.ref:hover {
+a.mhtml.ref:hover {
 	color: red;
 }
 
-a.txt:link {
+a.mhtml.txt:link {
 	color: black;
 }
 
-a.txt:hover {
+a.mhtml.txt:hover {
 	color: red;
 }
 
-span.kw {
+span.mhtml.kw {
 	font-weight: bold;
 }
 
-span.lab {
+span.mhtml.lab {
 	font-style: italic;
 }
 
-span.comment {
+span.mhtml.comment {
 	font-style: italic;
 }
 
-span.hide {
+span.mhtml.hide {
 	display: none;
 }
 
-span.p1:hover {
+span.mhtml.p1:hover {
 	color: inherit;
 	background-color: #BAFFFF;
 }
 
-span.p2:hover {
+span.html.p2:hover {
 	color: inherit;
 	background-color: #FFCACA;
 }
 
-span.p3:hover {
+span.mhtml.p3:hover {
 	color: inherit;
 	background-color: #FFFFBA;
 }
 
-span.p4:hover {
+span.mhtml.p4:hover {
 	color: inherit;
 	background-color: #CACAFF;
 }
 
-span.p5:hover {
+span.mhtml.p5:hover {
 	color: inherit;
 	background-color: #CAFFCA;
 }
 
-span.p0:hover {
+span.mhtml.p0:hover {
 	color: inherit;
 	background-color: #FFBAFF;
 }
 
-.default {
+.mhtml.default {
 	background-color: white;
 	color: black;
 }
 
-.default:hover {
+.mhtml.default:hover {
 	background-color: white;
 	color: black;
 }
 
-:target {
+.mhtml:target {
 	background: #5D9BF7;
 	border: solid 1px #aaa;
 }
