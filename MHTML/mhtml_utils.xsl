@@ -1290,7 +1290,7 @@
 
   <xsl:template name="add_hs_attrs">
     <xsl:attribute name="class">
-      <xsl:text>txt</xsl:text>
+      <xsl:text>mhtml,txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hs(this)</xsl:text>
@@ -1302,7 +1302,7 @@
 
   <xsl:template name="add_hs2_attrs">
     <xsl:attribute name="class">
-      <xsl:text>txt</xsl:text>
+      <xsl:text>mhtml,txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hs2(this)</xsl:text>
@@ -1314,7 +1314,7 @@
 
   <xsl:template name="add_hsNdiv_attrs">
     <xsl:attribute name="class">
-      <xsl:text>txt</xsl:text>
+      <xsl:text>mhtml,txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hsNdiv(this)</xsl:text>
@@ -1327,7 +1327,7 @@
   <xsl:template name="add_ajax_attrs">
     <xsl:param name="u"/>
     <xsl:attribute name="class">
-      <xsl:text>txt</xsl:text>
+      <xsl:text>mhtml,txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:value-of select="concat(&quot;makeRequest(this,&apos;&quot;,$u,&quot;&apos;)&quot;)"/>

@@ -461,7 +461,7 @@
       <xsl:when test="Proof">
         <xsl:element name="div">
           <xsl:attribute name="class">
-            <xsl:text>add</xsl:text>
+            <xsl:text>mhtml,add</xsl:text>
           </xsl:attribute>
           <xsl:apply-templates select="*[1]/*[1]"/>
         </xsl:element>
@@ -472,7 +472,7 @@
       <xsl:otherwise>
         <xsl:element name="div">
           <xsl:attribute name="class">
-            <xsl:text>add</xsl:text>
+            <xsl:text>mhtml,add</xsl:text>
           </xsl:attribute>
           <xsl:choose>
             <xsl:when test="Proposition/Verum">
@@ -613,7 +613,7 @@
               <xsl:value-of select="$byurl"/>
             </xsl:attribute>
             <xsl:attribute name="class">
-              <xsl:text>txt</xsl:text>
+              <xsl:text>mhtml,txt</xsl:text>
             </xsl:attribute>
             <xsl:choose>
               <xsl:when test="$linkbytoself &gt; 0">
@@ -726,7 +726,7 @@
     </xsl:element>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>hide</xsl:text>
+        <xsl:text>mhtml,hide</xsl:text>
       </xsl:attribute>
       <xsl:element name="br"/>
       <xsl:apply-templates select="*[2]"/>
@@ -750,7 +750,7 @@
     </xsl:element>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>hide</xsl:text>
+        <xsl:text>mhtml,hide</xsl:text>
       </xsl:attribute>
       <xsl:element name="br"/>
       <xsl:apply-templates select="*[1]"/>
@@ -779,7 +779,7 @@
     <!-- apply to subconditions , skip their conjunction -->
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>hide</xsl:text>
+        <xsl:text>mhtml,hide</xsl:text>
       </xsl:attribute>
       <xsl:element name="br"/>
       <xsl:apply-templates select="*[position()&lt;(last()-1)]"/>
@@ -893,7 +893,7 @@
       <xsl:element name="br"/>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>add</xsl:text>
+          <xsl:text>mhtml,add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="Proposition"/>
       </xsl:element>
@@ -905,7 +905,7 @@
         </xsl:call-template>
         <xsl:element name="div">
           <xsl:attribute name="class">
-            <xsl:text>add</xsl:text>
+            <xsl:text>mhtml,add</xsl:text>
           </xsl:attribute>
           <xsl:call-template name="andlist">
             <xsl:with-param name="elems" select="SchemePremises/Proposition"/>
@@ -1178,7 +1178,7 @@
       </xsl:call-template>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>add</xsl:text>
+          <xsl:text>mhtml,add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;EndPosition&apos;)]"/>
       </xsl:element>
@@ -1211,7 +1211,7 @@
       </xsl:call-template>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>add</xsl:text>
+          <xsl:text>mhtml,add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;EndPosition&apos;)]"/>
       </xsl:element>
@@ -1232,7 +1232,7 @@
       </xsl:call-template>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>add</xsl:text>
+          <xsl:text>mhtml,add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;EndPosition&apos;)]"/>
       </xsl:element>
@@ -1268,7 +1268,7 @@
       <xsl:apply-templates select="Case"/>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>add</xsl:text>
+          <xsl:text>mhtml,add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;Case&apos;)]"/>
       </xsl:element>
@@ -1298,7 +1298,7 @@
       <xsl:apply-templates select="Suppose"/>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>add</xsl:text>
+          <xsl:text>mhtml,add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;Suppose&apos;)]"/>
       </xsl:element>
@@ -1332,7 +1332,7 @@
       <xsl:apply-templates select="PerCases"/>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>add</xsl:text>
+          <xsl:text>mhtml,add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="BlockThesis"/>
         <xsl:apply-templates select="Thesis"/>
@@ -1368,7 +1368,7 @@
       <!-- add_ar_iconif(#line=`EndPosition[1]/@line`, #col=`EndPosition[1]/@col`); -->
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>add</xsl:text>
+          <xsl:text>mhtml,add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates/>
       </xsl:element>
@@ -1432,7 +1432,7 @@
           <xsl:document href="{$ajax_proof_dir}/{$anamelc}/{@newlevel}" format="html"> 
           <xsl:element name="div">
             <xsl:attribute name="class">
-              <xsl:text>add</xsl:text>
+              <xsl:text>mhtml,add</xsl:text>
             </xsl:attribute>
             <xsl:apply-templates/>
           </xsl:element>
@@ -1442,7 +1442,7 @@
         <xsl:otherwise>
           <xsl:element name="div">
             <xsl:attribute name="class">
-              <xsl:text>add</xsl:text>
+              <xsl:text>mhtml,add</xsl:text>
             </xsl:attribute>
             <xsl:apply-templates/>
           </xsl:element>
@@ -1501,7 +1501,7 @@
   <xsl:template name="now_body">
     <xsl:element name="div">
       <xsl:attribute name="class">
-        <xsl:text>add</xsl:text>
+        <xsl:text>mhtml,add</xsl:text>
       </xsl:attribute>
       <xsl:apply-templates select="BlockThesis"/>
       <xsl:apply-templates select="*[not(name()=&apos;BlockThesis&apos;)]"/>
@@ -1572,12 +1572,10 @@
   <!-- separate top-level items by additional newline -->
   <xsl:template match="Article">
     <xsl:element name="div">
-      <xsl:if test="not($mk_header &gt; 0)"/>
-      <xsl:if test="$idv &gt; 0">
-        <xsl:call-template name="idv_for_top"/>
-      </xsl:if>
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
     </xsl:element>
-    <xsl:element name="br"/>
     <xsl:for-each select="*">
       <xsl:apply-templates select="."/>
       <xsl:if test="(not(name()=&apos;Definiens&apos;)) and (not(name()=&apos;Reservation&apos;))">

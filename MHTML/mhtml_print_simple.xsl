@@ -137,7 +137,7 @@
           <xsl:when test="($const_links=2)">
             <xsl:element name="a">
               <xsl:attribute name="class">
-                <xsl:text>txt</xsl:text>
+                <xsl:text>mhtml,txt</xsl:text>
               </xsl:attribute>
               <xsl:attribute name="href">
                 <xsl:value-of select="concat(&quot;#&quot;,$ctarget)"/>
@@ -335,7 +335,7 @@
         </xsl:variable>
         <xsl:element name="span">
           <xsl:attribute name="class">
-            <xsl:text>lab</xsl:text>
+            <xsl:text>mhtml,lab</xsl:text>
           </xsl:attribute>
           <xsl:choose>
             <xsl:when test="$colored = &quot;1&quot;">
@@ -379,7 +379,7 @@
     <xsl:param name="nr"/>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>lab</xsl:text>
+        <xsl:text>mhtml,lab</xsl:text>
       </xsl:attribute>
       <xsl:choose>
         <xsl:when test="$colored=&quot;1&quot;">
@@ -404,7 +404,7 @@
     <xsl:param name="txt"/>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>lab</xsl:text>
+        <xsl:text>mhtml,lab</xsl:text>
       </xsl:attribute>
       <xsl:choose>
         <xsl:when test="$colored=&quot;1&quot;">
@@ -428,7 +428,7 @@
     <xsl:param name="str"/>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>kw</xsl:text>
+        <xsl:text>mhtml,kw</xsl:text>
       </xsl:attribute>
       <xsl:value-of select="$str"/>
     </xsl:element>
@@ -438,7 +438,7 @@
     <xsl:param name="str"/>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>comment</xsl:text>
+        <xsl:text>mhtml,comment</xsl:text>
       </xsl:attribute>
       <xsl:choose>
         <xsl:when test="$colored=&quot;1&quot;">

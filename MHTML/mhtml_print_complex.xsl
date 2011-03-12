@@ -34,7 +34,7 @@
     </xsl:variable>
     <xsl:element name="a">
       <xsl:attribute name="class">
-        <xsl:text>ref</xsl:text>
+        <xsl:text>mhtml,ref</xsl:text>
       </xsl:attribute>
       <xsl:choose>
         <xsl:when test="($linking = &apos;q&apos;) or (($linking = &apos;m&apos;) and not($c))">
@@ -501,6 +501,9 @@
       <xsl:when test="($parenspans = 1) and ($np &gt; 0)">
         <xsl:element name="span">
           <xsl:attribute name="class">
+            <xsl:text>mhtml</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="class">
             <xsl:value-of select="concat(&quot;p&quot;,$paren_color)"/>
           </xsl:attribute>
           <xsl:choose>
@@ -524,7 +527,7 @@
           </xsl:choose>
           <xsl:element name="span">
             <xsl:attribute name="class">
-              <xsl:text>default</xsl:text>
+              <xsl:text>mhtml,default</xsl:text>
             </xsl:attribute>
             <xsl:call-template name="pp2">
               <xsl:with-param name="k" select="$k"/>

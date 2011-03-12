@@ -1347,10 +1347,13 @@
       <xsl:attribute name="class">
         <xsl:value-of select="concat(&quot;p&quot;,$paren_color)"/>
       </xsl:attribute>
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:text>{</xsl:text>
       <xsl:element name="span">
         <xsl:attribute name="class">
-          <xsl:text>default</xsl:text>
+          <xsl:text>mhtml,default</xsl:text>
         </xsl:attribute>
         <xsl:text> </xsl:text>
         <!-- first display the term -->
