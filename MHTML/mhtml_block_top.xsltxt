@@ -259,7 +259,7 @@ tpl jt
     <a 
     { 
        @NAME = `concat("T", $nr1)`; 
-       pcomment0(#str = `concat($aname,":", $nr1)`); 
+       // pcomment0(#str = `concat($aname,":", $nr1)`); 
        if [@interesting > 0] 
        { 
           " interestingness: "; `@interesting`;
