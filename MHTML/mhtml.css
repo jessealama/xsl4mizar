@@ -1,6 +1,9 @@
+/* @override http://localhost:4242/mhtml.css */
+
 div.mhtml {
 	padding: 0 0 0 0;
 	margin: 0 0 0 0;
+	font-family: monospace;
 }
 
 div.mhtml.add {
