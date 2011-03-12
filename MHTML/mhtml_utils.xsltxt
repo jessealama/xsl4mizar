@@ -543,10 +543,10 @@ tpl get_parent_level(#pl, #ls, #n)
 
 
 
-tpl add_hs_attrs { @class="txt"; @onclick="hs(this)"; @href="javascript:()"; }
+tpl add_hs_attrs { @class="mhtml,txt"; @onclick="hs(this)"; @href="javascript:()"; }
 
-tpl add_hs2_attrs { @class="txt"; @onclick="hs2(this)"; @href="javascript:()"; }
+tpl add_hs2_attrs { @class="mhtml,txt"; @onclick="hs2(this)"; @href="javascript:()"; }
 
-tpl add_hsNdiv_attrs { @class="txt"; @onclick="hsNdiv(this)"; @href="javascript:()"; }
+tpl add_hsNdiv_attrs { @class="mhtml,txt"; @onclick="hsNdiv(this)"; @href="javascript:()"; }
 
-tpl add_ajax_attrs(#u) { @class="txt"; @onclick=`concat("makeRequest(this,'",$u,"')")`; @href="javascript:()"; }
+tpl add_ajax_attrs(#u) { @class="mhtml,txt"; @onclick=`concat("makeRequest(this,'",$u,"')")`; @href="javascript:()"; }
