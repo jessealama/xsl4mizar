@@ -2,8 +2,13 @@
 
 <xsl:stylesheet version="1.0" extension-element-prefixes="dc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="xml"/>
+<<<<<<< Updated upstream
   <xsl:output doctype-public=""/>
   <xsl:output doctype-system=""/>
+=======
+  <!-- output doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"; -->
+  <!-- output doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"; -->
+>>>>>>> Stashed changes
   <xsl:output omit-xml-declaration="yes"/>
   <!-- $Revision: 1.8 $ -->
   <!--  -->
@@ -51,6 +56,7 @@
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
+<<<<<<< Updated upstream
         <xsl:choose>
           <xsl:when test="$body_only = &quot;0&quot;">
             <xsl:element name="html">
@@ -282,6 +288,9 @@ return tstp_dump;
             <xsl:apply-templates/>
           </xsl:otherwise>
         </xsl:choose>
+=======
+        <xsl:apply-templates/>
+>>>>>>> Stashed changes
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

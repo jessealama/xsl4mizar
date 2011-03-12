@@ -697,84 +697,7 @@
   </xsl:template>
 
   <!-- private - assumes that is inside DefTheorem -->
-  <xsl:template name="dt">
-    <xsl:variable name="nr1" select="1+count(preceding-sibling::DefTheorem)"/>
-    <xsl:text>:: </xsl:text>
-    <xsl:call-template name="pkeyword">
-      <xsl:with-param name="str">
-        <xsl:text>deftheorem </xsl:text>
-      </xsl:with-param>
-    </xsl:call-template>
-    <xsl:choose>
-      <xsl:when test="($proof_links &gt; 0) and ($print_lab_identifiers = 0)">
-        <xsl:call-template name="plab1">
-          <xsl:with-param name="nr" select="$nr1"/>
-          <xsl:with-param name="txt">
-            <xsl:text>Def</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="Proposition[@nr &gt; 0]">
-          <xsl:call-template name="pplab">
-            <xsl:with-param name="nr" select="@nr"/>
-            <xsl:with-param name="vid" select="@vid"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:text> </xsl:text>
-    <!-- <a { @name=`concat("D",$nr1)`; -->
-    <xsl:if test="@constrkind">
-      <xsl:text>  defines </xsl:text>
-      <xsl:call-template name="abs">
-        <xsl:with-param name="k" select="@constrkind"/>
-        <xsl:with-param name="nr" select="@constrnr"/>
-        <xsl:with-param name="sym">
-          <xsl:call-template name="abs1">
-            <xsl:with-param name="k" select="@constrkind"/>
-            <xsl:with-param name="nr" select="@constrnr"/>
-          </xsl:call-template>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-    <xsl:text> </xsl:text>
-    <xsl:element name="a">
-      <xsl:attribute name="onclick">
-        <xsl:text>hs(this)</xsl:text>
-      </xsl:attribute>
-      <xsl:attribute name="href">
-        <xsl:text>javascript:()</xsl:text>
-      </xsl:attribute>
-      <xsl:value-of select="concat($aname, &quot;:def &quot;, $nr1)"/>
-      <xsl:text> : </xsl:text>
-      <xsl:element name="br"/>
-    </xsl:element>
-    <xsl:element name="span">
-      <xsl:attribute name="class">
-        <xsl:text>hide</xsl:text>
-      </xsl:attribute>
-      <!-- ##NOTE: div is not allowed inside span -->
-      <!-- <div -->
-      <!-- { -->
-      <!-- @class = "add"; -->
-      <xsl:choose>
-        <xsl:when test="Proposition/Verum">
-          <xsl:call-template name="pkeyword">
-            <xsl:with-param name="str">
-              <xsl:text>canceled; </xsl:text>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="*[1]/*[1]"/>
-          <xsl:text>;</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-      <!-- } -->
-      <xsl:element name="br"/>
-    </xsl:element>
-  </xsl:template>
+  <xsl:template name="dt"/>
 
   <!-- Property, elProposition, Justification -->
   <xsl:template match="JustifiedProperty">
@@ -1216,14 +1139,6 @@
           </xsl:choose>
           <xsl:text>: </xsl:text>
         </xsl:if>
-        <xsl:element name="a">
-          <xsl:attribute name="name">
-            <xsl:value-of select="concat(&quot;D&quot;, @defnr)"/>
-          </xsl:attribute>
-          <xsl:call-template name="pcomment">
-            <xsl:with-param name="str" select="concat($aname, &quot;:def &quot;, @defnr)"/>
-          </xsl:call-template>
-        </xsl:element>
         <!-- note that loci below can be translated to constants and identifiers -->
         <!-- - see definition of LocusVar -->
         <xsl:for-each select="DefMeaning/PartialDef">

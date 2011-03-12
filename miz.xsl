@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <?xml version='1.0' encoding='UTF-8'?>
 
 <!-- This file is now automatically produced from the files in the MHTML directory. -->
@@ -8456,3 +8457,5 @@ return tstp_dump;
     </xsl:call-template>
   </xsl:template>
 </xsl:stylesheet>
+=======
+>>>>>>> Stashed changes

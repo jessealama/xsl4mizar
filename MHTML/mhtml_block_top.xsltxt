@@ -431,57 +431,6 @@ tpl [DefTheorem]
 // private - assumes that is inside DefTheorem
 tpl dt 
 {
-  $nr1 = `1+count(preceding-sibling::DefTheorem)`;
-
-  ":: "; pkeyword(#str="deftheorem ");
-
-  if [($proof_links > 0) and ($print_lab_identifiers = 0)]
-  { 
-     plab1(#nr = $nr1, #txt = "Def"); 
-  } 
-  else 
-  { 
-     for-each [Proposition[@nr > 0]] { pplab(#nr = `@nr`, #vid = `@vid`); }
-  } 
-
-  " ";
-  //    <a { @NAME=`concat("D",$nr1)`; 
-  if [@constrkind] 
-  { 
-     "  defines "; 
-     abs(#k = `@constrkind`, #nr = `@constrnr`, 
-         #sym = abs1(#k = `@constrkind`, #nr = `@constrnr`)); 
-  } 
-
-  " ";
-  <a 
-  { 
-     @onclick = "hs(this)"; 
-     @href    = "javascript:()";
-     `concat($aname, ":def ", $nr1)`; 
-     " : "; <br; 
-  }
-
-  <span 
-  { 
-     @class = "hide"; 
-
-// ##NOTE: div is not allowed inside span
-//     <div 
-//     {   
-//        @class = "add"; 
-
-	if [Proposition/Verum] 
-	{ 
-	   pkeyword(#str="canceled; "); 
-        }
-	else 
-	{ 
-	   apply[*[1]/*[1]];  ";"; 
-	}  
-//     }
-       <br; 
-  }
 }
 
 //   Property, elProposition, Justification
@@ -732,12 +681,6 @@ tpl dfs()
 	     ": ";
 	  }
 
-	  <a 
-	  { 
-	     @NAME = `concat("D", @defnr)`; 
-	     pcomment(#str = `concat($aname, ":def ", @defnr)`); 
-	  }
-
          // note that loci below can be translated to constants and identifiers
          // - see definition of LocusVar
 	 for-each [DefMeaning/PartialDef] 
@@ -985,7 +928,6 @@ tpl [Article]
   {
     if [not($mk_header > 0)]
     {
-       // pcomment0(#str=`concat($aname, "  semantic presentation")`); 
     }
     if [$idv > 0] 
     { 
