@@ -230,8 +230,8 @@ tpl [JustifiedTheorem]
       {
          // scale red and blue from 0% (green) to 100% (white)
          $intensity = `(1 - @interesting) * 100`;
-         <div { @class="mhtml"; }
-	 { 
+         <div { 
+	    @class="mhtml"; 
 	    @style=`concat("background-color:rgb(",$intensity,"%,100%,", $intensity, "%);")`;
 	    jt();
          }
