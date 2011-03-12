@@ -1,5 +1,7 @@
 #mhtml {
 	border-style: dashed;
+	font-family: monospace;
+	font-size: large;
 }
 
 div.mhtml {
