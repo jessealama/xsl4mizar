@@ -63,6 +63,7 @@ tpl [/] { if [$generate_items = "1"] {
    }
    apply;
 }
+	apply;
 }
   
 // tpl [*] { copy { apply [@*]; apply; } }
