@@ -230,7 +230,7 @@ tpl [JustifiedTheorem]
       {
          // scale red and blue from 0% (green) to 100% (white)
          $intensity = `(1 - @interesting) * 100`;
-         <div 
+         <div { @class="mhtml"; }
 	 { 
 	    @style=`concat("background-color:rgb(",$intensity,"%,100%,", $intensity, "%);")`;
 	    jt();
@@ -497,10 +497,11 @@ tpl [SchemeBlock] {
 
 tpl sd 
 {
-  <div 
-  { 
+  <div  
+  { @class="mhtml";
     <a 
     { 
+      @class="mhtml";
       @NAME=`concat("S",@schemenr)`; pkeyword(#str="scheme  ");
       pcomment(#str=`concat($aname,":sch ",@schemenr)`); 
     }
@@ -713,6 +714,7 @@ tpl [DefinitionBlock]
 {
    <div 
    { 
+      @class="mhtml";
       pkeyword(#str="definition");
       <div { @class="mhtml,add"; apply[*[not(name()='EndPosition')]]; }
       pkeyword(#str="end;");
@@ -729,14 +731,14 @@ tpl [IdentifyRegistration] { apply; }
 //   ( elLet | AuxiliaryItem | elRegistration | elCanceled )+, elEndPosition
 tpl [RegistrationBlock] 
 {
-    <div { pkeyword(#str="registration");
+    <div { @class="mhtml"; pkeyword(#str="registration");
     <div { @class="mhtml,add"; apply[*[not(name()='EndPosition')]]; }
     pkeyword(#str="end;"); }  
 } 
 
 tpl [NotationBlock] 
 {
-    <div { pkeyword(#str="notation");
+    <div { @class="mhtml"; pkeyword(#str="notation");
     <div { @class="mhtml,add"; apply[*[not(name()='EndPosition')]]; }
     pkeyword(#str="end;"); }  
 } 
@@ -749,7 +751,7 @@ tpl [BlockThesis] { } // "blockthesis: "; apply; ";"; <br; }
 //   |  ( elCase, Reasoning, elBlockThesis ) )
 tpl [CaseBlock] 
 { 
-    <div { <a { add_hsNdiv_attrs(); if [$proof_links>0] { @title=`@newlevel`; } pkeyword(#str="case "); }
+    <div { @class="mhtml"; <a { @class="mhtml"; add_hsNdiv_attrs(); if [$proof_links>0] { @title=`@newlevel`; } pkeyword(#str="case "); }
     apply[Case];
     <div { @class="mhtml,add"; apply[*[not(name()='Case')]]; }
     pkeyword(#str="end;"); } 
@@ -757,7 +759,7 @@ tpl [CaseBlock]
 
 tpl [SupposeBlock] 
 {
-    <div { <a { add_hsNdiv_attrs(); if [$proof_links>0] { @title=`@newlevel`; } pkeyword(#str="suppose "); } 
+    <div { @class="mhtml"; <a { @class="mhtml"; add_hsNdiv_attrs(); if [$proof_links>0] { @title=`@newlevel`; } pkeyword(#str="suppose "); } 
     apply[Suppose];
     <div { @class="mhtml,add"; apply[*[not(name()='Suppose')]]; }
     pkeyword(#str="end;"); } 
@@ -771,8 +773,10 @@ tpl [PerCasesReasoning]
 {
     <div 
     { 
+       @class="html";
        <a 
        { 
+          @class="mhtml";
           add_hsNdiv_attrs(); 
 	  if [$proof_links>0] { @title=`@newlevel`; } 
 	  pkeyword(#str="per "); 
@@ -798,9 +802,11 @@ tpl [PerCasesReasoning]
 tpl [Proof/Proof | Now/Proof | Conclusion/Proof | CaseBlock/Proof | SupposeBlock/Proof]
 {
     <div 
-    { 
+    { 	
+       @class="mhtml";
        <a 
        { 
+          @class="mhtml";
           add_hs2_attrs(); 
 	  if [$proof_links>0] { @title=`@newlevel`; } 
 	  pkeyword(#str="proof "); 
@@ -819,7 +825,9 @@ tpl [Proof] {
     $nm0 = `concat($ajax_proof_dir,"/",$anamelc,"/",@newlevel)`;
     $nm =  { if[$ajax_proofs=3] { `concat($ltmpftptpcgi,"?tmp=",$lbytmpdir,"&raw=1","&file=",$nm0)`; } else { $nm0; } }
     <div { 
+         @class="mhtml";
 	 <a { 
+	    @class="mhtml";
 	    if [($ajax_proofs=1) or ($ajax_proofs=3)]	{ add_ajax_attrs(#u=$nm); } else { add_hs2_attrs(); }
 	    if [$proof_links>0] { @title=`@newlevel`; } 
 	    pkeyword(#str="proof "); 
@@ -846,10 +854,12 @@ tpl [Now](#nkw)
     { 
        <div 
        { 
+          @class="mhtml";
           if [@nr>0] { pplab(#nr=`@nr`, #vid=`@vid`); ": ";}
 
 	  <a 
 	  { 
+	     @class="mhtml";
 	     add_hs2_attrs(); 
 	     if [$proof_links>0] { @title=`@newlevel`; } 
 	     pkeyword(#str="now "); 

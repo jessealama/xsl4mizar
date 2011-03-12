@@ -417,6 +417,7 @@ tpl [Conclusion]
       {  
          <div 
 	 { 
+	    @class="mhtml";
 	    pkeyword(#str="hereby "); 
 	    try_th_exps();
 	    apply(#nkw = "1");  

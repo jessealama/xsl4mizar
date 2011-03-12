@@ -299,7 +299,7 @@ tpl andlist(#elems) {
 
 tpl dlist(#separ,#elems) { 
  for-each [$elems] {
-  <div { apply[.]; if [not(position()=last())] { $separ; } } }
+  <div { @class="mhtml"; apply[.]; if [not(position()=last())] { $separ; } } }
 }
 
 
