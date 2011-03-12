@@ -1,7 +1,10 @@
+/* @override http://localhost:4242/mhtml.css */
+
 #mhtml {
 	border-style: solid;
 	font-family: monospace;
 	font-size: large;
+	background-color: lightblue;
 }
 
 div.mhtml {
@@ -106,16 +109,13 @@ span.mhtml.p0:hover {
 }
 
 .mhtml.default {
-	background-color: white;
 	color: black;
 }
 
 .mhtml.default:hover {
-	background-color: white;
 	color: black;
 }
 
 .mhtml:target {
-	background: #5D9BF7;
 	border: solid 1px #aaa;
 }
