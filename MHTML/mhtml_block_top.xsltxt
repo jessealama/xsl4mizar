@@ -934,13 +934,13 @@ tpl idv_for_top()
 // separate top-level items by additional newline
 tpl [Article] 
 { 
-  <div { @class="mhtml"; }
-
-    for-each [*] 
+  <div { @"id"="mhtml"; 
+    for-each [*]      
     { 
       apply[.]; 
       if [(not(name()='Definiens')) and (not(name()='Reservation'))] { <br;} 
-    } 
+    }
+  }
 }
 
 tpl [Section] { }

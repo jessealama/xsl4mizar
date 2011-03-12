@@ -1,4 +1,6 @@
-/* @override http://localhost:4242/mhtml.css */
+#mhtml {
+	border-style: dashed;
+}
 
 div.mhtml {
 	padding: 0 0 0 0;
