@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <xsl:include href="mhtml_print_simple.xsl"/>
   <!-- $Revision: 1.9 $ -->
   <!--  -->
@@ -850,6 +850,9 @@
     <xsl:param name="elems"/>
     <xsl:for-each select="$elems">
       <xsl:element name="div">
+        <xsl:attribute name="class">
+          <xsl:text>mhtml</xsl:text>
+        </xsl:attribute>
         <xsl:apply-templates select="."/>
         <xsl:if test="not(position()=last())">
           <xsl:value-of select="$separ"/>
@@ -1290,7 +1293,7 @@
 
   <xsl:template name="add_hs_attrs">
     <xsl:attribute name="class">
-      <xsl:text>mhtml,txt</xsl:text>
+      <xsl:text>mhtml txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hs(this)</xsl:text>
@@ -1302,7 +1305,7 @@
 
   <xsl:template name="add_hs2_attrs">
     <xsl:attribute name="class">
-      <xsl:text>mhtml,txt</xsl:text>
+      <xsl:text>mhtml txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hs2(this)</xsl:text>
@@ -1314,7 +1317,7 @@
 
   <xsl:template name="add_hsNdiv_attrs">
     <xsl:attribute name="class">
-      <xsl:text>mhtml,txt</xsl:text>
+      <xsl:text>mhtml txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hsNdiv(this)</xsl:text>
@@ -1327,7 +1330,7 @@
   <xsl:template name="add_ajax_attrs">
     <xsl:param name="u"/>
     <xsl:attribute name="class">
-      <xsl:text>mhtml,txt</xsl:text>
+      <xsl:text>mhtml txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:value-of select="concat(&quot;makeRequest(this,&apos;&quot;,$u,&quot;&apos;)&quot;)"/>

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <xsl:include href="mhtml_utils.xsl"/>
 
   <!-- $Revision: 1.14 $ -->
@@ -34,7 +34,7 @@
     </xsl:variable>
     <xsl:element name="a">
       <xsl:attribute name="class">
-        <xsl:text>mhtml,ref</xsl:text>
+        <xsl:text>mhtml ref</xsl:text>
       </xsl:attribute>
       <xsl:choose>
         <xsl:when test="($linking = &apos;q&apos;) or (($linking = &apos;m&apos;) and not($c))">
@@ -527,7 +527,7 @@
           </xsl:choose>
           <xsl:element name="span">
             <xsl:attribute name="class">
-              <xsl:text>mhtml,default</xsl:text>
+              <xsl:text>mhtml default</xsl:text>
             </xsl:attribute>
             <xsl:call-template name="pp2">
               <xsl:with-param name="k" select="$k"/>

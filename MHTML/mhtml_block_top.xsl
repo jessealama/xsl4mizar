@@ -378,6 +378,9 @@
             <!-- scale red and blue from 0% (green) to 100% (white) -->
             <xsl:variable name="intensity" select="(1 - @interesting) * 100"/>
             <xsl:element name="div">
+              <xsl:attribute name="class">
+                <xsl:text>mhtml</xsl:text>
+              </xsl:attribute>
               <xsl:attribute name="style">
                 <xsl:value-of select="concat(&quot;background-color:rgb(&quot;,$intensity,&quot;%,100%,&quot;, $intensity, &quot;%);&quot;)"/>
               </xsl:attribute>
@@ -401,32 +404,16 @@
       </xsl:with-param>
     </xsl:call-template>
     <xsl:choose>
-      <xsl:when test="($proof_links &gt; 0) and ($print_lab_identifiers = 0)">
-        <xsl:call-template name="plab1">
-          <xsl:with-param name="nr" select="$nr1"/>
-          <xsl:with-param name="txt">
-            <xsl:text>Th</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>
-        <xsl:text>: </xsl:text>
-      </xsl:when>
+      <xsl:when test="($proof_links &gt; 0) and ($print_lab_identifiers = 0)"/>
       <xsl:otherwise>
-        <xsl:for-each select="Proposition[@nr &gt; 0]">
-          <xsl:call-template name="pplab">
-            <xsl:with-param name="nr" select="@nr"/>
-            <xsl:with-param name="vid" select="@vid"/>
-          </xsl:call-template>
-          <xsl:text>: </xsl:text>
-        </xsl:for-each>
+        <xsl:for-each select="Proposition[@nr &gt; 0]"/>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:element name="a">
       <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;T&quot;, $nr1)"/>
       </xsl:attribute>
-      <xsl:call-template name="pcomment0">
-        <xsl:with-param name="str" select="concat($aname,&quot;:&quot;, $nr1)"/>
-      </xsl:call-template>
+      <!-- pcomment0(#str = `concat($aname,":", $nr1)`); -->
       <xsl:if test="@interesting &gt; 0">
         <xsl:text> interestingness: </xsl:text>
         <xsl:value-of select="@interesting"/>
@@ -461,7 +448,7 @@
       <xsl:when test="Proof">
         <xsl:element name="div">
           <xsl:attribute name="class">
-            <xsl:text>mhtml,add</xsl:text>
+            <xsl:text>mhtml add</xsl:text>
           </xsl:attribute>
           <xsl:apply-templates select="*[1]/*[1]"/>
         </xsl:element>
@@ -472,7 +459,7 @@
       <xsl:otherwise>
         <xsl:element name="div">
           <xsl:attribute name="class">
-            <xsl:text>mhtml,add</xsl:text>
+            <xsl:text>mhtml add</xsl:text>
           </xsl:attribute>
           <xsl:choose>
             <xsl:when test="Proposition/Verum">
@@ -613,7 +600,7 @@
               <xsl:value-of select="$byurl"/>
             </xsl:attribute>
             <xsl:attribute name="class">
-              <xsl:text>mhtml,txt</xsl:text>
+              <xsl:text>mhtml txt</xsl:text>
             </xsl:attribute>
             <xsl:choose>
               <xsl:when test="$linkbytoself &gt; 0">
@@ -726,7 +713,7 @@
     </xsl:element>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>mhtml,hide</xsl:text>
+        <xsl:text>mhtml hide</xsl:text>
       </xsl:attribute>
       <xsl:element name="br"/>
       <xsl:apply-templates select="*[2]"/>
@@ -750,7 +737,7 @@
     </xsl:element>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>mhtml,hide</xsl:text>
+        <xsl:text>mhtml hide</xsl:text>
       </xsl:attribute>
       <xsl:element name="br"/>
       <xsl:apply-templates select="*[1]"/>
@@ -779,7 +766,7 @@
     <!-- apply to subconditions , skip their conjunction -->
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>mhtml,hide</xsl:text>
+        <xsl:text>mhtml hide</xsl:text>
       </xsl:attribute>
       <xsl:element name="br"/>
       <xsl:apply-templates select="*[position()&lt;(last()-1)]"/>
@@ -849,7 +836,13 @@
 
   <xsl:template name="sd">
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:element name="a">
+        <xsl:attribute name="class">
+          <xsl:text>mhtml</xsl:text>
+        </xsl:attribute>
         <xsl:attribute name="name">
           <xsl:value-of select="concat(&quot;S&quot;,@schemenr)"/>
         </xsl:attribute>
@@ -893,7 +886,7 @@
       <xsl:element name="br"/>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>mhtml,add</xsl:text>
+          <xsl:text>mhtml add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="Proposition"/>
       </xsl:element>
@@ -905,7 +898,7 @@
         </xsl:call-template>
         <xsl:element name="div">
           <xsl:attribute name="class">
-            <xsl:text>mhtml,add</xsl:text>
+            <xsl:text>mhtml add</xsl:text>
           </xsl:attribute>
           <xsl:call-template name="andlist">
             <xsl:with-param name="elems" select="SchemePremises/Proposition"/>
@@ -1171,6 +1164,9 @@
   <!-- elCanceled | elDefinition )*, elEndPosition -->
   <xsl:template match="DefinitionBlock">
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:call-template name="pkeyword">
         <xsl:with-param name="str">
           <xsl:text>definition</xsl:text>
@@ -1178,7 +1174,7 @@
       </xsl:call-template>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>mhtml,add</xsl:text>
+          <xsl:text>mhtml add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;EndPosition&apos;)]"/>
       </xsl:element>
@@ -1204,6 +1200,9 @@
   <!-- ( elLet | AuxiliaryItem | elRegistration | elCanceled )+, elEndPosition -->
   <xsl:template match="RegistrationBlock">
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:call-template name="pkeyword">
         <xsl:with-param name="str">
           <xsl:text>registration</xsl:text>
@@ -1211,7 +1210,7 @@
       </xsl:call-template>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>mhtml,add</xsl:text>
+          <xsl:text>mhtml add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;EndPosition&apos;)]"/>
       </xsl:element>
@@ -1225,6 +1224,9 @@
 
   <xsl:template match="NotationBlock">
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:call-template name="pkeyword">
         <xsl:with-param name="str">
           <xsl:text>notation</xsl:text>
@@ -1232,7 +1234,7 @@
       </xsl:call-template>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>mhtml,add</xsl:text>
+          <xsl:text>mhtml add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;EndPosition&apos;)]"/>
       </xsl:element>
@@ -1252,7 +1254,13 @@
   <!-- |  ( elCase, Reasoning, elBlockThesis ) ) -->
   <xsl:template match="CaseBlock">
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:element name="a">
+        <xsl:attribute name="class">
+          <xsl:text>mhtml</xsl:text>
+        </xsl:attribute>
         <xsl:call-template name="add_hsNdiv_attrs"/>
         <xsl:if test="$proof_links&gt;0">
           <xsl:attribute name="title">
@@ -1268,7 +1276,7 @@
       <xsl:apply-templates select="Case"/>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>mhtml,add</xsl:text>
+          <xsl:text>mhtml add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;Case&apos;)]"/>
       </xsl:element>
@@ -1282,7 +1290,13 @@
 
   <xsl:template match="SupposeBlock">
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:element name="a">
+        <xsl:attribute name="class">
+          <xsl:text>mhtml</xsl:text>
+        </xsl:attribute>
         <xsl:call-template name="add_hsNdiv_attrs"/>
         <xsl:if test="$proof_links&gt;0">
           <xsl:attribute name="title">
@@ -1298,7 +1312,7 @@
       <xsl:apply-templates select="Suppose"/>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>mhtml,add</xsl:text>
+          <xsl:text>mhtml add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="*[not(name()=&apos;Suppose&apos;)]"/>
       </xsl:element>
@@ -1316,7 +1330,13 @@
   <!-- elPerCases, elEndPosition, elBlockThesis ) ) -->
   <xsl:template match="PerCasesReasoning">
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>html</xsl:text>
+      </xsl:attribute>
       <xsl:element name="a">
+        <xsl:attribute name="class">
+          <xsl:text>mhtml</xsl:text>
+        </xsl:attribute>
         <xsl:call-template name="add_hsNdiv_attrs"/>
         <xsl:if test="$proof_links&gt;0">
           <xsl:attribute name="title">
@@ -1332,7 +1352,7 @@
       <xsl:apply-templates select="PerCases"/>
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>mhtml,add</xsl:text>
+          <xsl:text>mhtml add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates select="BlockThesis"/>
         <xsl:apply-templates select="Thesis"/>
@@ -1352,7 +1372,13 @@
   <!-- this is a non-top-level proof -->
   <xsl:template match="Proof/Proof | Now/Proof | Conclusion/Proof | CaseBlock/Proof | SupposeBlock/Proof">
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:element name="a">
+        <xsl:attribute name="class">
+          <xsl:text>mhtml</xsl:text>
+        </xsl:attribute>
         <xsl:call-template name="add_hs2_attrs"/>
         <xsl:if test="$proof_links&gt;0">
           <xsl:attribute name="title">
@@ -1368,7 +1394,7 @@
       <!-- add_ar_iconif(#line=`EndPosition[1]/@line`, #col=`EndPosition[1]/@col`); -->
       <xsl:element name="div">
         <xsl:attribute name="class">
-          <xsl:text>mhtml,add</xsl:text>
+          <xsl:text>mhtml add</xsl:text>
         </xsl:attribute>
         <xsl:apply-templates/>
       </xsl:element>
@@ -1397,7 +1423,13 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:element name="div">
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
       <xsl:element name="a">
+        <xsl:attribute name="class">
+          <xsl:text>mhtml</xsl:text>
+        </xsl:attribute>
         <xsl:choose>
           <xsl:when test="($ajax_proofs=1) or ($ajax_proofs=3)">
             <xsl:call-template name="add_ajax_attrs">
@@ -1432,7 +1464,7 @@
           <xsl:document href="{$ajax_proof_dir}/{$anamelc}/{@newlevel}" format="html"> 
           <xsl:element name="div">
             <xsl:attribute name="class">
-              <xsl:text>mhtml,add</xsl:text>
+              <xsl:text>mhtml add</xsl:text>
             </xsl:attribute>
             <xsl:apply-templates/>
           </xsl:element>
@@ -1442,7 +1474,7 @@
         <xsl:otherwise>
           <xsl:element name="div">
             <xsl:attribute name="class">
-              <xsl:text>mhtml,add</xsl:text>
+              <xsl:text>mhtml add</xsl:text>
             </xsl:attribute>
             <xsl:apply-templates/>
           </xsl:element>
@@ -1464,6 +1496,9 @@
     <xsl:choose>
       <xsl:when test="not($nkw=&quot;1&quot;)">
         <xsl:element name="div">
+          <xsl:attribute name="class">
+            <xsl:text>mhtml</xsl:text>
+          </xsl:attribute>
           <xsl:if test="@nr&gt;0">
             <xsl:call-template name="pplab">
               <xsl:with-param name="nr" select="@nr"/>
@@ -1472,6 +1507,9 @@
             <xsl:text>: </xsl:text>
           </xsl:if>
           <xsl:element name="a">
+            <xsl:attribute name="class">
+              <xsl:text>mhtml</xsl:text>
+            </xsl:attribute>
             <xsl:call-template name="add_hs2_attrs"/>
             <xsl:if test="$proof_links&gt;0">
               <xsl:attribute name="title">
@@ -1501,7 +1539,7 @@
   <xsl:template name="now_body">
     <xsl:element name="div">
       <xsl:attribute name="class">
-        <xsl:text>mhtml,add</xsl:text>
+        <xsl:text>mhtml add</xsl:text>
       </xsl:attribute>
       <xsl:apply-templates select="BlockThesis"/>
       <xsl:apply-templates select="*[not(name()=&apos;BlockThesis&apos;)]"/>
@@ -1572,16 +1610,16 @@
   <!-- separate top-level items by additional newline -->
   <xsl:template match="Article">
     <xsl:element name="div">
-      <xsl:attribute name="class">
+      <xsl:attribute name="id">
         <xsl:text>mhtml</xsl:text>
       </xsl:attribute>
+      <xsl:for-each select="*">
+        <xsl:apply-templates select="."/>
+        <xsl:if test="(not(name()=&apos;Definiens&apos;)) and (not(name()=&apos;Reservation&apos;))">
+          <xsl:element name="br"/>
+        </xsl:if>
+      </xsl:for-each>
     </xsl:element>
-    <xsl:for-each select="*">
-      <xsl:apply-templates select="."/>
-      <xsl:if test="(not(name()=&apos;Definiens&apos;)) and (not(name()=&apos;Reservation&apos;))">
-        <xsl:element name="br"/>
-      </xsl:if>
-    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="Section"/>

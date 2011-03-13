@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 <?xml version='1.0' encoding='UTF-8'?>
 
 <!-- This file is now automatically produced from the files in the MHTML directory. -->
@@ -1831,7 +1830,7 @@
       <xsl:variable name="nr1" select="$j+position()"/>
       <xsl:if test="$const_links&gt;0">
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(&quot;c&quot;,$nr1,$addpl)"/>
           </xsl:attribute>
         </xsl:element>
@@ -4854,7 +4853,7 @@
   <xsl:template match="Proposition">
     <xsl:if test="$proof_links&gt;0">
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:call-template name="propname">
             <xsl:with-param name="n" select="@propnr"/>
             <xsl:with-param name="pl" select="@plevel"/>
@@ -5489,7 +5488,7 @@
                 </xsl:call-template>
               </xsl:variable>
               <xsl:element name="a">
-                <xsl:attribute name="name">
+                <xsl:attribute name="NAME">
                   <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
                 </xsl:attribute>
               </xsl:element>
@@ -5536,7 +5535,7 @@
                     </xsl:call-template>
                   </xsl:variable>
                   <xsl:element name="a">
-                    <xsl:attribute name="name">
+                    <xsl:attribute name="NAME">
                       <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
                     </xsl:attribute>
                   </xsl:element>
@@ -5654,7 +5653,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
         </xsl:attribute>
       </xsl:element>
@@ -5827,7 +5826,7 @@
       <xsl:variable name="nr1" select="$j + $p1 - 1"/>
       <xsl:if test="$const_links&gt;0">
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(&quot;c&quot;,$nr1,$addpl)"/>
           </xsl:attribute>
         </xsl:element>
@@ -5864,7 +5863,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
         </xsl:attribute>
       </xsl:element>
@@ -6126,7 +6125,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="1 + count(preceding::RCluster)"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;RC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -6177,7 +6176,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="1 + count(preceding::CCluster)"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;CC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -6234,7 +6233,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="1 + count(preceding::FCluster)"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;FC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -6292,7 +6291,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="1 + count(preceding::*[name() = $iname])"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;IY&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -6514,7 +6513,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;T&quot;, $nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pcomment0">
@@ -6634,7 +6633,7 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
         <xsl:element name="PARAM">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:text>URL</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="VALUE">
@@ -6790,84 +6789,7 @@
   </xsl:template>
 
   <!-- private - assumes that is inside DefTheorem -->
-  <xsl:template name="dt">
-    <xsl:variable name="nr1" select="1+count(preceding-sibling::DefTheorem)"/>
-    <xsl:text>:: </xsl:text>
-    <xsl:call-template name="pkeyword">
-      <xsl:with-param name="str">
-        <xsl:text>deftheorem </xsl:text>
-      </xsl:with-param>
-    </xsl:call-template>
-    <xsl:choose>
-      <xsl:when test="($proof_links &gt; 0) and ($print_lab_identifiers = 0)">
-        <xsl:call-template name="plab1">
-          <xsl:with-param name="nr" select="$nr1"/>
-          <xsl:with-param name="txt">
-            <xsl:text>Def</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="Proposition[@nr &gt; 0]">
-          <xsl:call-template name="pplab">
-            <xsl:with-param name="nr" select="@nr"/>
-            <xsl:with-param name="vid" select="@vid"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:text> </xsl:text>
-    <!-- <a { @name=`concat("D",$nr1)`; -->
-    <xsl:if test="@constrkind">
-      <xsl:text>  defines </xsl:text>
-      <xsl:call-template name="abs">
-        <xsl:with-param name="k" select="@constrkind"/>
-        <xsl:with-param name="nr" select="@constrnr"/>
-        <xsl:with-param name="sym">
-          <xsl:call-template name="abs1">
-            <xsl:with-param name="k" select="@constrkind"/>
-            <xsl:with-param name="nr" select="@constrnr"/>
-          </xsl:call-template>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-    <xsl:text> </xsl:text>
-    <xsl:element name="a">
-      <xsl:attribute name="onclick">
-        <xsl:text>hs(this)</xsl:text>
-      </xsl:attribute>
-      <xsl:attribute name="href">
-        <xsl:text>javascript:()</xsl:text>
-      </xsl:attribute>
-      <xsl:value-of select="concat($aname, &quot;:def &quot;, $nr1)"/>
-      <xsl:text> : </xsl:text>
-      <xsl:element name="br"/>
-    </xsl:element>
-    <xsl:element name="span">
-      <xsl:attribute name="class">
-        <xsl:text>hide</xsl:text>
-      </xsl:attribute>
-      <!-- ##NOTE: div is not allowed inside span -->
-      <!-- <div -->
-      <!-- { -->
-      <!-- @class = "add"; -->
-      <xsl:choose>
-        <xsl:when test="Proposition/Verum">
-          <xsl:call-template name="pkeyword">
-            <xsl:with-param name="str">
-              <xsl:text>canceled; </xsl:text>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="*[1]/*[1]"/>
-          <xsl:text>;</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-      <!-- } -->
-      <xsl:element name="br"/>
-    </xsl:element>
-  </xsl:template>
+  <xsl:template name="dt"/>
 
   <!-- Property, elProposition, Justification -->
   <xsl:template match="JustifiedProperty">
@@ -7020,7 +6942,7 @@
   <xsl:template name="sd">
     <xsl:element name="div">
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:value-of select="concat(&quot;S&quot;,@schemenr)"/>
         </xsl:attribute>
         <xsl:call-template name="pkeyword">
@@ -7110,7 +7032,7 @@
         </xsl:variable>
         <xsl:for-each select="Pattern">
           <xsl:element name="a">
-            <xsl:attribute name="name">
+            <xsl:attribute name="NAME">
               <xsl:value-of select="concat(&quot;NM&quot;, @nr)"/>
             </xsl:attribute>
             <xsl:call-template name="pkeyword">
@@ -7310,7 +7232,7 @@
           <xsl:text>: </xsl:text>
         </xsl:if>
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(&quot;D&quot;, @defnr)"/>
           </xsl:attribute>
           <xsl:call-template name="pcomment">
@@ -7731,7 +7653,7 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
         <xsl:element name="PARAM">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:text>URL</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="VALUE">
@@ -7908,7 +7830,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(@kind,@nr)"/>
           </xsl:attribute>
           <xsl:call-template name="pkeyword">
@@ -8036,7 +7958,7 @@
     </xsl:variable>
     <xsl:variable name="argtypes" select="../Let/Typ"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;N&quot;,@kind,@nr)"/>
       </xsl:attribute>
       <xsl:choose>
@@ -8457,5 +8379,3 @@ return tstp_dump;
     </xsl:call-template>
   </xsl:template>
 </xsl:stylesheet>
-=======
->>>>>>> Stashed changes

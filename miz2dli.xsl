@@ -2,7 +2,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="text"/>
-  <!-- $Revision: 1.2 $ -->
+  <!-- $Revision: 1.4 $ -->
   <!--  -->
   <!-- File: miz2dli.xsltxt - stylesheet translating Mizar XML syntax to MML Query DLI syntax -->
   <!--  -->
