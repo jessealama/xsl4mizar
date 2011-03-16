@@ -218,3 +218,10 @@ thead {
 .fleft {
 	float: left;
 }
+
+div.miz-example {
+	border-style: solid;
+	font-family: monospace;
+	font-size: large;
+	background-color: lightblue;
+}
