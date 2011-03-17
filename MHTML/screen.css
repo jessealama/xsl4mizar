@@ -225,3 +225,11 @@ div.miz-example {
 	font-size: large;
 	background-color: lightblue;
 }
+
+caption.left {
+	caption-side: left;
+}
+
+caption.right {
+	caption-side: right;
+}
