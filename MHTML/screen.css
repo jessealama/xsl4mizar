@@ -1,7 +1,3 @@
-/* @override http://localhost:4242/screen.css */
-
-/* @override http://localhost:4242/screen.css */
-
 /* This is the default stylesheet for the screen media type. */
 
 /* Copyleft (c) 2002-2004 Jonas Fonseca <fonseca@diku.dk> */
@@ -14,6 +10,14 @@ body {
 
 td.arrow {
 	font-size: xx-large;
+}
+
+td.article-name {
+	text-transform: uppercase;
+}
+
+td.article-title {
+	font-style: oblique;
 }
 
 /* Link properties */
