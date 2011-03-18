@@ -12,6 +12,18 @@ table.article-listing {
 	border-style: solid;
 }
 
+ol.fragment-listing {
+}
+
+li.fragment-listing {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+a.fragment-listing {
+	text-decoration: none;
+}
+
 td.arrow {
 	font-size: xx-large;
 }
