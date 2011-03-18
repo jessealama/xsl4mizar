@@ -225,3 +225,11 @@ div.miz-example {
 	font-size: large;
 	background-color: lightblue;
 }
+
+tr.fullwidth {
+	width: 100%;
+}
+
+tr.halfwidth {
+	width: 50%;
+}
