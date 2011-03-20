@@ -43,11 +43,6 @@ td.article-title {
 
 /* Link properties */
 
-a:visited,
-a {
-	text-decoration: underline;
-}
-
 a:hover {
 	text-decoration: none;
 }
