@@ -27,6 +27,7 @@ a.fragment-listing:link {
 
 a.fragment-listing:visited {
 	text-decoration: none;
+	color: inherit;
 }
 
 td.arrow {
