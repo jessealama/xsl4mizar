@@ -20,7 +20,12 @@ li.fragment-listing {
     margin-top: 0.5em;
 }
 
-a.fragment-listing {
+a.fragment-listing:link {
+	text-decoration: none;
+	color: inherit;
+}
+
+a.fragment-listing:visited {
 	text-decoration: none;
 }
 
