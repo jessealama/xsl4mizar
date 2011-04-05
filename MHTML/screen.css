@@ -150,6 +150,11 @@ table.header {
 	display: block;
 }
 
+.header span.menu a {
+	font-weight: bold;
+	font-style: italic;
+}
+
 .header #top,
 .footer span.left {
 	float: left;
