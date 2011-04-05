@@ -48,6 +48,10 @@ a:hover {
 	text-decoration: none;
 }
 
+a.article-name {
+	text-transform: uppercase;
+}
+
 /* Specifically targeted on screenshoots/index.html */
 
 dt {
