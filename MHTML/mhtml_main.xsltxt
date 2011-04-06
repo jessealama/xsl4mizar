@@ -230,7 +230,7 @@ return tstp_dump;
 //          apply[document($schms,/)/Schemes/Scheme];
  
 // then process the whole document
-          apply; }}}
+          apply; }}}}}
   
      // $body_only > 0
      else 
