@@ -933,7 +933,7 @@ tpl idv_for_top()
 // separate top-level items by additional newline
 tpl [Article] 
 { 
-  <div { @"id"="mhtml"; 
+  <div { @class="mhtml-text"; 
     for-each [*]      
     { 
       apply[.]; 
