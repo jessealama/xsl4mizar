@@ -196,10 +196,10 @@ return tstp_dump;
 }}
 <base { @target=$default_target; }
 // if [$linking = "s"] { @target="_self"; } else { @target="mmlquery";} } 
-// <!-- 
+// 
 // var browse_url = \"http://merak.pb.bialystok.pl/mmlquery/fillin.php?entry=\"
 // function l1(c) { location = browse_url + c }
-// // End -->
+// 
 // "; }
 
         <body {  
