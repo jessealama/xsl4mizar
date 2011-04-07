@@ -821,12 +821,7 @@ tpl [Proof/Proof | Now/Proof | Conclusion/Proof | CaseBlock/Proof | SupposeBlock
 // (now done as perl postproc)
 // if you want ajax_proofs
 tpl [Proof] {
-    $nm0 = "";
-    if[$source_article="undefined"] { 
-      $nm0 = `concat($ajax_proof_dir,"/",$anamelc,"/",@newlevel)`;
-    } else { 
-      $nm0 = `concat($ajax_proof_dir,"/",$source_article,"/",$anamelc,"/",@newlevel)`;
-    } 
+    $nm0 = `concat($ajax_proof_dir,"/",$source_article,"/",$anamelc,"/",@newlevel)`;
     $nm =  { if[$ajax_proofs=3] { `concat($ltmpftptpcgi,"?tmp=",$lbytmpdir,"&raw=1","&file=",$nm0)`; } else { $nm0; } }
     <div { 
          @class="mhtml";
