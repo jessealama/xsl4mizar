@@ -62,7 +62,8 @@ tpl [/] { if [$generate_items = "1"] {
    $bogus=`1`;
    }
    apply;
-}
+} else {
+  apply;
 }
 
 // Header rules
