@@ -7,6 +7,23 @@
 	background-color: lightblue;
 }
 
+.mhtml-text {
+	font-family: monospace;
+	font-size: large;
+	background-color: lightblue;	color: inherit;
+}
+
+div.mhtml-text {
+	text-decoration: none;
+	color: inherit;
+	border-style: solid;
+	border: solid;
+}
+
+a:link {
+	text-decoration: none;
+}
+
 div.mhtml {
 	padding: 0 0 0 0;
 	margin: 0 0 0 0;
@@ -34,8 +51,14 @@ body.mhtml {
 	margin: 0px;
 }
 
+div#mhtml a {
+	text-decoration: none;
+		text-transform: uppercase;
+	color: inherit;
+}
+
 a.mhtml {
-	text-decoration: none
+	text-decoration: none;
 }
 
 a.mhtml:hover {
