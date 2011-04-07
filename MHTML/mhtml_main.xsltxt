@@ -64,7 +64,7 @@ tpl [/] { if [$generate_items = "1"] {
    apply;
 } else {
   apply;
-}
+}}
 
 // Header rules
 tpl [dc:title] { pcomment(#str=`text()`); }
