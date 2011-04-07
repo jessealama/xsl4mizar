@@ -174,7 +174,7 @@ $lbydlicgipref= { `concat($lbydlicgi,"?url=",$lbydliurl)`; }
 // rather than the default
 //
 // proofs/<article>
-#source_article = { ""; }
+#source_article = { "undefined"; }
 
 // tells if proofs are fetched through AJAX; default is off
 // value 2 tells to produce the proofs, but not to insert the ajax calls,
