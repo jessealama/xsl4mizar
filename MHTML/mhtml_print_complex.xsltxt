@@ -13,6 +13,14 @@ include mhtml_utils.xsl;
 //
 // License: GPL (GNU GENERAL PUBLIC LICENSE)
 
+tpl item_kind(#kind) {
+  choose 
+  { 
+      when [$kind = 'T'] { "theorem"; }
+      when [$kind = 'D'] { "deftheorem"; }
+      when [$kind = 'S'] { "scheme"; }
+  }
+}
 
 // ##TODO: try some unification of mkref and absref
 //
