@@ -37,7 +37,6 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
       if [$mizar_items = '1'] {
         $item_kind = { item_kind(#kind = $k); }
 	if [starts-with ($alc, 'ckb')] {
-	  @wow = "ckb";
 	  $after_ckb = `substring-after ($alc, 'ckb')`;
 	  if [$after_ckb > 0] {
 	    @href = `concat ("/fragment/",$source_article,"/",$after_ckb)`;
