@@ -30,6 +30,7 @@ tpl item_kind(#kind) {
 tpl mkref(#aid, #nr, #k, #c, #nm) 
 {
   $mk  =  { refkind(#kind = $k); }
+  $mizar_items_link_text = { ""; }
   $alc =  { lc(#s = $aid); }
   <a {
       @class = "mhtml ref";
@@ -39,6 +40,7 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
 	if [starts-with ($alc, 'ckb')] {
 	  $after_ckb = `substring-after ($alc, 'ckb')`;
 	  if [$after_ckb > 0] {
+	    $mizar_items_link_text = `concat ($source_article, " fragment #", $after_ckb)`;
 	    @href = `concat ("/fragment/",$source_article,"/",$after_ckb)`;
 	  } else {
             @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
@@ -81,17 +83,19 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
       }
       else 
       {
-        $aid; ":";
+        if [$mizar_items_link_text = ""] {
+          $aid; ":";
 
-        if [not($k="T")] 
-	{
-          $mk; " ";
-        }
-
-        $nr;
-      }
-
+          if [not($k="T")] 
+	  {
+            $mk; " ";
+          }
+          $nr;
+        } else {
+	  $mizar_items_link_text;
+	}
     }
+}
 }
 
 
