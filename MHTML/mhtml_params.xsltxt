@@ -164,6 +164,9 @@ $lbydlicgipref= { `concat($lbydlicgi,"?url=",$lbydliurl)`; }
 //         it should be done like privname (via the C key, not like now)
 #const_links = { "0"; }
 
+// Generate links suitable for the mizar-items namespace
+#mizar_items = { "0"; }
+
 // in the presence of ajax proofs, generate links to proofs coming
 // from a "base article" that generates many articles.
 //
