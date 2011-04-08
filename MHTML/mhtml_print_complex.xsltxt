@@ -34,6 +34,21 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
   <a {
       @class = "mhtml ref";
 
+      if [$mizar_items = '1'] {
+        $item_kind = { item_kind(#kind = $k); }
+	if [starts-with ($alc, 'ckb')] {
+	  @wow = "ckb";
+	  $after_ckb = `substring-after ($alc, 'ckb')`;
+	  if [$after_ckb > 0] {
+	    @href = `concat ("/fragment/",$source_article,"/",$after_ckb)`;
+	  } else {
+            @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
+	  }
+	} else {
+	  @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
+	}
+
+      } else {
       if [($linking = 'q') or (($linking = 'm') and not($c))] 
       {
         @href = `concat($mmlq,$aid,":",$mk,".",$nr)`;
@@ -54,6 +69,7 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
           @target = "_self";
         }
       }
+}
 
       if [$titles="1"] 
       {
