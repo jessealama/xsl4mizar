@@ -30,7 +30,11 @@ function insertRequest(obj,http_request) {
         if (http_request.readyState === 4) {
 //            if (http_request.status == 200) {
 	    var ndiv = obj;
-	    while (ndiv.nodeName !== 'SPAN') { ndiv = ndiv.nextSibling; }
+	    // alert (ndiv.nodeName);
+	    while (ndiv.nodeName !== "span" && ndiv.nodeName !== "SPAN") {
+		// alert (ndiv.nodeName);
+		ndiv = ndiv.nextSibling; 
+	    }
 	    ndiv.innerHTML = http_request.responseText;
 	    obj.onclick = function(){ return hs2(obj); };
 //            } else {
