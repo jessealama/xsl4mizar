@@ -167,9 +167,6 @@ $lbydlicgipref= { `concat($lbydlicgi,"?url=",$lbydliurl)`; }
 // Generate links suitable for the mizar-items namespace
 #mizar_items = { "0"; }
 
-// The text we will use 
-#mizar_items_link_text = { ""; }
-
 // in the presence of ajax proofs, generate links to proofs coming
 // from a "base article" that generates many articles.
 //

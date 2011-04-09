@@ -48,58 +48,44 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
 	} else {
 	  @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
 	}
-
+        if [$titles="1"] {
+          @title = `concat($aid,":",$mk,".",$nr)`;
+        }
+	$mizar_items_link_text;	
       } else {
-      if [($linking = 'q') or (($linking = 'm') and not($c))] 
-      {
-        @href = `concat($mmlq,$aid,":",$mk,".",$nr)`;
-      }
-      else 
-      {
-        @href =	
-	{
-           if[($c = 1) and (($linking = 'm') or ($linking = 'l'))]
-	   {
+        if [($linking = 'q') or (($linking = 'm') and not($c))] {
+          @href = `concat($mmlq,$aid,":",$mk,".",$nr)`;
+        } else {
+          @href = { 
+            if[($c = 1) and (($linking = 'm') or ($linking = 'l'))] {
 	      `concat("#",$k, $nr)`;
-	   }
-	   else { `concat($mizhtml,$alc, ".",$ext, "#",$k, $nr)`; }
-	}
+	     } else {
+               `concat($mizhtml,$alc, ".",$ext, "#",$k, $nr)`; }
+	     }
 
-        if [$c = "1"] 
-	{
+        if [$c = "1"] {
           @target = "_self";
         }
       }
-}
 
-      if [$titles="1"] 
-      {
+      if [$titles="1"] {
         @title = `concat($aid,":",$mk,".",$nr)`;
       }
 
-      if [$nm] 
-      { 
+      if [$nm] { 
         $nm; 
       }
-      else 
-      {
-        if [$mizar_items_link_text = ""] {
-          $aid; ":";
+      else {
+        $aid; ":";
 
-          if [not($k="T")] 
-	  {
-            $mk; " ";
-          }
-          $nr;
-        } else {
-	  $mizar_items_link_text;
-	}
+        if [not($k="T")] {
+          $mk; " ";
+        }
+        $nr;
     }
 }
 }
-
-
-
+}
 
 // add the constructor/pattern href, $c tells if it is from current article
 // #sym is optional Mizar symbol
