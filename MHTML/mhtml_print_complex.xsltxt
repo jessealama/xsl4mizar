@@ -39,18 +39,19 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
 	if [starts-with ($alc, 'ckb')] {
 	  $after_ckb = `substring-after ($alc, 'ckb')`;
 	  if [$after_ckb > 0] {
-	    $mizar_items_link_text = `concat ($source_article, " fragment #", $after_ckb)`;
 	    @href = `concat ("/fragment/",$source_article,"/",$after_ckb)`;
+            if [$titles="1"] { @title = `concat($aid,":",$mk,".",$nr)`; }
+	    `concat ($source_article, " fragment #", $after_ckb)`;	
 	  } else {
             @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
+            if [$titles="1"] { @title = `concat($aid,":",$mk,".",$nr)`; }
+            $aid; ":"; $nr;
 	  }
 	} else {
 	  @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
+          if [$titles="1"] { @title = `concat($aid,":",$mk,".",$nr)`; }
+          $aid; ":"; $nr;
 	}
-        if [$titles="1"] {
-          @title = `concat($aid,":",$mk,".",$nr)`;
-        }
-	$mizar_items_link_text;	
       } else {
         if [($linking = 'q') or (($linking = 'm') and not($c))] {
           @href = `concat($mmlq,$aid,":",$mk,".",$nr)`;
