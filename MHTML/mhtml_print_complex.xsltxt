@@ -30,6 +30,7 @@ tpl item_kind(#kind) {
 tpl mkref(#aid, #nr, #k, #c, #nm) 
 {
   $mk  =  { refkind(#kind = $k); }
+  $mizar_items_link_text = { ""; }
   $alc =  { lc(#s = $aid); }
   <a {
       @class = "mhtml ref";
