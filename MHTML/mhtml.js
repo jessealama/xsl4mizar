@@ -25,6 +25,10 @@ function next_sibling_with_name (obj, name) {
     var next = obj;
     var name_lc = name.toLowerCase ();
     var name_uc = name.toUpperCase ();
+    // check nodeName against both lower- and upper-case versions of
+    // the node; this is defensive coding, as some browsers look for
+    // uppercase (e.g., safari), while others look for lowercase (e.g,
+    // opera).
     while (next.nodeName !== name_lc && ndiv.nodeName !== name_uc) {
 	// alert (ndiv.nodeName);
 	next = next.nextSibling; 
