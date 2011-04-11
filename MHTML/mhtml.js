@@ -2,12 +2,10 @@ function hs(obj) {
     // document.getElementById('myimage').nextSibling.style.display = 'block';
     if (obj.nextSibling.style.display === 'inline') {
 	obj.nextSibling.style.display = 'none';
+    } else if (obj.nextSibling.style.display === 'none') { 
+	obj.nextSibling.style.display = 'inline'; 
     } else { 
-	if (obj.nextSibling.style.display === 'none') { 
-	    obj.nextSibling.style.display = 'inline'; 
-	} else { 
-	    obj.nextSibling.style.display = 'inline'; 
-	}
+	obj.nextSibling.style.display = 'inline'; 
     }
     return false;
 }
@@ -15,34 +13,34 @@ function hs(obj) {
 function hs2(obj) {
     if (obj.nextSibling.style.display === 'block') {
 	obj.nextSibling.style.display = 'none';
-    } else { 
-	if (obj.nextSibling.style.display === 'none') {
-	    obj.nextSibling.style.display = 'block';
-	} else {
-	    obj.nextSibling.style.display = 'none';
-	}
+    } else if (obj.nextSibling.style.display === 'none') {
+	obj.nextSibling.style.display = 'block';
+    } else {
+	obj.nextSibling.style.display = 'none';
     }
     return false;
 }
 
-function hsNdiv(obj) {
-    var ndiv = obj;
-    while (ndiv.nextSibling.nodeName  !== 'DIV') {
-	ndiv = ndiv.nextSibling;
+function next_sibling_with_name (obj, name) {
+    var next = obj;
+    var name_lc = name.toLowerCase ();
+    var name_uc = name.toUpperCase ();
+    while (next.nodeName !== name_lc && ndiv.nodeName !== name_uc) {
+	// alert (ndiv.nodeName);
+	next = next.nextSibling; 
     }
-    return hs2(ndiv);
+    return next;
+}
+
+function hsNdiv(obj) {
+    return hs2(next_sibling_with_name (obj, 'div'));
 }
 
 // commented the 200 state to have local requests too
 function insertRequest(obj,http_request) {
     if (http_request.readyState === 4) {
 	//            if (http_request.status == 200) {
-	var ndiv = obj;
-	// alert (ndiv.nodeName);
-	while (ndiv.nodeName !== "span" && ndiv.nodeName !== "SPAN") {
-	    // alert (ndiv.nodeName);
-	    ndiv = ndiv.nextSibling; 
-	}
+	var ndiv = next_sibling_with_name (obj, 'span');
 	ndiv.innerHTML = http_request.responseText;
 	obj.onclick = function(){ return hs2(obj); };
 	//            } else {
