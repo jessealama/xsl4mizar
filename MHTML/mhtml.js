@@ -79,3 +79,5 @@ function makeRequest(obj, url) {
     http_request.open('GET', url, true);
     http_request.send(null);
 }
+
+/*jslint windows: true, white: true, onevar: true, undef: true, nomen: true, regexp: true, plusplus: true, bitwise: true, newcap: true, browser: true, devel: true, maxerr: 50, indent: 4 */
