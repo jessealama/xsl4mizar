@@ -147,3 +147,29 @@ span.mhtml.p0:hover {
 tr.dependence-path-edge {
 	text-align: center;
 }
+
+/* Fixing Josef's xslt-generated FONT stuff */
+
+.varcolor {
+	color: olive;
+}
+
+.constcolor {
+	color: maroon;
+}
+
+.locicolor {
+	color: maroon;
+}
+
+.schpcolor {
+	color: maroon;
+}
+
+.schfcolor {
+	color: maroon;
+}
+
+.ppcolor {
+	color: maroon;
+}
