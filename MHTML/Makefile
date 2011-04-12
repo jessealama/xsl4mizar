@@ -4,7 +4,7 @@ JAVA = java
 XSLTXT = ../xsltxt.jar
 CAT = cat
 
-USE_XSL_DOCUMENT = 1;
+USE_XSL_DOCUMENT = 1
 
 MIZDEPS = mhtml_params mhtml_keys mhtml_print_simple mhtml_utils mhtml_frmtrm mhtml_print_complex mhtml_reasoning mhtml_block_top
 MIZXSLDEPS = $(addsuffix .xsl, $(MIZDEPS))
