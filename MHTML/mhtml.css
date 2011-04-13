@@ -18,7 +18,7 @@ div.mhtml-text {
 	text-decoration: none;
 	color: inherit;
 	border-style: solid;
-	border: solid;
+	border-width: 2px;
 }
 
 /*li.fragment-listing {
