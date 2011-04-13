@@ -195,3 +195,41 @@ tr.dependence-path-edge {
 .commentcolor {
 	color: red;
 }
+
+table.item-actions {
+	margin-left: 0px;
+	margin-right:  0px;
+}
+
+/*table.item-info {
+	margin-left: 10px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	border-left: 0px;
+	border-rigt: 0px;
+	border-spacing: 0px;
+}*/
+
+table.item-table {
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	border-left: 0px;
+	border-rigt: 0px;
+}
+
+ul.path-options {
+	padding-left: 0px;
+}
+
+ul.item-dep-options {
+	padding-left: 0px;
+}
+
+tr.item-row {
+	border: thick;
+	border-bottom-style: double;
+	border-bottom-width: thick;
+}
