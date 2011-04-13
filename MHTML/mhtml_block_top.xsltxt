@@ -27,9 +27,13 @@ tpl rc
 {
   if [($mml="1") or ($generate_items>0)] { apply[ArgTypes]; }
   $nr1 = `1 + count(preceding::RCluster)`;
-  <a 
-  { 
-    @NAME=`concat("RC",$nr1)`;
+  <a {
+    if [$source_article = ""] {
+      @NAME=`concat("RC",$nr1)`;
+    } else {
+      @ID=`concat("/","item","/",$source_article,"/","rcluster","/",$nr1)`;
+    }
+
     pkeyword(#str="cluster "); 
   }
   if [ErrorCluster] { "errorcluster"; } else { apply[*[3]](#all="1"); " "; apply[*[2]]; }
@@ -55,8 +59,12 @@ tpl cc
   }
   
   $nr1 = `1 + count(preceding::CCluster)`;
-  <a { 
-       @NAME=`concat("CC",$nr1)`;
+  <a {
+    if [$source_article = ""] {
+      @NAME=`concat("CC",$nr1)`;
+    } else {
+      @ID=`concat("/","item","/",$source_article,"/","ccluster","/",$nr1)`;
+    } 
        pkeyword(#str="cluster "); }
        if [ErrorCluster] { "errorcluster"; }
        else 
@@ -84,7 +92,12 @@ tpl fc
 { 
    if [($mml="1") or ($generate_items>0)] { apply[ArgTypes]; }
    $nr1 = `1 + count(preceding::FCluster)`;
-   <a { @NAME=`concat("FC",$nr1)`;
+   <a {
+     if [$source_article = ""] { 
+       @NAME=`concat("FC",$nr1)`;
+     } else {
+       @ID=`concat("/","item","/",$source_article,"/","fcluster","/",$nr1)`;
+     }
    pkeyword(#str="cluster "); }
    if [ErrorCluster] { "errorcluster"; }
    else { apply[*[2]]; pkeyword(#str=" -> "); apply[*[3]]; apply[Typ];}
@@ -118,7 +131,12 @@ tpl iy
 
    <a 
    { 
-      @NAME=`concat("IY",$nr1)`;
+      if [$source_article = ""] {
+        @NAME=`concat("IY",$nr1)`;
+      } else {
+        @ID=`concat("/","item","/",$source_article,"/","identification","/",$nr1)`;
+      }
+
       pkeyword(#str="identify "); 
    }
 
@@ -259,6 +277,8 @@ tpl jt
     {
       if [$source_article = ""] {
         @NAME = `concat("T", $nr1)`; 
+      } else {
+        @ID = `concat("/","item","/",$source_article,"/","theorem","/",$nr1)`; 
       }
        // pcomment0(#str = `concat($aname,":", $nr1)`); 
        if [@interesting > 0] 
@@ -509,7 +529,12 @@ tpl sd
     <a 
     { 
       @class="mhtml";
-      @NAME=`concat("S",@schemenr)`; pkeyword(#str="scheme  ");
+      if [$source_article = ""] {
+        @NAME=`concat("S",@schemenr)`;
+      } else {
+        @ID=`concat("/","item","/",$source_article,"/","scheme","/",@schemenr)`; 
+      }
+      pkeyword(#str="scheme  ");
       pcomment(#str=`concat($aname,":sch ",@schemenr)`); 
     }
 //     "s"; `@schemenr`; 
