@@ -286,7 +286,7 @@ tpl jt
 	  " "; edit_for_thm(#line=`Proposition[1]/@line`, #col=`Proposition[1]/@col`);
        }
 
-       <br;
+       // <br;
     }
 
     if [Proof] 
