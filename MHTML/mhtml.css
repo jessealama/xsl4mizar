@@ -76,7 +76,7 @@ a.mhtml:hover {
 }
 
 a.mhtml.ref {
-	font-size: x-small;
+	font-size: small;
 }
 
 a.mhtml.ref:link {
@@ -101,6 +101,7 @@ span.mhtml.kw {
 
 span.mhtml.lab {
 	font-style: italic;
+	font-size: small
 }
 
 span.mhtml.comment {
