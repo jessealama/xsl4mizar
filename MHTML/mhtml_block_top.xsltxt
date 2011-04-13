@@ -30,8 +30,6 @@ tpl rc
   <a {
     if [$source_article = ""] {
       @NAME=`concat("RC",$nr1)`;
-    } else {
-      @"id" = `concat("/","item","/",$source_article,"/","rcluster","/",$nr1)`;
     }
 
     pkeyword(#str="cluster "); 
@@ -62,9 +60,7 @@ tpl cc
   <a {
     if [$source_article = ""] {
       @NAME=`concat("CC",$nr1)`;
-    } else {
-      @"id"=`concat("/","item","/",$source_article,"/","ccluster","/",$nr1)`;
-    } 
+    }
        pkeyword(#str="cluster "); }
        if [ErrorCluster] { "errorcluster"; }
        else 
@@ -95,8 +91,6 @@ tpl fc
    <a {
      if [$source_article = ""] { 
        @NAME=`concat("FC",$nr1)`;
-     } else {
-       @"id"=`concat("/","item","/",$source_article,"/","fcluster","/",$nr1)`;
      }
    pkeyword(#str="cluster "); }
    if [ErrorCluster] { "errorcluster"; }
@@ -133,8 +127,6 @@ tpl iy
    { 
       if [$source_article = ""] {
         @NAME=`concat("IY",$nr1)`;
-      } else {
-        @"id"=`concat("/","item","/",$source_article,"/","identification","/",$nr1)`;
       }
 
       pkeyword(#str="identify "); 
@@ -277,9 +269,7 @@ tpl jt
     {
       if [$source_article = ""] {
         @NAME = `concat("T", $nr1)`; 
-      } else {
-        @"id" = `concat("/","item","/",$source_article,"/","theorem","/",$nr1)`; 
-      }
+      } 
        // pcomment0(#str = `concat($aname,":", $nr1)`); 
        if [@interesting > 0] 
        { 
@@ -531,9 +521,7 @@ tpl sd
       @class="mhtml";
       if [$source_article = ""] {
         @NAME=`concat("S",@schemenr)`;
-      } else {
-        @"id"=`concat("/","item","/",$source_article,"/","scheme","/",@schemenr)`; 
-      }
+      } 
       pkeyword(#str="scheme  ");
       pcomment(#str=`concat($aname,":sch ",@schemenr)`); 
     }
