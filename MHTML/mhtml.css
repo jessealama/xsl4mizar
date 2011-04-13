@@ -21,6 +21,15 @@ div.mhtml-text {
 	border: solid;
 }
 
+/*li.fragment-listing {
+	font-family: monospace;
+	font-size: large;
+	background-color: aliceblue;
+	border-style: solid;
+	border: solid;
+	color: inherit;
+}*/
+
 a:link {
 	text-decoration: none;
 }
