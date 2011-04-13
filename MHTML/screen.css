@@ -197,11 +197,11 @@ table.example {
 	text-align: center;
 }
 
-table {
+/*table {
 	margin-left: 4em;
 	margin-right: 4em;
 	border: none;
-}
+}*/
 
 table.code, table.code tr, table.code td {
 	margin: 0em;
