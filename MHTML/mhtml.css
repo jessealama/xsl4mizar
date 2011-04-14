@@ -63,8 +63,7 @@ body.mhtml {
 
 div#mhtml a {
 	text-decoration: none;
-		text-transform: uppercase;
-	color: inherit;
+	/* color: inherit; */
 }
 
 a.mhtml {
