@@ -227,6 +227,10 @@ ul.item-dep-options {
 	padding-left: 0px;
 }
 
+table.item-table > td {
+	vertical-align: top;
+}
+
 tr.item-info-row td {
 	border-bottom-style: solid;
 	border-bottom-width: thin;
