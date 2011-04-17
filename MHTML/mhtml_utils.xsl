@@ -1299,7 +1299,7 @@
       <xsl:text>hs(this)</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="href">
-      <xsl:text>javascript:()</xsl:text>
+      <xsl:text>javascript:void(0)</xsl:text>
     </xsl:attribute>
   </xsl:template>
 
@@ -1311,7 +1311,7 @@
       <xsl:text>hs2(this)</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="href">
-      <xsl:text>javascript:()</xsl:text>
+      <xsl:text>javascript:void(0)</xsl:text>
     </xsl:attribute>
   </xsl:template>
 
@@ -1323,7 +1323,7 @@
       <xsl:text>hsNdiv(this)</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="href">
-      <xsl:text>javascript:()</xsl:text>
+      <xsl:text>javascript:void(0)</xsl:text>
     </xsl:attribute>
   </xsl:template>
 
@@ -1336,7 +1336,7 @@
       <xsl:value-of select="concat(&quot;makeRequest(this,&apos;&quot;,$u,&quot;&apos;)&quot;)"/>
     </xsl:attribute>
     <xsl:attribute name="href">
-      <xsl:text>javascript:()</xsl:text>
+      <xsl:text>javascript:void(0)</xsl:text>
     </xsl:attribute>
   </xsl:template>
 </xsl:stylesheet>

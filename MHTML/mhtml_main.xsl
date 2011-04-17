@@ -38,23 +38,25 @@
   <!-- ##INCLUDE HERE -->
   <!-- Default -->
   <xsl:template match="/">
-    <xsl:if test="$generate_items = &quot;1&quot;">
-      <xsl:apply-templates select="/*/JustifiedTheorem|/*/DefTheorem|/*/SchemeBlock"/>
-      <xsl:apply-templates select="//RCluster|//CCluster|//FCluster|//Definition|//IdentifyWithExp"/>
-      <!-- top-level lemmas -->
-      <xsl:for-each select="/*/Proposition">
-        <xsl:document href="proofhtml/lemma/{$anamelc}.{@propnr}" format="html"> 
-        <xsl:apply-templates select="."/>
-        </xsl:document> 
-        <xsl:variable name="bogus" select="1"/>
-      </xsl:for-each>
-      <xsl:apply-templates/>
-    </xsl:if>
-    <xsl:apply-templates/>
+    <xsl:choose>
+      <xsl:when test="$generate_items = &quot;1&quot;">
+        <xsl:apply-templates select="/*/JustifiedTheorem|/*/DefTheorem|/*/SchemeBlock"/>
+        <xsl:apply-templates select="//RCluster|//CCluster|//FCluster|//Definition|//IdentifyWithExp"/>
+        <!-- top-level lemmas -->
+        <xsl:for-each select="/*/Proposition">
+          <!-- <xsl:document href="proofhtml/lemma/{$anamelc}.{@propnr}" format="html"> -->
+          <xsl:apply-templates select="."/>
+          <!-- </xsl:document> -->
+          <xsl:variable name="bogus" select="1"/>
+        </xsl:for-each>
+        <xsl:apply-templates/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
-  <!-- tpl [*] { copy { apply [@*]; apply; } } -->
-  <!-- tpl [@*] { copy-of `.`; } -->
   <!-- Header rules -->
   <xsl:template match="dc:title">
     <xsl:call-template name="pcomment">
