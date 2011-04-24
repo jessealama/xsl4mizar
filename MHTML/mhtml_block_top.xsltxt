@@ -675,12 +675,16 @@ tpl dfs()
              // here the redefined constructor is retrieved from definiens 
 	     pkeyword(#str="redefine ");
 
-	     $doc = { if [key($ckind, $cnr)] { ""; } else { $constrs; } }
+	     // $doc = { if [key($ckind, $cnr)] { ""; } else { $constrs; } }
 
-	     for-each [document($doc, /)] 
-	     { 
-	        apply[key($ckind, $cnr)](#indef = "1", #nl = $nl, #argt = $argtypes, #nrt= "1",#old="1"); 
-	     } 
+	     if [key($ckind, $cnr)] {
+	       // do nothing
+             } else {  
+	       for-each [document($constrs, /)] 
+	       { 
+	         apply[key($ckind, $cnr)](#indef = "1", #nl = $nl, #argt = $argtypes, #nrt= "1",#old="1"); 
+	       } 
+	     }
           }
 
 	  if [DefMeaning/@kind = 'e'] { pkeyword(#str=" equals "); } 

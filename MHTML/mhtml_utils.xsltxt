@@ -477,6 +477,7 @@ tpl patt_info(#k, #nr, #pid)
 		     or (key($pkey,$nr)[$pid=@relnr])]  { ""; } else { $patts; }
              }
 
+      if [$doc] {
       for-each [document($doc,/)] 
       {
 	   if [$typ and key('EXP',$pid)] 
@@ -503,10 +504,13 @@ tpl patt_info(#k, #nr, #pid)
 	      }
            }
        }
+     }
    }
    else 
    { 
       $doc = { if [key($pkey,$nr)] { ""; } else { $patts; } }
+
+      if [$doc] {
 
       for-each [document($doc,/)] 
       {
@@ -515,6 +519,7 @@ tpl patt_info(#k, #nr, #pid)
 	    encode_std_pattern(#k = $k);
 	 }
       }
+    }
    }
 }
 
