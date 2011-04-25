@@ -982,7 +982,7 @@ tpl [Article]
     for-each [*] { 
       apply[.];
       if [(not(name()='Definiens')) and (not(name()='Reservation'))] {
-        <br;
+        // <br;
       } 
     }
   }
