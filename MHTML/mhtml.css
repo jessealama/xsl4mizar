@@ -242,6 +242,10 @@ td.item-info-heading {
 	border-bottom-style: none;
 }
 
+td.item-info-value ul {
+	padding-left: 0px;
+}
+
 /* This is the default stylesheet for the screen media type. */
 
 /* Copyleft (c) 2002-2004 Jonas Fonseca <fonseca@diku.dk> */
