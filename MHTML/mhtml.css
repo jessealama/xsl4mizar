@@ -381,12 +381,13 @@ ul li, dl, p {
 }*/
 
 .header {
-	font-size: 1em;
 	font-weight: bold;
 }
 
 .footer {
 	font-size: 0.7em;
+	border-top-style: solid;
+	border-top-width: thin;
 }
 
 .header span.menu,
