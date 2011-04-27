@@ -41,7 +41,11 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
 	  if [$after_ckb > 0] {
 	    @href = `concat ("/fragment/",$source_article,"/",$after_ckb)`;
             if [$titles="1"] { @title = `concat($aid,":",$mk,".",$nr)`; }
-	    `concat ($source_article, " fragment #", $after_ckb)`;	
+	    <span {
+	      @class = "article-name";
+	      $source_article;
+	    }
+	    `concat (" fragment #", $after_ckb)`;	
 	  } else {
             @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
             if [$titles="1"] { @title = `concat($aid,":",$mk,".",$nr)`; }
