@@ -373,7 +373,7 @@ ul li, dl, p {
 .header,
 .footer {
 	padding: 0.4em 1em;
-	margin: 0em;
+	border: none;
 }
 
 /*table.header {
