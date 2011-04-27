@@ -517,3 +517,12 @@ tr.halfwidth {
 a.ref {
 	color: red;
 }
+
+p.error-message {
+	border-style: solid;
+	background-color: #ff201a;
+	text-transform: none;
+	text-align: center;
+	font-weight: bold;
+	font-style: italic;
+}
