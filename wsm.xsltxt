@@ -1,0 +1,98 @@
+stylesheet 1.0;
+output method=text;
+
+key "D_G" [Symbol[@kind='G']] `@nr`;
+key "D_K" [Symbol[@kind='K']] `@nr`;
+key "D_J" [Symbol[@kind='J']] `@nr`;
+key "D_L" [Symbol[@kind='L']] `@nr`;
+key "D_M" [Symbol[@kind='M']] `@nr`;
+key "D_O" [Symbol[@kind='O']] `@nr`;
+key "D_R" [Symbol[@kind='R']] `@nr`;
+key "D_U" [Symbol[@kind='U']] `@nr`;
+key "D_V" [Symbol[@kind='V']] `@nr`;
+// identifiers
+key "D_I" [Symbol[@kind='I']] `@nr`;
+
+$lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
+$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; } 
+
+// name of current article (upper case)
+#aname= { `string(/*/@articleid)`; }
+
+// name of current article (lower case)
+#anamelc= { `translate($aname, $ucletters, $lcletters)`; }
+
+// .idx file with identifier names
+#ids=  { `concat($anamelc, '.idx')`; }
+
+// private - look up the name of id
+tpl get_vid_name(#vid)
+{
+  for-each [document($ids, /)] 
+  { 
+     for-each [key('D_I', $vid)] { `@name`; }
+  }
+}
+
+tpl [Text-Proper] {
+  "begin"; "\n";
+  for-each [*] {
+    apply [.];
+  }
+}
+
+tpl [Item[@kind='Reservation']] {
+  "reserve ";
+  for-each [Variable] {
+    get_vid_name (#vid = `@idnr`); ", ";
+  }
+  "for ";
+  if [Standard-Type] {
+    for-each [Standard-Type] {
+      "type "; `@nr`;
+    }
+  } else {
+    "error: no type was found";
+  }
+  "\n";
+}
+
+tpl [Item[@kind='Scheme-Block-Item']] {
+  for-each [Block[@kind='Scheme-Block']] {
+    for-each [Item[@kind='Scheme-Head']] {
+      for-each [Scheme] {
+        "scheme "; get_vid_name (#vid = `@idnr`);
+      }
+      " { ";
+      // this seems suboptimal: we should treat possibly-interleaved
+      // functor and predicate segments
+      
+      // functor segment
+      for-each [Functor-Segment] {
+        for-each [Variable] {
+          get_vid_name (#vid = `@idnr`);
+        }
+        for-each [Type-List] {
+          "not sure how to handle this ";
+        }
+        for-each [Standard-Type] {
+          "type "; `@idnr`;
+        }
+      }
+      // predicate segments
+      for-each [Predicate-Segment] {
+        for-each [Variable] {
+          get_vid_name (#vid = `@idnr`);
+        }
+        for-each [Type-List] {
+          "not sure how to handle this ";
+        }
+        for-each [Standard-Type] {
+          "type "; `@idnr`;
+        }
+      }
+      " : ";
+      " } ";
+    }
+  }
+}
