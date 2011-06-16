@@ -34,6 +34,10 @@ tpl get_vid_name(#vid)
   }
 }
 
+tpl die(#message) {
+  msg terminate="yes" "No type was found";
+}
+
 tpl [Text-Proper] {
   "begin"; "\n";
   for-each [*] {
@@ -52,7 +56,7 @@ tpl [Item[@kind='Reservation']] {
       "type "; `@nr`;
     }
   } else {
-    "error: no type was found";
+    die(#message="No type was found");
   }
   "\n";
 }
