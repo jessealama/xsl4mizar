@@ -25,7 +25,6 @@ $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 // .idx file with identifier names
 #ids=  { `concat($anamelc, '.idx')`; }
 
-// private - look up the name of id
 tpl get_vid_name(#vid)
 {
   for-each [document($ids, /)] 
