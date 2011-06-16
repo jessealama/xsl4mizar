@@ -44,63 +44,268 @@ tpl [Text-Proper] {
   }
 }
 
+tpl [Variable] {
+  if [@spelling] {
+    `@spelling`;
+  } else {
+    die (#message = "Variable missing a spelling!");
+  }
+}
+
+tpl [Standard-Type] {
+  if [@spelling] {
+    `@spelling`;
+  } else {
+    die (#message = "Standard-Type lacks a spelling!");
+  }
+}
+
 tpl [Item[@kind='Reservation']] {
   "reserve ";
   for-each [Variable[following-sibling::Variable]] {
-    `@spelling`;
+    apply [.];
     ", ";
   }
   for-each [Variable[position()=last()]] {
-    `@spelling`;
+    apply [.];
   }
   " ";
   "for ";
+
+  // sanity check: one and only one type
   if [Standard-Type] {
-    for-each [Standard-Type] {
-      "type "; `@nr`;
+    if [Standard-Type[2]] {
+      die (#message = "Multiple Standard-Type children of a Reservation item!");
+    } else {
+      apply [Standard-Type[1]]; ";"; "\n";
     }
   } else {
-    die(#message="No type was found");
+    die(#message="No type was found under a Reservation!");
   }
-  "\n";
 }
 
 tpl [Item[@kind='Scheme-Block-Item']] {
-  for-each [Block[@kind='Scheme-Block']] {
-    for-each [Item[@kind='Scheme-Head']] {
-      for-each [Scheme] {
-        "scheme "; get_vid_name (#vid = `@idnr`);
-      }
-      " { ";
-      // this seems suboptimal: we should treat possibly-interleaved
-      // functor and predicate segments
-      
-      // functor segment
-      for-each [Functor-Segment] {
-        for-each [Variable] {
-          get_vid_name (#vid = `@idnr`);
-        }
-        for-each [Type-List] {
-          "not sure how to handle this ";
-        }
-        for-each [Standard-Type] {
-          "type "; `@idnr`;
-        }
-      }
-      // predicate segments
-      for-each [Predicate-Segment] {
-        for-each [Variable] {
-          get_vid_name (#vid = `@idnr`);
-        }
-        for-each [Type-List] {
-          "not sure how to handle this ";
-        }
-        for-each [Standard-Type] {
-          "type "; `@idnr`;
-        }
-      }
-      " : ";
-      " } ";
+
+  // sanity check: there is one and only one Scheme-Block child
+  if [Block[@kind='Scheme-Block']] {
+    if [Block[@kind='Scheme-Block'][2]] {
+      die(#message = "Multiple Scheme-Block children of a Scheme-Block-Item!");
+    } else {
+      apply[Block[@kind='Scheme-Block'][1]];
     }
+  } else {
+    die(#message = "Scheme-Block child of a Scheme-Block-Item is missing!");
   }
 }
+
+tpl [Block[@kind='Scheme-Block']] {
+
+  // sanity check: there is one and only one Scheme-Head child
+  if [Item[@kind='Scheme-Head']] {
+    if [Item[@kind='Scheme-Head'][2]] {
+      die(#message = "Multiple Scheme-Head children of a Scheme-Block!");
+    } else {
+      apply [Item[@kind='Scheme-Head'][1]];
+    }
+  } else {
+    die(#message = "Scheme-Head child of Scheme-Block is missing!");
+  }
+}
+
+tpl [Type-List] {
+  "(";
+  for-each [Standard-Type] {
+   apply [.];
+  }
+  ")";
+}
+
+tpl [Functor-Segment] {
+
+  // sanity check: there is one and only one Variable child
+  if [Variable] {
+    if [Variable[2]] {
+      die (#message = "More than one Variable child of a Functor-Segment element!");
+    } else {
+      apply [Variable[1]];
+
+      // sanity check: there is one and only one Type-List
+      if [Type-List] {
+        if [Type-List[2]] {
+          die (#message = "Multiple Type-List children of a Functor-Segment!");
+        } else {
+          apply [Type-List[1]];
+          " -> ";
+          // sanity check: there is one and only one Standard-Type
+          if [Standard-Type] {
+            if [Standard-Type[2]] {
+              die (#message = "Multiple Standard-Type children of a Functor-Segment element!");
+            } else {
+              apply [Standard-Type[1]];
+            }
+          } else {
+            die (#message = "Standard-Type child missing from Functor-Segment element!");
+          }
+        }
+      } else {
+        die (#message = "Type-List child of Functor-Segment is missing!");
+      }
+    }
+  } else {
+    die (#message = "Variable child missing from Functor-Segment element!");
+  }
+}
+
+tpl [Predicate-Segment] {
+  // sanity check: there is one and only one Variable child
+  if [Variable] {
+    if [Variable[2]] {
+      die (#message = "More than one Variable child of a Predicate-Segment element!");
+    } else {
+      apply [Variable[1]];
+
+      // sanity check: there is one and only one Type-List
+      if [Type-List] {
+        if [Type-List[2]] {
+          die (#message = "Multiple Type-List children of a Predicate-Segment!");
+        } else {
+          apply [Type-List[1]];
+        }
+      } else {
+        die (#message = "Type-List child of Predicate-Segment is missing!");
+      }
+    }
+  } else {
+    die (#message = "Variable child missing from Predicate-Segment element!");
+  }
+}
+
+tpl [Scheme] {
+  if [@idnr] {
+    "scheme "; get_vid_name (#vid = `@idnr`);
+  } else {
+    die (#message = "Scheme lacks an idnr attribute!");
+  }
+}
+
+tpl [Explicitly-Qualified-Segment] {
+  // sanity check: at least one variable
+  if [Variable] {
+    // sanity check: there is a Standard-Type
+    if [Standard-Type] {
+      for-each [Variable[following-sibling::Variable]] {
+        apply [.];
+	",";
+      }
+      for-each [Variable[position()=last()]] {
+        apply [.];
+      }
+      " being ";
+      apply [Standard-Type[1]];
+    } else {
+      die (#message = "Explicitly-Qualified-Segment lacks a Standard-Type child!");
+    }
+  } else {
+    die (#message = "Explicitly-Qualified-Segment lacks a Variable child!");
+  }
+}
+
+tpl [Existential-Quantifier-Formula] {
+  // sanity check: there is one and only one explicitly qualified segment
+  if [Explicitly-Qualified-Segment] {
+    if [Explicitly-Qualified-Segment[2]] {
+      die (#message = "Existential-Quantifier-Formula has multiple Explicitly-Qualified-Segment children!");
+    } else {
+      "ex ";
+      apply [Explicitly-Qualified-Segment[1]];
+      apply [*[2]]; // weird, definitely not right
+      ";";
+    }
+  } else {
+    die (#message = "Existential-Quantifier-Formula lacks an Explicitly-Qualified-Segment child!");
+  }
+}
+
+// dumb: this just is a copy-and-paste-and-edit of the
+// Existential-Quantifier-Formula case.  Should be parameterized and
+// combined into one.
+tpl [Universal-Quantifier-Formula] {
+  // sanity check: there is one and only one explicitly qualified segment
+  if [Explicitly-Qualified-Segment] {
+    if [Explicitly-Qualified-Segment[2]] {
+      die (#message = "Universal-Quantifier-Formula has multiple Explicitly-Qualified-Segment children!");
+    } else {
+      "for ";
+      apply [Explicitly-Qualified-Segment[1]];
+      apply [*[2]]; // weird, definitely not right
+      ";";
+    }
+  } else {
+    die (#message = "Universal-Quantifier-Formula lacks an Explicitly-Qualified-Segment child!");
+  }
+}
+
+tpl [Item[@kind='Scheme-Head']] {
+
+  // sanity check: one and only one Scheme child
+  if [Scheme] {
+    if [Scheme[2]] {
+      die (#message = "More than one Scheme child of a Scheme-Head element!");
+    } else {
+      apply [Scheme[1]];
+      " { ";
+      for-each [Functor-Segment | Predicate-Segment] {
+        apply [.];
+	", ";
+      }
+      " } :";
+      // now look for the scheme formula
+      if [Existential-Quantifier-Formula|Universal-Quantifier-Formula] {
+        apply [Existential-Quantifier-Formula|Universal-Quantifier-Formula];
+      } else {
+        die (#message = "Scheme-Head lacks a scheme formula!");
+      }
+    }
+  } else {
+    die (#message = "Scheme child of a Scheme-Head item is missing!");
+  }
+}
+
+//   for-each [Block[@kind='Scheme-Block']] {
+//     for-each [Item[@kind='Scheme-Head']] {
+//       for-each [Scheme] {
+//         "scheme "; get_vid_name (#vid = `@idnr`);
+//       }
+//       " { ";
+//       // this seems suboptimal: we should treat possibly-interleaved
+//       // functor and predicate segments
+      
+//       // functor segment
+//       for-each [Functor-Segment] {
+//         for-each [Variable] {
+//           get_vid_name (#vid = `@idnr`);
+//         }
+//         for-each [Type-List] {
+//           "not sure how to handle this ";
+//         }
+//         for-each [Standard-Type] {
+//           "type "; `@idnr`;
+//         }
+//       }
+//       // predicate segments
+//       for-each [Predicate-Segment] {
+//         for-each [Variable] {
+//           get_vid_name (#vid = `@idnr`);
+//         }
+//         for-each [Type-List] {
+//           "not sure how to handle this ";
+//         }
+//         for-each [Standard-Type] {
+//           "type "; `@idnr`;
+//         }
+//       }
+//       " : ";
+//       " } ";
+//     }
+//   }
+// }
