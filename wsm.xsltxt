@@ -47,9 +47,14 @@ tpl [Text-Proper] {
 
 tpl [Item[@kind='Reservation']] {
   "reserve ";
-  for-each [Variable] {
-    get_vid_name (#vid = `@idnr`); ", ";
+  for-each [Variable[following-sibling::Variable]] {
+    `@spelling`;
+    ", ";
   }
+  for-each [Variable[position()=last()]] {
+    `@spelling`;
+  }
+  " ";
   "for ";
   if [Standard-Type] {
     for-each [Standard-Type] {
