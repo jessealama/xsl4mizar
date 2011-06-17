@@ -226,6 +226,77 @@ tpl [Existential-Quantifier-Formula] {
   }
 }
 
+tpl [Simple-Term] {
+  // sanity check: there is a spelling
+  if [@spelling] {
+    `@spelling`;
+  } else {
+    die (#message = "Simple-Term lacks a spelling!");
+  }
+}
+
+// "Arguments" seems like it should be "Argument"; I've informed Czeslaw
+tpl [Arguments] {
+  apply [*[1]];
+}
+
+tpl [Private-Functor-Term] {
+  if [@spelling] {
+    `@spelling`;
+    "(";
+    for-each [./*] {
+      apply [.];
+      " ,";
+    }
+    ")";
+  } else {
+    die (#message = "Pivate-Functor-Term lacks a spelling!");
+  }
+}
+
+tpl [Private-Predicate-Formula] {
+  if [@spelling] {
+    `@spelling`;
+    "(";
+    for-each [./*] {
+      apply [.];
+    }
+    ")";
+  } else {
+    die (#message = "Private-Predicate-Formula lacks a spelling!");
+  }
+}
+
+tpl [Conjuctive-Formula] { // typo: should be "Conjunctive-Formula"
+  apply [*[1]];
+  " & ";
+  apply [*[2]];
+}
+
+tpl [Predicative-Formula] {
+  // sanity check: there's a spelling
+  if [@spelling] {
+    `@spelling`;
+    "(";
+    for-each [Arguments] {
+      apply [.];
+      ", ";
+    }
+    ")";
+  } else {
+    die (#message = "Predicative-Formula lacks a spellin!");
+  }
+}
+
+tpl [Biconditional-Formula] {
+  "(";
+  apply [*[1]];
+  " iff ";
+  apply [*[2]];
+  ")";
+  ";";
+}
+
 // dumb: this just is a copy-and-paste-and-edit of the
 // Existential-Quantifier-Formula case.  Should be parameterized and
 // combined into one.
