@@ -223,10 +223,9 @@ tpl [Existential-Quantifier-Formula] {
       "ex ";
       apply [Explicitly-Qualified-Segment[1]];
       " holds ";
-      "("
+      "(";
       apply [*[2]]; // weird, definitely not right
       ")";
-      ";";
     }
   } else {
     die (#message = "Existential-Quantifier-Formula lacks an Explicitly-Qualified-Segment child!");
@@ -359,10 +358,9 @@ tpl [Universal-Quantifier-Formula] {
       "for ";
       apply [Explicitly-Qualified-Segment[1]];
       " holds ";
-      "("
+      "(";
       apply [*[2]]; // weird, definitely not right
-      ")"
-      ";";
+      ")";
     }
   } else {
     die (#message = "Universal-Quantifier-Formula lacks an Explicitly-Qualified-Segment child!");
