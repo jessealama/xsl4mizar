@@ -323,7 +323,28 @@ tpl [Biconditional-Formula] {
   " iff ";
   apply [*[2]];
   ")";
-  ";";
+}
+
+// first stab at abstracting treatment of quantified formulas not sure
+// if this applies in all cases.  Need to grab the explicitly
+// qualified segment.
+tpl quantified-formula(#kind) {
+
+  // sanity check: there is one and only one explicitly qualified segment
+  if [Explicitly-Qualified-Segment] {
+    if [Explicitly-Qualified-Segment[2]] {
+      die (#message = "Universal-Quantifier-Formula has multiple Explicitly-Qualified-Segment children!");
+    } else {
+      if [$kind = "forall"] { "for "; } else { "ex"; }
+      apply [Explicitly-Qualified-Segment[1]];
+      " holds ";
+      "(";
+      apply [*[2]]; // weird, definitely not right
+      ")";
+    }
+  } else {
+    die (#message = "Universal-Quantifier-Formula lacks an Explicitly-Qualified-Segment child!");
+  }
 }
 
 // dumb: this just is a copy-and-paste-and-edit of the
