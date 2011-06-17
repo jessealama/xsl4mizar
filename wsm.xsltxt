@@ -258,6 +258,34 @@ tpl [Private-Functor-Term] {
   }
 }
 
+tpl [Item[@kind='Private-Predicate-Definition']] {
+  if [Variable] {
+    if [Variable[2]] {
+      die (#message = "Private-Predicate-Definition has multiple variables!");
+    } else {
+      "defpred ";
+      apply [Variable[1]];
+      // sanity check: Type-List is present
+      if [Type-List] {
+        if [Type-List[2]] {
+          die (#message = "Private-Predicate-Definition has multiple Type-List children!");
+        } else {
+          "[";
+          list(#separ = ",", #elems = `Type-List[1]/*`);
+          "]";
+	  " means ";
+	  apply [*[3]];
+	  ";";
+        }
+      } else {
+        die (#message = "Private-Predicate-Definition lacks a Type-List child!");
+      }
+    }
+  } else {
+    die (#message = "Private-Predicate-Definition item lacks a Variable child!");
+  }
+}
+
 tpl [Private-Predicate-Formula] {
   if [@spelling] {
     `@spelling`;
