@@ -34,7 +34,7 @@ tpl get_vid_name(#vid)
 }
 
 tpl die(#message) {
-  msg terminate="yes" "No type was found";
+  msg terminate="yes" $message;
 }
 
 tpl [Text-Proper] {
