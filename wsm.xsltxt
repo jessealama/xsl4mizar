@@ -251,10 +251,7 @@ tpl [Private-Functor-Term] {
   if [@spelling] {
     `@spelling`;
     "(";
-    for-each [./*] {
-      apply [.];
-      " ,";
-    }
+    list (#separ = ",", #elems = `./*`);
     ")";
   } else {
     die (#message = "Pivate-Functor-Term lacks a spelling!");
