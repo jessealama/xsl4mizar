@@ -331,7 +331,7 @@ tpl [Item[@kind='Scheme-Head']] {
         apply [.];
 	", ";
       }
-      " } :";
+      " } : ";
       // now look for the scheme formula
       if [Existential-Quantifier-Formula|Universal-Quantifier-Formula] {
         apply [Existential-Quantifier-Formula|Universal-Quantifier-Formula];
