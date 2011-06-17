@@ -189,6 +189,15 @@ tpl [Scheme] {
   }
 }
 
+tpl [Implicitly-Qualified-Segment] {
+  // sanity check: at least one variable
+  if [Variable] {
+    list (#separ = ",", #elems = `Variable`);
+  } else {
+    die (#message = "Explicitly-Qualified-Segment lacks a Variable child!");
+  }
+}
+
 tpl [Explicitly-Qualified-Segment] {
   // sanity check: at least one variable
   if [Variable] {
