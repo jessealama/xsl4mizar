@@ -218,6 +218,7 @@ tpl [Existential-Quantifier-Formula] {
     } else {
       "ex ";
       apply [Explicitly-Qualified-Segment[1]];
+      " holds ";
       apply [*[2]]; // weird, definitely not right
       ";";
     }
@@ -308,6 +309,7 @@ tpl [Universal-Quantifier-Formula] {
     } else {
       "for ";
       apply [Explicitly-Qualified-Segment[1]];
+      " holds ";
       apply [*[2]]; // weird, definitely not right
       ";";
     }
