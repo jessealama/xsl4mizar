@@ -11,6 +11,21 @@
   <!-- Author: Josef Urban -->
   <!--  -->
   <!-- License: GPL (GNU GENERAL PUBLIC LICENSE) -->
+  <xsl:template name="item_kind">
+    <xsl:param name="kind"/>
+    <xsl:choose>
+      <xsl:when test="$kind = &apos;T&apos;">
+        <xsl:text>theorem</xsl:text>
+      </xsl:when>
+      <xsl:when test="$kind = &apos;D&apos;">
+        <xsl:text>deftheorem</xsl:text>
+      </xsl:when>
+      <xsl:when test="$kind = &apos;S&apos;">
+        <xsl:text>scheme</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- ##TODO: try some unification of mkref and absref -->
   <!--  -->
   <!-- theorem, definition and scheme references -->
@@ -37,46 +52,101 @@
         <xsl:text>mhtml ref</xsl:text>
       </xsl:attribute>
       <xsl:choose>
-        <xsl:when test="($linking = &apos;q&apos;) or (($linking = &apos;m&apos;) and not($c))">
-          <xsl:attribute name="href">
-            <xsl:value-of select="concat($mmlq,$aid,&quot;:&quot;,$mk,&quot;.&quot;,$nr)"/>
-          </xsl:attribute>
+        <xsl:when test="$mizar_items = &apos;1&apos;">
+          <xsl:variable name="item_kind">
+            <xsl:call-template name="item_kind">
+              <xsl:with-param name="kind" select="$k"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="starts-with ($alc, &apos;ckb&apos;)">
+              <xsl:variable name="after_ckb" select="substring-after ($alc, &apos;ckb&apos;)"/>
+              <xsl:choose>
+                <xsl:when test="$after_ckb &gt; 0">
+                  <xsl:attribute name="href">
+                    <xsl:value-of select="concat (&quot;/fragment/&quot;,$source_article,&quot;/&quot;,$after_ckb)"/>
+                  </xsl:attribute>
+                  <xsl:if test="$titles=&quot;1&quot;">
+                    <xsl:attribute name="title">
+                      <xsl:value-of select="concat($aid,&quot;:&quot;,$mk,&quot;.&quot;,$nr)"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="concat ($source_article, &quot; fragment #&quot;, $after_ckb)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="href">
+                    <xsl:value-of select="concat(&quot;/item/&quot;,$alc,&quot;/&quot;,$item_kind,&quot;/&quot;,$nr)"/>
+                  </xsl:attribute>
+                  <xsl:if test="$titles=&quot;1&quot;">
+                    <xsl:attribute name="title">
+                      <xsl:value-of select="concat($aid,&quot;:&quot;,$mk,&quot;.&quot;,$nr)"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="$aid"/>
+                  <xsl:text>:</xsl:text>
+                  <xsl:value-of select="$nr"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="href">
+                <xsl:value-of select="concat(&quot;/item/&quot;,$alc,&quot;/&quot;,$item_kind,&quot;/&quot;,$nr)"/>
+              </xsl:attribute>
+              <xsl:if test="$titles=&quot;1&quot;">
+                <xsl:attribute name="title">
+                  <xsl:value-of select="concat($aid,&quot;:&quot;,$mk,&quot;.&quot;,$nr)"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:value-of select="$aid"/>
+              <xsl:text>:</xsl:text>
+              <xsl:value-of select="$nr"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:attribute name="href">
-            <xsl:choose>
-              <xsl:when test="($c = 1) and (($linking = &apos;m&apos;) or ($linking = &apos;l&apos;))">
-                <xsl:value-of select="concat(&quot;#&quot;,$k, $nr)"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="concat($mizhtml,$alc, &quot;.&quot;,$ext, &quot;#&quot;,$k, $nr)"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:if test="$c = &quot;1&quot;">
-            <xsl:attribute name="target">
-              <xsl:text>_self</xsl:text>
+          <xsl:choose>
+            <xsl:when test="($linking = &apos;q&apos;) or (($linking = &apos;m&apos;) and not($c))">
+              <xsl:attribute name="href">
+                <xsl:value-of select="concat($mmlq,$aid,&quot;:&quot;,$mk,&quot;.&quot;,$nr)"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="href">
+                <xsl:choose>
+                  <xsl:when test="($c = 1) and (($linking = &apos;m&apos;) or ($linking = &apos;l&apos;))">
+                    <xsl:value-of select="concat(&quot;#&quot;,$k, $nr)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="concat($mizhtml,$alc, &quot;.&quot;,$ext, &quot;#&quot;,$k, $nr)"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+              <xsl:if test="$c = &quot;1&quot;">
+                <xsl:attribute name="target">
+                  <xsl:text>_self</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:if test="$titles=&quot;1&quot;">
+            <xsl:attribute name="title">
+              <xsl:value-of select="concat($aid,&quot;:&quot;,$mk,&quot;.&quot;,$nr)"/>
             </xsl:attribute>
           </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:if test="$titles=&quot;1&quot;">
-        <xsl:attribute name="title">
-          <xsl:value-of select="concat($aid,&quot;:&quot;,$mk,&quot;.&quot;,$nr)"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:choose>
-        <xsl:when test="$nm">
-          <xsl:value-of select="$nm"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$aid"/>
-          <xsl:text>:</xsl:text>
-          <xsl:if test="not($k=&quot;T&quot;)">
-            <xsl:value-of select="$mk"/>
-            <xsl:text> </xsl:text>
-          </xsl:if>
-          <xsl:value-of select="$nr"/>
+          <xsl:choose>
+            <xsl:when test="$nm">
+              <xsl:value-of select="$nm"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$aid"/>
+              <xsl:text>:</xsl:text>
+              <xsl:if test="not($k=&quot;T&quot;)">
+                <xsl:value-of select="$mk"/>
+                <xsl:text> </xsl:text>
+              </xsl:if>
+              <xsl:value-of select="$nr"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:element>

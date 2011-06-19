@@ -13,6 +13,14 @@ include mhtml_utils.xsl;
 //
 // License: GPL (GNU GENERAL PUBLIC LICENSE)
 
+tpl item_kind(#kind) {
+  choose 
+  { 
+      when [$kind = 'T'] { "theorem"; }
+      when [$kind = 'D'] { "deftheorem"; }
+      when [$kind = 'S'] { "scheme"; }
+  }
+}
 
 // ##TODO: try some unification of mkref and absref
 //
@@ -26,53 +34,62 @@ tpl mkref(#aid, #nr, #k, #c, #nm)
   <a {
       @class = "mhtml ref";
 
-      if [($linking = 'q') or (($linking = 'm') and not($c))] 
-      {
-        @href = `concat($mmlq,$aid,":",$mk,".",$nr)`;
-      }
-      else 
-      {
-        @href =	
-	{
-           if[($c = 1) and (($linking = 'm') or ($linking = 'l'))]
-	   {
-	      `concat("#",$k, $nr)`;
-	   }
-	   else { `concat($mizhtml,$alc, ".",$ext, "#",$k, $nr)`; }
+      if [$mizar_items = '1'] {
+        $item_kind = { item_kind(#kind = $k); }
+	if [starts-with ($alc, 'ckb')] {
+	  $after_ckb = `substring-after ($alc, 'ckb')`;
+	  if [$after_ckb > 0] {
+	    @href = `concat ("/fragment/",$source_article,"/",$after_ckb)`;
+            if [$titles="1"] { @title = `concat($aid,":",$mk,".",$nr)`; }
+	    <span {
+	      @class = "article-name";
+	      $source_article;
+	    }
+	    `concat (" fragment #", $after_ckb)`;	
+	  } else {
+            @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
+            if [$titles="1"] { @title = `concat($aid,":",$mk,".",$nr)`; }
+            $aid; ":"; $nr;
+	  }
+	} else {
+	  @href = `concat("/item/",$alc,"/",$item_kind,"/",$nr)`;
+          if [$titles="1"] { @title = `concat($aid,":",$mk,".",$nr)`; }
+          $aid; ":"; $nr;
 	}
+      } else {
+        if [($linking = 'q') or (($linking = 'm') and not($c))] {
+          @href = `concat($mmlq,$aid,":",$mk,".",$nr)`;
+        } else {
+          @href = { 
+            if[($c = 1) and (($linking = 'm') or ($linking = 'l'))] {
+	      `concat("#",$k, $nr)`;
+	     } else {
+               `concat($mizhtml,$alc, ".",$ext, "#",$k, $nr)`; }
+	     }
 
-        if [$c = "1"] 
-	{
+        if [$c = "1"] {
           @target = "_self";
         }
       }
 
-      if [$titles="1"] 
-      {
+      if [$titles="1"] {
         @title = `concat($aid,":",$mk,".",$nr)`;
       }
 
-      if [$nm] 
-      { 
+      if [$nm] { 
         $nm; 
       }
-      else 
-      {
+      else {
         $aid; ":";
 
-        if [not($k="T")] 
-	{
+        if [not($k="T")] {
           $mk; " ";
         }
-
         $nr;
-      }
-
     }
 }
-
-
-
+}
+}
 
 // add the constructor/pattern href, $c tells if it is from current article
 // #sym is optional Mizar symbol
@@ -147,21 +164,25 @@ tpl abs(#k, #nr, #sym, #pid)
       $k1  = `concat('P_',$k)`;
       $doc = { if [key($k1,$nr)[$pid=@relnr]] { ""; } else { $patts; } }
 
-      for-each [document($doc,/)] 
-      {
-         $c1  = { if [(name(/*) = "Article") and ($mml = "0")] { "1"; } else { "0"; } }
-         absref(#elems = `key($k1,$nr)[$pid=@relnr]`, #c = $c1, #sym = $sym, #pid = $pid);
-      }
+      if [$doc != ""] {
+        for-each [document($doc,/)] 
+        {
+           $c1  = { if [(name(/*) = "Article") and ($mml = "0")] { "1"; } else { "0"; } }
+           absref(#elems = `key($k1,$nr)[$pid=@relnr]`, #c = $c1, #sym = $sym, #pid = $pid);
+        }
+     }
    } 
    else 
    {
       $doc = { if [key($k,$nr)] { ""; } else { $constrs; } }
 
-      for-each [document($doc,/)] 
-      {
-         $c1  = { if [(name(/*) = "Article") and ($mml = "0")] { "1"; } else { "0"; } }
-         absref(#elems = `key($k,$nr)`, #c = $c1, #sym = $sym);
-      }
+      if [$doc != ""] {
+        for-each [document($doc,/)] 
+        {
+           $c1  = { if [(name(/*) = "Article") and ($mml = "0")] { "1"; } else { "0"; } }
+           absref(#elems = `key($k,$nr)`, #c = $c1, #sym = $sym);
+        }
+     }
    }
 }
 
@@ -180,16 +201,17 @@ tpl pp(#k, #nr, #args, #parenth, #pid, #loci, #i)
   {
      $doc     = { if [key($pkey,$nr)[$pid=@relnr]] { ""; } else { $patts; } }
 
-     for-each [document($doc,/)] 
-     {
-         if [key($pkey,$nr)[$pid=@relnr]] 
-	 {
-	    for-each [key($pkey,$nr)[$pid=@relnr]] 
-	    {
-	       $npid =  { if [@redefnr>0] { $pid; } }
-	       // $vis = { if [$k = "V"] { `Visible/Int[position() < last()]`; } else { `Visible/Int`; } }
-
-	       if [$k = "V"] 
+     if [$doc] {
+       for-each [document($doc,/)] 
+       {
+           if [key($pkey,$nr)[$pid=@relnr]] 
+  	 {
+  	    for-each [key($pkey,$nr)[$pid=@relnr]] 
+  	    {
+  	       $npid =  { if [@redefnr>0] { $pid; } }
+  	       // $vis = { if [$k = "V"] { `Visible/Int[position() < last()]`; } else { `Visible/Int`; } }
+  
+  	       if [$k = "V"] 
 	       { 
 	          pp1(#k = $k, #nr = $nr, #args = $args, #vis = `Visible/Int[position() < last()]`,
 	              #fnr = `@formatnr`, #parenth = $parenth, #loci = $loci, #pid = $npid, #i = $i);
@@ -212,41 +234,44 @@ tpl pp(#k, #nr, #args, #parenth, #pid, #loci, #i)
 	 }
      }
   }
+  }
   //  pattern number not given - take first suitable 
   else 
   {
      $doc     = { if [key($pkey,$nr)] { ""; } else { $patts; } }
 
-     for-each [document($doc,/)] 
-     {
-         if [key($pkey,$nr)] 
-	 {
-	    for-each [key($pkey,$nr)[position()=1]] 
-	    {
-               $npid =  { if [@redefnr>0] { `@relnr`; } }
-//	       $vis = { if [$k = "V"] { `Visible/Int[position() < last()]`; } else { `Visible/Int`; } }
-  	       if [$k = "V"] 
-	       { 
-	         pp1(#k = $k, #nr = $nr, #args = $args, #vis = `Visible/Int[position() < last()]`,
-	             #fnr = `@formatnr`, #parenth = $parenth, #loci = $loci, #pid = $npid, #i = $i);
-	       }
-	       else 
-	       {
-	       	 pp1(#k = $k, #nr = $nr, #args = $args, #vis = `Visible/Int`,
-	             #fnr = `@formatnr`, #parenth = $parenth, #loci = $loci, #pid = $npid, #i = $i);
-	       }
-            }
-         }
-	 //  failure, print in absolute notation 
-	 else 
-	 {
-	    abs(#k = $k, #nr = $nr);
-	    "(";
-	    list(#separ = ",", #elems = $args);
-	    ")";
-         }
-      }
-   }
+     if [$doc] {
+       for-each [document($doc,/)] 
+       {
+           if [key($pkey,$nr)] 
+  	 {
+  	    for-each [key($pkey,$nr)[position()=1]] 
+  	    {
+                 $npid =  { if [@redefnr>0] { `@relnr`; } }
+  //	       $vis = { if [$k = "V"] { `Visible/Int[position() < last()]`; } else { `Visible/Int`; } }
+    	       if [$k = "V"] 
+  	       { 
+  	         pp1(#k = $k, #nr = $nr, #args = $args, #vis = `Visible/Int[position() < last()]`,
+  	             #fnr = `@formatnr`, #parenth = $parenth, #loci = $loci, #pid = $npid, #i = $i);
+  	       }
+  	       else 
+  	       {
+  	       	 pp1(#k = $k, #nr = $nr, #args = $args, #vis = `Visible/Int`,
+  	             #fnr = `@formatnr`, #parenth = $parenth, #loci = $loci, #pid = $npid, #i = $i);
+  	       }
+              }
+           }
+  	 //  failure, print in absolute notation 
+  	 else 
+  	 {
+  	    abs(#k = $k, #nr = $nr);
+  	    "(";
+  	    list(#separ = ",", #elems = $args);
+  	    ")";
+           }
+        }
+     }
+  }
 }
 
 

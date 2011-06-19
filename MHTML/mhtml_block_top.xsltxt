@@ -27,9 +27,11 @@ tpl rc
 {
   if [($mml="1") or ($generate_items>0)] { apply[ArgTypes]; }
   $nr1 = `1 + count(preceding::RCluster)`;
-  <a 
-  { 
-    @NAME=`concat("RC",$nr1)`;
+  <a {
+    if [$source_article = ""] {
+      @NAME=`concat("RC",$nr1)`;
+    }
+
     pkeyword(#str="cluster "); 
   }
   if [ErrorCluster] { "errorcluster"; } else { apply[*[3]](#all="1"); " "; apply[*[2]]; }
@@ -55,8 +57,10 @@ tpl cc
   }
   
   $nr1 = `1 + count(preceding::CCluster)`;
-  <a { 
-       @NAME=`concat("CC",$nr1)`;
+  <a {
+    if [$source_article = ""] {
+      @NAME=`concat("CC",$nr1)`;
+    }
        pkeyword(#str="cluster "); }
        if [ErrorCluster] { "errorcluster"; }
        else 
@@ -84,7 +88,10 @@ tpl fc
 { 
    if [($mml="1") or ($generate_items>0)] { apply[ArgTypes]; }
    $nr1 = `1 + count(preceding::FCluster)`;
-   <a { @NAME=`concat("FC",$nr1)`;
+   <a {
+     if [$source_article = ""] { 
+       @NAME=`concat("FC",$nr1)`;
+     }
    pkeyword(#str="cluster "); }
    if [ErrorCluster] { "errorcluster"; }
    else { apply[*[2]]; pkeyword(#str=" -> "); apply[*[3]]; apply[Typ];}
@@ -118,7 +125,10 @@ tpl iy
 
    <a 
    { 
-      @NAME=`concat("IY",$nr1)`;
+      if [$source_article = ""] {
+        @NAME=`concat("IY",$nr1)`;
+      }
+
       pkeyword(#str="identify "); 
    }
 
@@ -256,8 +266,10 @@ tpl jt
     }
 
     <a 
-    { 
-       @NAME = `concat("T", $nr1)`; 
+    {
+      if [$source_article = ""] {
+        @NAME = `concat("T", $nr1)`; 
+      } 
        // pcomment0(#str = `concat($aname,":", $nr1)`); 
        if [@interesting > 0] 
        { 
@@ -274,7 +286,7 @@ tpl jt
 	  " "; edit_for_thm(#line=`Proposition[1]/@line`, #col=`Proposition[1]/@col`);
        }
 
-       <br;
+       // <br;
     }
 
     if [Proof] 
@@ -435,18 +447,24 @@ tpl dt
 //   Property, elProposition, Justification
 tpl [JustifiedProperty] 
 {
-   $nm = { lc(#s = `name(*[1])`); }
+  $nm = { lc(#s = `name(*[1])`); }
 
-   <a 
-   { 
-      add_hs_attrs(); 
-      if [$nm = "antisymmetry"] { pkeyword(#str="asymmetry"); } 
-      else { pkeyword(#str=$nm); } " "; 
-     
-   }
+  <a { 
+    add_hs_attrs(); 
+    if [$nm = "antisymmetry"] {
+      pkeyword(#str="asymmetry");
+    } else {
+      pkeyword(#str=$nm);
+    } 
+    " ";  
+  }
 
-   <span { @class="mhtml hide"; <br; apply[*[2]]; }
-   apply[*[position()>2]]; 
+  <div {
+    @class="mhtml hide";
+    <br;
+    apply[*[2]];
+  }
+  apply[*[position()>2]]; 
 }
 
 //  Formula | ( elProposition, Justification )
@@ -501,7 +519,10 @@ tpl sd
     <a 
     { 
       @class="mhtml";
-      @NAME=`concat("S",@schemenr)`; pkeyword(#str="scheme  ");
+      if [$source_article = ""] {
+        @NAME=`concat("S",@schemenr)`;
+      } 
+      pkeyword(#str="scheme  ");
       pcomment(#str=`concat($aname,":sch ",@schemenr)`); 
     }
 //     "s"; `@schemenr`; 
@@ -654,12 +675,16 @@ tpl dfs()
              // here the redefined constructor is retrieved from definiens 
 	     pkeyword(#str="redefine ");
 
-	     $doc = { if [key($ckind, $cnr)] { ""; } else { $constrs; } }
+	     // $doc = { if [key($ckind, $cnr)] { ""; } else { $constrs; } }
 
-	     for-each [document($doc, /)] 
-	     { 
-	        apply[key($ckind, $cnr)](#indef = "1", #nl = $nl, #argt = $argtypes, #nrt= "1",#old="1"); 
-	     } 
+	     if [key($ckind, $cnr)] {
+	       // do nothing
+             } else {  
+	       for-each [document($constrs, /)] 
+	       { 
+	         apply[key($ckind, $cnr)](#indef = "1", #nl = $nl, #argt = $argtypes, #nrt= "1",#old="1"); 
+	       } 
+	     }
           }
 
 	  if [DefMeaning/@kind = 'e'] { pkeyword(#str=" equals "); } 
@@ -800,20 +825,23 @@ tpl [PerCasesReasoning]
 // this is a non-top-level proof
 tpl [Proof/Proof | Now/Proof | Conclusion/Proof | CaseBlock/Proof | SupposeBlock/Proof]
 {
-    <div 
-    { 	
-       @class="mhtml";
-       <a 
-       { 
-          @class="mhtml";
-          add_hs2_attrs(); 
-	  if [$proof_links>0] { @title=`@newlevel`; } 
-	  pkeyword(#str="proof "); 
-       }
+  <div { 	
+    @class="mhtml";
+    <a { 
+      @class="mhtml";
+      add_hs2_attrs(); 
+      if [$proof_links>0] {
+        @title=`@newlevel`;
+      }
+      pkeyword(#str="proof "); 
+    }
 //       add_ar_iconif(#line=`EndPosition[1]/@line`, #col=`EndPosition[1]/@col`);
-       <div { @class="mhtml add"; apply; }
-       pkeyword(#str="end;"); 
-    } 
+    <div {
+      @class="mhtml add";
+      apply;
+    }
+    pkeyword(#str="end;"); 
+  } 
 }
 
 // hence the rest is a top-level proof
@@ -821,27 +849,47 @@ tpl [Proof/Proof | Now/Proof | Conclusion/Proof | CaseBlock/Proof | SupposeBlock
 // (now done as perl postproc)
 // if you want ajax_proofs
 tpl [Proof] {
-    $nm0 = `concat($ajax_proof_dir,"/",$anamelc,"/",@newlevel)`;
-    $nm =  { if[$ajax_proofs=3] { `concat($ltmpftptpcgi,"?tmp=",$lbytmpdir,"&raw=1","&file=",$nm0)`; } else { $nm0; } }
-    <div { 
-         @class="mhtml";
-	 <a { 
-	    @class="mhtml";
-	    if [($ajax_proofs=1) or ($ajax_proofs=3)]	{ add_ajax_attrs(#u=$nm); } else { add_hs2_attrs(); }
-	    if [$proof_links>0] { @title=`@newlevel`; } 
-	    pkeyword(#str="proof "); 
-	    }
+  $nm0 = `concat("/",$ajax_proof_dir,"/",$source_article,"/",$anamelc,"/",@newlevel)`;
+  $nm =  {
+    if[$ajax_proofs=3] {
+      `concat($ltmpftptpcgi,"?tmp=",$lbytmpdir,"&raw=1","&file=",$nm0)`;
+    } else {
+      $nm0;
+    }
+  }
+  <div { 
+    @class="mhtml";
+    <a { 
+      @class="mhtml";
+      if [($ajax_proofs=1) or ($ajax_proofs=3)]	{
+        add_ajax_attrs(#u=$nm);
+      } else {
+        add_hs2_attrs();
+      }
+      if [$proof_links>0] { @title=`@newlevel`; } 
+      pkeyword(#str="proof "); 
+    }
+    <br ;
 //	  add_ar_iconif(#line=`EndPosition[1]/@line`, #col=`EndPosition[1]/@col`); 
-         if [$ajax_proofs>0]	{ <span { if[$ajax_proofs=2] {@filebasedproofinsert=`@newlevel`;}} 
+    if [$ajax_proofs>0]	{
+      <div {
+        if[$ajax_proofs=2] {
+          @filebasedproofinsert=`@newlevel`;
+        }
+      }
 // <xsl:document href="{$ajax_proof_dir}/{$anamelc}/{@newlevel}" format="html">
-	    <div { @class="mhtml add"; apply; }
+      <div { @class="mhtml add"; apply; }
 // </xsl:document>
-   $bogus=`1`;
- }
-	 else { <div { @class="mhtml add"; apply; } }
-	 pkeyword(#str="end;"); 
-	 } 
-     }
+      $bogus=`1`;
+    } else {
+      <div {
+        @class="mhtml add";
+        apply;
+      }
+    }
+    pkeyword(#str="end;");
+  } 
+}
 
 
 //   Reasoning, elBlockThesis 
@@ -933,11 +981,13 @@ tpl idv_for_top()
 // separate top-level items by additional newline
 tpl [Article] 
 { 
-  <div { @"id"="mhtml"; 
-    for-each [*]      
-    { 
-      apply[.]; 
-      if [(not(name()='Definiens')) and (not(name()='Reservation'))] { <br;} 
+  <div {
+    @class="mhtml-text";
+    for-each [*] { 
+      apply[.];
+      if [(not(name()='Definiens')) and (not(name()='Reservation'))] {
+        // <br;
+      } 
     }
   }
 }
@@ -947,10 +997,15 @@ tpl [Section] { }
 // processing of imported documents
 tpl [Theorem] 
 { 
-   pkeyword(#str="theorem "); 
-   mkref(#aid=`@aid`, #nr=`@nr`, #k=`@kind`); <br; 
-   if [Verum] { pkeyword(#str="canceled; "); } else { apply; } 
-   <br; <br; 
+  pkeyword(#str="theorem "); 
+  mkref(#aid=`@aid`, #nr=`@nr`, #k=`@kind`); <br; 
+  if [Verum] {
+    pkeyword(#str="canceled; ");
+  } else {
+    apply;
+  } 
+  <br;
+  <br; 
 }
 
 // now used only when #mml=1 - in article the block has them

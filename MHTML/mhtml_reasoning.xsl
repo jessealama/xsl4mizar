@@ -13,14 +13,19 @@
   <!-- License: GPL (GNU GENERAL PUBLIC LICENSE) -->
   <xsl:template match="Proposition">
     <xsl:if test="$proof_links&gt;0">
-      <xsl:element name="a">
-        <xsl:attribute name="name">
-          <xsl:call-template name="propname">
-            <xsl:with-param name="n" select="@propnr"/>
-            <xsl:with-param name="pl" select="@plevel"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:element>
+      <xsl:choose>
+        <xsl:when test="$source_article = &quot;&quot;">
+          <xsl:element name="a">
+            <xsl:attribute name="name">
+              <xsl:call-template name="propname">
+                <xsl:with-param name="n" select="@propnr"/>
+                <xsl:with-param name="pl" select="@plevel"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:element>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
     </xsl:if>
     <xsl:if test="following-sibling::*[1][(name()=&quot;By&quot;) and (@linked=&quot;true&quot;)]">
       <xsl:if test="not((name(..) = &quot;Consider&quot;) or (name(..) = &quot;Reconsider&quot;) 

@@ -16,7 +16,13 @@ include mhtml_frmtrm.xsl;
 
 tpl [Proposition] 
 { 
-    if [$proof_links>0] {<a { @NAME=propname(#n=`@propnr`, #pl=`@plevel`); }}
+    if [$proof_links>0] {
+      if [$source_article = ""] {
+        <a { @NAME=propname(#n=`@propnr`, #pl=`@plevel`); }
+      } else {
+        // don't know what to do yet
+       }
+     }
 
     if [following-sibling::*[1][(name()="By") and (@linked="true")]] 
     { 
@@ -596,12 +602,14 @@ tpl [ThesisExpansions/Pair]
 
   $current = { if [$doc=""] { "1"; } else { "0"; } }
 
-  for-each [document($doc,/)] 
-  {
-     for-each [key('DF',$x)] 
-     {
-        mkref(#aid = `@aid`, #nr = `@defnr`, #k = "D", #c = $current);
-     }
+  if [$doc] {
+    for-each [document($doc,/)] 
+    {
+       for-each [key('DF',$x)] 
+       {
+         mkref(#aid = `@aid`, #nr = `@defnr`, #k = "D", #c = $current);
+       }
+    }
   }
 }
 

@@ -62,12 +62,9 @@ tpl [/] { if [$generate_items = "1"] {
    $bogus=`1`;
    }
    apply;
-}
-	apply;
-}
-  
-// tpl [*] { copy { apply [@*]; apply; } }
-// tpl [@*] { copy-of `.`; }
+} else {
+  apply;
+}}
 
 // Header rules
 tpl [dc:title] { pcomment(#str=`text()`); }

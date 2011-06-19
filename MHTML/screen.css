@@ -1,7 +1,3 @@
-/* @override http://localhost:4242/screen.css */
-
-/* @override http://localhost:4242/screen.css */
-
 /* This is the default stylesheet for the screen media type. */
 
 /* Copyleft (c) 2002-2004 Jonas Fonseca <fonseca@diku.dk> */
@@ -12,16 +8,42 @@ body {
 	background-color: lightgrey;
 }
 
+table.article-listing {
+	border-style: solid;
+}
+
+ol.fragment-listing {
+}
+
+li.fragment-listing {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+a.fragment-listing:link {
+	text-decoration: none;
+	color: inherit;
+}
+
+a.fragment-listing:visited {
+	text-decoration: none;
+	color: inherit;
+}
+
 td.arrow {
 	font-size: xx-large;
 }
 
-/* Link properties */
-
-a:visited,
-a {
-	text-decoration: underline;
+.article-name {
+	text-transform: uppercase;
+	font-family: monospace;
 }
+
+td.article-title {
+	font-style: oblique;
+}
+
+/* Link properties */
 
 a:hover {
 	text-decoration: none;
@@ -106,6 +128,10 @@ ul li, dl, p {
 	margin: 0em;
 }
 
+/*table.header {
+	border-bottom-style: solid;
+}*/
+
 .header {
 	font-size: 1em;
 	font-weight: bold;
@@ -119,6 +145,11 @@ ul li, dl, p {
 .footer span.menu {
 	text-align: right;
 	display: block;
+}
+
+.header span.menu a {
+	font-weight: bold;
+	font-style: italic;
 }
 
 .header #top,
@@ -166,11 +197,11 @@ table.example {
 	text-align: center;
 }
 
-table {
+/*table {
 	margin-left: 4em;
 	margin-right: 4em;
 	border: none;
-}
+}*/
 
 table.code, table.code tr, table.code td {
 	margin: 0em;
@@ -217,4 +248,19 @@ thead {
 
 .fleft {
 	float: left;
+}
+
+div.miz-example {
+	border-style: solid;
+	font-family: monospace;
+	font-size: large;
+	background-color: lightblue;
+}
+
+tr.fullwidth {
+	width: 100%;
+}
+
+tr.halfwidth {
+	width: 50%;
 }
