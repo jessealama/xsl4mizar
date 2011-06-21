@@ -370,6 +370,10 @@ tpl [Universal-Quantifier-Formula] {
   }
 }
 
+tpl [Schematic-Variables] {
+  list (#separ = ",", #elems = `Functor-Segment | Predicate-Segment`);
+}
+
 tpl [Item[@kind='Scheme-Head']] {
 
   // sanity check: one and only one Scheme child
@@ -379,7 +383,7 @@ tpl [Item[@kind='Scheme-Head']] {
     } else {
       apply [Scheme[1]];
       " { ";
-      list (#separ = ",", #elems = `Functor-Segment | Predicate-Segment`);
+      apply [Schematic-Variables[1]];
       " } : ";
       // now look for the scheme formula
       if [Existential-Quantifier-Formula|Universal-Quantifier-Formula] {
