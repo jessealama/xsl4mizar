@@ -5,7 +5,7 @@ output method=xml;
 #target_nr = { "0"; }
 #target_aid = { "NOTHING"; }
 #target_relnr = { "0"; }
-#target_prop = { "Whatever"; }
+#target_property = { "Whatever"; }
 
 tpl [Constructors] {
   <Constructors { @aid=`@aid`; @mizfiles=`@mizfiles`;
@@ -31,7 +31,7 @@ tpl [Func] {
 
 // structures
 tpl [Abstractness](#ignore) {
-  if [$target_prop = "Abstractness" and $ignore = "1"] {
+  if [$target_property = "Abstractness" and $ignore = "1"] {
     // do nothing
   } else {
     <Abstractness;
@@ -41,7 +41,7 @@ tpl [Abstractness](#ignore) {
 
 // predicates
 tpl [Symmetry](#ignore) {
-  if [$target_prop = "Symmetry" and $ignore = "1"] {
+  if [$target_property = "Symmetry" and $ignore = "1"] {
     // do nothing
   } else {
     <Symmetry;
@@ -50,7 +50,7 @@ tpl [Symmetry](#ignore) {
 }
 
 tpl [Reflexivity](#ignore) {
-  if [$target_prop = "Reflexivity" and $ignore = "1"] {
+  if [$target_property = "Reflexivity" and $ignore = "1"] {
     // do nothing
   } else {
     <Reflexivity;
@@ -59,7 +59,7 @@ tpl [Reflexivity](#ignore) {
 }
 
 tpl [Irreflexivity](#ignore) {
-  if [$target_prop = "Irreflexivity" and $ignore = "1"] {
+  if [$target_property = "Irreflexivity" and $ignore = "1"] {
     // do nothing
   } else {
     <Irreflexivity;
@@ -68,7 +68,7 @@ tpl [Irreflexivity](#ignore) {
 }
 
 tpl [Antisymmetry](#ignore) {
-  if [$target_prop = "Antisymmetry" and $ignore = "1"] {
+  if [$target_property = "Antisymmetry" and $ignore = "1"] {
     // do nothing
   } else {
     <Antisymmetry;
@@ -77,7 +77,7 @@ tpl [Antisymmetry](#ignore) {
 }
 
 tpl [Connectedness](#ignore) {
-  if [$target_prop = "Connectedness" and $ignore = "1"] {
+  if [$target_property = "Connectedness" and $ignore = "1"] {
     // do nothing
   } else {
     <Connectedness;
@@ -87,7 +87,7 @@ tpl [Connectedness](#ignore) {
 
 // functions
 tpl [Commutativity](#ignore) {
-  if [$target_prop = "Commutativity" and $ignore = "1"] {
+  if [$target_property = "Commutativity" and $ignore = "1"] {
     // do nothing
   } else {
     <Commutativity;
@@ -96,7 +96,7 @@ tpl [Commutativity](#ignore) {
 }
 
 tpl [Idempotence](#ignore) {
-  if [$target_prop = "Idempotence" and $ignore = "1"] {
+  if [$target_property = "Idempotence" and $ignore = "1"] {
     // do nothing
   } else {
     <Idempotence;
@@ -105,7 +105,7 @@ tpl [Idempotence](#ignore) {
 }
 
 tpl [Involutiveness](#ignore) {
-  if [$target_prop = "Involutiveness" and $ignore = "1"] {
+  if [$target_property = "Involutiveness" and $ignore = "1"] {
     // do nothing
   } else {
     <Involutiveness;
@@ -114,7 +114,7 @@ tpl [Involutiveness](#ignore) {
 }
 
 tpl [Projectivity](#ignore) {
-  if [$target_prop = "Projectivity" and $ignore = "1"] {
+  if [$target_property = "Projectivity" and $ignore = "1"] {
     // do nothing
   } else {
     <Projectivity;
