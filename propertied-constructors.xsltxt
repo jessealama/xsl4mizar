@@ -58,7 +58,9 @@ tpl [Properties] {
 }
 
 tpl [Constructor] {
+  `@kind`; "-"; `@nr`; "-"; `@aid`; "-"; `@relnr`;
   if [Properties] {
-    `@kind`; "-"; `@nr`; "-"; `@aid`; "-"; `@relnr`; " "; apply [Properties]; "\n";
+     " "; apply [Properties];
   }
+  "\n";
 }
