@@ -15,3 +15,14 @@
 /MHTML/test.xml~
 /wsm.xsltxt~
 /wsm.xsl
+/functors.xsltxt
+/functors.xsltxt~
+/functors.xsl
+/ckb104.atr.new
+/propertied-constructors.xsl
+/remove-properties.xsl
+/propertied-constructors.xsltxt~
+/remove-properties.xsltxt~
+/props.pl~
+/strip-prop.xsl
+/strip-prop.xsltxt~
