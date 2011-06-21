@@ -244,9 +244,8 @@ tpl [Simple-Term] {
   }
 }
 
-// "Arguments" seems like it should be "Argument"; I've informed Czeslaw
 tpl [Arguments] {
-  apply [*[1]];
+  list (#separ = ",", #elems = `*`);
 }
 
 tpl [Private-Functor-Term] {
@@ -310,10 +309,9 @@ tpl [Conjuctive-Formula] { // typo: should be "Conjunctive-Formula"
 tpl [Predicative-Formula] {
   // sanity check: there's a spelling
   if [@spelling] {
-    `@spelling`;
-    "(";
-    list (#separ = ",", #elems = `Arguments`);
-    ")";
+    apply [Arguments[1]];
+    " "; `@spelling`; " ";
+    apply [Arguments[2]];
   } else {
     die (#message = "Predicative-Formula lacks a spellin!");
   }
