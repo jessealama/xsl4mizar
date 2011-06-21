@@ -45,8 +45,7 @@ tpl die(#message) {
 }
 
 tpl [Text-Proper] {
-  "begin"; "\n";
-  for-each [*] {
+  for-each [Item] {
     apply [.];
   }
 }
@@ -83,6 +82,10 @@ tpl [Item[@kind='Reservation']] {
   } else {
     die(#message="No type was found under a Reservation!");
   }
+}
+
+tpl [Item[@kind='Section-Pragmma']] {
+  "begin"; "\n";
 }
 
 tpl [Item[@kind='Scheme-Block-Item']] {
