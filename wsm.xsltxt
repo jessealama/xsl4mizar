@@ -383,12 +383,7 @@ tpl [Item[@kind='Scheme-Head']] {
       " { ";
       apply [Schematic-Variables[1]];
       " } : ";
-      // now look for the scheme formula
-      if [Existential-Quantifier-Formula|Universal-Quantifier-Formula] {
-        apply [Existential-Quantifier-Formula|Universal-Quantifier-Formula];
-      } else {
-        die (#message = "Scheme-Head lacks a scheme formula!");
-      }
+      apply [*[3]]; // the scheme formula
     }
   } else {
     die (#message = "Scheme child of a Scheme-Head item is missing!");
