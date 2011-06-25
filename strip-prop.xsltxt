@@ -7,8 +7,19 @@ output method=xml;
 #target_relnr = { "0"; }
 #target_property = { "Whatever"; }
 
+tpl escape-backslash(#str) {
+  if [contains ($str, '/')] {
+    $before = `substring-before ($str, '/')`;
+    $after = `substring-after ($str, '/')`;
+    $tail = escape-backslash (#str = $after);
+    `concat ($before, "&amp;#47;", $tail)`;
+  } else {
+    $str;
+  }
+}
+
 tpl [Constructors] {
-  <Constructors { @aid=`@aid`; @mizfiles=`@mizfiles`;
+  <Constructors { @aid=`@aid`; @mizfiles = escape-backslash (#str = `@mizfiles`);
   "\n";
   apply [Constructor];
   }
