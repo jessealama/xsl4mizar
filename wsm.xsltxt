@@ -110,9 +110,136 @@ tpl [Block[@kind='Scheme-Block']] {
       die(#message = "Multiple Scheme-Head children of a Scheme-Block!");
     } else {
       apply [Item[@kind='Scheme-Head'][1]];
+      if [*[2]] { // I guess this is the proof
+        "\n";
+        "proof";
+        "\n";
+        apply [*[position() > 2]];
+        "end";
+	";";
+	"\n";
+      }
     }
   } else {
     die(#message = "Scheme-Head child of Scheme-Block is missing!");
+  }
+}
+
+tpl [Item[@kind='Definition-Item']] {
+  apply [*[1]];
+}
+
+tpl [Block[@kind='Definitional-Block']] {
+  "definition";
+  "\n";
+  apply [*];
+  "end";
+  ";";
+  "\n";
+}
+
+tpl [Block[@kind='Registration-Block']] {
+  "registration";
+  "\n";
+  apply [*];
+  "end"; ";"; "\n";
+}
+
+tpl [Item[@kind='Cluster']] {
+  apply [*[1]]; // should be just one child, right?
+}
+
+tpl [existence] { // I guess it should be "Existence"
+  "existence";
+}
+
+tpl [Item[@kind='Correctness-Condition']] {
+  apply [*[1]]; // I guess there's always at least one child
+  if [Block[@kind='Proof']] {
+    "\n";
+    apply [Block[@kind='Proof'][1]];
+  } else {
+    ";"; "\n";
+  }
+}
+
+tpl [Adjective] {
+  if [@spelling] {
+    `@spelling`;
+  } else {
+    die (#message = "Adjective lacks a spelling attribute!");
+  }
+}
+
+tpl [Adjective-Cluster] {
+  "cluster ";
+  list (#separ = "WEIRD", #elems = `Adjective`); // don't know how to deal with multiple adjectives
+}
+
+tpl [Existential-Registration] {
+  apply [Adjective-Cluster[1]]; // always exists, right?
+  " for ";
+  apply [Standard-Type[1]]; // is it always a Standard-Type element?
+  ";"; "\n";
+}
+
+tpl [Item[@kind='Loci-Decraration']] { // should be Declaration
+  "let "; apply [*]; ";"; "\n";
+}
+
+tpl [Formula-Expression] {
+  // ???
+}
+
+tpl [Definiens] {
+  if [Label] {
+    ":"; // special case: labels of definiens look like :this:, not like this:
+    apply [Label[1]];
+    " ";
+    apply [*[3]]; // hacktastic
+  } else {
+    apply [*[2]]; // probably not correct...
+  }
+}
+
+tpl [Negated-Formula] {
+  "not ";
+  apply [*[1]]; // assuming there's just one child
+}
+
+tpl [Item[@kind='Attribute-Definition']] {
+  "attr ";
+  apply [Attribute-Pattern[1]]; // is this always present?
+  if [Definiens] {
+    "\n";
+    "means";
+    "\n";
+    apply [Definiens[1]]; // is this always present?
+    "\n";
+  } else {
+    // not sure what to do in this case
+  }
+}
+
+tpl [Loci] {
+  // ???
+}
+
+tpl [Locus] {
+  if [@spelling] {
+    `@spelling`;
+  } else {
+    die (#message = "Locus lacks a spelling attribute!");
+  }
+}
+
+tpl [Attribute-Pattern] {
+  if [@spelling] {
+    apply [Locus];
+    " is ";
+    `@spelling`;
+  } else {
+    die (#message = "Attribute-Pattern lacks a spelling attribute!");
   }
 }
 
@@ -185,10 +312,10 @@ tpl [Predicate-Segment] {
 }
 
 tpl [Scheme] {
-  if [@idnr] {
-    "scheme "; get_vid_name (#vid = `@idnr`);
+  if [@spelling] {
+    "scheme "; `@spelling`;
   } else {
-    die (#message = "Scheme lacks an idnr attribute!");
+    die (#message = "Scheme lacks a spelling attribute!");
   }
 }
 
@@ -197,7 +324,7 @@ tpl [Implicitly-Qualified-Segment] {
   if [Variable] {
     list (#separ = ",", #elems = `Variable`);
   } else {
-    die (#message = "Explicitly-Qualified-Segment lacks a Variable child!");
+    die (#message = "Implicitly-Qualified-Segment lacks a Variable child!");
   }
 }
 
@@ -218,21 +345,12 @@ tpl [Explicitly-Qualified-Segment] {
 }
 
 tpl [Existential-Quantifier-Formula] {
-  // sanity check: there is one and only one explicitly qualified segment
-  if [Explicitly-Qualified-Segment] {
-    if [Explicitly-Qualified-Segment[2]] {
-      die (#message = "Existential-Quantifier-Formula has multiple Explicitly-Qualified-Segment children!");
-    } else {
-      "ex ";
-      apply [Explicitly-Qualified-Segment[1]];
-      " holds ";
-      "(";
-      apply [*[2]]; // weird, definitely not right
-      ")";
-    }
-  } else {
-    die (#message = "Existential-Quantifier-Formula lacks an Explicitly-Qualified-Segment child!");
-  }
+  "ex ";
+  apply [*[1]]; // Implicitly-Qualified-Segment or Explicitly-Qualified-Segment; can there be more than one?
+  " holds ";
+  "(";
+  apply [*[2]]; // weird, definitely not right
+  ")";
 }
 
 tpl [Simple-Term] {
@@ -287,23 +405,49 @@ tpl [Item[@kind='Private-Predicate-Definition']] {
   }
 }
 
+tpl [Item[@kind='Exemplification']] {
+  "take ";
+  list (#separ = ",", #elems = `*`);
+  ";";
+  "\n";
+}
+
+tpl [Item[@kind='Generalization']] {
+  "let ";
+  list (#separ = ",", #elems = `*`);
+  ";";
+  "\n";
+}
+
 tpl [Private-Predicate-Formula] {
   if [@spelling] {
     `@spelling`;
     "(";
-    for-each [./*] {
-      apply [.];
-    }
+    list (#separ = ",", #elems = `*`);
     ")";
   } else {
     die (#message = "Private-Predicate-Formula lacks a spelling!");
   }
 }
 
-tpl [Conjuctive-Formula] { // typo: should be "Conjunctive-Formula"
+tpl [Conjunctive-Formula] {
   apply [*[1]];
   " & ";
   apply [*[2]];
+}
+
+tpl [Conditional-Formula] {
+  apply [*[1]];
+  " implies ";
+  apply [*[2]];
+}
+
+tpl [Placeholder-Term] {
+  if [@nr] {
+    "$"; `@nr`;
+  } else {
+    die (#message = "Placeholder-Term lacks an NR attribute!");
+  }
 }
 
 tpl [Predicative-Formula] {
@@ -313,7 +457,7 @@ tpl [Predicative-Formula] {
     " "; `@spelling`; " ";
     apply [Arguments[2]];
   } else {
-    die (#message = "Predicative-Formula lacks a spellin!");
+    die (#message = "Predicative-Formula lacks a spelling!");
   }
 }
 
@@ -347,29 +491,112 @@ tpl quantified-formula(#kind) {
   }
 }
 
+tpl [Compact-Statement] {
+  // nothing?
+}
+
+tpl [thesis] { // probably should be "Thesis"
+  "thesis";
+}
+
+tpl [Proposition] {
+  if [Label] {
+    apply [Label[1]];
+    " ";
+    apply [*[2]];
+  } else {
+    apply [*[1]]; // no label case
+  }
+}
+
+tpl [Label] {
+  if [@spelling] {
+    `@spelling`; ":";
+  } else {
+    die (#message = "Label element lacks a spelling attribute!");
+  }
+}
+
+tpl [Local-Reference] {
+  if [@spelling] {
+    `@spelling`;
+  } else {
+    die (#message = "Local-Reference element lacks a spelling attribute!");
+  }
+}
+
+tpl [Scheme-Justification] {
+  if [@nr] {
+    " from BOGUS:sch "; `@nr`;
+    "(";
+    list (#separ = ",", #elems = `*`);
+    ")";
+  } else {
+    die (#message = "Scheme-Justification lacks an nr attribute!");
+  }
+
+}
+
+tpl [Item[@kind='Choice-Statement']] {
+  "consider ";
+  apply [*[1]]; // variables
+  if [Proposition] {
+    " such that ";
+    apply [Proposition]; // could be more than one, right?
+    if [Scheme-Justification] {
+      apply [Scheme-Justification[1]];
+    }
+  }
+  ";";
+  "\n";
+}
+
+tpl [Straightforward-Justification] {
+  if [*[1]] {
+    " by ";
+    apply [*];
+  } else {
+    // do nothing
+  }
+}
+
+tpl [Item[@kind='Conclusion']] {
+  if [Straightforward-Justification/Link] { // hence
+    "hence "; apply [Proposition[1]];
+  } else { // thus
+    // not handled yet
+  }
+  ";";
+  "\n";
+}
+
+tpl [Item[@kind='Regular-Statement']] {
+  apply [Proposition[1]];
+  apply [Straightforward-Justification[1]]; // is this always around?
+  ";";
+  "\n";
+}
+
 // dumb: this just is a copy-and-paste-and-edit of the
 // Existential-Quantifier-Formula case.  Should be parameterized and
 // combined into one.
 tpl [Universal-Quantifier-Formula] {
-  // sanity check: there is one and only one explicitly qualified segment
-  if [Explicitly-Qualified-Segment] {
-    if [Explicitly-Qualified-Segment[2]] {
-      die (#message = "Universal-Quantifier-Formula has multiple Explicitly-Qualified-Segment children!");
-    } else {
-      "for ";
-      apply [Explicitly-Qualified-Segment[1]];
-      " holds ";
-      "(";
-      apply [*[2]]; // weird, definitely not right
-      ")";
-    }
-  } else {
-    die (#message = "Universal-Quantifier-Formula lacks an Explicitly-Qualified-Segment child!");
-  }
+  "for ";
+  apply [*[1]]; // Implicitly-Qualified-Segment or Explicitly-Qualified-Segment
+  " holds ";
+  "(";
+  apply [*[2]]; // matrix
+  ")";
 }
 
 tpl [Schematic-Variables] {
   list (#separ = ",", #elems = `Functor-Segment | Predicate-Segment`);
+}
+
+tpl [Provisional-Formulas] {
+  if [*[1]] { // there's something to do
+    list (#separ = "\nand", #elems = `*`);
+  }
 }
 
 tpl [Item[@kind='Scheme-Head']] {
@@ -384,6 +611,9 @@ tpl [Item[@kind='Scheme-Head']] {
       apply [Schematic-Variables[1]];
       " } : ";
       apply [*[3]]; // the scheme formula
+      if [Provisional-Formulas] {
+        apply [Provisional-Formulas[1]];
+      }
     }
   } else {
     die (#message = "Scheme child of a Scheme-Head item is missing!");
