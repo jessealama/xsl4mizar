@@ -164,7 +164,7 @@ tpl [Constructor] {
     if [@superfluous] { @superfluous=`@superfluous`; }
     "\n";
     if [$kind = $target_kind and $nr = $target_nr and $aid = $target_aid and $relnr = $target_relnr] {
-      if [$target_prop = "all"] {
+      if [$target_property = "all"] {
         apply [*](#ignore = "all");
       } else {
         apply [*](#ignore = "1");
