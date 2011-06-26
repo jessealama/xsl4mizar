@@ -180,6 +180,10 @@ tpl [Cluster] {
   "\n";
 }
 
+tpl [Num] {
+  <Num { @nr=`@nr`; }
+}
+
 tpl [ArgTypes] {
   if [*[1]] {
     <ArgTypes {
