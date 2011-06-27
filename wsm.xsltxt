@@ -84,7 +84,7 @@ tpl [Item[@kind='Reservation']] {
   }
 }
 
-tpl [Item[@kind='Section-Pragmma']] {
+tpl [Item[@kind='Section-Pragma']] {
   "begin"; "\n";
 }
 
@@ -114,7 +114,7 @@ tpl [Block[@kind='Scheme-Block']] {
         "\n";
         "proof";
         "\n";
-        apply [*[position() > 2]];
+        apply [*[position() > 1]];
         "end";
 	";";
 	"\n";
@@ -127,6 +127,18 @@ tpl [Block[@kind='Scheme-Block']] {
 
 tpl [Item[@kind='Definition-Item']] {
   apply [*[1]];
+}
+
+tpl [Specification] {
+  apply [*]; // ...
+}
+
+tpl [Item[@kind='Functor-Definition']] {
+  apply [Operation-Functor-Pattern[1]]; // always exists?
+  if [Specification] {
+    " -> "; apply [Specification[1]];
+  }
+  "\n";
 }
 
 tpl [Block[@kind='Definitional-Block']] {
@@ -149,8 +161,18 @@ tpl [Item[@kind='Cluster']] {
   apply [*[1]]; // should be just one child, right?
 }
 
-tpl [existence] { // I guess it should be "Existence"
+tpl [Existence] { // I guess it should be "Existence"
   "existence";
+}
+
+tpl [Coherence] {
+  "coherence";
+}
+
+tpl [Block[@kind='Proof']] {
+  "proof"; "\n";
+  apply [*];
+  "end"; ";"; "\n";
 }
 
 tpl [Item[@kind='Correctness-Condition']] {
@@ -183,7 +205,7 @@ tpl [Existential-Registration] {
   ";"; "\n";
 }
 
-tpl [Item[@kind='Loci-Decraration']] { // should be Declaration
+tpl [Item[@kind='Loci-Declaration']] {
   "let "; apply [*]; ";"; "\n";
 }
 
@@ -377,6 +399,23 @@ tpl [Private-Functor-Term] {
   }
 }
 
+tpl [Contradiction] {
+  "contradiction";
+}
+
+tpl [Global-Choice-Term] {
+  "the ";
+  apply [*[1]];
+}
+
+tpl [Item[@kind='Constant-Definition']] {
+  "set ";
+  apply [Variable[1]]; // only one, right?
+  " = ";
+  apply [*[2]];
+  ";"; "\n";
+}
+
 tpl [Item[@kind='Private-Predicate-Definition']] {
   if [Variable] {
     if [Variable[2]] {
@@ -395,6 +434,7 @@ tpl [Item[@kind='Private-Predicate-Definition']] {
 	  " means ";
 	  apply [*[3]];
 	  ";";
+          "\n";
         }
       } else {
         die (#message = "Private-Predicate-Definition lacks a Type-List child!");
@@ -443,10 +483,10 @@ tpl [Conditional-Formula] {
 }
 
 tpl [Placeholder-Term] {
-  if [@nr] {
-    "$"; `@nr`;
+  if [@spelling] {
+    `@spelling`;
   } else {
-    die (#message = "Placeholder-Term lacks an NR attribute!");
+    die (#message = "Placeholder-Term lacks a spelling attribute!");
   }
 }
 
@@ -495,7 +535,7 @@ tpl [Compact-Statement] {
   // nothing?
 }
 
-tpl [thesis] { // probably should be "Thesis"
+tpl [Thesis] {
   "thesis";
 }
 
@@ -526,13 +566,17 @@ tpl [Local-Reference] {
 }
 
 tpl [Scheme-Justification] {
-  if [@nr] {
-    " from BOGUS:sch "; `@nr`;
-    "(";
-    list (#separ = ",", #elems = `*`);
-    ")";
+  if [@spelling and @nr] {
+    if [@nr = "0"] {
+      " from "; `@spelling`;
+    } else {
+      " from "; `@spelling`; ":sch "; `@nr`;
+      "(";
+      list (#separ = ",", #elems = `*`);
+      ")";
+    }
   } else {
-    die (#message = "Scheme-Justification lacks an nr attribute!");
+    die (#message = "Scheme-Justification lacks either a spelling or an nr attribute!");
   }
 
 }
@@ -563,8 +607,12 @@ tpl [Straightforward-Justification] {
 tpl [Item[@kind='Conclusion']] {
   if [Straightforward-Justification/Link] { // hence
     "hence "; apply [Proposition[1]];
-  } else { // thus
-    // not handled yet
+  } else {
+    if [Straightforward-Justification/Local-Reference] { // thus
+      "thus "; apply [Proposition[1]]; " by "; list (#separ = ",", #elems = `Straightforward-Justification/Local-Reference`);
+    } else {
+      // not handled yet
+    }
   }
   ";";
   "\n";
