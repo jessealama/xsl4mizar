@@ -88,6 +88,40 @@ tpl [Item[@kind='Section-Pragma']] {
   "begin"; "\n";
 }
 
+tpl [Item[@kind='Per-Cases']] {
+  if [Straightforward-Justification] {
+    "per cases"; apply [Straightforward-Justification[1]]; ";"; "\n";
+  } else {
+    die (#message = "Don't know how to deal with a Per-Cases item that lacks a Straightforward-Justification child!");
+  }
+}
+
+tpl [Item[@kind='Case-Block']] {
+  if [Block[@kind='Suppose']] {
+    apply [Block[@kind='Suppose'][1]]; // could there be more than one?
+  } else {
+    die (#message = "Don't know how to deal with a Case-Block item that lacks a Suppose block child!");
+  }
+}
+
+tpl [Block[@kind='Suppose']] {
+  if [Item[@kind='Suppose-Head']] {
+    apply [Item[@kind='Suppose-Head'][1]];
+    apply [*[position() > 1]]; // assuming that the Suppose-Head element is at position 1
+    "end;"; "\n";
+  } else {
+    die (#message = "Don't know hot to deal with a Suppose block that lacks a Suppose-Head child!");
+  }
+}
+
+tpl [Item[@kind='Suppose-Head']] {
+  if [Single-Assumption] {
+    "suppose "; apply [Single-Assumption[1]]; ";"; "\n";
+  } else {
+    die (#message = "Don't know how to deal with a Suppose-Head item that lacks a Single-Assumption child!");
+  }
+}
+
 tpl [Item[@kind='Scheme-Block-Item']] {
 
   // sanity check: there is one and only one Scheme-Block child
