@@ -547,8 +547,9 @@ tpl [Locus] {
 
 tpl [Attribute-Pattern] {
   if [@spelling] {
-    apply [Locus];
+    apply [Locus[1]];
     " is ";
+    apply [Loci[1]];
     `@spelling`;
   } else {
     die (#message = "Attribute-Pattern lacks a spelling attribute!");
