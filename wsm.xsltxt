@@ -1120,14 +1120,14 @@ tpl [Item[@kind='Regular-Statement']] {
       
         if [Straightforward-Justification] {
           " "; apply [Straightforward-Justification[1]]; ";"; "\n";
-        } else {
-          if [Block[@kind='Proof']] {
-            "\n";
-            apply [Block[@kind='Proof'][1]];
-          } else {
-            die (#message = "Don't know how to handle a Regular-Statement item: it is not a diffuse statement, it lacks a Straightforward-Justification child, and it lacks a Proof block child.");
-          }
         }
+        if [Scheme-Justification] {
+          " "; apply [Scheme-Justification[1]]; ";"; "\n";
+        }
+        if [Block[@kind='Proof']] {
+          "\n";
+          apply [Block[@kind='Proof'][1]];
+        } 
       }
   }
 }
