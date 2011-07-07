@@ -912,7 +912,29 @@ tpl [Infix-Term] {
     die (#message = "Infix-Term lacks two Arguments children!");
   }
 
-  "("; apply [Arguments[1]]; " "; `@spelling`; " "; apply [Arguments[2]]; ")";
+  "(";
+
+  if [Arguments[1]/*[1]] {
+    if [Arguments[1]/*[2]] {
+      "("; list (#separ = ",", #elems = `Arguments[1]/*`); ")";
+    } else {
+      apply [Arguments[1]/*[1]];
+    }
+    " ";
+  }
+
+  `@spelling`;
+
+  if [Arguments[2]/*[1]] {
+    " ";
+    if [Arguments[2]/*[2]] {
+      "("; list (#separ = ",", #elems = `Arguments[2]/*`); ")";
+    } else {
+      apply [Arguments[2]/*[1]];
+    }
+  }
+
+  ")";
 }
 
 tpl [Bracket-Functor-Pattern] {
