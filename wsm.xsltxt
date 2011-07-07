@@ -227,8 +227,6 @@ tpl [Item[@kind='Functor-Definition']] {
   
   if [Type-Specification] {
     " -> "; apply [Type-Specification[1]];
-  } else {
-    die (#message = "Functor-Definition lacks a Type-Specification child!");
   }
 
   if [Definiens] {
