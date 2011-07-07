@@ -480,15 +480,7 @@ tpl [Definiens] {
     if [Partial-Definiens] {
       apply [Partial-Definiens[1]]; // could there be more than one?
       " otherwise ";
-      if [Formula-Expression] {
-        if [Attributive-Formula] {
-          apply [Attributive-Formula[1]]; // hack!
-        } else {
-          die (#message = "Don't know how to deal with a Definiens that has a Partial-Definiens child, a Formula-Expression child, but lacks an Attributive-Formula child!");
-        }
-      } else {
-        die (#message = "Don't know how to deal with a Definiens that has a Partial-Definiens child, but lacks a Formula-Expression child!");
-      }
+      apply [*[position() > 2]];
     } else {
       apply [*[position() > 1]];
     }
