@@ -955,7 +955,7 @@ tpl [Item[@kind='Existential-Assumption']] {
       if [Straightforward-Justification] {
         apply [Straightforward-Justification[1]];
       }
-      ";"; "\n";
+      "\n";
     } else {
       die (#message = "Existential-Assumption element lacks a Proposition child!");
     }
