@@ -1218,6 +1218,35 @@ tpl [Block[@kind='Hereby-Reasoning']] {
   "end;"; "\n";
 }
 
+tpl [Item[@kind='Type-Changing-Statement']] {
+  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
+    "then ";
+  }
+  "reconsider ";
+  if [Variable] {
+    list (#separ = ",", #elems = `Variable`);
+  } else {
+    if [Equality] {
+      apply [Equality[1]];
+    } else {
+      die (#message = "Don't know how to deal with a Type-Changing-Statement that lacks both a Variable and an Equality child!");
+    }
+  }
+  if [Standard-Type] {
+    " as "; apply [Standard-Type];
+    if [Straightforward-Justification] {
+      apply [Straightforward-Justification[1]];
+    }
+    ";"; "\n";
+  } else {
+    die (#message = "Don't know how to deal with a Type-Changing-Statement element that lacks a Standard-Type child!");
+  }
+}
+
+tpl [Equality] {
+  apply [*[1]]; " = "; apply [*[2]];
+}
+
 tpl [Item[@kind='Regular-Statement']] {
 
   if [Iterative-Equality] {
