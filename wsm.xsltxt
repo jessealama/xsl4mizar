@@ -607,11 +607,11 @@ tpl [Item[@kind='Exemplification']] {
 tpl [Item[@kind='Generalization']] { // very ugly.  I've asked Czeslaw to refactor
   "let "; list (#separ = ",", #elems = `*`);
   // look at the following sibling
-  if [following-sibling::Item[@kind='Assumption']/Collective-Assumption] {
-    " such that"; "\n";
-    list (#separ = "\nand\n",
-          #elems = `following-sibling::Item[@kind='Assumption']/Collective-Assumption/Proposition`);
-  }
+  // if [following-sibling::Item[@kind='Assumption']/Collective-Assumption] {
+  //   " such that"; "\n";
+  //   list (#separ = "\nand\n",
+  //         #elems = `following-sibling::Item[@kind='Assumption']/Collective-Assumption/Proposition`);
+  // }
   ";"; "\n";
 }
 
@@ -899,7 +899,8 @@ tpl [Item[@kind='Assumption']] {
 }
 
 tpl [Collective-Assumption] {
-  // do nothing.  I've asked Czeslaw for help.
+  "assume that"; "\n";
+  list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
 }
 
 tpl [Item[@kind='Existential-Assumption']] {
