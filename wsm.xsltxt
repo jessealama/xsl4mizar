@@ -254,22 +254,24 @@ tpl [Item[@kind='Functor-Definition']] {
     " -> "; apply [Type-Specification[1]];
   }
 
-  if [Definiens] {
-    // do nothing: this is a sanity check
-  } else {
-    die (#message = "Functor-Definition lacks a Definiens!");
-  }
-
   "\n";
 
   if [Equals] {
     apply [Equals[1]]; "\n";
-    apply [Definiens[1]]; ";";
+    if [Definiens] {
+      apply [Definiens[1]]; ";";
+    } else {
+      die (#message = "Functor-Definition defined by an equation lacks a Definiens child!");
+    }
   }
 
   if [Means] {
     apply [Means[1]]; "\n";
-    apply [Definiens[1]]; ";";
+    if [Definiens] {
+      apply [Definiens[1]]; ";";
+    } else {
+      die (#message = "Functor-Definition defined by a formula lacks a Definiens child!");
+    }
   }
 
   "\n";
