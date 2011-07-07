@@ -522,6 +522,9 @@ tpl [Negated-Formula] {
 }
 
 tpl [Item[@kind='Attribute-Definition']] {
+  if [Redefine] {
+    "redefine ";
+  }
   "attr ";
   apply [Attribute-Pattern[1]]; // is this always present?
   if [Definiens] {
