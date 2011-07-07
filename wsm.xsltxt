@@ -1022,6 +1022,10 @@ tpl [Connectedness] {
   "connectedness";
 }
 
+tpl [Sethood] {
+  "sethood";
+}
+
 tpl [Compact-Statement] {
   // do nothing.  This element simply indicates what kind of thing its
   // parent is.  It should probably be represented as an atribute of
