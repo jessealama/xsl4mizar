@@ -212,6 +212,49 @@ tpl [it-Term] {
   "it";
 }
 
+// Standard-Mode elements suck
+tpl [Standard-Mode] {
+  if [Definiens] {
+    apply [Definiens[1]]; ";"; "\n";
+  } else {
+    if [Type-Specification] {
+      apply [Type-Specification[1]]; ";"; "\n";
+    } else {
+      die (#message = "Don't know how to deal with a Standard-Mode element that lacks a Definiens child!");
+    }
+  }
+}
+
+tpl [Expandable-Mode] {
+  if [Standard-Type] {
+    " is ";
+    apply [Standard-Type[1]];
+  } else {
+    die (#message = "Don't know how to deal with an Expandable-Mode element that lacks a Standard-Type child!");
+  }
+}
+
+tpl [Item[@kind='Mode-Definition']] {
+  if [Redefine] {
+    "redefine ";
+  }
+  "mode ";
+  if [Mode-Pattern] {
+    apply [Mode-Pattern[1]]; "\n";
+  } else {
+    die (#message = "Mode-Definition element lacks a Mode-Pattern child!");
+  }
+  if [Standard-Mode/Type-Specification] {
+    " -> "; apply [Standard-Mode[1]];
+  }
+  if [Standard-Mode/Definiens] {
+    "means "; apply [Standard-Mode[1]];
+  }
+  if [Expandable-Mode] {
+    apply [Expandable-Mode[1]]; ";"; "\n";
+  }
+}
+
 tpl [Item[@kind='Predicate-Definition']] {
   if [Redefine] {
     "redefine ";
@@ -275,6 +318,17 @@ tpl [Predicate-Pattern] {
       apply [Loci[2]];
     } else {
       die (#message = "Predicate-Pattern does not have two Loci children!");
+    }
+  } else {
+    die (#message = "Predicate-Pattern lacks a spelling attribute!");
+  }
+}
+
+tpl [Mode-Pattern] {
+  if [@spelling] {
+    `@spelling`;
+    if [Loci] {
+      " of "; apply [Loci[1]];
     }
   } else {
     die (#message = "Predicate-Pattern lacks a spelling attribute!");
@@ -414,9 +468,45 @@ tpl [Definiens] {
     ":"; // special case: labels of definiens look like :this:, not like this:
     apply [Label[1]];
     " ";
-    apply [*[position() > 1]];
+    if [Partial-Definiens] {
+      apply [Partial-Definiens[1]]; // could there be more than one?
+      " otherwise ";
+      if [Formula-Expression] {
+        if [Attributive-Formula] {
+          apply [Attributive-Formula[1]]; // hack!
+        } else {
+          die (#message = "Don't know how to deal with a Definiens that has a Partial-Definiens child, a Formula-Expression child, but lacks an Attributive-Formula child!");
+        }
+      } else {
+        die (#message = "Don't know how to deal with a Definiens that has a Partial-Definiens child, but lacks a Formula-Expression child!");
+      }
+    } else {
+      apply [*[position() > 1]];
+    }
   } else {
     apply [*];
+  }
+}
+
+tpl [Partial-Definiens] {
+  if [Formula-Expression] {
+    apply [*[2]]; " if "; apply [*[3]]; // hmm...
+  } else {
+    die (#message = "Don't know how to deal with a Partial-Definiens item that lacks a Formula-Expression child!");
+  }
+}
+
+tpl [Qualifying-Formula] {
+  if [Simple-Term | Infix-Term | Circumfix-Term] {
+    apply [(Simple-Term | Infix-Term | Circumfix-Term)[1]];
+    " is ";
+    if [Standard-Type] {
+      apply [Standard-Type[1]];
+    } else {
+      die (#message = "Qualifying-Formula lacks a Standard-Type child!");
+    }
+  } else {
+    die (#message = "Qualifying-Formula lacks a Simple-Term child and an Infix-Term and a Circumfix-Term child!");
   }
 }
 
@@ -471,10 +561,10 @@ tpl [Functor-Segment] {
     if [Type-List] {
       "("; apply [Type-List[1]]; ")";
       " -> ";
-      if [Standard-Type] {
-        apply [Standard-Type[1]];
+      if [Standard-Type | Clustered-Type] {
+        apply [(Standard-Type | Clustered-Type)[1]];
       } else {
-        die (#message = "Standard-Type child missing from Functor-Segment element!");
+        die (#message = "Standard-Type and Clustered-Type child missing from Functor-Segment element!");
       }
     } else {
       die (#message = "Type-List child of Functor-Segment is missing!");
