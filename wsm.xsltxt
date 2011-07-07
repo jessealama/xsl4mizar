@@ -108,7 +108,21 @@ tpl [Item[@kind='Case-Block']] {
   if [Block[@kind='Suppose']] {
     apply [Block[@kind='Suppose'][1]]; // could there be more than one?
   } else {
-    die (#message = "Don't know how to deal with a Case-Block item that lacks a Suppose block child!");
+    if [Block[@kind='Case']] {
+      apply [Block[@kind='Case'][1]];
+    } else {
+      die (#message = "Don't know how to deal with a Case-Block item that lacks both a Suppose block and Case block child!");
+    }
+  }
+}
+
+tpl [Block[@kind='Case']] {
+  if [Item[@kind='Case-Head']] {
+    "case "; apply [Item[@kind='Case-Head'][1]]; ";"; "\n";
+    apply [*[position() > 1]]; // assuming that the Case-Head is the first child
+    "end;"; "\n";
+  } else {
+    die (#message = "Don't know how to deal with a Case block that lacks a Case-Head item child!");
   }
 }
 
@@ -119,6 +133,14 @@ tpl [Block[@kind='Suppose']] {
     "end;"; "\n";
   } else {
     die (#message = "Don't know hot to deal with a Suppose block that lacks a Suppose-Head child!");
+  }
+}
+
+tpl [Item[@kind='Case-Head']] {
+  if [Single-Assumption] {
+    "suppose "; apply [Single-Assumption[1]]; ";"; "\n";
+  } else {
+    die (#message = "Don't know how to deal with a Suppose-Head item that lacks a Single-Assumption child!");
   }
 }
 
