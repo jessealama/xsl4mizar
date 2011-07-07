@@ -372,7 +372,7 @@ tpl [Adjective] {
 }
 
 tpl [Adjective-Cluster] {
-  list (#separ = "WEIRD", #elems = `Adjective`); // don't know how to deal with multiple adjectives
+  list (#separ = " ", #elems = `Adjective`);
 }
 
 tpl [Existential-Registration] {
