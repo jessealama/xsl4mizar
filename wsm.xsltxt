@@ -736,7 +736,11 @@ tpl [Definition-Reference] {
 
 tpl [Item[@kind='Exemplification']] {
   "take ";
-  list (#separ = ",", #elems = `*`);
+  if [*[2]] {  // take X = Y
+    apply [*[1]]; " = "; apply [*[2]];
+  } else {
+    apply [*[1]];
+  }
   ";";
   "\n";
 }
