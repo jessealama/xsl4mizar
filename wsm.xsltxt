@@ -234,8 +234,6 @@ tpl [Item[@kind='Predicate-Definition']] {
   if [Definiens] {
     "means"; "\n";
     apply [Definiens[1]]; "\n"; ";";
-  } else {
-    die (#message = "Predicate-Definition lacks a Definiens child!");
   }
 }
 
