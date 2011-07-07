@@ -1098,6 +1098,9 @@ tpl [Item[@kind='Regular-Statement']] {
     }
   } else {
     if [Diffuse-Statement] {
+      if [Label] {
+        apply [Label[1]];
+      }
       if [Block[@kind='Now-Reasoning']] {
         apply [Block[@kind='Now-Reasoning'][1]];
       } else {
