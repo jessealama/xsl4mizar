@@ -57,6 +57,9 @@ tpl [Variable] {
 tpl [Standard-Type] {
   if [@spelling] {
     `@spelling`;
+    if [Infix-Term | Simple-Term] {
+      " of "; apply [(Infix-Term | Simple-Term)[1]];
+    }
   } else {
     die (#message = "Standard-Type lacks a spelling!");
   }
