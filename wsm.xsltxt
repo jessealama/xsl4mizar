@@ -944,10 +944,11 @@ tpl [Collective-Assumption] {
 
 tpl [Item[@kind='Existential-Assumption']] {
   if [Implicitly-Qualified-Segment] {
-    "given "; apply [Implicitly-Qualified-Segment[1]];
+    "given ";
+    list (#separ = ",", #elems = `Implicitly-Qualified-Segment`);
     if [Proposition] {
-      " such that ";
-      apply [Proposition[1]];
+      " such that"; "\n";
+      list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
       if [Scheme-Justification] {
         apply [Scheme-Justification[1]];
       }
