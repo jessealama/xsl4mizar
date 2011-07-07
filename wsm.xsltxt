@@ -109,7 +109,7 @@ tpl [Item[@kind='Case-Block']] {
 
 tpl [Block[@kind='Case']] {
   if [Item[@kind='Case-Head']] {
-    "case "; apply [Item[@kind='Case-Head'][1]]; ";"; "\n";
+    apply [Item[@kind='Case-Head'][1]]; ";"; "\n";
     apply [*[position() > 1]]; // assuming that the Case-Head is the first child
     "end;"; "\n";
   } else {
@@ -129,7 +129,7 @@ tpl [Block[@kind='Suppose']] {
 
 tpl [Item[@kind='Case-Head']] {
   if [Single-Assumption] {
-    "suppose "; apply [Single-Assumption[1]]; ";"; "\n";
+    "case "; apply [Single-Assumption[1]];
   } else {
     die (#message = "Don't know how to deal with a Suppose-Head item that lacks a Single-Assumption child!");
   }
