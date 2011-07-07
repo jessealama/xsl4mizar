@@ -8,18 +8,6 @@ tpl list(#separ,#elems) {
   apply[.]; if [not(position()=last())] { copy-of $separ; } }
 }
 
-key "D_G" [Symbol[@kind='G']] `@nr`;
-key "D_K" [Symbol[@kind='K']] `@nr`;
-key "D_J" [Symbol[@kind='J']] `@nr`;
-key "D_L" [Symbol[@kind='L']] `@nr`;
-key "D_M" [Symbol[@kind='M']] `@nr`;
-key "D_O" [Symbol[@kind='O']] `@nr`;
-key "D_R" [Symbol[@kind='R']] `@nr`;
-key "D_U" [Symbol[@kind='U']] `@nr`;
-key "D_V" [Symbol[@kind='V']] `@nr`;
-// identifiers
-key "D_I" [Symbol[@kind='I']] `@nr`;
-
 $lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
 $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; } 
 
