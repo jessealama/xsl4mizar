@@ -219,10 +219,10 @@ tpl [Item[@kind='Predicate-Definition']] {
 
 tpl [Item[@kind='Functor-Definition']] {
   "func ";
-  if [Operation-Functor-Pattern] {
-    apply [Operation-Functor-Pattern[1]]; // always exists?
+  if [Operation-Functor-Pattern | Bracket-Functor-Pattern] {
+    apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[1]]; // always exists?
   } else {
-    die (#message = "Functor-Definition lacks an Operation-Functor-Pattern child!");
+    die (#message = "Functor-Definition lacks both an Operation-Functor-Pattern child and a Bracket-Functor-Pattern child!");
   }
   
   if [Type-Specification] {
@@ -780,6 +780,24 @@ tpl [Infix-Term] {
   }
 
   "("; apply [Arguments[1]]; " "; `@spelling`; " "; apply [Arguments[2]]; ")";
+}
+
+tpl [Bracket-Functor-Pattern] {
+  if [@spelling] {
+    if [Right-Circumflex-Symbol] {
+      if [Loci] {
+        `@spelling`;
+         list (#separ = ",", #elems = `Loci/Locus`);
+         apply [Right-Circumflex-Symbol[1]];
+      } else {
+        die (#message = "Bracket-Functor-Pattern lacks a Loci child!");
+      }
+    } else {
+      die (#message = "Bracket-Functor-Pattern lacks a Right-Circumflex-Symbol child!");
+    }
+  } else {
+    die (#message = "Bracket-Functor-Pattern lacks a spelling!");
+  }
 }
 
 tpl [Circumfix-Term] {
