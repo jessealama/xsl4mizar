@@ -41,7 +41,15 @@ tpl get_vid_name(#vid)
 }
 
 tpl die(#message) {
-  msg terminate="yes" $message;
+  if [@line and @col] {
+    $line = `@line`;
+    $col = `@col`;
+    $final_message = `concat ($message, " (line ", $line, ", column ", $col, ")")`;
+    msg terminate="yes" $final_message;
+  } else {
+    $final_message = `concat ($message, " (unable to determine line and column information)")`;
+    msg terminate="yes" $final_message;
+  }
 }
 
 tpl [Text-Proper] {
