@@ -1265,8 +1265,8 @@ tpl [Item[@kind='Type-Changing-Statement']] {
       die (#message = "Don't know how to deal with a Type-Changing-Statement that lacks both a Variable and an Equality child!");
     }
   }
-  if [Standard-Type] {
-    " as "; apply [Standard-Type];
+  if [Standard-Type | Clustered-Type] {
+    " as "; apply [(Standard-Type | Clustered-Type)[1]];
     if [Straightforward-Justification] {
       apply [Straightforward-Justification[1]];
     }
