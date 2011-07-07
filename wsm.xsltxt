@@ -389,6 +389,10 @@ tpl [Compatibility] {
   "compatibility";
 }
 
+tpl [Consistency] {
+  "consistency";
+}
+
 tpl [Item[@kind='Correctness-Condition']] {
   apply [*[1]]; // I guess there's always at least one child
   if [Block[@kind='Proof']] {
