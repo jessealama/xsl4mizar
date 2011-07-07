@@ -874,7 +874,7 @@ tpl [Item[@kind='Choice-Statement']] {
     "then ";
   }
   "consider ";
-  apply [*[1]]; // variables
+  list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
   if [Proposition] {
     " such that ";
     list (#separ = " and ", #elems = `Proposition`);
