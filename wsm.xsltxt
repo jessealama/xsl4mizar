@@ -753,10 +753,10 @@ tpl [Local-Reference] {
 }
 
 tpl [Scheme-Justification] {
-  if [@spelling and @nr] {
+  if [@spelling and @idnr] {
     " from "; `@spelling`;
-    if [@nr > "0"] {
-      ":sch "; `@nr`;
+    if [@idnr > "0"] {
+      ":sch "; `@idnr`;
     }
     if [*[1]] { // there are scheme arguments
     "("; list (#separ = ",", #elems = `*`); ")";
