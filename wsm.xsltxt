@@ -240,6 +240,9 @@ tpl [Item[@kind='Predicate-Definition']] {
 }
 
 tpl [Item[@kind='Functor-Definition']] {
+  if [Redefine] {
+    "redefine ";
+  }
   "func ";
   if [Operation-Functor-Pattern | Bracket-Functor-Pattern] {
     apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[1]]; // always exists?
