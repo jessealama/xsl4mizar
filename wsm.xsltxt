@@ -925,8 +925,8 @@ tpl [Item[@kind='Assumption']] {
 }
 
 tpl [Iterative-Step] {
-  if [Infix-Term | Simple-Term] {
-    apply[(Infix-Term | Simple-Term)[1]];
+  if [Infix-Term | Simple-Term | Circumfix-Term] {
+    apply[(Infix-Term | Simple-Term | Circumfix-Term)[1]];
     if [Straightforward-Justification] {
       apply [Straightforward-Justification[1]];
     }
@@ -935,7 +935,7 @@ tpl [Iterative-Step] {
     }
     // there might be no justification; in that case, do nothing
   } else {
-    die (#message = "Don't know how to deal with an Iterative-Step that lacks an Infix-Term child!");
+    die (#message = "Don't know how to deal with an Iterative-Step that lacks an Infix-Term child, a Simple-Term child, and a Circumfix-Term child!");
   }
 }
 
