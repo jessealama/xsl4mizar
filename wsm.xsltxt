@@ -398,6 +398,20 @@ tpl [Functorial-Registration] {
   }
 }
 
+tpl [Conditional-Registration] {
+  "cluster ";
+  if [Adjective-Cluster[2]] {
+    apply [Adjective-Cluster[1]];
+    " -> ";
+    apply [Adjective-Cluster[2]];
+    " for ";
+    apply [*[3]]; // this is the type, hopefully
+    ";"; "\n";
+  } else {
+    die (#message = "Conditional-Registration lacks two Adjective-Cluster children!");
+  }
+}
+
 tpl [Item[@kind='Loci-Declaration']] {
   "let "; apply [*]; ";"; "\n";
 }
