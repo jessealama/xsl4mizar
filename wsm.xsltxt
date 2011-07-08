@@ -1131,9 +1131,9 @@ tpl [Collective-Assumption] {
 }
 
 tpl [Item[@kind='Existential-Assumption']] {
-  if [Implicitly-Qualified-Segment] {
+  if [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
     "given ";
-    list (#separ = ",", #elems = `Implicitly-Qualified-Segment`);
+    list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
     if [Proposition] {
       " such that"; "\n";
       list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
@@ -1148,7 +1148,7 @@ tpl [Item[@kind='Existential-Assumption']] {
       die (#message = "Existential-Assumption element lacks a Proposition child!");
     }
   } else {
-    die (#message = "Existential-Assumption item lacks an Implicitly-QualifiedSegment child!");
+    die (#message = "Existential-Assumption item lacks an Implicitly-QualifiedSegment child and an Explicitly-Qualified-Segment child!");
   }
 }
 
