@@ -562,11 +562,7 @@ tpl [Item[@kind='Attribute-Definition']] {
 
 tpl [Loci] {
   if [Locus] {
-    if [Locus[2]] {
-      "("; list (#separ = ",", #elems = `Locus`); ")";
-    } else {
-      apply [Locus[1]];
-    }
+    list (#separ = ",", #elems = `Locus`);
   }
 }
 
