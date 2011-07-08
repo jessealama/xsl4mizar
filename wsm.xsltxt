@@ -645,11 +645,17 @@ tpl [Implicitly-Qualified-Segment] {
   }
 }
 
-tpl [Explicitly-Qualified-Segment] {
+tpl [Explicitly-Qualified-Segment](#verb) {
   // sanity check: at least one variable
   if [Variable] {
     list (#separ = ",", #elems = `Variable`);
-    " being ";
+    " ";
+    if [$verb = ""] {
+      "being";
+    } else {
+      $verb;
+    }
+    " ";
     apply [Standard-Type | Clustered-Type]; // should be Standard-Type or Clustered-Type
   } else {
     die (#message = "Explicitly-Qualified-Segment lacks a Variable child!");
