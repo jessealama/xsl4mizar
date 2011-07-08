@@ -1368,7 +1368,7 @@ tpl [Item[@kind='Type-Changing-Statement']] {
     list (#separ = ",", #elems = `Variable`);
   } else {
     if [Equality] {
-      apply [Equality[1]];
+      list (#separ = ",", #elems = `Equality`);
     } else {
       die (#message = "Don't know how to deal with a Type-Changing-Statement that lacks both a Variable and an Equality child!");
     }
