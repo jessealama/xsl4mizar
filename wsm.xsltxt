@@ -504,7 +504,11 @@ tpl [Functorial-Registration] {
     apply [*[1]];
     " -> ";
     if [Adjective-Cluster] {
-      apply [Adjective-Cluster[1]]; ";"; "\n";
+      apply [Adjective-Cluster[1]]; 
+    if [Standard-Type] {
+      " for "; apply [Standard-Type[1]];
+    }
+    ";"; "\n";
     } else {
       die (#message = "Functorial-Registation lacks an Adjective-Cluster child!");
     }
