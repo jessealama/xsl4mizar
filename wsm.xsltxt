@@ -1216,6 +1216,16 @@ tpl [Item[@kind='Conclusion']] {
   }
 }
 
+tpl [Item[@kind='Mode-Synonym']] {
+  if [Mode-Pattern[2]] {
+    "synonym ";
+     apply [Mode-Pattern[2]]; " for ";
+     apply [Mode-Pattern[1]]; ";"; "\n"; // aren't these backwards?
+  } else {
+    die (#message = "Mode-Synonym item missing two Mode-Pattern children!");
+  }
+}
+
 tpl [Item[@kind='Func-Synonym']] {
   if [Operation-Functor-Pattern[2]] {
     "synonym ";
