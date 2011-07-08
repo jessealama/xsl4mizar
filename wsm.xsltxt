@@ -494,8 +494,14 @@ tpl [Existential-Registration] {
   "cluster ";
   apply [Adjective-Cluster[1]]; // always exists, right?
   " for ";
-  apply [Standard-Type[1]]; // is it always a Standard-Type element?
-  ";"; "\n";
+  if [Standard-Type | Clustered-Type] {
+    apply [(Standard-Type | Clustered-Type)[1]];
+    ";"; "\n";
+  } else {
+    die (#message = "Don't know how to deal with an Existential-Registration that lacks a Standard-Type child and a Clustered-Type child!");
+  }
+
+
 }
 
 tpl [Functorial-Registration] {
