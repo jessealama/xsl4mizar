@@ -64,11 +64,13 @@ tpl [Internal-Selector-Term] {
 
 tpl [Standard-Type] {
   if [@spelling] {
-    `@spelling`;
-    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term] {
-      " of ";
-      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term`);
-    } 
+    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term] {
+     "("; `@spelling`; " of ";
+      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term`);
+      ")";
+    } else {
+      `@spelling`;
+    }
   } else {
     die (#message = "Standard-Type lacks a spelling!");
   }
@@ -80,11 +82,10 @@ tpl [Item[@kind='Reservation']] {
   " ";
   "for ";
 
-  // sanity check: one and only one type
-  if [Standard-Type | Clustered-Type] {
-    apply [(Standard-Type | Clustered-Type)[1]]; ";"; "\n";
+  if [Standard-Type | Clustered-Type | Struct-Type] {
+    apply [(Standard-Type | Clustered-Type | Struct-Type)[1]]; ";"; "\n";
   } else {
-    die(#message="No type (neither a Standard-Type nor a Clustered-Type) was found under a Reservation!");
+    die(#message="No type (neither a Standard-Type nor a Clustered-Type nor a Struct-Type) was found under a Reservation!");
   }
 }
 
@@ -531,8 +532,8 @@ tpl [Functorial-Registration] {
     " -> ";
     if [Adjective-Cluster] {
       apply [Adjective-Cluster[1]]; 
-    if [Standard-Type] {
-      " for "; apply [Standard-Type[1]];
+    if [Standard-Type | Struct-Type] {
+      " for "; apply [(Standard-Type | Struct-Type)[1]];
     }
     ";"; "\n";
     } else {
@@ -571,9 +572,20 @@ tpl [Definiens] {
     apply [Label[1]];
     " ";
     if [Partial-Definiens] {
-      apply [Partial-Definiens[1]]; // could there be more than one?
-      " otherwise ";
-      apply [*[position() > 2]];
+      for-each [Partial-Definiens] {
+        apply [.];
+        if [position()=last()] {
+          if [following-sibling::*[1]] {
+            // dangerous: the idea is that after all the
+            // Partial-Definiens, there is an element like
+            // "<Formula-Expression/>" or "<Term-Expression>"; we want
+            // the thing *after* that
+            " otherwise "; apply [following-sibling::*[2]]; 
+          }
+        } else {
+          ",";
+        }
+      }
     } else {
       apply [*[position() > 1]];
     }
@@ -587,8 +599,8 @@ tpl [Partial-Definiens] {
 }
 
 tpl [Qualifying-Formula] {
-  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term] {
-    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term)[1]];
+  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term] {
+    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term)[1]];
     " is ";
     if [Standard-Type | Clustered-Type] {
       apply [(Standard-Type | Clustered-Type)[1]];
@@ -665,10 +677,10 @@ tpl [Functor-Segment] {
     if [Type-List] {
       "("; apply [Type-List[1]]; ")";
       " -> ";
-      if [Standard-Type | Clustered-Type] {
-        apply [(Standard-Type | Clustered-Type)[1]];
+      if [Standard-Type | Clustered-Type | Struct-Type] {
+        apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
       } else {
-        die (#message = "Standard-Type and Clustered-Type child missing from Functor-Segment element!");
+        die (#message = "Standard-Type and Clustered-Type and Struct-Type child missing from Functor-Segment element!");
       }
     } else {
       die (#message = "Type-List child of Functor-Segment is missing!");
@@ -718,11 +730,11 @@ tpl [Selector] {
 
 tpl [Field-Segment] {
   if [Selector] {
-    apply [Selector[1]];
-    if [Standard-Type] {
-      " -> "; apply [Standard-Type[1]];
+    list (#separ = ",", #elems = `Selector`);
+    if [Standard-Type | Clustered-Type] {
+      " -> "; apply [(Standard-Type | Clustered-Type)[1]];
     } else {
-      die (#message = "Don't know how to deal with a Field-Segment that lacks a Standard-Type child!");
+      die (#message = "Don't know how to deal with a Field-Segment that lacks a Standard-Type child and a Clustered-Type child!");
     }
   } else {
     die (#message = "Don't know how to deal with a Field-Segment element that lacks a Selector child!");
@@ -733,7 +745,9 @@ tpl [Structure-Pattern] {
   if [@spelling] {
     `@spelling`;
     if [Loci] {
-      " over "; apply [Loci[1]];
+      if [Loci/*[1]] {
+        " over "; apply [Loci[1]];
+      }
     }
     "(# ";
     list (#separ = ",", #elems = `Field-Segment`);
@@ -750,9 +764,11 @@ tpl [Ancestors] {
 tpl [Item[@kind='Structure-Definition']] {
   "struct ";
   if [Ancestors] {
-    "("; apply [Ancestors[1]]; ") ";
+    if [Ancestors/*[1]] {
+      "("; apply [Ancestors[1]]; ") ";
+    }
     if [Structure-Pattern] {
-    apply [Structure-Pattern[1]]; ";"; "\n";
+      apply [Structure-Pattern[1]]; ";"; "\n";
     } else {
       die (#message = "Don't know how to deal with a Structure-Definition that lacks a Structure-Pattern");
     }
@@ -792,6 +808,17 @@ tpl [Simple-Term] {
     `@spelling`;
   } else {
     die (#message = "Simple-Term lacks a spelling!");
+  }
+}
+
+tpl [Forgetful-Functor-Term] {
+  if [@spelling] {
+    "the "; `@spelling`;
+    if [*[1]] {
+      " of "; apply [*[1]];
+    }
+  } else {
+    die (#message = "Don't know how to deal with a Forgetful-Functor-Term that lacks a spelling!");
   }
 }
 
@@ -840,14 +867,15 @@ tpl [Contradiction] {
 
 tpl [Global-Choice-Term] {
   "the ";
-  apply [*[1]];
+  apply [*];
 }
 
 tpl [Struct-Type] {
   if [@spelling] {
     `@spelling`;
     if [*[1]] { // dependent struct type
-      " over "; apply [*[1]];
+      " over ";
+      list (#separ = ",", #elems = `*`);
     }
   } else {
     die (#message = "Don't know how to deal with a Struct-Type element that lacks a spelling!");
@@ -1190,12 +1218,20 @@ tpl [Fraenkel-Term] {
   if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term] {
     "{ "; apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term)[1]];
     if [Explicitly-Qualified-Segment] {
-      " where "; apply [Explicitly-Qualified-Segment[1]](#verb = "is");
-     }
-    if [Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Biconditional-Formula] {
-      ": "; apply [(Predicative-Formula | Private-Predicative-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Biconditional-Formula)[1]]; " }";
+      " where ";
+      // manual listing.  Using the list template would be nicer, but
+      // I need to pass in the verb "is"
+      for-each [Explicitly-Qualified-Segment] {
+        apply [.](#verb = "is");
+        if [not(position()=last())] {
+          ",";
+        }
+      }
+    }
+    if [Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula] {
+      ": "; apply [(Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula)[1]]; " }";
     } else {
-      die (#message = "Don't know how to deal with a Fraenkel-Term that lacks a Predicative-Formula child and a Private-Predicate-Formula child and a Negated-Formula child and a Conjunctive-Formula child and a Contradiction child and a Disjunctive-Formula child and a Biconditional-Formula!");
+      die (#message = "Don't know how to deal with a Fraenkel-Term that lacks a Predicative-Formula child and a Private-Predicate-Formula child and a Negated-Formula child and a Conjunctive-Formula child and a Contradiction child and a Disjunctive-Formula child and a Biconditional-Formula child and an Existential-Quantifier-Formula child and a Universal-Quantifier-Child and an Attributive-Formula child!");
     }
   } else {
     die (#message = "Don't know how to deal with a Fraenkel term that lacks an Infix-Term child and a Simple-Term child and a Circumfix-Term child!");
@@ -1335,8 +1371,8 @@ tpl [Item[@kind='Assumption']] {
 }
 
 tpl [Iterative-Step] {
-  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term] {
-    apply[(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term)[1]];
+  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term | Forgetful-Functor-Term | Selector-Term | Aggregate-Term | Global-Choice-Term] {
+    apply[(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term | Forgetful-Functor-Term | Selector-Term | Aggregate-Term | Global-Choice-Term)[1]];
     if [Straightforward-Justification] {
       apply [Straightforward-Justification[1]];
     }
@@ -1345,7 +1381,7 @@ tpl [Iterative-Step] {
     }
     // there might be no justification; in that case, do nothing
   } else {
-    die (#message = "Don't know how to deal with an Iterative-Step that lacks an Infix-Term child, a Simple-Term child, and a Circumfix-Term child, and a Priate-Functor-Term child, and a Numeral-Term child!");
+    die (#message = "Don't know how to deal with an Iterative-Step that lacks an Infix-Term child, a Simple-Term child, and a Circumfix-Term child, and a Priate-Functor-Term child, and a Numeral-Term child, and a Forgetful-Functor-Term child and a Selector-Term child and an Aggregate-Term child and a Global-Choice-Term child!");
   }
 }
 
@@ -1405,6 +1441,14 @@ tpl [Item[@kind='Conclusion']](#case) {
     }
   } else {
     if [Diffuse-Statement] {
+      if [Label] {
+        apply [Label[1]];
+      }
+      if [Straightforward-Justification/Link | Scheme-Justification/Link] {
+        "then ";
+      } else {
+        "thus ";
+      }
       apply [Block[1]];
     } else {
       if [Scheme-Justification] {
@@ -1531,17 +1575,9 @@ tpl [Item[@kind='Type-Changing-Statement']] {
     "then ";
   }
   "reconsider ";
-  if [Variable] {
-    list (#separ = ",", #elems = `Variable`);
-  } else {
-    if [Equality] {
-      list (#separ = ",", #elems = `Equality`);
-    } else {
-      die (#message = "Don't know how to deal with a Type-Changing-Statement that lacks both a Variable and an Equality child!");
-    }
-  }
-  if [Standard-Type | Clustered-Type] {
-    " as "; apply [(Standard-Type | Clustered-Type)[1]];
+  list (#separ = ",", #elems = `Variable | Equality`);
+  if [Standard-Type | Clustered-Type | Struct-Type] {
+    " as "; apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
     if [Straightforward-Justification] {
       apply [Straightforward-Justification[1]];
     }
