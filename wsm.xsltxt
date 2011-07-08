@@ -333,7 +333,9 @@ tpl [Mode-Pattern] {
   if [@spelling] {
     `@spelling`;
     if [Loci] {
-      " of "; apply [Loci[1]];
+      if [Loci/*[1]] {
+        " of "; apply [Loci[1]];
+      }
     }
   } else {
     die (#message = "Predicate-Pattern lacks a spelling attribute!");
@@ -557,9 +559,7 @@ tpl [Attribute-Pattern] {
 }
 
 tpl [Type-List] {
-  for-each [Standard-Type | Clustered-Type] { // are these the only two kinds?
-   apply [.];
-  }
+  list (#separ = ",", #elems = `Standard-Type | Clustered-Type`);
 }
 
 tpl [Functor-Segment] {
@@ -886,9 +886,9 @@ tpl [Local-Reference] {
 }
 
 tpl [Scheme-Justification] {
-  if [@spelling and @idnr] {
+  if [@spelling and @idnr and @nr] {
     " from "; `@spelling`;
-    if [@idnr > "0"] {
+    if [@nr > "0"] {
       ":sch "; `@idnr`;
     }
     if [*[1]] { // there are scheme arguments
@@ -979,6 +979,10 @@ tpl [Right-Circumflex-Symbol] {
   } else {
     die (#message = "Right-Circumflex-Symbol lacks a spelling attribute!");
   }
+}
+
+tpl [Qualification-Term] {
+  "("; apply [*[1]]; " qua "; apply [*[2]]; ")";
 }
 
 tpl [Item[@kind='Choice-Statement']] {
@@ -1186,6 +1190,16 @@ tpl [Item[@kind='Conclusion']] {
         }
       }
     }
+  }
+}
+
+tpl [Item[@kind='Func-Synonym']] {
+  if [Operation-Functor-Pattern[2]] {
+    "synonym ";
+     apply [Operation-Functor-Pattern[2]]; " for ";
+     apply [Operation-Functor-Pattern[1]]; ";"; "\n"; // aren't these backwards?
+  } else {
+    die (#message = "Func-Synonym item missing two Operation-Functor-Pattern children!");
   }
 }
 
