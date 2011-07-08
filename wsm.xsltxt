@@ -256,10 +256,16 @@ tpl [Item[@kind='Mode-Definition']] {
     die (#message = "Mode-Definition element lacks a Mode-Pattern child!");
   }
   if [Standard-Mode/Type-Specification] {
-    " -> "; apply [Standard-Mode[1]];
+    " -> "; apply [Standard-Mode/Type-Specification[1]];
+    if [Standard-Mode/Definiens] {
+      // do nothing
+    } else {
+      ";";
+    }
+    "\n";
   }
   if [Standard-Mode/Definiens] {
-    "means "; apply [Standard-Mode[1]];
+    "means "; apply [Standard-Mode/Definiens[1]]; ";"; "\n";
   }
   if [Expandable-Mode] {
     apply [Expandable-Mode[1]]; ";"; "\n";
