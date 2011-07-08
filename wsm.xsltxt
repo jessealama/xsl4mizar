@@ -1306,7 +1306,9 @@ tpl [Equality] {
 }
 
 tpl [Item[@kind='Regular-Statement']] {
-
+  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
+    "then ";
+  }
   if [Iterative-Equality] {
     if [Proposition] {
       apply [Proposition[1]];
