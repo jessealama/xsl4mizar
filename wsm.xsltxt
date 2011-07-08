@@ -73,14 +73,10 @@ tpl [Item[@kind='Reservation']] {
   "for ";
 
   // sanity check: one and only one type
-  if [Standard-Type] {
-    if [Standard-Type[2]] {
-      die (#message = "Multiple Standard-Type children of a Reservation item!");
-    } else {
-      apply [Standard-Type[1]]; ";"; "\n";
-    }
+  if [Standard-Type | Clustered-Type] {
+    apply [(Standard-Type | Clustered-Type)[1]]; ";"; "\n";
   } else {
-    die(#message="No type was found under a Reservation!");
+    die(#message="No type (neither a Standard-Type nor a Clustered-Type) was found under a Reservation!");
   }
 }
 
