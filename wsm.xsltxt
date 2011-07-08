@@ -125,11 +125,20 @@ tpl [Block[@kind='Case']] {
 
 tpl [Block[@kind='Suppose']] {
   if [Item[@kind='Suppose-Head']] {
-    apply [Item[@kind='Suppose-Head'][1]];
-    apply [*[position() > 1]]; // assuming that the Suppose-Head element is at position 1
+    if [Item[@kind='Suppose-Head'][1]/Collective-Assumption] {
+      // skip applying the Suppose-Head template; we'll do the work here
+      "suppose that ";
+      list (#separ = "\nand\n",
+           #elems = `Item[@kind='Suppose-Head'][1]/Collective-Assumption/Proposition`);
+      ";"; "\n"; 
+      apply [*[position() > 1]];
+    } else {
+      apply [Item[@kind='Suppose-Head'][1]]; "\n";
+      apply [*[position() > 1]];
+    }
     "end;"; "\n";
   } else {
-    die (#message = "Don't know hot to deal with a Suppose block that lacks a Suppose-Head child!");
+    die (#message = "Don't know how to deal with a Suppose block that lacks a Suppose-Head child!");
   }
 }
 
