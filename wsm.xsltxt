@@ -407,6 +407,19 @@ tpl [Block[@kind='Registration-Block']] {
   "end"; ";"; "\n";
 }
 
+tpl [Item[@kind='Identify']] {
+  "identify ";
+  if [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[2]] {
+    apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[2]];
+    " with ";
+    apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[1]];
+    ";"; "\n";
+  } else {
+    die (#message = "Identify item lacks two Operation-Functor-Pattern/Bracket-Functor-Pattern children!");
+  }
+  
+}
+
 tpl [Item[@kind='Cluster']] {
   apply [*[1]]; // should be just one child, right?
 }
