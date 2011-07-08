@@ -312,9 +312,10 @@ tpl [Item[@kind='Functor-Definition']] {
   
   if [Type-Specification] {
     " -> "; apply [Type-Specification[1]];
-    if [No-Definiens] { // lol
-      ";";
-    }
+  }
+
+  if [No-Definiens] { // lol
+    ";";
   }
 
   "\n";
