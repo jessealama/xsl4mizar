@@ -561,8 +561,8 @@ tpl [Partial-Definiens] {
 }
 
 tpl [Qualifying-Formula] {
-  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term] {
-    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term)[1]];
+  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term] {
+    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term)[1]];
     " is ";
     if [Standard-Type] {
       apply [Standard-Type[1]];
