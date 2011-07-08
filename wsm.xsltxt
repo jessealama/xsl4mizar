@@ -1257,7 +1257,7 @@ tpl [Item[@kind='Existential-Assumption']] {
   }
 }
 
-tpl [Item[@kind='Conclusion']] {
+tpl [Item[@kind='Conclusion']](#case) {
 
   if [Iterative-Equality] {
     if [Proposition] {
@@ -1300,7 +1300,11 @@ tpl [Item[@kind='Conclusion']] {
           ";";
           "\n";
         } else {
-          "thus ";
+          if [$case = ""] {
+            "thus ";
+          } else {
+            "that ";
+          }
           if [Straightforward-Justification] {
             apply [Proposition[1]];
             " ";
