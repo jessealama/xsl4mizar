@@ -716,6 +716,14 @@ tpl [Arguments] {
   list (#separ = ",", #elems = `*`);
 }
 
+tpl [Numeral-Term] {
+  if [@number] {
+    `@number`;
+  } else {
+    die (#message = "Numeral-Term lacks a number!");
+  }
+}
+
 tpl [Private-Functor-Term] {
   if [@spelling] {
     `@spelling`;
