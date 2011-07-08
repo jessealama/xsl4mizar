@@ -1066,20 +1066,18 @@ tpl [Bracket-Functor-Pattern] {
 }
 
 tpl [Fraenkel-Term] {
-  if [Infix-Term] {
-    "{ "; apply [Infix-Term[1]];
+  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term] {
+    "{ "; apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term)[1]];
     if [Explicitly-Qualified-Segment] {
       " where "; apply [Explicitly-Qualified-Segment[1]](#verb = "is");
-      if [Predicative-Formula] {
-        ": "; apply [Predicative-Formula[1]]; " }";
-      } else {
-        die (#message = "Don't know how to deal with a Fraenkel-Term that lacks a Predicative-Formula child!");
-      }
+     }
+    if [Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Biconditional-Formula] {
+      ": "; apply [(Predicative-Formula | Private-Predicative-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Biconditional-Formula)[1]]; " }";
     } else {
-      die (#message = "Don't know how to deal with a Fraenkel-Term that lacks an Explicitly-Qualified-Segment child!");
+      die (#message = "Don't know how to deal with a Fraenkel-Term that lacks a Predicative-Formula child and a Private-Predicate-Formula child and a Negated-Formula child and a Conjunctive-Formula child and a Contradiction child and a Disjunctive-Formula child and a Biconditional-Formula!");
     }
   } else {
-    die (#message = "Don't know how to deal with a Fraenkel term that lacks an Infix-Term child!");
+    die (#message = "Don't know how to deal with a Fraenkel term that lacks an Infix-Term child and a Simple-Term child and a Circumfix-Term child!");
   }
 }
 
