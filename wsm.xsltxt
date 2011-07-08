@@ -1261,10 +1261,10 @@ tpl [Block[@kind='Notation-Block']] {
   if [Item[@kind='Loci-Declaration']] {
     apply [Item[@kind="Loci-Declaration"][1]];
     apply [Item[position() > 1]]; // bad form...
-    "end;"; "\n";
   } else {
-    die (#message = "Notation-Block Block lacks a Loci-Declaration Item child!");
+    apply [*];
   }
+  "end;"; "\n";
 }
 
 tpl [Item[@kind='Theorem-Item']] {
