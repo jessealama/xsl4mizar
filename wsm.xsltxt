@@ -226,9 +226,9 @@ tpl [Standard-Mode] {
 }
 
 tpl [Expandable-Mode] {
-  if [Standard-Type] {
+  if [Standard-Type | Clustered-Type] {
     " is ";
-    apply [Standard-Type[1]];
+    apply [(Standard-Type | Standard-Type)[1]];
   } else {
     die (#message = "Don't know how to deal with an Expandable-Mode element that lacks a Standard-Type child!");
   }
