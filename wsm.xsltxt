@@ -418,6 +418,17 @@ tpl [Adjective] {
   if [@spelling] {
     if [Negated] {
       "non ";
+      if [*[3]] {
+         "("; list (#separ = ",", #elems = `*[position() > 1]`); ")";
+      } else {
+         apply [*[2]];
+      }
+    } else {
+      if [*[2]] {
+         "("; list (#separ = ",", #elems = `*`); ")";
+      } else {
+        apply [*[1]];
+      }
     }
     `@spelling`;
   } else {
