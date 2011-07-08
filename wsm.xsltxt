@@ -984,12 +984,15 @@ tpl [Item[@kind='Property']] {
 tpl [Item[@kind="Correctness"]] {
   "correctness";
   if [Straightforward-Justification] {
-    apply [Straightforward-Justification[1]];
+    apply [Straightforward-Justification[1]]; ";"; "\n";
   }
   if [Scheme-Justification] {
-    apply [Scheme-Justification[1]];
+    apply [Scheme-Justification[1]]; ";"; "\n";
   }
-  ";"; "\n";
+  if [Block[@kind='Proof']] {
+    "\n";
+    apply [Block[@kind='Proof'][1]];
+  }
 }
 
 tpl [Proposition] {
