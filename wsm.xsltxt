@@ -54,12 +54,20 @@ tpl [Variable] {
   }
 }
 
+tpl [Internal-Selector-Term] {
+  if [@spelling] {
+    "the "; `@spelling`;
+  } else {
+    die (#message = "Don't know how to deal with an Internal-Selector-Term that lacks a spelling!");
+  }
+}
+
 tpl [Standard-Type] {
   if [@spelling] {
     `@spelling`;
-    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term] {
+    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term] {
       " of ";
-      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term`);
+      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term`);
     } 
   } else {
     die (#message = "Standard-Type lacks a spelling!");
@@ -423,6 +431,10 @@ tpl [Item[@kind='Identify']] {
     apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[2]];
     " with ";
     apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[1]];
+    if [*[3]] { // conditions for the identification
+      " when ";
+      list (#separ = ",", #elems = `*[position() > 2]`); // assuming that the two patterns are the first two children of this Identify item
+    }
     ";"; "\n";
   } else {
     die (#message = "Identify item lacks two Operation-Functor-Pattern/Bracket-Functor-Pattern children!");
@@ -504,14 +516,12 @@ tpl [Existential-Registration] {
   "cluster ";
   apply [Adjective-Cluster[1]]; // always exists, right?
   " for ";
-  if [Standard-Type | Clustered-Type] {
-    apply [(Standard-Type | Clustered-Type)[1]];
+  if [Standard-Type | Clustered-Type | Struct-Type] {
+    apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
     ";"; "\n";
   } else {
-    die (#message = "Don't know how to deal with an Existential-Registration that lacks a Standard-Type child and a Clustered-Type child!");
+    die (#message = "Don't know how to deal with an Existential-Registration that lacks a Standard-Type child and a Clustered-Type child and a Struct-Type child!");
   }
-
-
 }
 
 tpl [Functorial-Registration] {
@@ -577,16 +587,16 @@ tpl [Partial-Definiens] {
 }
 
 tpl [Qualifying-Formula] {
-  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term] {
-    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term)[1]];
+  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term] {
+    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term)[1]];
     " is ";
-    if [Standard-Type] {
-      apply [Standard-Type[1]];
+    if [Standard-Type | Clustered-Type] {
+      apply [(Standard-Type | Clustered-Type)[1]];
     } else {
-      die (#message = "Qualifying-Formula lacks a Standard-Type child!");
+      die (#message = "Qualifying-Formula lacks a Standard-Type child and a Clustered-Type child!");
     }
   } else {
-    die (#message = "Qualifying-Formula lacks a Simple-Term child and an Infix-Term and a Circumfix-Term and a Placeholder-Term and a Private-Functor-Term and a Fraenkel-Term child!");
+    die (#message = "Qualifying-Formula lacks a Simple-Term child and an Infix-Term and a Circumfix-Term and a Placeholder-Term and a Private-Functor-Term and a Fraenkel-Term child and an Aggregate-Term child!");
   }
 }
 
@@ -698,6 +708,59 @@ tpl [Implicitly-Qualified-Segment] {
   }
 }
 
+tpl [Selector] {
+  if [@spelling] {
+    `@spelling`;
+  } else {
+    die (#message = "Don't know how to deal with a Selector that lacks a spelling attribute!");
+  }
+}
+
+tpl [Field-Segment] {
+  if [Selector] {
+    apply [Selector[1]];
+    if [Standard-Type] {
+      " -> "; apply [Standard-Type[1]];
+    } else {
+      die (#message = "Don't know how to deal with a Field-Segment that lacks a Standard-Type child!");
+    }
+  } else {
+    die (#message = "Don't know how to deal with a Field-Segment element that lacks a Selector child!");
+  }
+}
+
+tpl [Structure-Pattern] {
+  if [@spelling] {
+    `@spelling`;
+    if [Loci] {
+      " over "; apply [Loci[1]];
+    }
+    "(# ";
+    list (#separ = ",", #elems = `Field-Segment`);
+    " #)";
+  } else {
+    die (#message = "Don't know how to deal with a Structure-Pattern that lacks a spelling!");
+  }
+}
+
+tpl [Ancestors] {
+  list (#separ = ",", #elems = `*`);
+}
+
+tpl [Item[@kind='Structure-Definition']] {
+  "struct ";
+  if [Ancestors] {
+    "("; apply [Ancestors[1]]; ") ";
+    if [Structure-Pattern] {
+    apply [Structure-Pattern[1]]; ";"; "\n";
+    } else {
+      die (#message = "Don't know how to deal with a Structure-Definition that lacks a Structure-Pattern");
+    }
+  } else {
+    die (#message = "Don't know how to deal with a Structure-Definition item that lacks an Ancestors child!");
+  }
+}
+
 tpl [Explicitly-Qualified-Segment](#verb) {
   // sanity check: at least one variable
   if [Variable] {
@@ -709,7 +772,11 @@ tpl [Explicitly-Qualified-Segment](#verb) {
       $verb;
     }
     " ";
-    apply [Standard-Type | Clustered-Type]; // should be Standard-Type or Clustered-Type
+    if [Standard-Type | Clustered-Type | Struct-Type] {
+      apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
+    } else {
+      die (#message = "Don't know how to deal with an Explicitly-Qualified-Segment that lacks a Standard-Type child, a Clustered-Type child, and a Struct-Type child!");
+    }
   } else {
     die (#message = "Explicitly-Qualified-Segment lacks a Variable child!");
   }
@@ -725,6 +792,22 @@ tpl [Simple-Term] {
     `@spelling`;
   } else {
     die (#message = "Simple-Term lacks a spelling!");
+  }
+}
+
+tpl [Aggregate-Term] {
+  if [@spelling] {
+  `@spelling`; " (# "; list (#separ = ",", #elems = `*`); " #)";
+  } else {
+    die (#message = "Don't know how to deal with an Aggregate-Term that lacks a spelling attribute!");
+  }
+}
+
+tpl [Selector-Term] {
+  if [@spelling] {
+    "(the "; `@spelling`; " of "; apply [*[1]]; ")"; // always just one child?
+  } else {
+    die (#message = "Don't know how to deal with a Selector-Term that lacks a spelling!");
   }
 }
 
@@ -758,6 +841,17 @@ tpl [Contradiction] {
 tpl [Global-Choice-Term] {
   "the ";
   apply [*[1]];
+}
+
+tpl [Struct-Type] {
+  if [@spelling] {
+    `@spelling`;
+    if [*[1]] { // dependent struct type
+      " over "; apply [*[1]];
+    }
+  } else {
+    die (#message = "Don't know how to deal with a Struct-Type element that lacks a spelling!");
+  }
 }
 
 tpl [Clustered-Type] {
