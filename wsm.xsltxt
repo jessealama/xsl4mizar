@@ -717,6 +717,20 @@ tpl [Item[@kind='Constant-Definition']] {
   ";"; "\n";
 }
 
+tpl [Item[@kind='Private-Functor-Definition']] {
+  if [Variable] {
+    "deffunc ";  apply [Variable[1]];
+    if [Type-List] {
+      if [Type-List/*[1]] {
+        "("; list (#separ = ",", #elems = `Type-List/*`); ")";
+      }
+    }
+    " = "; apply [*[3]]; ";"; "\n"; // doesn't feel safe to me
+  } else {
+    die (#message = "Don't know how to deal with a Private-Functor-Definition that lacks a Variable child!");
+  }
+}
+
 tpl [Item[@kind='Private-Predicate-Definition']] {
   if [Variable] {
     if [Variable[2]] {
