@@ -57,10 +57,10 @@ tpl [Variable] {
 tpl [Standard-Type] {
   if [@spelling] {
     `@spelling`;
-    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term] {
+    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term] {
       " of ";
-      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term`);
-    }
+      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term`);
+    } 
   } else {
     die (#message = "Standard-Type lacks a spelling!");
   }
