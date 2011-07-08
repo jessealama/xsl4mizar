@@ -1338,9 +1338,6 @@ tpl [Item[@kind='Regular-Statement']] {
         }
       }
     } else {
-        if [Straightforward-Justification/Link] {
-          "then ";
-        }
         if [Proposition] {
           apply [Proposition[1]];
         } else {
