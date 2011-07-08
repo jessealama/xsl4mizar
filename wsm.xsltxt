@@ -507,8 +507,8 @@ tpl [Partial-Definiens] {
 }
 
 tpl [Qualifying-Formula] {
-  if [Simple-Term | Infix-Term | Circumfix-Term] {
-    apply [(Simple-Term | Infix-Term | Circumfix-Term)[1]];
+  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term] {
+    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term)[1]];
     " is ";
     if [Standard-Type] {
       apply [Standard-Type[1]];
@@ -516,7 +516,7 @@ tpl [Qualifying-Formula] {
       die (#message = "Qualifying-Formula lacks a Standard-Type child!");
     }
   } else {
-    die (#message = "Qualifying-Formula lacks a Simple-Term child and an Infix-Term and a Circumfix-Term child!");
+    die (#message = "Qualifying-Formula lacks a Simple-Term child and an Infix-Term and a Circumfix-Term and a Placeholder-Term child!");
   }
 }
 
