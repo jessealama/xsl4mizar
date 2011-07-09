@@ -475,11 +475,7 @@ tpl [Item[@kind='Correctness-Condition']] {
     "\n";
     apply [Block[@kind='Proof'][1]];
   } else {
-    if [Straightforward-Justification | Scheme-Justification] {
-      apply [(Straightforward-Justification | Scheme-Justification)[1]]; ";"; "\n";
-    } else {
-      ";"; "\n";
-    }
+    apply-justification-if-present (#end = "1");
   }
 }
 
@@ -1106,16 +1102,7 @@ tpl [Item[@kind='Property']] {
 
 tpl [Item[@kind="Correctness"]] {
   "correctness";
-  if [Straightforward-Justification] {
-    apply [Straightforward-Justification[1]]; ";"; "\n";
-  }
-  if [Scheme-Justification] {
-    apply [Scheme-Justification[1]]; ";"; "\n";
-  }
-  if [Block[@kind='Proof']] {
-    "\n";
-    apply [Block[@kind='Proof'][1]];
-  }
+  apply-justification-if-present (#end = "1");
 }
 
 tpl [Proposition] {
@@ -1216,28 +1203,45 @@ tpl [Bracket-Functor-Pattern] {
   }
 }
 
+tpl ensure-term {
+  if [not(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term)] {
+    die (#message = "A term was expected, but one was not given");
+  }
+}
+
+tpl apply-term {
+  apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term)[1]];
+}
+
+tpl ensure-formula {
+  if [not(Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Conditional-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula | Qualifying-Formula)] {
+    die (#message = "A formula was expected, but one was not given");
+  }
+}
+
+tpl apply-formula {
+  apply [(Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Conditional-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula | Qualifying-Formula)[1]];
+}
+
 tpl [Fraenkel-Term] {
-  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term] {
-    "{ "; apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term)[1]];
-    if [Explicitly-Qualified-Segment] {
-      " where ";
-      // manual listing.  Using the list template would be nicer, but
-      // I need to pass in the verb "is"
-      for-each [Explicitly-Qualified-Segment] {
-        apply [.](#verb = "is");
-        if [not(position()=last())] {
-          ",";
-        }
+  ensure-term ();
+  "{ ";
+  apply-term ();
+  if [Explicitly-Qualified-Segment] {
+    " where ";
+    // manual listing.  Using the list template would be nicer, but
+    // I need to pass in the verb "is"
+    for-each [Explicitly-Qualified-Segment] {
+      apply [.](#verb = "is");
+      if [not(position()=last())] {
+        ",";
       }
     }
-    if [Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Conditional-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula | Qualifying-Formula] {
-      ": "; apply [(Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Conditional-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula | Qualifying-Formula)[1]]; " }";
-    } else {
-      die (#message = "Don't know how to deal with a Fraenkel-Term that lacks a Predicative-Formula child and a Private-Predicate-Formula child and a Negated-Formula child and a Conjunctive-Formula child and a Contradiction child and a Disjunctive-Formula child and a Conditional-Formula child and a Biconditional-Formula child and an Existential-Quantifier-Formula child and a Universal-Quantifier-Child and an Attributive-Formula and a Quantifying-Formula child!");
-    }
-  } else {
-    die (#message = "Don't know how to deal with a Fraenkel term that lacks an Infix-Term child and a Simple-Term child and a Circumfix-Term child and a Private-Functor-Term child and a Fraenkel-Term child!");
   }
+  ensure-formula ();
+  ": ";
+  apply-formula ();
+  " }";
 }
 
 tpl [Circumfix-Term] {
@@ -1279,12 +1283,7 @@ tpl [Item[@kind='Choice-Statement']] {
   if [Proposition] {
     " such that ";
     list (#separ = " and ", #elems = `Proposition`);
-    if [Scheme-Justification] {
-      apply [Scheme-Justification[1]];
-    }
-    if [Straightforward-Justification] {
-      apply [Straightforward-Justification[1]];
-    }
+    apply-justification-if-present ();
   }
   ";";
   "\n";
@@ -1372,19 +1371,31 @@ tpl [Item[@kind='Assumption']] {
   }
 }
 
+
+
 tpl [Iterative-Step] {
-  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term | Forgetful-Functor-Term | Selector-Term | Aggregate-Term | Global-Choice-Term | Fraenkel-Term] {
-    apply[(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term | Forgetful-Functor-Term | Selector-Term | Aggregate-Term | Global-Choice-Term | Fraenkel-Term)[1]];
-    if [Straightforward-Justification] {
-      apply [Straightforward-Justification[1]];
+  ensure-term ();
+  apply-term ();
+  apply-justification-if-present ();
+}
+
+tpl apply-justification-if-present(#end) {
+  if [Scheme-Justification] {
+    apply [Scheme-Justification[1]];
+    if [not($end = "")] {
+      ";"; "\n";
     }
-    if [Scheme-Justification] {
-      apply [Scheme-Justification[1]];
-    }
-    // there might be no justification; in that case, do nothing
-  } else {
-    die (#message = "Don't know how to deal with an Iterative-Step that lacks an Infix-Term child, a Simple-Term child, and a Circumfix-Term child, and a Priate-Functor-Term child, and a Numeral-Term child, and a Forgetful-Functor-Term child and a Selector-Term child and an Aggregate-Term child and a Global-Choice-Term child!");
   }
+  if [Straightforward-Justification] {
+    apply [Straightforward-Justification[1]];
+    if [not($end = "")] {
+      ";"; "\n";
+    }
+  }
+  if [Block[@kind='Proof']] {
+    "\n";
+    apply [Block[@kind='Proof'][1]];
+  } 
 }
 
 tpl [Collective-Assumption] {
@@ -1399,12 +1410,7 @@ tpl [Item[@kind='Existential-Assumption']] {
     if [Proposition] {
       " such that"; "\n";
       list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
-      if [Scheme-Justification] {
-        apply [Scheme-Justification[1]];
-      }
-      if [Straightforward-Justification] {
-        apply [Straightforward-Justification[1]];
-      }
+      apply-justification-if-present ();
       "\n";
     } else {
       die (#message = "Existential-Assumption element lacks a Proposition child!");
@@ -1436,9 +1442,7 @@ tpl [Item[@kind='Conclusion']](#case) {
     } else {
       die (#message = "Don't know how to deal with an Iterative-Equality conclusion that lacks a Proposition child!");
     }
-    if [Straightforward-Justification | Scheme-Justification] {
-      apply [Straightforward-Justification[1]];
-    }
+    apply-justification-if-present ();
     "\n";
     ".= ";
     list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
@@ -1560,11 +1564,7 @@ tpl [Item[@kind='Theorem-Item']] {
       "\n";
       apply [Block[@kind='Proof'][1]];
     } else {
-      if [Straightforward-Justification] {
-        apply [Straightforward-Justification[1]]; ";"; "\n";
-      } else {
-        die (#message = "Don't know how to deal with a Theorem-Item element that lacks both a Proof block child and a Straightforward-Justification child");
-      }
+      apply-justification-if-present (#end = "1");
     }
   } else {
     die (#message = "Theorem-Item lacks a Proposition child!");
@@ -1591,10 +1591,7 @@ tpl [Item[@kind='Type-Changing-Statement']] {
   list (#separ = ",", #elems = `Variable | Equality`);
   if [Standard-Type | Clustered-Type | Struct-Type] {
     " as "; apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
-    if [Straightforward-Justification | Scheme-Justification] {
-      apply [(Straightforward-Justification | Scheme-Justification)[1]];
-    }
-    ";"; "\n";
+    apply-justification-if-present (#end = "1");
   } else {
     die (#message = "Don't know how to deal with a Type-Changing-Statement element that lacks a Standard-Type child!");
   }
@@ -1611,12 +1608,7 @@ tpl [Item[@kind='Regular-Statement']] {
   if [Iterative-Equality] {
     if [Proposition] {
       apply [Proposition[1]];
-      if [Straightforward-Justification] {
-        apply [Straightforward-Justification[1]];
-      }
-      if [Scheme-Justification] {
-        apply [Scheme-Justification[1]];
-      }
+      apply-justification-if-present ();
       "\n";
       ".= "; list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
     } else {
@@ -1642,17 +1634,8 @@ tpl [Item[@kind='Regular-Statement']] {
         } else {
           die (#message = "Item of kind Regular-Statement lacks a Proposition child!");
         }
-      
-        if [Straightforward-Justification] {
-          " "; apply [Straightforward-Justification[1]]; ";"; "\n";
-        }
-        if [Scheme-Justification] {
-          " "; apply [Scheme-Justification[1]]; ";"; "\n";
-        }
-        if [Block[@kind='Proof']] {
-          "\n";
-          apply [Block[@kind='Proof'][1]];
-        } 
+        " ";
+        apply-justification-if-present (#end = "1");
       }
   }
 }
