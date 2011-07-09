@@ -750,10 +750,7 @@ tpl [Simple-Term] {
 
 tpl [Forgetful-Functor-Term] {
   ensure-spelling ();
-  "the "; `@spelling`;
-  if [*[1]] {
-    " of "; apply [*[1]];
-  }
+  "( "; "the "; `@spelling`; if [*[1]] { " of "; apply [*[1]]; } " )";
 }
 
 tpl [Aggregate-Term] {
