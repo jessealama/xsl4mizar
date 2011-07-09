@@ -599,8 +599,8 @@ tpl [Partial-Definiens] {
 }
 
 tpl [Qualifying-Formula] {
-  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term | Numeral-Term] {
-    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term | Numeral-Term)[1]];
+  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term | Numeral-Term | Qualification-Term | Forgetful-Functor-Term] {
+    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term | Numeral-Term | Qualification-Term | Forgetful-Functor-Term)[1]];
     " is ";
     if [Standard-Type | Clustered-Type] {
       apply [(Standard-Type | Clustered-Type)[1]];
@@ -608,7 +608,7 @@ tpl [Qualifying-Formula] {
       die (#message = "Qualifying-Formula lacks a Standard-Type child and a Clustered-Type child!");
     }
   } else {
-    die (#message = "Qualifying-Formula lacks a Simple-Term child and an Infix-Term and a Circumfix-Term and a Placeholder-Term and a Private-Functor-Term and a Fraenkel-Term child and an Aggregate-Term child and a Selector-Term child and an it-Term child and a Numeral-Term child!");
+    die (#message = "Qualifying-Formula lacks a Simple-Term child and an Infix-Term and a Circumfix-Term and a Placeholder-Term and a Private-Functor-Term and a Fraenkel-Term child and an Aggregate-Term child and a Selector-Term child and an it-Term child and a Numeral-Term child and a Qualification-Term child and a Forgetful-Functor-Term child!");
   }
 }
 
