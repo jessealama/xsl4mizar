@@ -1215,8 +1215,8 @@ tpl [Bracket-Functor-Pattern] {
 }
 
 tpl [Fraenkel-Term] {
-  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term] {
-    "{ "; apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term)[1]];
+  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term] {
+    "{ "; apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term)[1]];
     if [Explicitly-Qualified-Segment] {
       " where ";
       // manual listing.  Using the list template would be nicer, but
@@ -1234,7 +1234,7 @@ tpl [Fraenkel-Term] {
       die (#message = "Don't know how to deal with a Fraenkel-Term that lacks a Predicative-Formula child and a Private-Predicate-Formula child and a Negated-Formula child and a Conjunctive-Formula child and a Contradiction child and a Disjunctive-Formula child and a Biconditional-Formula child and an Existential-Quantifier-Formula child and a Universal-Quantifier-Child and an Attributive-Formula child!");
     }
   } else {
-    die (#message = "Don't know how to deal with a Fraenkel term that lacks an Infix-Term child and a Simple-Term child and a Circumfix-Term child!");
+    die (#message = "Don't know how to deal with a Fraenkel term that lacks an Infix-Term child and a Simple-Term child and a Circumfix-Term child and a Private-Functor-Term child and a Fraenkel-Term child!");
   }
 }
 
