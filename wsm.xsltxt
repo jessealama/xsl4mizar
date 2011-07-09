@@ -532,8 +532,8 @@ tpl [Functorial-Registration] {
     " -> ";
     if [Adjective-Cluster] {
       apply [Adjective-Cluster[1]]; 
-    if [Standard-Type | Struct-Type] {
-      " for "; apply [(Standard-Type | Struct-Type)[1]];
+    if [Standard-Type | Struct-Type | Clustered-Type] {
+      " for "; apply [(Standard-Type | Struct-Type | Clustered-Type)[1]];
     }
     ";"; "\n";
     } else {
