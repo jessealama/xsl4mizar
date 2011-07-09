@@ -1228,10 +1228,10 @@ tpl [Fraenkel-Term] {
         }
       }
     }
-    if [Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula] {
-      ": "; apply [(Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula)[1]]; " }";
+    if [Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Conditional-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula] {
+      ": "; apply [(Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Conditional-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula)[1]]; " }";
     } else {
-      die (#message = "Don't know how to deal with a Fraenkel-Term that lacks a Predicative-Formula child and a Private-Predicate-Formula child and a Negated-Formula child and a Conjunctive-Formula child and a Contradiction child and a Disjunctive-Formula child and a Biconditional-Formula child and an Existential-Quantifier-Formula child and a Universal-Quantifier-Child and an Attributive-Formula child!");
+      die (#message = "Don't know how to deal with a Fraenkel-Term that lacks a Predicative-Formula child and a Private-Predicate-Formula child and a Negated-Formula child and a Conjunctive-Formula child and a Contradiction child and a Disjunctive-Formula child and a Conditional-Formula child and a Biconditional-Formula child and an Existential-Quantifier-Formula child and a Universal-Quantifier-Child and an Attributive-Formula child!");
     }
   } else {
     die (#message = "Don't know how to deal with a Fraenkel term that lacks an Infix-Term child and a Simple-Term child and a Circumfix-Term child and a Private-Functor-Term child and a Fraenkel-Term child!");
