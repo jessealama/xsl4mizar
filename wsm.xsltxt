@@ -73,6 +73,16 @@ tpl [Standard-Type] {
   }
 }
 
+tpl ensure-type {
+  if [not(Standard-Type | Clustered-Type | Struct-Type)] {
+    die (#message = "A type was expected, but we didn't get one");
+  }
+}
+
+tpl apply-type {
+  apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
+}
+
 tpl [Item[@kind='Reservation']] {
   "reserve ";
   list (#separ = ",", #elems = `Variable`);
