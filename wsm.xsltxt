@@ -1160,14 +1160,11 @@ tpl [Scheme-Justification] {
 }
 
 tpl [Infix-Term] {
-  if [@spelling] {
-    // do nothing: this is just a sanity check
-  } else {
+  if [not(@spelling)] {
     die (#message = "Infix-Term lacks a spelling!");
   }
 
-  if [Arguments[2]] {
-  } else {
+  if [not(Arguments[2])] {
     die (#message = "Infix-Term lacks two Arguments children!");
   }
 
