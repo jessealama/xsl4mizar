@@ -599,8 +599,8 @@ tpl [Partial-Definiens] {
 }
 
 tpl [Qualifying-Formula] {
-  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term] {
-    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term)[1]];
+  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term | Numeral-Term] {
+    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term | Numeral-Term)[1]];
     " is ";
     if [Standard-Type | Clustered-Type] {
       apply [(Standard-Type | Clustered-Type)[1]];
