@@ -1168,7 +1168,11 @@ tpl [Infix-Term] {
     die (#message = "Infix-Term lacks two Arguments children!");
   }
 
-  "(";
+
+  // Troublesome example: "M#".  "(M #)" is bad, "M #" is fine.
+  // Solution: write "( M # )"
+
+  "( ";
 
   if [Arguments[1]/*[1]] {
     if [Arguments[1]/*[2]] {
@@ -1190,7 +1194,8 @@ tpl [Infix-Term] {
     }
   }
 
-  ")";
+  " )";
+
 }
 
 tpl [Bracket-Functor-Pattern] {
