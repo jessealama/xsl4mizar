@@ -1418,15 +1418,14 @@ tpl [Item[@kind='Conclusion']](#case) {
     die (#message = "Don't know how to deal with a conclusion that it not an Iterative-Equality, Diffuse-Statement., nor a Compact-Statement");
   }
 
-  if [Label] {
-    apply [Label[1]];
-  }
-
   if [Straightforward-Justification/Link | Scheme-Justification/Link] {
     "hence ";
   }
 
   if [Iterative-Equality] {
+    if [Label] {
+      apply [Label[1]];
+    }
     if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
       "thus ";
     }
@@ -1447,11 +1446,22 @@ tpl [Item[@kind='Conclusion']](#case) {
     if [Block[@kind='Hereby-Reasoning']] {
       apply [Block[@kind='Hereby-Reasoning'][1]];
     } else {
+      if [Straightforward-Justification/Link | Scheme-Justification/Link] {
+        "hence ";
+      } else {
+        "thus ";
+      }
+      if [Label] {
+        apply [Label[1]];
+      }
       apply [Block[1]];
     }
   }
 
   if [Compact-Statement] {
+    if [Label] {
+      apply [Label[1]];
+    }
     if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
       "thus ";
     }
