@@ -175,11 +175,7 @@ tpl [Item[@kind='Scheme-Block-Item']] {
 
   // sanity check: there is one and only one Scheme-Block child
   if [Block[@kind='Scheme-Block']] {
-    if [Block[@kind='Scheme-Block'][2]] {
-      die(#message = "Multiple Scheme-Block children of a Scheme-Block-Item!");
-    } else {
-      apply[Block[@kind='Scheme-Block'][1]];
-    }
+    apply[Block[@kind='Scheme-Block'][1]];
   } else {
     die(#message = "Scheme-Block child of a Scheme-Block-Item is missing!");
   }
@@ -189,22 +185,18 @@ tpl [Block[@kind='Scheme-Block']] {
 
   // sanity check: there is one and only one Scheme-Head child
   if [Item[@kind='Scheme-Head']] {
-    if [Item[@kind='Scheme-Head'][2]] {
-      die(#message = "Multiple Scheme-Head children of a Scheme-Block!");
-    } else {
-      apply [Item[@kind='Scheme-Head'][1]];
-      if [*[2]] { // I guess this is the proof
-        "\n";
-        "proof";
-        "\n";
-        apply [*[position() > 1]];
-        "end";
-	";";
-	"\n";
-      }
+    apply [Item[@kind='Scheme-Head'][1]];
+    if [*[2]] { // I guess this is the proof
+      "\n";
+      "proof";
+      "\n";
+      apply [*[position() > 1]];
+      "end";
+      ";";
+      "\n";
     }
   } else {
-    die(#message = "Scheme-Head child of Scheme-Block is missing!");
+    die (#message = "Scheme-Head child of Scheme-Block is missing!");
   }
 }
 
@@ -844,27 +836,15 @@ tpl [Item[@kind='Private-Functor-Definition']] {
 
 tpl [Item[@kind='Private-Predicate-Definition']] {
   if [Variable] {
-    if [Variable[2]] {
-      die (#message = "Private-Predicate-Definition has multiple variables!");
+    "defpred ";
+    apply [Variable[1]];
+    // sanity check: Type-List is present
+    if [Type-List] {
+      "["; list(#separ = ",", #elems = `Type-List[1]/*`); "]"; "\n";
+      " means"; "\n";
+      apply [*[3]]; ";"; "\n";
     } else {
-      "defpred ";
-      apply [Variable[1]];
-      // sanity check: Type-List is present
-      if [Type-List] {
-        if [Type-List[2]] {
-          die (#message = "Private-Predicate-Definition has multiple Type-List children!");
-        } else {
-          "[";
-          list(#separ = ",", #elems = `Type-List[1]/*`);
-          "]";
-	  " means ";
-	  apply [*[3]];
-	  ";";
-          "\n";
-        }
-      } else {
-        die (#message = "Private-Predicate-Definition lacks a Type-List child!");
-      }
+      die (#message = "Private-Predicate-Definition lacks a Type-List child!");
     }
   } else {
     die (#message = "Private-Predicate-Definition item lacks a Variable child!");
