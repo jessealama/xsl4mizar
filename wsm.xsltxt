@@ -571,26 +571,30 @@ tpl [Definiens] {
     ":"; // special case: labels of definiens look like :this:, not like this:
     apply [Label[1]];
     " ";
-    if [Partial-Definiens] {
-      for-each [Partial-Definiens] {
-        apply [.];
-        if [position()=last()] {
-          if [following-sibling::*[1]] {
-            // dangerous: the idea is that after all the
-            // Partial-Definiens, there is an element like
-            // "<Formula-Expression/>" or "<Term-Expression>"; we want
-            // the thing *after* that
-            " otherwise "; apply [following-sibling::*[2]]; 
-          }
-        } else {
-          ",";
+  }
+
+  if [Partial-Definiens] {
+    for-each [Partial-Definiens] {
+      apply [.];
+      if [position()=last()] {
+        if [following-sibling::*[1]] {
+          // dangerous: the idea is that after all the
+          // Partial-Definiens, there is an element like
+          // "<Formula-Expression/>" or "<Term-Expression>"; we want
+          // the thing *after* that
+          " otherwise ";
+          apply [../*[position()=last()]];
         }
+      } else {
+        ",";
       }
-    } else {
-      apply [*[position() > 1]];
     }
   } else {
-    apply [*];
+    if [Label] {
+      apply [*[position() > 1]];
+    } else {
+      apply [*];
+    }
   }
 }
 
