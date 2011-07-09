@@ -88,12 +88,8 @@ tpl [Item[@kind='Reservation']] {
   list (#separ = ",", #elems = `Variable`);
   " ";
   "for ";
-
-  if [Standard-Type | Clustered-Type | Struct-Type] {
-    apply [(Standard-Type | Clustered-Type | Struct-Type)[1]]; ";"; "\n";
-  } else {
-    die(#message="No type (neither a Standard-Type nor a Clustered-Type nor a Struct-Type) was found under a Reservation!");
-  }
+  ensure-type ();
+  apply-type (); ";"; "\n";
 }
 
 tpl [Item[@kind='Section-Pragma']] {
@@ -258,12 +254,8 @@ tpl [Standard-Mode] {
 }
 
 tpl [Expandable-Mode] {
-  if [Standard-Type | Clustered-Type] {
-    " is ";
-    apply [(Standard-Type | Clustered-Type)[1]];
-  } else {
-    die (#message = "Don't know how to deal with an Expandable-Mode element that lacks a Standard-Type and Clustered-Type child!");
-  }
+  ensure-type ();
+  " is "; apply-type ();
 }
 
 tpl [Item[@kind='Mode-Definition']] {
@@ -504,12 +496,8 @@ tpl [Existential-Registration] {
   "cluster ";
   apply [Adjective-Cluster[1]]; // always exists, right?
   " for ";
-  if [Standard-Type | Clustered-Type | Struct-Type] {
-    apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
-    ";"; "\n";
-  } else {
-    die (#message = "Don't know how to deal with an Existential-Registration that lacks a Standard-Type child and a Clustered-Type child and a Struct-Type child!");
-  }
+  ensure-type ();
+  apply-type (); ";"; "\n";
 }
 
 tpl [Functorial-Registration] {
@@ -518,11 +506,11 @@ tpl [Functorial-Registration] {
     apply [*[1]];
     " -> ";
     if [Adjective-Cluster] {
-      apply [Adjective-Cluster[1]]; 
-    if [Standard-Type | Struct-Type | Clustered-Type] {
-      " for "; apply [(Standard-Type | Struct-Type | Clustered-Type)[1]];
-    }
-    ";"; "\n";
+      apply [Adjective-Cluster[1]];
+      if [Standard-Type | Clustered-Type | Struct-Type] {
+        " for "; apply-type ();
+      }
+      ";"; "\n";
     } else {
       die (#message = "Functorial-Registation lacks an Adjective-Cluster child!");
     }
@@ -590,17 +578,11 @@ tpl [Partial-Definiens] {
 }
 
 tpl [Qualifying-Formula] {
-  if [Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term | Numeral-Term | Qualification-Term | Forgetful-Functor-Term] {
-    apply [(Simple-Term | Infix-Term | Circumfix-Term | Placeholder-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Selector-Term | it-Term | Numeral-Term | Qualification-Term | Forgetful-Functor-Term)[1]];
-    " is ";
-    if [Standard-Type | Clustered-Type] {
-      apply [(Standard-Type | Clustered-Type)[1]];
-    } else {
-      die (#message = "Qualifying-Formula lacks a Standard-Type child and a Clustered-Type child!");
-    }
-  } else {
-    die (#message = "Qualifying-Formula lacks a Simple-Term child and an Infix-Term and a Circumfix-Term and a Placeholder-Term and a Private-Functor-Term and a Fraenkel-Term child and an Aggregate-Term child and a Selector-Term child and an it-Term child and a Numeral-Term child and a Qualification-Term child and a Forgetful-Functor-Term child!");
-  }
+  ensure-term ();
+  apply-term ();
+  " is ";
+  ensure-type ();
+  apply-type ();
 }
 
 tpl [Negated-Formula] {
@@ -653,7 +635,7 @@ tpl [Attribute-Pattern] {
 }
 
 tpl [Type-List] {
-  list (#separ = ",", #elems = `Standard-Type | Clustered-Type`);
+  list (#separ = ",", #elems = `Standard-Type | Clustered-Type | Struct-Type`);
 }
 
 tpl [Functor-Segment] {
@@ -662,11 +644,8 @@ tpl [Functor-Segment] {
     if [Type-List] {
       "("; apply [Type-List[1]]; ")";
       " -> ";
-      if [Standard-Type | Clustered-Type | Struct-Type] {
-        apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
-      } else {
-        die (#message = "Standard-Type and Clustered-Type and Struct-Type child missing from Functor-Segment element!");
-      }
+      ensure-type ();
+      apply-type ();
     } else {
       die (#message = "Type-List child of Functor-Segment is missing!");
     }
@@ -710,11 +689,8 @@ tpl [Selector] {
 tpl [Field-Segment] {
   if [Selector] {
     list (#separ = ",", #elems = `Selector`);
-    if [Standard-Type | Clustered-Type] {
-      " -> "; apply [(Standard-Type | Clustered-Type)[1]];
-    } else {
-      die (#message = "Don't know how to deal with a Field-Segment that lacks a Standard-Type child and a Clustered-Type child!");
-    }
+    ensure-type ();
+    " -> "; apply-type ();
   } else {
     die (#message = "Don't know how to deal with a Field-Segment element that lacks a Selector child!");
   }
@@ -764,11 +740,8 @@ tpl [Explicitly-Qualified-Segment](#verb) {
       $verb;
     }
     " ";
-    if [Standard-Type | Clustered-Type | Struct-Type] {
-      apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
-    } else {
-      die (#message = "Don't know how to deal with an Explicitly-Qualified-Segment that lacks a Standard-Type child, a Clustered-Type child, and a Struct-Type child!");
-    }
+    ensure-type ();
+    apply-type ();
   } else {
     die (#message = "Explicitly-Qualified-Segment lacks a Variable child!");
   }
@@ -1128,13 +1101,13 @@ tpl [Bracket-Functor-Pattern] {
 }
 
 tpl ensure-term {
-  if [not(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term)] {
+  if [not(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term | Placeholder-Term | it-Term)] {
     die (#message = "A term was expected, but one was not given");
   }
 }
 
 tpl apply-term {
-  apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term)[1]];
+  apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term | Placeholder-Term | it-Term)[1]];
 }
 
 tpl ensure-formula {
@@ -1184,7 +1157,7 @@ tpl [Circumfix-Term] {
 
 tpl [Right-Circumflex-Symbol] {
   ensure-spelling ();
-  `@spelling`;
+  " "; `@spelling`;
 }
 
 tpl [Qualification-Term] {
@@ -1506,12 +1479,9 @@ tpl [Item[@kind='Type-Changing-Statement']] {
   }
   "reconsider ";
   list (#separ = ",", #elems = `Variable | Equality`);
-  if [Standard-Type | Clustered-Type | Struct-Type] {
-    " as "; apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
-    apply-justification-if-present (#end = "1");
-  } else {
-    die (#message = "Don't know how to deal with a Type-Changing-Statement element that lacks a Standard-Type child!");
-  }
+  ensure-type ();
+  " as "; apply-type ();
+  apply-justification-if-present (#end = "1");
 }
 
 tpl [Equality] {
