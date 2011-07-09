@@ -479,8 +479,8 @@ tpl [Item[@kind='Correctness-Condition']] {
     "\n";
     apply [Block[@kind='Proof'][1]];
   } else {
-    if [Straightforward-Justification] {
-      apply [Straightforward-Justification[1]]; ";"; "\n";
+    if [Straightforward-Justification | Scheme-Justification] {
+      apply [(Straightforward-Justification | Scheme-Justification)[1]]; ";"; "\n";
     } else {
       ";"; "\n";
     }
