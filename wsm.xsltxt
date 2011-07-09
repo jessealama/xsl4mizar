@@ -1499,10 +1499,10 @@ tpl [Item[@kind='Mode-Synonym']] {
 }
 
 tpl [Item[@kind='Func-Synonym']] {
-  if [Operation-Functor-Pattern[2]] {
+  if [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[2]] {
     "synonym ";
-     apply [Operation-Functor-Pattern[2]]; " for ";
-     apply [Operation-Functor-Pattern[1]]; ";"; "\n"; // aren't these backwards?
+     apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[2]]; " for ";
+     apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[1]]; ";"; "\n"; // aren't these backwards?
   } else {
     die (#message = "Func-Synonym item missing two Operation-Functor-Pattern children!");
   }
