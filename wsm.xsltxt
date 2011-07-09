@@ -1499,6 +1499,16 @@ tpl [Item[@kind='Attr-Synonym']] {
   }
 }
 
+tpl [Item[@kind='Pred-Synonym']] {
+  if [Predicate-Pattern[2]] {
+    "synonym ";
+     apply [Predicate-Pattern[2]]; " for ";
+     apply [Predicate-Pattern[1]]; ";"; "\n"; // aren't these backwards?
+  } else {
+    die (#message = "Predicate-Synonym item missing two Predicate-Pattern children!");
+  }
+}
+
 tpl [Item[@kind='Attr-Antonym']] {
   if [Attribute-Pattern[2]] {
     "antonym ";
