@@ -697,7 +697,7 @@ tpl [Field-Segment] {
 }
 
 tpl [Structure-Pattern] {
-  ensure-spellin ();
+  ensure-spelling ();
   `@spelling`;
   if [Loci] {
     if [Loci/*[1]] {
