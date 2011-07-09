@@ -1059,7 +1059,7 @@ tpl [Bracket-Functor-Pattern] {
 }
 
 tpl ensure-term {
-  if [not(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term | Placeholder-Term | it-Term | Selector-Term)] {
+  if [not(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term | Placeholder-Term | it-Term | Selector-Term | Forgetful-Functor-Term)] {
     die (#message = "A term was expected, but one was not given");
   }
 }
