@@ -1371,8 +1371,8 @@ tpl [Item[@kind='Assumption']] {
 }
 
 tpl [Iterative-Step] {
-  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term | Forgetful-Functor-Term | Selector-Term | Aggregate-Term | Global-Choice-Term] {
-    apply[(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term | Forgetful-Functor-Term | Selector-Term | Aggregate-Term | Global-Choice-Term)[1]];
+  if [Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term | Forgetful-Functor-Term | Selector-Term | Aggregate-Term | Global-Choice-Term | Fraenkel-Term] {
+    apply[(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Numeral-Term | Forgetful-Functor-Term | Selector-Term | Aggregate-Term | Global-Choice-Term | Fraenkel-Term)[1]];
     if [Straightforward-Justification] {
       apply [Straightforward-Justification[1]];
     }
