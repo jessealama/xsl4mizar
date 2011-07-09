@@ -1087,7 +1087,7 @@ tpl ensure-term {
 }
 
 tpl apply-term {
-  apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term | Placeholder-Term | it-Term | Selector-Term)[1]];
+  apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term | Placeholder-Term | it-Term | Selector-Term | Forgetful-Functor-Term)[1]];
 }
 
 tpl ensure-formula {
