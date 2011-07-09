@@ -46,33 +46,30 @@ tpl [Text-Proper] {
   }
 }
 
-tpl [Variable] {
-  if [@spelling] {
-    `@spelling`;
-  } else {
-    die (#message = "Variable missing a spelling!");
+tpl ensure-spelling {
+  if [not(@spelling)] {
+    die (#message = "We expected an element to have a spelling attribute, but it lacks one");
   }
+}
+
+tpl [Variable] {
+  ensure-spelling ();
+  `@spelling`;
 }
 
 tpl [Internal-Selector-Term] {
-  if [@spelling] {
-    "the "; `@spelling`;
-  } else {
-    die (#message = "Don't know how to deal with an Internal-Selector-Term that lacks a spelling!");
-  }
+  ensure-spelling ();
+  "the "; `@spelling`;
 }
 
 tpl [Standard-Type] {
-  if [@spelling] {
-    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term] {
-     "("; `@spelling`; " of ";
-      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term`);
-      ")";
-    } else {
-      `@spelling`;
-    }
+  ensure-spelling ();
+  if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term] {
+   "("; `@spelling`; " of ";
+    list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term`);
+    ")";
   } else {
-    die (#message = "Standard-Type lacks a spelling!");
+    `@spelling`;
   }
 }
 
@@ -348,61 +345,52 @@ tpl [Item[@kind='Functor-Definition']] {
 }
 
 tpl [Predicate-Pattern] {
-  if [@spelling] {
-    if [Loci[2]] {
-      apply [Loci[1]];
-      " ";  `@spelling`;  " ";
-      apply [Loci[2]];
-    } else {
-      die (#message = "Predicate-Pattern does not have two Loci children!");
-    }
+  ensure-spelling ();
+  if [Loci[2]] {
+    apply [Loci[1]];
+    " ";  `@spelling`;  " ";
+    apply [Loci[2]];
   } else {
-    die (#message = "Predicate-Pattern lacks a spelling attribute!");
+    die (#message = "Predicate-Pattern does not have two Loci children!");
   }
 }
 
 tpl [Mode-Pattern] {
-  if [@spelling] {
-    `@spelling`;
-    if [Loci] {
-      if [Loci/*[1]] {
-        " of "; apply [Loci[1]];
-      }
+  ensure-spelling ();
+  `@spelling`;
+  if [Loci] {
+    if [Loci/*[1]] {
+      " of "; apply [Loci[1]];
     }
-  } else {
-    die (#message = "Predicate-Pattern lacks a spelling attribute!");
   }
 }
 
 tpl [Operation-Functor-Pattern] {
-  if [@spelling] {
-    // If either the first or the second Loci children have multiple
-    // arguments, put parentheses around them.
-    //
-    // This should probably be simply a parameter of the Loci template.
-    if [Loci[2]] {
-      if [Loci[1]/*[2]] {
-        apply [Loci[1]](#parentheses = "1");
-      } else {
-        apply [Loci[1]];
-      }
-      if [Loci[1]/*[1]] {
-         " ";
-       }
-       `@spelling`;
-      if [Loci[2]/*[1]] {
-         " ";
-       }
-      if [Loci[2]/*[2]] {
-        apply [Loci[2]](#parentheses = "1");
-      } else {
-        apply [Loci[2]];
-      }
+  ensure-spelling ();
+  // If either the first or the second Loci children have multiple
+  // arguments, put parentheses around them.
+  //
+  // This should probably be simply a parameter of the Loci template.
+  if [Loci[2]] {
+    if [Loci[1]/*[2]] {
+      apply [Loci[1]](#parentheses = "1");
     } else {
-      die (#message = "Operation-Functor-Pattern lacks two Loci children!");
+      apply [Loci[1]];
+    }
+    if [Loci[1]/*[1]] {
+       " ";
+     }
+     `@spelling`;
+    if [Loci[2]/*[1]] {
+       " ";
+     }
+    if [Loci[2]/*[2]] {
+      apply [Loci[2]](#parentheses = "1");
+    } else {
+      apply [Loci[2]];
     }
   } else {
-    die (#message = "Operation-Functor-Pattern lacks a spelling!");
+    die (#message = "Operation-Functor-Pattern lacks two Loci children!");
   }
 }
 
@@ -480,25 +468,22 @@ tpl [Item[@kind='Correctness-Condition']] {
 }
 
 tpl [Adjective] {
-  if [@spelling] {
-    if [Negated] {
-      "non ";
-      if [*[3]] {
-         "("; list (#separ = ",", #elems = `*[position() > 1]`); ")";
-      } else {
-         apply [*[2]];
-      }
+  ensure-spelling ();
+  if [Negated] {
+    "non ";
+    if [*[3]] {
+       "("; list (#separ = ",", #elems = `*[position() > 1]`); ")";
     } else {
-      if [*[2]] {
-         "("; list (#separ = ",", #elems = `*`); ")";
-      } else {
-        apply [*[1]];
-      }
+       apply [*[2]];
     }
-    `@spelling`;
   } else {
-    die (#message = "Adjective lacks a spelling attribute!");
+    if [*[2]] {
+       "("; list (#separ = ",", #elems = `*`); ")";
+    } else {
+      apply [*[1]];
+    }
   }
+  `@spelling`;
 }
 
 tpl [Adjective-Cluster] {
@@ -645,22 +630,16 @@ tpl [Loci](#parentheses) {
 }
 
 tpl [Locus] {
-  if [@spelling] {
-    `@spelling`;
-  } else {
-    die (#message = "Locus lacks a spelling attribute!");
-  }
+  ensure-spelling ();
+  `@spelling`;
 }
 
 tpl [Attribute-Pattern] {
-  if [@spelling] {
-    apply [Locus[1]];
-    " is ";
-    apply [Loci[1]];
-    `@spelling`;
-  } else {
-    die (#message = "Attribute-Pattern lacks a spelling attribute!");
-  }
+  ensure-spelling ();
+  apply [Locus[1]];
+  " is ";
+  apply [Loci[1]];
+  `@spelling`;
 }
 
 tpl [Type-List] {
@@ -700,11 +679,8 @@ tpl [Predicate-Segment] {
 }
 
 tpl [Scheme] {
-  if [@spelling] {
-    "scheme "; `@spelling`;
-  } else {
-    die (#message = "Scheme lacks a spelling attribute!");
-  }
+  ensure-spelling ();
+  "scheme "; `@spelling`;
 }
 
 tpl [Implicitly-Qualified-Segment] {
@@ -717,11 +693,8 @@ tpl [Implicitly-Qualified-Segment] {
 }
 
 tpl [Selector] {
-  if [@spelling] {
-    `@spelling`;
-  } else {
-    die (#message = "Don't know how to deal with a Selector that lacks a spelling attribute!");
-  }
+  ensure-spelling ();
+  `@spelling`;
 }
 
 tpl [Field-Segment] {
@@ -738,19 +711,16 @@ tpl [Field-Segment] {
 }
 
 tpl [Structure-Pattern] {
-  if [@spelling] {
-    `@spelling`;
-    if [Loci] {
-      if [Loci/*[1]] {
-        " over "; apply [Loci[1]];
-      }
+  ensure-spellin ();
+  `@spelling`;
+  if [Loci] {
+    if [Loci/*[1]] {
+      " over "; apply [Loci[1]];
     }
-    "(# ";
-    list (#separ = ",", #elems = `Field-Segment`);
-    " #)";
-  } else {
-    die (#message = "Don't know how to deal with a Structure-Pattern that lacks a spelling!");
   }
+  "(# ";
+  list (#separ = ",", #elems = `Field-Segment`);
+  " #)";
 }
 
 tpl [Ancestors] {
@@ -799,39 +769,26 @@ tpl [Existential-Quantifier-Formula] {
 }
 
 tpl [Simple-Term] {
-  // sanity check: there is a spelling
-  if [@spelling] {
-    `@spelling`;
-  } else {
-    die (#message = "Simple-Term lacks a spelling!");
-  }
+  ensure-spelling ();
+  `@spelling`;
 }
 
 tpl [Forgetful-Functor-Term] {
-  if [@spelling] {
-    "the "; `@spelling`;
-    if [*[1]] {
-      " of "; apply [*[1]];
-    }
-  } else {
-    die (#message = "Don't know how to deal with a Forgetful-Functor-Term that lacks a spelling!");
+  ensure-spelling ();
+  "the "; `@spelling`;
+  if [*[1]] {
+    " of "; apply [*[1]];
   }
 }
 
 tpl [Aggregate-Term] {
-  if [@spelling] {
+  ensure-spelling ();
   `@spelling`; " (# "; list (#separ = ",", #elems = `*`); " #)";
-  } else {
-    die (#message = "Don't know how to deal with an Aggregate-Term that lacks a spelling attribute!");
-  }
 }
 
 tpl [Selector-Term] {
-  if [@spelling] {
-    "(the "; `@spelling`; " of "; apply [*[1]]; ")"; // always just one child?
-  } else {
-    die (#message = "Don't know how to deal with a Selector-Term that lacks a spelling!");
-  }
+  ensure-spelling ();
+  "(the "; `@spelling`; " of "; apply [*[1]]; ")"; // always just one child?
 }
 
 tpl [Arguments] {
@@ -847,14 +804,9 @@ tpl [Numeral-Term] {
 }
 
 tpl [Private-Functor-Term] {
-  if [@spelling] {
-    `@spelling`;
-    "(";
-    list (#separ = ",", #elems = `./*`);
-    ")";
-  } else {
-    die (#message = "Pivate-Functor-Term lacks a spelling!");
-  }
+  ensure-spelling ();
+  `@spelling`;
+  "("; list (#separ = ",", #elems = `./*`); ")";
 }
 
 tpl [Contradiction] {
@@ -867,14 +819,11 @@ tpl [Global-Choice-Term] {
 }
 
 tpl [Struct-Type] {
-  if [@spelling] {
-    `@spelling`;
-    if [*[1]] { // dependent struct type
-      " over ";
-      list (#separ = ",", #elems = `*`);
-    }
-  } else {
-    die (#message = "Don't know how to deal with a Struct-Type element that lacks a spelling!");
+  ensure-spelling ();
+  `@spelling`;
+  if [*[1]] { // dependent struct type
+    " over ";
+    list (#separ = ",", #elems = `*`);
   }
 }
 
@@ -940,30 +889,19 @@ tpl [Item[@kind='Private-Predicate-Definition']] {
 }
 
 tpl [Theorem-Reference] {
-  if [@spelling] {
-    if [@number] {
-      `@spelling`; ":"; `@number`;
-    } else {
-      die (#message = "Theorem-Reference lacks a number attribute!");
-    }
+  ensure-spelling ();
+  if [@number] {
+    `@spelling`; ":"; `@number`;
   } else {
-    die (#message = "Theorem-Reference lacks a spelling attribute!");
+    die (#message = "Theorem-Reference lacks a number attribute!");
   }
 }
 
 tpl [Definition-Reference] {
-  if [@spelling] {
-    // do nothing: this is a sanity check
-  } else {
-    die (#message = "Definition-Reference lacks a spelling attribute!");
-  }
-
-  if [@number] {
-    // do nothing: this is a sanity check
-  } else {
+  ensure-spelling ();
+  if [not(@number)] {
     die (#message = "Definition-Reference lacks a number attribute!");
   }
-
   `@spelling`; ":def "; `@number`;
 }
 
@@ -990,14 +928,8 @@ tpl [Item[@kind='Generalization']] { // very ugly.  I've asked Czeslaw to refact
 }
 
 tpl [Private-Predicate-Formula] {
-  if [@spelling] {
-    `@spelling`;
-    "[";
-    list (#separ = ",", #elems = `*`);
-    "]";
-  } else {
-    die (#message = "Private-Predicate-Formula lacks a spelling!");
-  }
+  ensure-spelling ();
+  `@spelling`; "["; list (#separ = ",", #elems = `*`); "]";
 }
 
 tpl [Conjunctive-Formula] {
@@ -1017,11 +949,8 @@ tpl [Biconditional-Formula] {
 }
 
 tpl [Placeholder-Term] {
-  if [@spelling] {
-    `@spelling`;
-  } else {
-    die (#message = "Placeholder-Term lacks a spelling attribute!");
-  }
+  ensure-spelling ();
+  `@spelling`;
 }
 
 tpl [Attributive-Formula] {
@@ -1029,14 +958,10 @@ tpl [Attributive-Formula] {
 }
 
 tpl [Predicative-Formula] {
-  // sanity check: there's a spelling
-  if [@spelling] {
-    apply [Arguments[1]];
-    " "; `@spelling`; " ";
-    apply [Arguments[2]];
-  } else {
-    die (#message = "Predicative-Formula lacks a spelling!");
-  }
+  ensure-spelling ();
+  apply [Arguments[1]];
+  " "; `@spelling`; " ";
+  apply [Arguments[2]];
 }
 
 // first stab at abstracting treatment of quantified formulas not sure
@@ -1116,19 +1041,13 @@ tpl [Proposition] {
 }
 
 tpl [Label] {
-  if [@spelling] {
-    `@spelling`; ":";
-  } else {
-    die (#message = "Label element lacks a spelling attribute!");
-  }
+  ensure-spelling ();
+  `@spelling`; ":";
 }
 
 tpl [Local-Reference] {
-  if [@spelling] {
-    `@spelling`;
-  } else {
-    die (#message = "Local-Reference element lacks a spelling attribute!");
-  }
+  ensure-spelling ();
+  `@spelling`;
 }
 
 tpl [Scheme-Justification] {
@@ -1147,9 +1066,7 @@ tpl [Scheme-Justification] {
 }
 
 tpl [Infix-Term] {
-  if [not(@spelling)] {
-    die (#message = "Infix-Term lacks a spelling!");
-  }
+  ensure-spelling ();
 
   if [not(Arguments[2])] {
     die (#message = "Infix-Term lacks two Arguments children!");
@@ -1186,20 +1103,17 @@ tpl [Infix-Term] {
 }
 
 tpl [Bracket-Functor-Pattern] {
-  if [@spelling] {
-    if [Right-Circumflex-Symbol] {
-      if [Loci] {
-        `@spelling`;
-         list (#separ = ",", #elems = `Loci/Locus`);
-         apply [Right-Circumflex-Symbol[1]];
-      } else {
-        die (#message = "Bracket-Functor-Pattern lacks a Loci child!");
-      }
+  ensure-spelling ();
+  if [Right-Circumflex-Symbol] {
+    if [Loci] {
+      `@spelling`;
+       list (#separ = ",", #elems = `Loci/Locus`);
+       apply [Right-Circumflex-Symbol[1]];
     } else {
-      die (#message = "Bracket-Functor-Pattern lacks a Right-Circumflex-Symbol child!");
+      die (#message = "Bracket-Functor-Pattern lacks a Loci child!");
     }
   } else {
-    die (#message = "Bracket-Functor-Pattern lacks a spelling!");
+    die (#message = "Bracket-Functor-Pattern lacks a Right-Circumflex-Symbol child!");
   }
 }
 
@@ -1245,11 +1159,7 @@ tpl [Fraenkel-Term] {
 }
 
 tpl [Circumfix-Term] {
-  if [@spelling] {
-    // do nothing: this is just a sanity check
-  } else {
-    die (#message = "Circumfix-Term lacks a spelling attribute!");
-  }
+  ensure-spelling ();
 
   if [Right-Circumflex-Symbol] {
     // do nothing: this is just a sanity check
@@ -1263,11 +1173,8 @@ tpl [Circumfix-Term] {
 }
 
 tpl [Right-Circumflex-Symbol] {
-  if [@spelling] {
-    `@spelling`;
-  } else {
-    die (#message = "Right-Circumflex-Symbol lacks a spelling attribute!");
-  }
+  ensure-spelling ();
+  `@spelling`;
 }
 
 tpl [Qualification-Term] {
