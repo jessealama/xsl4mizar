@@ -1489,6 +1489,16 @@ tpl [Item[@kind='Func-Synonym']] {
   }
 }
 
+tpl [Item[@kind='Attr-Synonym']] {
+  if [Attribute-Pattern[2]] {
+    "synonym ";
+     apply [Attribute-Pattern[2]]; " for ";
+     apply [Attribute-Pattern[1]]; ";"; "\n"; // aren't these backwards?
+  } else {
+    die (#message = "Attr-Synonym item missing two Attribute-Pattern children!");
+  }
+}
+
 tpl [Item[@kind='Attr-Antonym']] {
   if [Attribute-Pattern[2]] {
     "antonym ";
