@@ -1414,6 +1414,10 @@ tpl [Item[@kind='Existential-Assumption']] {
 
 tpl [Item[@kind='Conclusion']](#case) {
 
+  if [not(Iterative-Equality or Diffuse-Statement or Compact-Statement)] {
+    die (#message = "Don't know how to deal with a conclusion that it not an Iterative-Equality, Diffuse-Statement., nor a Compact-Statement");
+  }
+
   if [Label] {
     apply [Label[1]];
   }
