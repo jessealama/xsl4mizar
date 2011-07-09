@@ -64,9 +64,9 @@ tpl [Internal-Selector-Term] {
 
 tpl [Standard-Type] {
   if [@spelling] {
-    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term] {
+    if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term] {
      "("; `@spelling`; " of ";
-      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term`);
+      list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term`);
       ")";
     } else {
       `@spelling`;
@@ -94,11 +94,7 @@ tpl [Item[@kind='Section-Pragma']] {
 }
 
 tpl [Item[@kind='Per-Cases']] {
-  if [Straightforward-Justification] {
-    "per cases"; apply [Straightforward-Justification[1]]; ";"; "\n";
-  } else {
-    die (#message = "Don't know how to deal with a Per-Cases item that lacks a Straightforward-Justification child!");
-  }
+  "per cases "; apply-justification-if-present (#end = "1");
 }
 
 tpl [Item[@kind='Case-Block']] {
