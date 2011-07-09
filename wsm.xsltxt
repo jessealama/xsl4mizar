@@ -1559,8 +1559,8 @@ tpl [Item[@kind='Type-Changing-Statement']] {
   list (#separ = ",", #elems = `Variable | Equality`);
   if [Standard-Type | Clustered-Type | Struct-Type] {
     " as "; apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
-    if [Straightforward-Justification] {
-      apply [Straightforward-Justification[1]];
+    if [Straightforward-Justification | Scheme-Justification] {
+      apply [(Straightforward-Justification | Scheme-Justification)[1]];
     }
     ";"; "\n";
   } else {
