@@ -1414,77 +1414,54 @@ tpl [Item[@kind='Existential-Assumption']] {
 
 tpl [Item[@kind='Conclusion']](#case) {
 
+  if [Label] {
+    apply [Label[1]];
+  }
+
+  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
+    "hence ";
+  }
+
   if [Iterative-Equality] {
+    if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
+      "thus ";
+    }
     if [Proposition] {
-      if [Straightforward-Justification] {
-        if [Straightforward-Justification/Link] {
-          "hence ";
-        } else {
-          "thus ";
-        }
-        apply [Proposition[1]];
-        apply [Straightforward-Justification[1]];
-      }
-      if [Scheme-Justification] {
-        if [Scheme-Justification/Link] {
-          "hence ";
-        } else {
-          "thus ";
-        }
-        apply [Proposition[1]];
-        apply [Scheme-Justification[1]];
-      }
-      "\n";
-      ".= "; list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
+      apply [Proposition[1]];
     } else {
-      die (#message = "Don't know how to deal with a Conclusion item representing an iterative equality that lacks a Proposition child!");
+      die (#message = "Don't know how to deal with an Iterative-Equality conclusion that lacks a Proposition child!");
     }
-  } else {
-    if [Diffuse-Statement] {
-      if [Label] {
-        apply [Label[1]];
-      }
-      if [Straightforward-Justification/Link | Scheme-Justification/Link] {
-        "then ";
-      } else {
-        "thus ";
-      }
+    if [Straightforward-Justification | Scheme-Justification] {
+      apply [Straightforward-Justification[1]];
+    }
+    "\n";
+    ".= ";
+    list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
+  }
+
+  if [Diffuse-Statement] {
+    if [Block[@kind='Hereby-Reasoning']] {
+      apply [Block[@kind='Hereby-Reasoning'][1]];
+    } else {
       apply [Block[1]];
-    } else {
-      if [Scheme-Justification] {
-        "thus ";
-        apply [Proposition[1]];
-        apply [Scheme-Justification[1]]; ";"; "\n";
-      } else {
-        if [Straightforward-Justification/Link] { // hence
-          "hence ";
-          apply [Proposition[1]];
-          apply [Straightforward-Justification[1]];
-          ";";
-          "\n";
-        } else {
-          if [$case = ""] {
-            "thus ";
-          } else {
-            "that ";
-          }
-          if [Straightforward-Justification] {
-            apply [Proposition[1]];
-            " ";
-            apply [Straightforward-Justification[1]];
-            ";";
-            "\n";
-          } else {
-            if [Block[@kind='Proof']] {
-              apply [Proposition[1]]; "\n";
-              apply [Block[@kind='Proof'][1]];
-            } else {
-              die (#message = "Don't know how to handle Item of kind Conclusion: it lacks s a Straightforward-Justification child, and it lacks a Proof block!");
-            }
-          }
-        }
-      }
     }
+  }
+
+  if [Compact-Statement] {
+    if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
+      "thus ";
+    }
+    apply [Proposition[1]];
+    if [Block[@kind='Proof']] {
+      "\n";
+      apply [Block[@kind='Proof'][1]];
+    } else {
+      if [Straightforward-Justification | Scheme-Justification] {
+        apply [(Straightforward-Justification | Scheme-Justification)[1]]; 
+      }
+      ";";
+    }
+    "\n";
   }
 }
 
