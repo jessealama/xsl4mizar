@@ -42,6 +42,10 @@ tpl apply-variable {
   apply [Variable[1]];
 }
 
+tpl variable-list {
+  list (#separ = ",", #elems = `Variable`);
+}
+
 tpl [Variable] {
   ensure-spelling ();
   `@spelling`;
@@ -76,7 +80,7 @@ tpl apply-type {
 
 tpl [Item[@kind='Reservation']] {
   "reserve ";
-  list (#separ = ",", #elems = `Variable`);
+  variable-list ();
   " ";
   "for ";
   ensure-type ();
@@ -622,7 +626,7 @@ tpl [Type-List] {
 
 tpl [Functor-Segment] {
   ensure-variable ();
-  list (#separ = ",", #elems = `Variable`);
+  variable-list ();
   if [Type-List] {
     "("; apply [Type-List[1]]; ")";
     " -> ";
@@ -635,7 +639,7 @@ tpl [Functor-Segment] {
 
 tpl [Predicate-Segment] {
   ensure-variable ();
-  list (#separ = ",", #elems = `Variable`);
+  variable-list ();
   if [Type-List] {
     "["; apply [Type-List[1]]; "]";
   } else {
@@ -650,7 +654,7 @@ tpl [Scheme] {
 
 tpl [Implicitly-Qualified-Segment] {
   ensure-variable ();
-  list (#separ = ",", #elems = `Variable`);
+  variable-list ();
 }
 
 tpl [Selector] {
@@ -703,7 +707,7 @@ tpl [Item[@kind='Structure-Definition']] {
 
 tpl [Explicitly-Qualified-Segment](#verb) {
   ensure-variable ();
-  list (#separ = ",", #elems = `Variable`);
+  variable-list ();
   " ";
   if [$verb = ""] {
     "being";
