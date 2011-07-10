@@ -8,26 +8,6 @@ tpl list(#separ,#elems) {
   apply[.]; if [not(position()=last())] { copy-of $separ; } }
 }
 
-$lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
-$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; } 
-
-// name of current article (upper case)
-#aname= { `string(/*/@articleid)`; }
-
-// name of current article (lower case)
-#anamelc= { `translate($aname, $ucletters, $lcletters)`; }
-
-// .idx file with identifier names
-#ids=  { `concat($anamelc, '.idx')`; }
-
-tpl get_vid_name(#vid)
-{
-  for-each [document($ids, /)] 
-  { 
-     for-each [key('D_I', $vid)] { `@name`; }
-  }
-}
-
 tpl die(#message) {
   if [@line and @col] {
     $line = `@line`;
