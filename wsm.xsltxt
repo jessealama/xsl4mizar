@@ -358,8 +358,6 @@ tpl [Operation-Functor-Pattern] {
   ensure-spelling ();
   // If either the first or the second Loci children have multiple
   // arguments, put parentheses around them.
-  //
-  // This should probably be simply a parameter of the Loci template.
   if [Loci[2]] {
     if [Loci[1]/*[2]] {
       apply [Loci[1]](#parentheses = "1");
