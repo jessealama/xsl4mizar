@@ -837,7 +837,7 @@ tpl [Item[@kind='Private-Predicate-Definition']] {
     apply [Variable[1]];
     // sanity check: Type-List is present
     if [Type-List] {
-      "["; list(#separ = ",", #elems = `Type-List[1]/*`); "]"; "\n";
+      "[ "; list(#separ = ",", #elems = `Type-List[1]/*`); " ]"; "\n";
       " means"; "\n";
       apply [*[3]]; ";"; "\n";
     } else {
@@ -889,7 +889,7 @@ tpl [Item[@kind='Generalization']] { // very ugly.  I've asked Czeslaw to refact
 
 tpl [Private-Predicate-Formula] {
   ensure-spelling ();
-  `@spelling`; "["; list (#separ = ",", #elems = `*`); "]";
+  `@spelling`; "[ "; list (#separ = ",", #elems = `*`); " ]";
 }
 
 tpl [Conjunctive-Formula] {
