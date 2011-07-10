@@ -474,7 +474,7 @@ tpl [Adjective] {
     if [*[2]] {
        "("; list (#separ = ",", #elems = `*`); ")";
     } else {
-      apply [*[1]];
+      apply [*[1]]; " ";
     }
   }
   `@spelling`;
@@ -622,8 +622,7 @@ tpl [Attribute-Pattern] {
   ensure-spelling ();
   apply [Locus[1]];
   " is ";
-  apply [Loci[1]];
-  `@spelling`;
+  apply [Loci[1]]; " "; `@spelling`;
 }
 
 tpl [Type-List] {
