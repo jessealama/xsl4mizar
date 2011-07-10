@@ -32,6 +32,16 @@ tpl ensure-spelling {
   }
 }
 
+tpl ensure-variable {
+  if [not(Variable)] {
+    die (#message = "A variable was expected, but none was found!");
+  }
+}
+
+tpl apply-variable {
+  apply [Variable[1]];
+}
+
 tpl [Variable] {
   ensure-spelling ();
   `@spelling`;
@@ -610,31 +620,25 @@ tpl [Type-List] {
 }
 
 tpl [Functor-Segment] {
-  if [Variable] {
-    list (#separ = ",", #elems = `Variable`);
-    if [Type-List] {
-      "("; apply [Type-List[1]]; ")";
-      " -> ";
-      ensure-type ();
-      apply-type ();
-    } else {
-      die (#message = "Type-List child of Functor-Segment is missing!");
-    }
+  ensure-variable ();
+  list (#separ = ",", #elems = `Variable`);
+  if [Type-List] {
+    "("; apply [Type-List[1]]; ")";
+    " -> ";
+    ensure-type ();
+    apply-type ();
   } else {
-    die (#message = "Variable child missing from Functor-Segment element!");
+    die (#message = "Type-List child of Functor-Segment is missing!");
   }
 }
 
 tpl [Predicate-Segment] {
-  if [Variable] {
-    list (#separ = ",", #elems = `Variable`);
-    if [Type-List] {
-      "["; apply [Type-List[1]]; "]";
-    } else {
-      die (#message = "Type-List child of Predicate-Segment is missing!");
-    }
+  ensure-variable ();
+  list (#separ = ",", #elems = `Variable`);
+  if [Type-List] {
+    "["; apply [Type-List[1]]; "]";
   } else {
-    die (#message = "Variable child missing from Predicate-Segment element!");
+    die (#message = "Type-List child of Predicate-Segment is missing!");
   }
 }
 
@@ -644,12 +648,8 @@ tpl [Scheme] {
 }
 
 tpl [Implicitly-Qualified-Segment] {
-  // sanity check: at least one variable
-  if [Variable] {
-    list (#separ = ",", #elems = `Variable`);
-  } else {
-    die (#message = "Implicitly-Qualified-Segment lacks a Variable child!");
-  }
+  ensure-variable ();
+  list (#separ = ",", #elems = `Variable`);
 }
 
 tpl [Selector] {
@@ -701,21 +701,17 @@ tpl [Item[@kind='Structure-Definition']] {
 }
 
 tpl [Explicitly-Qualified-Segment](#verb) {
-  // sanity check: at least one variable
-  if [Variable] {
-    list (#separ = ",", #elems = `Variable`);
-    " ";
-    if [$verb = ""] {
-      "being";
-    } else {
-      $verb;
-    }
-    " ";
-    ensure-type ();
-    apply-type ();
+  ensure-variable ();
+  list (#separ = ",", #elems = `Variable`);
+  " ";
+  if [$verb = ""] {
+    "being";
   } else {
-    die (#message = "Explicitly-Qualified-Segment lacks a Variable child!");
+    $verb;
   }
+  " ";
+  ensure-type ();
+  apply-type ();
 }
 
 tpl [Existential-Quantifier-Formula] {
@@ -789,41 +785,31 @@ tpl [Clustered-Type] {
 }
 
 tpl [Item[@kind='Constant-Definition']] {
-  "set ";
-  apply [Variable[1]]; // only one, right?
-  " = ";
-  apply [*[2]];
-  ";"; "\n";
+  ensure-variable ();
+  "set "; apply-variable (); " = "; apply [*[2]]; ";"; "\n";
 }
 
 tpl [Item[@kind='Private-Functor-Definition']] {
-  if [Variable] {
-    "deffunc ";  apply [Variable[1]];
-    if [Type-List] {
-      if [Type-List/*[1]] {
-        "("; list (#separ = ",", #elems = `Type-List/*`); ")";
-      }
+  ensure-variable ();
+  "deffunc ";  apply-variable ();
+  if [Type-List] {
+    if [Type-List/*[1]] {
+      "("; list (#separ = ",", #elems = `Type-List/*`); ")";
     }
-    " = "; apply [*[3]]; ";"; "\n"; // doesn't feel safe to me
-  } else {
-    die (#message = "Don't know how to deal with a Private-Functor-Definition that lacks a Variable child!");
   }
+  " = "; apply [*[3]]; ";"; "\n"; // doesn't feel safe to me
 }
 
 tpl [Item[@kind='Private-Predicate-Definition']] {
-  if [Variable] {
-    "defpred ";
-    apply [Variable[1]];
-    // sanity check: Type-List is present
-    if [Type-List] {
-      "[ "; list(#separ = ",", #elems = `Type-List[1]/*`); " ]"; "\n";
-      " means"; "\n";
-      apply [*[3]]; ";"; "\n";
-    } else {
-      die (#message = "Private-Predicate-Definition lacks a Type-List child!");
-    }
+  ensure-variable ();
+  "defpred "; apply-variable ();
+  // sanity check: Type-List is present
+  if [Type-List] {
+    "[ "; list(#separ = ",", #elems = `Type-List[1]/*`); " ]"; "\n";
+    " means"; "\n";
+    apply [*[3]]; ";"; "\n";
   } else {
-    die (#message = "Private-Predicate-Definition item lacks a Variable child!");
+    die (#message = "Private-Predicate-Definition lacks a Type-List child!");
   }
 }
 
