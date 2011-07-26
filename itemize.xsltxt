@@ -409,9 +409,9 @@ tpl [Implicitly-Qualified-Segment] {
   <Explicitly-Qualified-Segment {
     for-each [Variable] {
       $spelling = `@spelling`;
-      copy-of `.`;
+      apply [.];
       if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
-        copy-of `preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type`;
+        apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type];
       } else {
         die (#message = "Could not determine type of an implicitly qualified variable!");
       }
