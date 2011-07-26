@@ -1419,6 +1419,11 @@ tpl [Item[@kind='Regular-Statement']] {
   if [Straightforward-Justification/Link | Scheme-Justification/Link] {
     "then ";
   }
+
+  if [not(Iterative-Equality | Diffuse-Statement | Compact-Statement)] {
+    die (#message = "A Regular-Statement item must have either an Iterative-Equality, Diffuse-Statement, or Compact-Statement child");
+  }
+
   if [Iterative-Equality] {
     ensure-proposition ();
     apply-proposition ();
