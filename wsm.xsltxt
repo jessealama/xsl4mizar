@@ -1440,10 +1440,8 @@ tpl [Item[@kind='Regular-Statement']] {
         }
       }
     } else {
-        if [Proposition]
-          apply [Proposition[1]];
-          " ";
-        }
+        ensure-proposition ();
+        apply-proposition ();
         apply-justification-if-present (#end = "1");
       }
   }
