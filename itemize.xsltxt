@@ -15,8 +15,8 @@ tpl die(#message) {
 }
 
 tpl [Text-Proper] {
-  for-each [Item] {
-    apply [.];
+  <Text-Proper {
+    apply [*];
   }
 }
 
