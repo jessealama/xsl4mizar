@@ -755,6 +755,10 @@ tpl [Label] {
   }
 }
 
+tpl [Link] {
+  <Link;
+}
+
 tpl [Local-Reference] {
   ensure-spelling ();
   <Local-Reference {
