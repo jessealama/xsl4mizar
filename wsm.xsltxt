@@ -1085,10 +1085,14 @@ tpl [Qualification-Term] {
   "("; apply [*[1]]; " qua "; apply [*[2]]; ")";
 }
 
-tpl [Item[@kind='Choice-Statement']] {
-  if [Straightforward-Justification/Link] {
+tpl maybe-link {
+  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
     "then ";
   }
+}
+
+tpl [Item[@kind='Choice-Statement']] {
+  maybe-link ();
   "consider ";
   list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
   if [Proposition] {
@@ -1401,9 +1405,7 @@ tpl [Block[@kind='Hereby-Reasoning']] {
 }
 
 tpl [Item[@kind='Type-Changing-Statement']] {
-  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
-    "then ";
-  }
+  maybe-link ();
   "reconsider ";
   list (#separ = ",", #elems = `Variable | Equality`);
   ensure-type ();
@@ -1416,10 +1418,7 @@ tpl [Equality] {
 }
 
 tpl [Item[@kind='Regular-Statement']] {
-  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
-    "then ";
-  }
-
+  maybe-link ();
   if [not(Iterative-Equality | Diffuse-Statement | Compact-Statement)] {
     die (#message = "A Regular-Statement item must have either an Iterative-Equality, Diffuse-Statement, or Compact-Statement child");
   }
