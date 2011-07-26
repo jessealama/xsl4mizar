@@ -966,7 +966,7 @@ tpl [Scheme-Justification] {
     "("; list (#separ = ",", #elems = `*`); ")";
     }
   } else {
-    die (#message = "Scheme-Justification lacks either a spelling or an idnr attribute!");
+    die (#message = "Scheme-Justification lacks either a spelling, idnr, or nr attribute!");
   }
 
 }
