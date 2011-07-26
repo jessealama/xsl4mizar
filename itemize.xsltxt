@@ -656,6 +656,39 @@ tpl [Item[@kind="Correctness"]] {
 }
 
 tpl [Proposition] {
+  for-each [.//Simple-Term] {
+    $spelling = `@spelling`;
+    if [not(ancestor::Universal-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Universal-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Existential-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Existential-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Block/Item[@kind="Constant-Definition"]/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Block/Item[@kind="Choice-Statement"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Block/Item[@kind="Choice-Statement"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Block/Item[@kind="Generalization"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Block/Item[@kind="Generalization"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Block/Item[@kind="Loci-Declaration"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+        and
+        not(ancestor::Block/Item[@kind="Loci-Declaration"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])] {
+      <Universal-Quantifier-Formula {
+        <Implicitly-Qualified-Segment {
+          <Variable {
+            @spelling = $spelling;
+            @elicited="elicited";
+          }
+        }
+      }
+    }
+  }
   <Proposition {
     apply [*];
   }
