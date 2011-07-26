@@ -26,46 +26,25 @@ tpl ensure-spelling {
   }
 }
 
-tpl ensure-variable {
-  if [not(Variable)] {
-    die (#message = "A variable was expected, but none was found!");
+tpl [Variable] {
+  <Variable {
+    @spelling = `@spelling`;
+    @idnr = `@idnr`;
   }
 }
 
-tpl apply-variable {
-  apply [Variable[1]];
-}
-
-tpl variable-list {
-  copy-of `.`;
-}
-
-tpl [Variable] {
-  ensure-spelling ();
-  copy-of `.`;
-}
-
 tpl [Internal-Selector-Term] {
-  ensure-spelling ();
-  copy-of `.`;
-}
-
-tpl [Standard-Type] {
-  ensure-spelling ();
-  <Standard-Type {
+  <Internal-Selector-Term {
     @spelling = `@spelling`;
     apply [*];
   }
 }
 
-tpl ensure-type {
-  if [not(Standard-Type | Clustered-Type | Struct-Type)] {
-    die (#message = "A type was expected, but we didn't get one");
+tpl [Standard-Type] {
+  <Standard-Type {
+    @spelling = `@spelling`;
+    apply [*];
   }
-}
-
-tpl apply-type {
-  apply [(Standard-Type | Clustered-Type | Struct-Type)[1]];
 }
 
 tpl [Item[@kind='Reservation']] {
