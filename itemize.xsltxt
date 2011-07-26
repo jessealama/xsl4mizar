@@ -394,7 +394,6 @@ tpl [Functor-Segment] {
 }
 
 tpl [Predicate-Segment] {
-  ensure-variable ();
   <Predicate-Segment {
     apply [*];
   }
