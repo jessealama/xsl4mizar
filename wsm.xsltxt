@@ -1234,17 +1234,14 @@ tpl [Collective-Assumption] {
 }
 
 tpl [Item[@kind='Existential-Assumption']] {
+  ensure-proposition ();
   if [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
     "given ";
     list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
-    if [Proposition] {
-      " such that"; "\n";
-      list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
-      apply-justification-if-present ();
-      "\n";
-    } else {
-      die (#message = "Existential-Assumption element lacks a Proposition child!");
-    }
+    " such that"; "\n";
+    list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
+    apply-justification-if-present ();
+    "\n";
   } else {
     die (#message = "Existential-Assumption item lacks an Implicitly-QualifiedSegment child and an Explicitly-Qualified-Segment child!");
   }
@@ -1261,17 +1258,14 @@ tpl [Item[@kind='Conclusion']](#case) {
   }
 
   if [Iterative-Equality] {
+    ensure-proposition ();
     if [Label] {
       apply [Label[1]];
     }
     if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
       "thus ";
     }
-    if [Proposition] {
-      apply [Proposition[1]];
-    } else {
-      die (#message = "Don't know how to deal with an Iterative-Equality conclusion that lacks a Proposition child!");
-    }
+    apply-proposition ();
     apply-justification-if-present ();
     "\n";
     ".= ";
@@ -1387,17 +1381,14 @@ tpl [Block[@kind='Notation-Block']] {
 }
 
 tpl [Item[@kind='Theorem-Item']] {
+  ensure-proposition ();
   "theorem"; "\n";
-  if [Proposition] {
-    apply [Proposition[1]];
-    if [Block[@kind='Proof']] {
-      "\n";
-      apply [Block[@kind='Proof'][1]];
-    } else {
-      apply-justification-if-present (#end = "1");
-    }
+  apply-proposition ();
+  if [Block[@kind='Proof']] {
+    "\n";
+    apply [Block[@kind='Proof'][1]];
   } else {
-    die (#message = "Theorem-Item lacks a Proposition child!");
+    apply-justification-if-present (#end = "1");
   }
 }
 
@@ -1433,14 +1424,11 @@ tpl [Item[@kind='Regular-Statement']] {
     "then ";
   }
   if [Iterative-Equality] {
-    if [Proposition] {
-      apply [Proposition[1]];
-      apply-justification-if-present ();
-      "\n";
-      ".= "; list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
-    } else {
-      die (#message = "Don't know how to deal with a Regular-Statement item representing an iterative equality that lacks a Proposition child!");
-    }
+    ensure-proposition ();
+    apply-proposition ();
+    apply-justification-if-present ();
+    "\n";
+    ".= "; list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
   } else {
     if [Diffuse-Statement] {
       if [Label] {
@@ -1456,12 +1444,10 @@ tpl [Item[@kind='Regular-Statement']] {
         }
       }
     } else {
-        if [Proposition] {
+        if [Proposition]
           apply [Proposition[1]];
-        } else {
-          die (#message = "Item of kind Regular-Statement lacks a Proposition child!");
+          " ";
         }
-        " ";
         apply-justification-if-present (#end = "1");
       }
   }
