@@ -890,10 +890,6 @@ tpl [Predicative-Formula] {
   apply [Arguments[2]];
 }
 
-tpl [Compact-Statement] {
-  // nothing?
-}
-
 tpl [Thesis] {
   "thesis";
 }
