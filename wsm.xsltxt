@@ -28,7 +28,9 @@ tpl [Text-Proper] {
 
 tpl ensure-spelling {
   if [not(@spelling)] {
-    die (#message = "We expected an element to have a spelling attribute, but it lacks one");
+    $n = `name ()`;
+    $message = `concat ("We expected an element (", $n, ") to have a spelling attribute, but it lacks one")`;
+    die (#message = $message);
   }
 }
 
