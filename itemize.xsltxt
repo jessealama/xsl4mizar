@@ -262,7 +262,7 @@ tpl [Coherence] {
   <Coherence;
 }
 
-tpl [Block[@kind='Proof']] {
+tpl [Block[@kind='Proof']](#generalize) {
   <Block {
     @kind = "Proof";
     apply [*];
