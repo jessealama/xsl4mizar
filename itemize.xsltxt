@@ -121,10 +121,8 @@ tpl emit-unqualified-variables {
 }
 
 tpl [Item[@kind='Scheme-Block-Item']] {
-
   <Item {
     @kind="Scheme-Block-Item";
-    // emit-unqualified-variables ();
     apply [*];
   }
 }
