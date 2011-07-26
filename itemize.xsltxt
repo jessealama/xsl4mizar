@@ -400,7 +400,9 @@ tpl [Predicate-Segment] {
 }
 
 tpl [Scheme] {
-  copy-of `.`;
+  <Scheme {
+    @spelling = `@spelling`;
+  }
 }
 
 tpl [Implicitly-Qualified-Segment] {
