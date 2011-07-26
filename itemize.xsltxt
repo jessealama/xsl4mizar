@@ -420,162 +420,149 @@ tpl [Implicitly-Qualified-Segment] {
 }
 
 tpl [Selector] {
-  ensure-spelling ();
-  `@spelling`;
+  <Selector {
+    @spelling = `@spelling`;
+    apply [*];
+  }
 }
 
 tpl [Field-Segment] {
-  if [Selector] {
-    list (#separ = ",", #elems = `Selector`);
-    ensure-type ();
-    " -> "; apply-type ();
-  } else {
-    die (#message = "Don't know how to deal with a Field-Segment element that lacks a Selector child!");
+  <Field-Segment {
+    apply [*];
   }
 }
 
 tpl [Structure-Pattern] {
-  ensure-spelling ();
-  `@spelling`;
-  if [Loci] {
-    if [Loci/*[1]] {
-      " over "; apply [Loci[1]];
-    }
+  <Structure-Pattern {
+    @spelling = `@spelling`;
+    apply [*];
   }
-  "(# ";
-  list (#separ = ",", #elems = `Field-Segment`);
-  " #)";
 }
 
 tpl [Ancestors] {
-  list (#separ = ",", #elems = `*`);
+  <Ancestors {
+    apply [*];
+  }
 }
 
 tpl [Item[@kind='Structure-Definition']] {
-  "struct ";
-  if [Ancestors] {
-    if [Ancestors/*[1]] {
-      "("; apply [Ancestors[1]]; ") ";
-    }
-    if [Structure-Pattern] {
-      apply [Structure-Pattern[1]]; ";"; "\n";
-    } else {
-      die (#message = "Don't know how to deal with a Structure-Definition that lacks a Structure-Pattern");
-    }
-  } else {
-    die (#message = "Don't know how to deal with a Structure-Definition item that lacks an Ancestors child!");
+  <Item {
+    @kind = "Structure-Definition";
+    apply [*];
   }
 }
 
 tpl [Explicitly-Qualified-Segment] {
-  ensure-variable ();
-  ensure-type ();
-  apply [*];
+  <Explicitly-Qualified-Segment {
+    apply [*];
+  }
 }
 
 tpl [Simple-Term] {
-  ensure-spelling ();
-  `@spelling`;
+  <Simple-Term {
+    @spelling=`@spelling`;
+    apply [*];
+  }
 }
 
 tpl [Forgetful-Functor-Term] {
-  ensure-spelling ();
-  "( "; "the "; `@spelling`; if [*[1]] { " of "; apply [*[1]]; } " )";
+  <Forgetful-Functor-Term {
+    @spelling = `@spelling`;
+    apply [*];
+  }
 }
 
 tpl [Aggregate-Term] {
-  ensure-spelling ();
-  `@spelling`; " (# "; list (#separ = ",", #elems = `*`); " #)";
+  <Aggregate-Term {
+    @spelling = `@spelling`;
+    apply [*];
+  }
 }
 
 tpl [Selector-Term] {
-  ensure-spelling ();
-  "(the "; `@spelling`; " of "; apply [*[1]]; ")"; // always just one child?
+  <Selector-Term {
+    @spelling = `@spelling`;
+    apply [*];
+  }
 }
 
 tpl [Arguments] {
-  list (#separ = ",", #elems = `*`);
+  <Arguments {
+    apply [*];
+  }
 }
 
 tpl [Numeral-Term] {
-  if [@number] {
-    `@number`;
-  } else {
-    die (#message = "Numeral-Term lacks a number!");
+  <Numeral-Term {
+    @"number" = `@number`;
   }
 }
 
 tpl [Private-Functor-Term] {
-  ensure-spelling ();
-  `@spelling`;
-  "("; list (#separ = ",", #elems = `./*`); ")";
+  <Private-Functor-Term {
+    @spelling = `@spelling`;
+    apply [*];
+  }
 }
 
 tpl [Contradiction] {
-  "contradiction";
+  <Contradiction;
 }
 
 tpl [Global-Choice-Term] {
-  "the ";
-  apply [*];
+  <Global-Choice-Term {
+    apply [*];
+  }
 }
 
 tpl [Struct-Type] {
-  ensure-spelling ();
-  `@spelling`;
-  if [*[1]] { // dependent struct type
-    " over ";
-    list (#separ = ",", #elems = `*`);
+  <Struct-Type {
+    @spelling = `@spelling`;
+    apply [*];
   }
 }
 
 tpl [Clustered-Type] {
-  if [Adjective-Cluster] {
-    apply [Adjective-Cluster[1]]; // adjectives
-    " ";
-    apply [*[2]]; // the type that the adjectives modity
-  } else {
-    die (#message = "Clustered-Type lacks an Adjective-Cluster child!");
+  <Clustered-Type {
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Constant-Definition']] {
-  ensure-variable ();
-  "set "; apply-variable (); " = "; apply [*[2]]; ";"; "\n";
+  <Item {
+    @kind="Constant-Definition";
+    apply [*];
+  }
 }
 
 tpl [Item[@kind='Private-Functor-Definition']] {
-  ensure-variable ();
-  "deffunc ";  apply-variable ();
-  if [Type-List] {
-    if [Type-List/*[1]] {
-      "("; list (#separ = ",", #elems = `Type-List/*`); ")";
-    }
+  <Item {
+    @kind = "Private-Functor-Definition";
+    apply [*];
   }
-  " = "; apply [*[3]]; ";"; "\n"; // doesn't feel safe to me
 }
 
 tpl [Item[@kind='Private-Predicate-Definition']] {
-  <Private-Predicate-Definition {
+  <Item {
+    @kind = "Private-Predicate-Definition";
     apply [*];
   }
 }
 
 tpl [Theorem-Reference] {
-  ensure-spelling ();
-  if [@number] {
-    `@spelling`; ":"; `@number`;
-  } else {
-    die (#message = "Theorem-Reference lacks a number attribute!");
+  <Theorem-Reference {
+    @spelling = `@spelling`;
+    @"number" = `@number`;
+    apply [*];
   }
 }
 
 tpl [Definition-Reference] {
-  ensure-spelling ();
-  if [not(@number)] {
-    die (#message = "Definition-Reference lacks a number attribute!");
+  <Definition-Reference {
+    @"number" = `@number`;
+    @spelling = `@spelling`;
+    apply [*];
   }
-  `@spelling`; ":def "; `@number`;
 }
 
 tpl [Item[@kind='Exemplification']] {
@@ -602,87 +589,70 @@ tpl [Private-Predicate-Formula] {
 
 tpl [Conjunctive-Formula] {
   <Conjunctive-Formula {
-    apply [*[1]];
-    apply [*[2]];
+    apply [*];
   }
 }
 
 tpl [Disjunctive-Formula] {
   <Disjunctive-Formula {
-    apply [*[1]];
-    apply [*[2]];
+    apply [*];
   }
 }
 
 tpl [Conditional-Formula] {
   <Conditional-Formula {
-    apply [*[1]];
-    apply [*[2]];
+    apply [*];
   }
 }
 
 tpl [Biconditional-Formula] {
   <Biconditional-Formula {
-    apply [*[1]];
-    apply [*[2]];
+    apply [*];
   }
 }
 
 tpl [Placeholder-Term] {
-  ensure-spelling ();
-  `@spelling`;
+  <Placeholder-Term {
+    @spelling = `@spelling`;
+  }  
 }
 
 tpl [Attributive-Formula] {
-  apply [*[1]]; " is "; apply [*[2]];
+  <Attributive-Formula {
+    apply [*];
+  }
 }
 
 tpl [Predicative-Formula] {
-  copy-of `.`;
-}
-
-tpl [Compact-Statement] {
-  // nothing?
+  <Predicative-Formula {
+    @spelling=`@spelling`;
+    apply [*];
+  }
 }
 
 tpl [Thesis] {
-  "thesis";
+  <Thesis;
 }
 
 tpl [Item[@kind='PropertyRegistration']] { // shouldn't this be "Property-Registration", for parallelism?
-  apply [*[1]]; // property
-  " of ";
-  apply [*[2]];
-  if [*[3]] {  // justification for the property registration
-    "\n";
-    apply [*[3]];
-  } else {
-    ";"; "\n";
+  <Item {
+    @kind = "PropertyRegistration";
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Property']] {
-  if [*[1]] {
-    apply [*[1]];
-    if [*[2]] {
-      if [Block[@kind='Proof']] {
-        "\n";
-        apply [Block[@kind='Proof'][1]];
-      } else {
-        apply [*[2]]; ";"; "\n";
-      }
-
-    } else {
-      die (#message = "Property Item has only one child!");
-    }
-  } else {
-    die (#message = "Property Item has no children!");
+  <Item {
+    @kind = "Property";
+    apply [*];
   }
 }
 
 tpl [Item[@kind="Correctness"]] {
-  "correctness";
-  apply-justification-if-present (#end = "1");
+  <Item {
+    @kind = "Correctness";
+    apply [*];
+  }
 }
 
 tpl [Proposition] {
@@ -692,8 +662,9 @@ tpl [Proposition] {
 }
 
 tpl [Label] {
-  ensure-spelling ();
-  `@spelling`; ":";
+  <Label {
+    @spelling = `@spelling`;
+  }
 }
 
 tpl [Local-Reference] {
@@ -704,393 +675,207 @@ tpl [Local-Reference] {
 }
 
 tpl [Scheme-Justification] {
-  copy-of `.`;
+  <Scheme-Justification {
+    @spelling = `@spelling`;
+    @idnr = `@idnr`;
+    @nr = `@nr`;
+    apply [*];
+  }
 }
 
 tpl [Infix-Term] {
-  ensure-spelling ();
-
-  if [not(Arguments[2])] {
-    die (#message = "Infix-Term lacks two Arguments children!");
+  <Infix-Term {
+    @spelling = `@spelling`;
+    apply [*];
   }
-
-
-  // Troublesome example: "M#".  "(M #)" is bad, "M #" is fine.
-  // Solution: write "( M # )"
-
-  "( ";
-
-  if [Arguments[1]/*[1]] {
-    if [Arguments[1]/*[2]] {
-      "("; list (#separ = ",", #elems = `Arguments[1]/*`); ")";
-    } else {
-      apply [Arguments[1]/*[1]];
-    }
-    " ";
-  }
-
-  `@spelling`;
-
-  if [Arguments[2]/*[1]] {
-    " ";
-    if [Arguments[2]/*[2]] {
-      "("; list (#separ = ",", #elems = `Arguments[2]/*`); ")";
-    } else {
-      apply [Arguments[2]/*[1]];
-    }
-  }
-
-  " )";
-
 }
 
 tpl [Bracket-Functor-Pattern] {
-  ensure-spelling ();
-  if [Right-Circumflex-Symbol] {
-    if [Loci] {
-      `@spelling`;
-       list (#separ = ",", #elems = `Loci/Locus`);
-       apply [Right-Circumflex-Symbol[1]];
-    } else {
-      die (#message = "Bracket-Functor-Pattern lacks a Loci child!");
-    }
-  } else {
-    die (#message = "Bracket-Functor-Pattern lacks a Right-Circumflex-Symbol child!");
+  <Bracket-Functor-Pattern {
+    @spelling = `@spelling`;
+    apply [*];
   }
-}
-
-tpl ensure-term {
-  if [not(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term | Placeholder-Term | it-Term | Selector-Term | Forgetful-Functor-Term | Qualification-Term | Global-Choice-Term)] {
-    die (#message = "A term was expected, but one was not given");
-  }
-}
-
-tpl apply-term {
-  apply [(Infix-Term | Simple-Term | Circumfix-Term | Private-Functor-Term | Fraenkel-Term | Aggregate-Term | Numeral-Term | Placeholder-Term | it-Term | Selector-Term | Forgetful-Functor-Term | Qualification-Term | Global-Choice-Term)[1]];
-}
-
-tpl ensure-formula {
-  if [not(Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Conditional-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula | Qualifying-Formula)] {
-    die (#message = "A formula was expected, but one was not given");
-  }
-}
-
-tpl apply-formula {
-  apply [(Predicative-Formula | Private-Predicate-Formula | Negated-Formula | Conjunctive-Formula | Contradiction | Disjunctive-Formula | Conditional-Formula | Biconditional-Formula | Existential-Quantifier-Formula | Universal-Quantifier-Formula | Attributive-Formula | Qualifying-Formula)[1]];
 }
 
 tpl [Fraenkel-Term] {
-  ensure-term ();
-  "{ ";
-  apply-term ();
-  if [Explicitly-Qualified-Segment] {
-    " where ";
-    // manual listing.  Using the list template would be nicer, but
-    // I need to pass in the verb "is"
-    for-each [Explicitly-Qualified-Segment] {
-      apply [.](#verb = "is");
-      if [not(position()=last())] {
-        ",";
-      }
-    }
+  <Fraenkel-Term {
+    apply [*];
   }
-  ensure-formula ();
-  ": ";
-  apply-formula ();
-  " }";
 }
 
 tpl [Circumfix-Term] {
-  ensure-spelling ();
-
-  if [Right-Circumflex-Symbol] {
-    // do nothing: this is just a sanity check
-  } else {
-    die (#message = "Circumfix-Term lacks a right-Circumflex-Symbol child!");
+  <Circumfix-Term {
+    @spelling = `@spelling`;
+    apply [*];
   }
-
-  `@spelling`;
-  list (#separ = ",", #elems = `*[position() > 1]`); // everything after the Right-Circumflex-Symbol
-  apply [Right-Circumflex-Symbol[1]];
 }
 
 tpl [Right-Circumflex-Symbol] {
-  ensure-spelling ();
-  " "; `@spelling`;
+  <Right-Circumflex-Symbol {
+    @spelling = `@spelling`;
+    apply [*];
+  }
 }
 
 tpl [Qualification-Term] {
-  "("; apply [*[1]]; " qua "; apply [*[2]]; ")";
+  <Qualification-Term {
+    apply [*];
+  }
 }
 
 tpl [Item[@kind='Choice-Statement']] {
-  if [Straightforward-Justification/Link] {
-    "then ";
+  <Item {
+    @kind="Choice-Statement";
+    apply [*];
   }
-  "consider ";
-  list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
-  if [Proposition] {
-    " such that ";
-    list (#separ = " and ", #elems = `Proposition`);
-    apply-justification-if-present ();
-  }
-  ";";
-  "\n";
 }
 
 tpl [Straightforward-Justification] {
-  copy-of `.`;
+  <Straightforward-Justification {
+    apply [*];
+  }
 }
 
 // Constructor properties
 
 tpl [Projectivity] {
-  "projectivity";
+  <Projectivity;
 }
 
 tpl [Involutiveness] {
-  "involutiveness";
+  <Involutiveness;
 }
 
 tpl [Idempotence] {
-  "idempotence";
+  <Idempotence;
 }
 
 tpl [Commutativity] {
-  "commutativity";
+  <Commutativity;
 }
 
 tpl [Reflexivity] {
-  "reflexivity";
+  <Reflexivity;
 }
 
 tpl [Irreflexivity] {
-  "irreflexivity";
+  <Irreflexivity;
 }
 
 tpl [Symmetry] {
-  "symmetry";
+  <Symmetry;
 }
 
 tpl [Asymmetry] {
-  "asymmetry";
+  <Asymmetry;
 }
 
 tpl [Connectedness] {
-  "connectedness";
+  <Connectedness;
 }
 
 tpl [Sethood] {
-  "sethood";
+  <Sethood;
 }
 
 tpl [Compact-Statement] {
-  // do nothing.  This element simply indicates what kind of thing its
-  // parent is.  It should probably be represented as an atribute of
-  // the parent; or the parent element itself could be something
-  // different.
+  <Compact-Statement;
+}
+
+tpl [Diffuse-Statement] {
+  <Diffuse-Statement;
+}
+
+tpl [Iterative-Equality] {
+  <Iterative-Equality;
 }
 
 tpl [Single-Assumption] {
-  if [Proposition] {
-    apply [Proposition[1]];
-  } else {
-    die (#message = "Single-Assumption element lacks a Proposition child!");
+  <Single-Assumption {
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Assumption']] {
-  if [Single-Assumption] {
-    "assume "; apply [Single-Assumption]; ";"; "\n";
-  }
-  if [Collective-Assumption] {
-    apply [Collective-Assumption[1]];
+  <Item {
+    @kind = "Assumption";
+    apply [*];
   }
 }
-
-
 
 tpl [Iterative-Step] {
-  ensure-term ();
-  apply-term ();
-  apply-justification-if-present ();
-}
-
-tpl apply-justification-if-present(#end) {
-  if [Scheme-Justification] {
-    apply [Scheme-Justification[1]];
-    if [not($end = "")] {
-      ";"; "\n";
-    }
+  <Iterative-Step {
+    apply [*];
   }
-  if [Straightforward-Justification] {
-    apply [Straightforward-Justification[1]];
-    if [not($end = "")] {
-      ";"; "\n";
-    }
-  }
-  if [Block[@kind='Proof']] {
-    "\n";
-    apply [Block[@kind='Proof'][1]];
-  } 
 }
 
 tpl [Collective-Assumption] {
-  "assume that"; "\n";
-  list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
+  <Collective-Assumption {
+    apply [*];
+  }
 }
 
 tpl [Item[@kind='Existential-Assumption']] {
-  if [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
-    "given ";
-    list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
-    if [Proposition] {
-      " such that"; "\n";
-      list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
-      apply-justification-if-present ();
-      "\n";
-    } else {
-      die (#message = "Existential-Assumption element lacks a Proposition child!");
-    }
-  } else {
-    die (#message = "Existential-Assumption item lacks an Implicitly-QualifiedSegment child and an Explicitly-Qualified-Segment child!");
+  <Item {
+    @kind = "Existential-Assumption";
+    apply [*];
   }
 }
 
-tpl [Item[@kind='Conclusion']](#case) {
-
-  if [not(Iterative-Equality or Diffuse-Statement or Compact-Statement)] {
-    die (#message = "Don't know how to deal with a conclusion that it not an Iterative-Equality, Diffuse-Statement., nor a Compact-Statement");
-  }
-
-  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
-    "hence ";
-  }
-
-  if [Iterative-Equality] {
-    if [Label] {
-      apply [Label[1]];
-    }
-    if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
-      "thus ";
-    }
-    if [Proposition] {
-      apply [Proposition[1]];
-    } else {
-      die (#message = "Don't know how to deal with an Iterative-Equality conclusion that lacks a Proposition child!");
-    }
-    apply-justification-if-present ();
-    "\n";
-    ".= ";
-    list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
-  }
-
-  if [Diffuse-Statement] {
-    if [Block[@kind='Hereby-Reasoning']] {
-      apply [Block[@kind='Hereby-Reasoning'][1]];
-    } else {
-      if [Straightforward-Justification/Link | Scheme-Justification/Link] {
-        "hence ";
-      } else {
-        "thus ";
-      }
-      if [Label] {
-        apply [Label[1]];
-      }
-      apply [Block[1]];
-    }
-  }
-
-  if [Compact-Statement] {
-    if [Label] {
-      apply [Label[1]];
-    }
-    if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
-      "thus ";
-    }
-    apply [Proposition[1]];
-    if [Block[@kind='Proof']] {
-      "\n";
-      apply [Block[@kind='Proof'][1]];
-    } else {
-      if [Straightforward-Justification | Scheme-Justification] {
-        apply [(Straightforward-Justification | Scheme-Justification)[1]]; 
-      }
-      ";";
-    }
-    "\n";
+tpl [Item[@kind='Conclusion']] {
+  <Item {
+    @kind = "Conclusion";
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Mode-Synonym']] {
-  if [Mode-Pattern[2]] {
-    "synonym ";
-     apply [Mode-Pattern[2]]; " for ";
-     apply [Mode-Pattern[1]]; ";"; "\n"; // aren't these backwards?
-  } else {
-    die (#message = "Mode-Synonym item missing two Mode-Pattern children!");
+  <Item {
+    @kind = "Mode-Synonym";
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Func-Synonym']] {
-  if [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[2]] {
-    "synonym ";
-     apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[2]]; " for ";
-     apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[1]]; ";"; "\n"; // aren't these backwards?
-  } else {
-    die (#message = "Func-Synonym item missing two Operation-Functor-Pattern children!");
+  <Item {
+    @kind = "Func-Synonym";
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Attr-Synonym']] {
-  if [Attribute-Pattern[2]] {
-    "synonym ";
-     apply [Attribute-Pattern[2]]; " for ";
-     apply [Attribute-Pattern[1]]; ";"; "\n"; // aren't these backwards?
-  } else {
-    die (#message = "Attr-Synonym item missing two Attribute-Pattern children!");
+  <Item {
+    @kind = "Attr-Synonym";
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Pred-Synonym']] {
-  if [Predicate-Pattern[2]] {
-    "synonym ";
-     apply [Predicate-Pattern[2]]; " for ";
-     apply [Predicate-Pattern[1]]; ";"; "\n"; // aren't these backwards?
-  } else {
-    die (#message = "Predicate-Synonym item missing two Predicate-Pattern children!");
+  <Item {
+    @kind = "Pred-Synonym";
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Attr-Antonym']] {
-  if [Attribute-Pattern[2]] {
-    "antonym ";
-     apply [Attribute-Pattern[2]]; " for ";
-     apply [Attribute-Pattern[1]]; ";"; "\n"; // aren't these backwards?
-  } else {
-    die (#message = "Attr-Antonym item missing two Attribute-Pattern children!");
+  <Item {
+    @kind = "Attr-Synonym";
+    apply [*];
   }
 }
 
 tpl [Item[@kind='Pred-Antonym']] {
-  if [Predicate-Pattern[2]] {
-    "antonym ";
-     apply [Predicate-Pattern[2]]; " for ";
-     apply [Predicate-Pattern[1]]; ";"; "\n"; // aren't these backwards?
-  } else {
-    die (#message = "Pred-Antonym item missing two Predicate-Pattern children!");
+  <Item {
+    @kind = "Pred-Antonym";
+    apply [*];
   }
 }
 
 tpl [Block[@kind='Notation-Block']] {
-  "notation"; "\n";
-  if [Item[@kind='Loci-Declaration']] {
-    apply [Item[@kind="Loci-Declaration"][1]];
-    apply [Item[position() > 1]]; // bad form...
-  } else {
+  <Block {
+    @kind = "Notation-Block";
     apply [*];
   }
-  "end;"; "\n";
 }
 
 tpl [Item[@kind='Theorem-Item']] {
@@ -1101,82 +886,48 @@ tpl [Item[@kind='Theorem-Item']] {
 }
 
 tpl [Block[@kind='Now-Reasoning']] {
-  "now"; "\n";
-  apply [*];
-  "end;"; "\n";
+  <Block {
+    @kind = "Now-Reasoning";
+    apply [*];
+  }
 }
 
 tpl [Block[@kind='Hereby-Reasoning']] {
-  "hereby"; "\n";
-  apply [*];
-  "end;"; "\n";
+  <Block {
+    @kind = "Hereby-Reasoning";
+    apply [*];
+  }
 }
 
 tpl [Item[@kind='Type-Changing-Statement']] {
-  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
-    "then ";
+  <Item {
+    @kind = "Type-Changing-Statement";
+    apply [*];
   }
-  "reconsider ";
-  list (#separ = ",", #elems = `Variable | Equality`);
-  ensure-type ();
-  " as "; apply-type ();
-  apply-justification-if-present (#end = "1");
 }
 
 tpl [Equality] {
-  apply [*[1]]; " = "; apply [*[2]];
+  <Equality {
+    apply [*];
+  }
 }
 
 tpl [Item[@kind='Regular-Statement']] {
-  if [Straightforward-Justification/Link | Scheme-Justification/Link] {
-    "then ";
-  }
-  if [Iterative-Equality] {
-    if [Proposition] {
-      apply [Proposition[1]];
-      apply-justification-if-present ();
-      "\n";
-      ".= "; list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
-    } else {
-      die (#message = "Don't know how to deal with a Regular-Statement item representing an iterative equality that lacks a Proposition child!");
-    }
-  } else {
-    if [Diffuse-Statement] {
-      if [Label] {
-        apply [Label[1]];
-      }
-      if [Block[@kind='Now-Reasoning']] {
-        apply [Block[@kind='Now-Reasoning'][1]];
-      } else {
-        if [Block[@kind='Hereby-Reasoning']] {
-          apply [Block[@kind='Hereby-Reasoning'][1]];
-        } else {
-          die (#message = "Don't know how to handle this piece of diffuse reasoning it is neither a 'now' nor a 'hereby' block.");
-        }
-      }
-    } else {
-        if [Proposition] {
-          apply [Proposition[1]];
-        } else {
-          die (#message = "Item of kind Regular-Statement lacks a Proposition child!");
-        }
-        " ";
-        apply-justification-if-present (#end = "1");
-      }
+  <Item {
+    @kind = "Regular-Statement";
+    apply [*];
   }
 }
 
 tpl [Universal-Quantifier-Formula] {
   <Universal-Quantifier-Formula {
-    apply [*[1]];
-    apply [*[2]];
+    apply [*];
   }
 }
 
 tpl [Existential-Quantifier-Formula] {
   <Existential-Quantifier-Formula {
-    apply [*[1]];
-    apply [*[2]];
+    apply [*];
   }
 }
 
@@ -1187,7 +938,9 @@ tpl [Schematic-Variables] {
 }
 
 tpl [Provisional-Formulas] {
-  copy-of `.`;
+  <Provisional-Formulas {
+    apply [*];
+  }
 }
 
 tpl [Item[@kind='Scheme-Head']] {
