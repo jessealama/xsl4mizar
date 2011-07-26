@@ -655,51 +655,80 @@ tpl [Item[@kind="Correctness"]] {
   }
 }
 
-tpl occurs-freely(#spelling) {
-  if [not(ancestor::Universal-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Universal-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Existential-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Existential-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Block/Item[@kind="Constant-Definition"]/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Block/Item[@kind="Choice-Statement"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Block/Item[@kind="Choice-Statement"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Block/Item[@kind="Generalization"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Block/Item[@kind="Generalization"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Block/Item[@kind="Loci-Declaration"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-      and
-      not(ancestor::Block/Item[@kind="Loci-Declaration"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])] {
-    "1";
+tpl occurs-freely(#variable, #val) {
+  if [$val] {
+    $val;
   } else {
-    "0";
-  }
-}
-
-tpl [Proposition] {
-  for-each [.//Simple-Term] {
-    $spelling = `@spelling`;
-    $occurs_freely = occurs-freely (#spelling = $spelling);
-    if [$occurs_freely = "1"] {
-      <Universal-Quantifier-Formula {
-        <Implicitly-Qualified-Segment {
-          <Variable {
-            @spelling = $spelling;
-            @elicited="elicited";
-          }
-        }
+    $spelling = $variable/@spelling;
+    for-each [$variable] { // kludge to force $variable to be the context node
+      if [not(ancestor::Universal-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Universal-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Existential-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Existential-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Constant-Definition"]/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Choice-Statement"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Choice-Statement"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Generalization"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Generalization"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Loci-Declaration"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Loci-Declaration"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])] {
+        occurs-freely (#val = "1");
+      } else {
+        occurs-freely (#val = "0");
       }
     }
   }
-  <Proposition {
-    apply [*];
+}
+
+tpl [Proposition](#initialized, #candidates, #seen) {
+  if [$initialized] {
+    if [$candidates] {
+      $candidate = `$candidates[1]`;
+      $spelling = $candidate/@spelling;
+      $free = occurs-freely (#variable = $candidate);
+      if [$free = "0"] {
+        apply [.](#initialized = "1",
+                  #candidates = `$candidates[position() > 1]`,
+                  #seen = $seen);
+      } else {
+        $var_token = `concat ($spelling, ",")`;
+        if [contains ($seen, $var_token)] {
+          apply [.](#initialized = "1",
+                    #candidates = `$candidates[position() > 1]`,
+                    #seen = `concat ($seen, $spelling, ",")`);
+        } else {
+          <Universal-Quantifier-Formula {
+            <Implicitly-Qualified-Segment {
+              <Variable {
+                @spelling = $spelling;
+                @elicited = "elicited";
+              }
+            }
+            apply [.](#initialized = "1",
+                      #candidates = `$candidates[position() > 1]`,
+                      #seen = `concat ($seen, $spelling, ",")`);
+          }
+        }
+      }
+    } else {
+      <Proposition {
+        apply [*];
+      }
+    }    
+  } else {
+    apply [.](#initialized = "1",
+              #candidates = `.//Simple-Term`,
+              #seen = "");
   }
 }
 
