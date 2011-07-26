@@ -1163,10 +1163,15 @@ tpl [Sethood] {
 }
 
 tpl [Compact-Statement] {
-  // do nothing.  This element simply indicates what kind of thing its
-  // parent is.  It should probably be represented as an atribute of
-  // the parent; or the parent element itself could be something
-  // different.
+  die (#message = "We are somehow applying the template for a Compact-Statement element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
+}
+
+tpl [Diffuse-Statement] {
+  die (#message = "We are somehow applying the template for a Diffuse-Statement element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
+}
+
+tpl [Iterative-Equality] {
+  die (#message = "We are somehow applying the template for an Iterative-Equality element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
 }
 
 tpl ensure-proposition {
