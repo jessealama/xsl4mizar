@@ -404,7 +404,6 @@ tpl [Scheme] {
 }
 
 tpl [Implicitly-Qualified-Segment] {
-  ensure-variable ();
   <Explicitly-Qualified-Segment {
     for-each [Variable] {
       $spelling = `@spelling`;
