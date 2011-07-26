@@ -262,9 +262,14 @@ tpl [Coherence] {
   <Coherence;
 }
 
-tpl [Block[@kind='Proof']](#generalize) {
+tpl [Block[@kind='Proof']] {
   <Block {
     @kind = "Proof";
+    $parent_name = `local-name (..)`;
+    $parent_kind = `../@kind`;
+    if [not($parent_name = "Item" and $parent_kind = "Correctness-Condition")] {
+      generalize-proof ();
+    }
     apply [*];
   }
 }
@@ -624,6 +629,47 @@ tpl generalize {
                     #seen = "");
 }
 
+// Assumes that the context node is a proof block
+tpl generalize-proof-helper(#candidates, #seen) {
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    $spelling = $candidate/@spelling;
+    $free = occurs-freely (#variable = $candidate); 
+    if [$free = "0"] {
+      generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
+                              #seen = $seen);
+    } else {
+      $var_token = `concat ($spelling, ",")`;
+      if [contains ($seen, $var_token)] {
+        generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
+                                #seen = `concat ($seen, $spelling, ",")`);
+      } else {
+        if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
+          <Item {
+            @kind = "Loci-Declaration";        
+            <Explicitly-Qualified-Segment {
+              <Variable {
+                @spelling = $spelling;
+                @elicited = "elicited";
+              }
+              apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type];
+            }
+          }
+          generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
+                                  #seen = `concat ($seen, $spelling, ",")`);
+        } else {
+          die (#message = "Could not determine type of an implicitly qualified variable!");
+        }
+      }
+    }
+  }
+}
+
+tpl generalize-proof {
+  generalize-proof-helper(#candidates = `..//Simple-Term`,
+                          #seen = "");
+}
+
 // Atoms
 
 tpl [Attributive-Formula](#generalize) {
@@ -788,9 +834,9 @@ tpl occurs-freely(#variable, #val) {
   }
 }
 
-tpl [Proposition] {
+tpl [Proposition](#generalize) {
   <Proposition {
-    apply [*](#generalize = "1");
+    apply [*](#generalize = $generalize);
   }
 }
 
@@ -1050,17 +1096,17 @@ tpl [Equality] {
 }
 
 tpl [Item[@kind='Regular-Statement']] {
-  if [../Text-Proper] {
+  $parent_name = `local-name (..)`;
+  if [$parent_name = "Text-Proper"] {
     <Item {
       @kind = "Regular-Statement";
       apply [*[1]]; // should be Compact-Statement, Diffuse-Statement, or Iterative-Equality
-      ensure-proposition ();
       apply [Proposition[1]](#generalize = "1");
       if [Straightforward-Justification | Scheme-Justification] {
         apply [(Straightforward-Justification | Scheme-Justification)[1]];
       } else {
         if [Block[@kind='Proof']] {
-          apply [Block[@kind='Proof'][1]](#generalize = "1");
+          apply [Block[@kind='Proof'][1]];
         } else {
           die (#message = "Don't know how to deal with a Regular-Statement item that lacks a Straightforward-Justification, a Scheme-Justification, and a Proof block");
         }
