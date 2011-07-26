@@ -214,15 +214,11 @@ tpl [Means] {
 }
 
 tpl [Formula-Expression] {
-  // do nothing.  This is an element found as a child of Definiens
-  // elements that simply indicates that the definiens has the shape
-  // of a formula, as opposed to a term.
+  die (#message = "We are somehow applying the template for a Formula-Expression element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
 }
 
 tpl [Term-Expression] {
-  // do nothing.  This is an element found as a child of Definiens
-  // elements that simply indicates that the definiens has the shape
-  // of a term, as opposed to a formula.
+  die (#message = "We are somehow applying the template for a Term-Expression element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
 }
 
 tpl [it-Term] {
