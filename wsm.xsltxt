@@ -1169,12 +1169,27 @@ tpl [Compact-Statement] {
   // different.
 }
 
-tpl [Single-Assumption] {
-  if [Proposition] {
-    apply [Proposition[1]];
-  } else {
-    die (#message = "Single-Assumption element lacks a Proposition child!");
+tpl ensure-proposition {
+  if [not(Proposition)] {
+    $n = `name ()`;
+    if [@kind] {
+      $k = `@kind`;
+      $message = `concat ("We expected an element (", $n, ") of kind ", $k, " to have a Proposition child, but it doesn't")`;
+      die (#message = $message);
+    } else {
+      $message = `concat ("We expected an element (", $n, ") to have a Proposition child, but it doesn't")`;
+      die (#message = $message);
+    }
   }
+}
+
+tpl apply-proposition {
+  apply [Proposition[1]];
+}
+
+tpl [Single-Assumption] {
+  ensure-proposition ();
+  apply-proposition ();
 }
 
 tpl [Item[@kind='Assumption']] {
