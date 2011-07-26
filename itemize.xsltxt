@@ -709,17 +709,22 @@ tpl [Proposition](#initialized, #candidates, #seen, #exclude_label) {
                     #seen = `concat ($seen, $spelling, ",")`,
                     #exclude_label = $exclude_label);
         } else {
-          <Universal-Quantifier-Formula {
-            <Implicitly-Qualified-Segment {
-              <Variable {
-                @spelling = $spelling;
-                @elicited = "elicited";
+          if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
+            <Universal-Quantifier-Formula {
+              <Explicitly-Qualified-Segment {
+                <Variable {
+                  @spelling = $spelling;
+                  @elicited = "elicited";
+                }
+                apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type];
               }
+              apply [.](#initialized = "1",
+                        #candidates = `$candidates[position() > 1]`,
+                        #seen = `concat ($seen, $spelling, ",")`,
+                        #exclude_label = $exclude_label);
             }
-            apply [.](#initialized = "1",
-                      #candidates = `$candidates[position() > 1]`,
-                      #seen = `concat ($seen, $spelling, ",")`,
-                      #exclude_label = $exclude_label);
+          } else {
+            die (#message = "Could not determine type of an implicitly qualified variable!");
           }
         }
       }
