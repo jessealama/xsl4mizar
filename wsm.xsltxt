@@ -719,10 +719,6 @@ tpl [Explicitly-Qualified-Segment](#verb) {
   apply-type ();
 }
 
-tpl [Existential-Quantifier-Formula] {
-  "("; "ex "; apply [*[1]]; " st "; apply [*[2]]; ")";
-}
-
 tpl [Simple-Term] {
   ensure-spelling ();
   `@spelling`;
@@ -1453,11 +1449,12 @@ tpl [Item[@kind='Regular-Statement']] {
   }
 }
 
-// dumb: this just is a copy-and-paste-and-edit of the
-// Existential-Quantifier-Formula case.  Should be parameterized and
-// combined into one.
 tpl [Universal-Quantifier-Formula] {
   "("; "for "; apply [*[1]]; " holds "; apply [*[2]]; ")";
+}
+
+tpl [Existential-Quantifier-Formula] {
+  "("; "ex "; apply [*[1]]; " st "; apply [*[2]]; ")";
 }
 
 tpl [Schematic-Variables] {
