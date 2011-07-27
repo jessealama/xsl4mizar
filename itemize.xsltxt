@@ -267,10 +267,12 @@ tpl [Block[@kind='Proof']] {
     @kind = "Proof";
     $parent_name = `local-name(parent::*)`;
     $parent_kind = `../@kind`;
-    if [not($parent_name = "Item" and $parent_kind = "Correctness-Condition")] {
+    if [$parent_name = "Item" and $parent_kind = "Correctness-Condition"] {
+      apply [*](#generalize = "1");
+    } else {
       generalize-proof ();
+      apply [*](#generalize = "0");
     }
-    apply [*](#generalize = "1");
   }
 }
 
