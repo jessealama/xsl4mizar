@@ -270,7 +270,7 @@ tpl [Block[@kind='Proof']] {
     if [not($parent_name = "Item" and $parent_kind = "Correctness-Condition")] {
       generalize-proof ();
     }
-    apply [*];
+    apply [*](#generalize = "1");
   }
 }
 
@@ -906,10 +906,10 @@ tpl [Qualification-Term] {
   }
 }
 
-tpl [Item[@kind='Choice-Statement']] {
+tpl [Item[@kind='Choice-Statement']](#generalize) {
   <Item {
     @kind="Choice-Statement";
-    apply [*];
+    apply [*](#generalize = $generalize);
   }
 }
 
@@ -973,16 +973,16 @@ tpl [Iterative-Equality] {
   <Iterative-Equality;
 }
 
-tpl [Single-Assumption] {
+tpl [Single-Assumption](#generalize) {
   <Single-Assumption {
-    apply [*];
+    apply [*](#generalize = $generalize);
   }
 }
 
-tpl [Item[@kind='Assumption']] {
+tpl [Item[@kind='Assumption']](#generalize) {
   <Item {
     @kind = "Assumption";
-    apply [*];
+    apply [*](#generalize = $generalize);
   }
 }
 
@@ -992,9 +992,9 @@ tpl [Iterative-Step] {
   }
 }
 
-tpl [Collective-Assumption] {
+tpl [Collective-Assumption](#generalize) {
   <Collective-Assumption {
-    apply [*];
+    apply [*](#generalize = $generalize);
   }
 }
 
@@ -1064,7 +1064,7 @@ tpl [Block[@kind='Notation-Block']] {
 tpl [Item[@kind='Theorem-Item']] {
   <Item {
     @kind="Theorem-Item";
-    apply [*];
+    apply [*](#generalize = "1");
   }
 }
 
@@ -1095,8 +1095,8 @@ tpl [Equality] {
   }
 }
 
-tpl [Item[@kind='Regular-Statement']] {
-  $parent_name = `local-name (..)`;
+tpl [Item[@kind='Regular-Statement']](#generalize) {
+  $parent_name = `local-name (parent::*)`;
   if [$parent_name = "Text-Proper"] {
     <Item {
       @kind = "Regular-Statement";
@@ -1115,7 +1115,7 @@ tpl [Item[@kind='Regular-Statement']] {
   } else {
     <Item {
       @kind = "Regular-Statement";
-      apply [*](#generalize = "0");
+      apply [*](#generalize = $generalize);
     }
   }
 }
