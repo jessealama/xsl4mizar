@@ -274,12 +274,13 @@ tpl free-in-proposition(#prop_node) {
   }
 }
 
-tpl [Block[@kind='Proof']] {
+tpl [Block[@kind='Proof']](#already_bound) {
   <Block {
     @kind = "Proof";
     $free_in_proposition = free-in-proposition (#prop_node = `preceding-sibling::Proposition[1]`);
-    generalize-proof ();
-    apply [*](#already_bound = $free_in_proposition, #do_generalize = "1");
+    $now_already_bound = `concat ($already_bound, $free_in_proposition)`;
+    generalize-proof (#already_bound = $already_bound);
+    apply [*](#already_bound = $now_already_bound, #do_generalize = "1");
   }
 }
 
@@ -658,40 +659,51 @@ tpl generalize(#already_bound) {
 }
 
 // Assumes that the context node is a proof block
-tpl generalize-proof-helper(#candidates, #seen) {
+tpl generalize-proof-helper(#candidates, #seen, #already_bound) {
   if [$candidates] {
     $candidate = `$candidates[1]`;
     $spelling = $candidate/@spelling;
     $free = occurs-freely (#variable = $candidate); 
     if [$free = "0"] {
       generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
-                              #seen = $seen);
+                              #seen = $seen,
+                              #already_bound = $already_bound);
     } else {
       $var_token = `concat ($spelling, ",")`;
       if [contains ($seen, $var_token)] {
         generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
-                                #seen = $seen);
+                                #seen = $seen,
+                                #already_bound = $already_bound);
       } else {
-        <Item {
-          @kind = "Loci-Declaration";        
-          <Explicitly-Qualified-Segment {
-            <Variable {
-              @spelling = $spelling;
-              @elicited = "elicited";
+        if [contains ($already_bound, $var_token)] {
+          generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
+                                  #seen = $seen,
+                                  #already_bound = $already_bound);
+        } else {
+          <Item {
+            @kind = "Loci-Declaration";        
+            <Explicitly-Qualified-Segment {
+              <Variable {
+                @spelling = $spelling;
+                @elicited = "elicited";
+              }
+              apply-type-of-variable (#spelling = $spelling);
             }
-            apply-type-of-variable (#spelling = $spelling);
+          }
+          generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
+                                  #seen = `concat ($seen, $spelling, ",")`,
+                                  #already_bound = `concat ($already_bound, $var_token)`);
           }
         }
-        generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
-                                #seen = `concat ($seen, $spelling, ",")`);
       }
     }
   }
-}
 
-tpl generalize-proof {
+
+tpl generalize-proof(#already_bound) {
   generalize-proof-helper(#candidates = `../Proposition//Simple-Term`,
-                          #seen = "");
+                          #seen = "",
+                          #already_bound = $already_bound);
 }
 
 // Atoms
