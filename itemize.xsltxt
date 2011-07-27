@@ -99,25 +99,6 @@ tpl [Item[@kind='Suppose-Head']] {
   }
 }
 
-tpl copy-children {
-  for-each [*] {
-    copy-of `.`;
-  }
-}
-
-tpl first-one(#elems) {
-  copy-of `$elems[1]`;
-}
-
-tpl emit-unqualified-variables {
-  if [//Implicitly-Qualified-Segment/Variable] {
-    "\n";
-  }
-  for-each [//Implicitly-Qualified-Segment/Variable[not(@spelling = preceding::Implicitly-Qualified-Segment/Variable/@spelling)]] {
-    copy-of `.`; "\n";
-  }
-}
-
 tpl [Item[@kind='Scheme-Block-Item']] {
   <Item {
     @kind="Scheme-Block-Item";
