@@ -857,7 +857,11 @@ tpl occurs-freely(#variable, #val) {
           and
           not(ancestor::Block/Item[@kind="Loci-Declaration"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
           and
-          not(ancestor::Block/Item[@kind="Loci-Declaration"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])] {
+          not(ancestor::Block/Item[@kind="Loci-Declaration"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Existential-Assumption"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
+          and
+          not(ancestor::Block/Item[@kind="Existential-Assumption"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])] {
         occurs-freely (#val = "1");
       } else {
         occurs-freely (#val = "0");
