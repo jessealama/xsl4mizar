@@ -411,16 +411,35 @@ tpl [Scheme] {
   }
 }
 
+tpl apply-type-of-variable(#spelling) {
+  if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
+    if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type] {
+      apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type[1]];
+    } else {
+      $message = `concat ("Unable to determine the type of an implicitly qualified variable, ", $spelling, ", bound by a reservation")`;
+      die (#message = $message);
+    }
+  } else {
+    if [preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]] {
+      if [preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]/../../Standard-Type | preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]/../../Clustered-Type] {
+        apply [(preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]/../../Standard-Type | preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]/../../Clustered-Type)[1]];
+      } else {
+        $message = `concat ("Unable to determine the type of an implicitly qualified variable, ", $spelling, ", introduced by a type-changing statement")`;
+        die (#message = $message);
+      }
+    } else {
+      $message = `concat ("Could not determine type of an implicitly qualified variable, ", $spelling, ": it is not bound by a resevation, nor introduced by a type-changing statement!")`;
+      die (#message = $message);
+    }
+  }
+}
+
 tpl [Implicitly-Qualified-Segment] {
   <Explicitly-Qualified-Segment {
     for-each [Variable] {
       $spelling = `@spelling`;
       apply [.];
-      if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
-        apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type];
-      } else {
-        die (#message = "Could not determine type of an implicitly qualified variable!");
-      }
+      apply-type-of-variable (#spelling = $spelling);
     }
   }
 }
@@ -610,21 +629,17 @@ tpl generalize-helper(#candidates, #seen, #already_bound) {
                              #seen = $seen,
                              #already_bound = $already_bound);
         } else {
-          if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
-            <Universal-Quantifier-Formula {
-              <Explicitly-Qualified-Segment {
-                <Variable {
-                  @spelling = $spelling;
-                  @elicited = "elicited";
-                }
-                apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type];
+          <Universal-Quantifier-Formula {
+            <Explicitly-Qualified-Segment {
+              <Variable {
+                @spelling = $spelling;
+                @elicited = "elicited";
               }
-              generalize-helper(#candidates = `$candidates[position() > 1]`,
-                                #seen = `concat ($seen, $spelling, ",")`,
-                                #already_bound = $already_bound);
+              apply-type-of-variable (#spelling = $spelling);
             }
-          } else {
-            die (#message = "Could not determine type of an implicitly qualified variable!");
+            generalize-helper(#candidates = `$candidates[position() > 1]`,
+                              #seen = `concat ($seen, $spelling, ",")`,
+                              #already_bound = $already_bound);
           }
         }
       }
@@ -657,22 +672,18 @@ tpl generalize-proof-helper(#candidates, #seen) {
         generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
                                 #seen = $seen);
       } else {
-        if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
-          <Item {
-            @kind = "Loci-Declaration";        
-            <Explicitly-Qualified-Segment {
-              <Variable {
-                @spelling = $spelling;
-                @elicited = "elicited";
-              }
-              apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type];
+        <Item {
+          @kind = "Loci-Declaration";        
+          <Explicitly-Qualified-Segment {
+            <Variable {
+              @spelling = $spelling;
+              @elicited = "elicited";
             }
+            apply-type-of-variable (#spelling = $spelling);
           }
-          generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
-                                  #seen = `concat ($seen, $spelling, ",")`);
-        } else {
-          die (#message = "Could not determine type of an implicitly qualified variable!");
         }
+        generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
+                                #seen = `concat ($seen, $spelling, ",")`);
       }
     }
   }
