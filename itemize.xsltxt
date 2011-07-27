@@ -1034,10 +1034,10 @@ tpl [Collective-Assumption](#already_bound) {
   }
 }
 
-tpl [Item[@kind='Existential-Assumption']] {
+tpl [Item[@kind='Existential-Assumption']](#already_bound) {
   <Item {
     @kind = "Existential-Assumption";
-    apply [*];
+    apply [*](#already_bound = $already_bound, #do_generalize = "1");
   }
 }
 
