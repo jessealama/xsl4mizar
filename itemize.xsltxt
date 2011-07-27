@@ -1107,10 +1107,10 @@ tpl [Block[@kind='Now-Reasoning']](#already_bound) {
   }
 }
 
-tpl [Block[@kind='Hereby-Reasoning']] {
+tpl [Block[@kind='Hereby-Reasoning']](#already_bound) {
   <Block {
     @kind = "Hereby-Reasoning";
-    apply [*];
+    apply [*](#already_bound = $already_bound, #do_generalize = "1");
   }
 }
 
