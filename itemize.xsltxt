@@ -626,6 +626,7 @@ tpl generalize-helper(#candidates, #seen) {
   }
 }
 
+// Assumes the context node is a formula of some kind
 tpl generalize {
   generalize-helper(#candidates = `.//Simple-Term`,
                     #seen = "");
