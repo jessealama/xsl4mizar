@@ -260,13 +260,45 @@ tpl [Coherence] {
   <Coherence;
 }
 
+tpl free-in-proposition-helper (#free_vars, #candidates) {
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    $spelling = `$candidate/@spelling`;
+    $var_token = `concat ($spelling, ",")`;
+    $free = occurs-freely (#variable = $candidate);
+    if [$free = "0"] {
+      free-in-proposition-helper (#free_vars = $free_vars,
+                                  #candidates = `$candidates[position() > 1]`);
+    } else {
+      if [contains ($free_vars, $var_token)] {
+        free-in-proposition-helper (#free_vars = $free_vars,
+                                    #candidates = `$candidates[position() > 1]`);
+      } else {
+        $new_free_vars = `concat ($free_vars, $var_token)`;
+        free-in-proposition-helper (#free_vars = $new_free_vars,
+                                    #candidates = `$candidates[position() > 1]`);
+      }
+    }
+  } else {
+    `$free_vars`;
+  }
+}
+
+tpl free-in-proposition(#prop_node) {
+  if [$prop_node] {
+    free-in-proposition-helper (#free_vars = "",
+                                #candidates = `$prop_node//Simple-Term`);
+  } else {
+    "";
+  }
+}
+
 tpl [Block[@kind='Proof']] {
   <Block {
     @kind = "Proof";
-    $parent_name = `local-name(parent::*)`;
-    $parent_kind = `../@kind`;
+    $free_in_proposition = free-in-proposition (#prop_node = `preceding-sibling::Proposition[1]`);
     generalize-proof ();
-    apply [*](#generalize = "1");
+    apply [*](#already_bound = $free_in_proposition, #do_generalize = "1");
   }
 }
 
@@ -323,17 +355,9 @@ tpl [Item[@kind='Loci-Declaration']] {
   }
 }
 
-tpl [Formula-Expression] {
-  <Formula-Expression;
-}
-
-tpl [Term-Expression] {
-  <Term-Expression;
-}
-
 tpl [Definiens] {
   <Definiens {
-    apply [*](#generalize = "1");
+    apply [*](#already_bound = "", #do_generalize = "1"); // is that OK?
   }
 }
 
@@ -584,46 +608,57 @@ tpl [Item[@kind='Generalization']] {
 
 // Generalizing free variables
 
-tpl generalize-helper(#candidates, #seen) {
+tpl generalize-helper(#candidates, #seen, #already_bound) {
   if [$candidates] {
     $candidate = `$candidates[1]`;
     $spelling = $candidate/@spelling;
     $free = occurs-freely (#variable = $candidate);
     if [$free = "0"] {
       generalize-helper(#candidates = `$candidates[position() > 1]`,
-                        #seen = $seen);
+                        #seen = $seen,
+                        #already_bound = $already_bound);
     } else {
       $var_token = `concat ($spelling, ",")`;
       if [contains ($seen, $var_token)] {
         generalize-helper(#candidates = `$candidates[position() > 1]`,
-                          #seen = `concat ($seen, $spelling, ",")`);
+                          #seen = $seen,
+                          #already_bound = $already_bound);
       } else {
-        if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
-          <Universal-Quantifier-Formula {
-            <Explicitly-Qualified-Segment {
-              <Variable {
-                @spelling = $spelling;
-                @elicited = "elicited";
-              }
-              apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type];
-            }
-            generalize-helper(#candidates = `$candidates[position() > 1]`,
-                              #seen = `concat ($seen, $spelling, ",")`);
-          }
+        if [contains ($already_bound, $var_token)] {
+          generalize-helper (#candidates = `$candidates[position() > 1]`,
+                             #seen = $seen,
+                             #already_bound = $already_bound);
         } else {
-          die (#message = "Could not determine type of an implicitly qualified variable!");
+          if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
+            <Universal-Quantifier-Formula {
+              <Explicitly-Qualified-Segment {
+                <Variable {
+                  @spelling = $spelling;
+                  @elicited = "elicited";
+                }
+                apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type];
+              }
+              generalize-helper(#candidates = `$candidates[position() > 1]`,
+                                #seen = `concat ($seen, $spelling, ",")`,
+                                #already_bound = $already_bound);
+            }
+          } else {
+            die (#message = "Could not determine type of an implicitly qualified variable!");
+          }
         }
       }
     }
   } else {
-    apply [.](#generalize = "0");
+    $newly_bound = `concat ($seen, $already_bound)`;
+    apply [.](#already_bound = $newly_bound, #do_generalize = "0");
   }
 }
 
 // Assumes the context node is a formula of some kind
-tpl generalize {
+tpl generalize(#already_bound) {
   generalize-helper(#candidates = `.//Simple-Term`,
-                    #seen = "");
+                    #seen = "",
+                    #already_bound = $already_bound);
 }
 
 // Assumes that the context node is a proof block
@@ -639,7 +674,7 @@ tpl generalize-proof-helper(#candidates, #seen) {
       $var_token = `concat ($spelling, ",")`;
       if [contains ($seen, $var_token)] {
         generalize-proof-helper(#candidates = `$candidates[position() > 1]`,
-                                #seen = `concat ($seen, $spelling, ",")`);
+                                #seen = $seen);
       } else {
         if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
           <Item {
@@ -669,98 +704,98 @@ tpl generalize-proof {
 
 // Atoms
 
-tpl [Attributive-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Attributive-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Attributive-Formula {
-      apply [*](#generalize = "0");
+      apply [*](#already_bound = $already_bound);
     }
   }
 }
 
-tpl [Predicative-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Predicative-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Predicative-Formula {
       @spelling=`@spelling`;
-      apply [*](#generalize = "0");
+      apply [*](#already_bound = $already_bound);
     }
   }
 }
 
-tpl [Private-Predicate-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Private-Predicate-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Private-Predicate-Formula {
       @spelling = `@spelling`;
-      apply [*](#generalize = "0");
-  }
+      apply [*](#already_bound = $already_bound);
+    }
   }
 }
 
 // Complex formulas
 
-tpl [Conjunctive-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Conjunctive-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Conjunctive-Formula {
-      apply [*](#generalize = "0");
+      apply [*](#already_bound = $already_bound);
     }
   }
 }
 
-tpl [Disjunctive-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Disjunctive-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Disjunctive-Formula {
-      apply [*](#generalize = "0");
+      apply [*](#already_bound = $already_bound);
     }
   }
 }
 
-tpl [Conditional-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Conditional-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Conditional-Formula {
-      apply [*](#generalize = "0");
+      apply [*](#already_bound);
     }
   }
 }
 
-tpl [Biconditional-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Biconditional-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Biconditional-Formula {
-      apply [*](#generalize = "0");
+      apply [*](#already_bound = $already_bound);
     }
   }
 }
 
 // Quantifed formulas
 
-tpl [Universal-Quantifier-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Universal-Quantifier-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Universal-Quantifier-Formula {
-      apply [*](#generalize = "0");
+      apply [*](#already_bound = $already_bound);
     }
   }
 }
 
-tpl [Existential-Quantifier-Formula](#generalize) {
-  if [$generalize = "1"] {
-    generalize ();
+tpl [Existential-Quantifier-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
   } else {
     <Existential-Quantifier-Formula {
-      apply [*](#generalize = "0");
+      apply [*](#already_bound = $already_bound);
     }
   }
 }
@@ -831,9 +866,9 @@ tpl occurs-freely(#variable, #val) {
   }
 }
 
-tpl [Proposition](#generalize) {
+tpl [Proposition](#already_bound) {
   <Proposition {
-    apply [*](#generalize = $generalize);
+    apply [*](#already_bound = $already_bound, #do_generalize = "1");
   }
 }
 
@@ -903,10 +938,10 @@ tpl [Qualification-Term] {
   }
 }
 
-tpl [Item[@kind='Choice-Statement']](#generalize) {
+tpl [Item[@kind='Choice-Statement']](#already_bound) {
   <Item {
     @kind="Choice-Statement";
-    apply [*](#generalize = $generalize);
+    apply [*](#already_bound = $already_bound);
   }
 }
 
@@ -970,16 +1005,16 @@ tpl [Iterative-Equality] {
   <Iterative-Equality;
 }
 
-tpl [Single-Assumption](#generalize) {
+tpl [Single-Assumption](#already_bound) {
   <Single-Assumption {
-    apply [*](#generalize = $generalize);
+    apply [*](#already_bound = $already_bound);
   }
 }
 
-tpl [Item[@kind='Assumption']](#generalize) {
+tpl [Item[@kind='Assumption']](#already_bound) {
   <Item {
     @kind = "Assumption";
-    apply [*](#generalize = $generalize);
+    apply [*](#already_bound = $already_bound);
   }
 }
 
@@ -989,9 +1024,9 @@ tpl [Iterative-Step] {
   }
 }
 
-tpl [Collective-Assumption](#generalize) {
+tpl [Collective-Assumption](#already_bound) {
   <Collective-Assumption {
-    apply [*](#generalize = $generalize);
+    apply [*](#already_bound = $already_bound);
   }
 }
 
@@ -1002,10 +1037,10 @@ tpl [Item[@kind='Existential-Assumption']] {
   }
 }
 
-tpl [Item[@kind='Conclusion']] {
+tpl [Item[@kind='Conclusion']](#already_bound) {
   <Item {
     @kind = "Conclusion";
-    apply [*];
+    apply [*](#already_bound = $already_bound, #do_generalize = "1");
   }
 }
 
@@ -1061,14 +1096,14 @@ tpl [Block[@kind='Notation-Block']] {
 tpl [Item[@kind='Theorem-Item']] {
   <Item {
     @kind="Theorem-Item";
-    apply [*](#generalize = "1");
+    apply [*](#already_bound = "");
   }
 }
 
-tpl [Block[@kind='Now-Reasoning']] {
+tpl [Block[@kind='Now-Reasoning']](#already_bound) {
   <Block {
     @kind = "Now-Reasoning";
-    apply [*];
+    apply [*](#already_bound = $already_bound, #do_generalize = "1");
   }
 }
 
@@ -1092,13 +1127,13 @@ tpl [Equality] {
   }
 }
 
-tpl [Item[@kind='Regular-Statement']](#generalize) {
+tpl [Item[@kind='Regular-Statement']](#already_bound) {
   $parent_name = `local-name (parent::*)`;
   if [$parent_name = "Text-Proper"] {
     <Item {
       @kind = "Regular-Statement";
       apply [*[1]]; // should be Compact-Statement, Diffuse-Statement, or Iterative-Equality
-      apply [Proposition[1]](#generalize = "1");
+      apply [Proposition[1]](#already_bound = $already_bound);
       if [Straightforward-Justification | Scheme-Justification] {
         apply [(Straightforward-Justification | Scheme-Justification)[1]];
       } else {
@@ -1112,7 +1147,7 @@ tpl [Item[@kind='Regular-Statement']](#generalize) {
   } else {
     <Item {
       @kind = "Regular-Statement";
-      apply [*](#generalize = $generalize);
+      apply [*](#already_bound = $already_bound);
     }
   }
 }
