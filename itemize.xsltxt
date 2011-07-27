@@ -666,7 +666,7 @@ tpl generalize-proof-helper(#candidates, #seen) {
 }
 
 tpl generalize-proof {
-  generalize-proof-helper(#candidates = `..//Simple-Term`,
+  generalize-proof-helper(#candidates = `../Proposition//Simple-Term`,
                           #seen = "");
 }
 
