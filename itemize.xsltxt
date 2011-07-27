@@ -265,7 +265,7 @@ tpl [Coherence] {
 tpl [Block[@kind='Proof']] {
   <Block {
     @kind = "Proof";
-    $parent_name = `local-name (..)`;
+    $parent_name = `local-name(parent::*)`;
     $parent_kind = `../@kind`;
     if [not($parent_name = "Item" and $parent_kind = "Correctness-Condition")] {
       generalize-proof ();
