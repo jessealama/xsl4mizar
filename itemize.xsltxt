@@ -109,8 +109,6 @@ tpl first-one(#elems) {
   copy-of `$elems[1]`;
 }
 
-key "V" [Variable] `@spelling`;
-
 tpl emit-unqualified-variables {
   if [//Implicitly-Qualified-Segment/Variable] {
     "\n";
