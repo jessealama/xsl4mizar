@@ -20,12 +20,6 @@ tpl [Text-Proper] {
   }
 }
 
-tpl ensure-spelling {
-  if [not(@spelling)] {
-    die (#message = "We expected an element to have a spelling attribute, but it lacks one");
-  }
-}
-
 tpl [Variable] {
   <Variable {
     @spelling = `@spelling`;
@@ -891,7 +885,6 @@ tpl [Link] {
 }
 
 tpl [Local-Reference] {
-  ensure-spelling ();
   <Local-Reference {
     @spelling=`@spelling`;
   }
