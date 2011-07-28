@@ -829,6 +829,94 @@ tpl [Item[@kind="Correctness"]] {
   }
 }
 
+tpl bound-by-quantifier (#variable) {
+  $spelling = `local-name ($variable/@spelling)`;
+  for-each [$variable[1]] {
+    if [ancestor::Universal-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+      "1";
+    } else {
+      if [ancestor::Universal-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+        "1";
+      } else {
+        if [ancestor::Existential-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+          "1";
+        } else {
+          if [ancestor::Existential-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+            "1";
+          } else {
+            "0";
+          }
+        }
+      }
+    }
+  }
+}
+
+tpl bound-by-item-in-block (#variable, #block, #item) {
+  $spelling = `$variable/@spelling`;
+  if [$item[@kind = "Choice-Statement"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling] | $item[@kind = "Choice-Statement"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+    "1";
+  } else {
+    if [$item[@kind = "Generalization"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling] | $item[@kind = "Generalization"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+      "1";
+    } else {
+      if [$item[@kind = "Loci-Declaration"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling] | $item[@kind = "Loci-Declaration"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+        "1";
+      } else {
+        if [$item[@kind = "Existential-Assumption"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling] | $item[@kind = "Existential-Assumption"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+          "1";
+        } else {
+          "0";
+        }
+      }
+    }
+  }
+}
+
+tpl item-containing-variable (#variable, #candidates) {
+  if [$candidates] {
+    $candidate = $candidates[1];
+    if [$candidate//Simple-Term = $variable] {
+      $candidate;
+    } else {
+      item-containing-variable (#variable = $variable,
+                                #candidates = `$candidates[position() > 1]`);
+    }
+  } else {
+    $spelling = `$variable/@spelling`;
+    $message = `concat ("We expected to find one (and only one) Item element that contains the variable ", $spelling, ", but none was found")`;
+    die (#message = $message);
+  }
+}
+
+tpl bound-in-block (#variable, #block) {
+  $item = item-containing-variable (#variable = $variable,
+                                    #candidates = `$block/Item);
+  $item_pos = position ($item);
+  bound-by-item-in-block (#variable = $variable,
+                          #block = $block,
+                          #items = `reverse(Block/Item[position <= $item_pos])`);
+}
+
+tpl bound-in-blocks (#variable, #blocks) {
+  if [$blocks] {
+    $block = $blocks[1];
+    $bound = bound-in-block (#variable = $variable, #block = $block);
+    if [$bound = "0"] {
+      bound-in-blocks (#variable = $variable,
+                       #blocks = $blocks[position() > 1]);
+    } else {
+      "1";
+    }
+  } else {
+    "0";
+  }
+}
+
+tpl block-bound (#variable) {
+  bound-in-blocks (#variable = $variable, #blocks = `ancestor::Block`);
+}
+
 tpl occurs-freely(#variable, #val) {
   if [$val] {
     $val;
