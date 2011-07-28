@@ -35,7 +35,7 @@ fi
 
 newparser -q -s -l $article > /dev/null 2>&1;
 if [ "$?" -ne "0" ]; then
-    echo "Error with newparser applied to $article"; 
+    echo "$article: newparser did not terminate cleanly"; 
     rm -f $article.* splork.*;
     exit 1;
 fi
