@@ -834,35 +834,60 @@ tpl occurs-freely(#variable, #val) {
     $val;
   } else {
     $spelling = $variable/@spelling;
+    $depth = `count (ancestor::*)`;
     for-each [$variable] { // kludge to force $variable to be the context node
-      if [not(ancestor::Universal-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Universal-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Existential-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Existential-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Constant-Definition"]/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Choice-Statement"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Choice-Statement"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Generalization"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Generalization"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Loci-Declaration"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Loci-Declaration"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Existential-Assumption"]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling])
-          and
-          not(ancestor::Block/Item[@kind="Existential-Assumption"]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])] {
-        occurs-freely (#val = "1");
-      } else {
+      if [ancestor::Universal-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
         occurs-freely (#val = "0");
+      } else {
+        if [ancestor::Universal-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+          occurs-freely (#val = "0");
+        } else {
+          if [ancestor::Existential-Quantifier-Formula/Explicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+            occurs-freely (#val = "0");
+          } else {
+            if [ancestor::Existential-Quantifier-Formula/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+              occurs-freely (#val = "0");
+            } else {
+              if [ancestor::Block/Item[@kind="Constant-Definition" and count(ancestor::*) < $depth]/Variable[@spelling = $spelling]] {
+                occurs-freely (#val = "0");
+              } else {
+                if [ancestor::Block/Item[@kind="Choice-Statement" and count(ancestor::*) < $depth]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+                  occurs-freely (#val = "0");
+                } else {
+                  if [ancestor::Block/Item[@kind="Choice-Statement" and count(ancestor::*) < $depth]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+                    occurs-freely (#val = "0");
+                  } else {
+                    if [ancestor::Block/Item[@kind="Generalization" and count(ancestor::*) < $depth]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+                      occurs-freely (#val = "0");
+                    } else {
+                      if [(ancestor::Block/Item[@kind="Generalization" and count(ancestor::*) < $depth]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling])] {
+                        occurs-freely (#val = "0");
+                      } else {
+                        if [ancestor::Block/Item[@kind="Loci-Declaration" and count(ancestor::*) < $depth]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+                          occurs-freely (#val = "0");
+                        } else {
+                          if [ancestor::Block/Item[@kind="Loci-Declaration" and count(ancestor::*) < $depth]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+                            occurs-freely (#val = "0");
+                          } else {
+                            if [ancestor::Block/Item[@kind="Existential-Assumption" and count(ancestor::*) < $depth]/Explicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+                              occurs-freely (#val = "0");
+                            } else {
+                              if [ancestor::Block/Item[@kind="Existential-Assumption" and count(ancestor::*) < $depth]/Implicitly-Qualified-Segment/Variable[@spelling = $spelling]] {
+                                occurs-freely (#val = "0");
+                              } else {
+                                occurs-freely (#val = "1");
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
