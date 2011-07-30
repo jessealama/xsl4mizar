@@ -1292,3 +1292,14 @@ tpl [Redefine] {
 tpl [Negated] {
   <Negated;
 }
+
+tpl [Text-Proper/Item] {
+  <Item-Bundle {
+    copy { @kind = `@kind`; @line = `@line`; @col = `@col`; }
+    apply [*];
+  }
+}
+
+tpl [Text-Proper/Item[@kind='Reservation']] {
+  // do nothing
+}
