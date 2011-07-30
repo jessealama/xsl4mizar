@@ -873,49 +873,49 @@ tpl bound-by-item-in-block (#variable, #block, #item) {
   }
 }
 
-tpl item-containing-variable (#variable, #candidates) {
-  if [$candidates] {
-    $candidate = $candidates[1];
-    if [$candidate//Simple-Term = $variable] {
-      $candidate;
-    } else {
-      item-containing-variable (#variable = $variable,
-                                #candidates = `$candidates[position() > 1]`);
-    }
-  } else {
-    $spelling = `$variable/@spelling`;
-    $message = `concat ("We expected to find one (and only one) Item element that contains the variable ", $spelling, ", but none was found")`;
-    die (#message = $message);
-  }
-}
+// tpl item-containing-variable (#variable, #candidates) {
+//   if [$candidates] {
+//     $candidate = `$candidates[1]`;
+//     if [$candidate//Simple-Term = $variable] {
+//       $candidate;
+//     } else {
+//       item-containing-variable (#variable = $variable,
+//                                 #candidates = `$candidates[position() > 1]`);
+//     }
+//   } else {
+//     $spelling = `$variable/@spelling`;
+//     $message = `concat ("We expected to find one (and only one) Item element that contains the variable ", $spelling, ", but none was found")`;
+//     die (#message = $message);
+//   }
+// }
 
-tpl bound-in-block (#variable, #block) {
-  $item = item-containing-variable (#variable = $variable,
-                                    #candidates = `$block/Item);
-  $item_pos = position ($item);
-  bound-by-item-in-block (#variable = $variable,
-                          #block = $block,
-                          #items = `reverse(Block/Item[position <= $item_pos])`);
-}
+// tpl bound-in-block (#variable, #block) {
+//   $item = item-containing-variable (#variable = $variable,
+//                                     #candidates = `$block/Item`);
+//   $item_pos = position ($item);
+//   bound-by-item-in-block (#variable = $variable,
+//                           #block = $block,
+//                           #items = `Block/Item[position <= $item_pos]`);
+// }
 
-tpl bound-in-blocks (#variable, #blocks) {
-  if [$blocks] {
-    $block = $blocks[1];
-    $bound = bound-in-block (#variable = $variable, #block = $block);
-    if [$bound = "0"] {
-      bound-in-blocks (#variable = $variable,
-                       #blocks = $blocks[position() > 1]);
-    } else {
-      "1";
-    }
-  } else {
-    "0";
-  }
-}
+// tpl bound-in-blocks (#variable, #blocks) {
+//   if [$blocks] {
+//     $block = $blocks[1];
+//     $bound = bound-in-block (#variable = $variable, #block = $block);
+//     if [$bound = "0"] {
+//       bound-in-blocks (#variable = $variable,
+//                        #blocks = $blocks[position() > 1]);
+//     } else {
+//       "1";
+//     }
+//   } else {
+//     "0";
+//   }
+// }
 
-tpl block-bound (#variable) {
-  bound-in-blocks (#variable = $variable, #blocks = `ancestor::Block`);
-}
+// tpl block-bound (#variable) {
+//   bound-in-blocks (#variable = $variable, #blocks = `ancestor::Block`);
+// }
 
 tpl occurs-freely(#variable, #val) {
   if [$val] {
