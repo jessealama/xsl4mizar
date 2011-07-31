@@ -14,225 +14,42 @@ tpl die(#message) {
   }
 }
 
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    if [@line] { @line = `@line`; }
+    if [@col] { @col = `@col`; }
+    if [@spelling] { @spelling = `@spelling`; }
+    if [@idnr] { @idnr = `@idnr`; }
+    if [@nr] { @nr = `@nr`; }
+    if [@number] { @"number" = `@number`; }
+    if [@articleid] { @articleid = `@articleid`; }
+    apply [*];
+  }
+}
+
+tpl enumerate-items (#candidates, #bundlenr) {
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    apply [$candidate](#bundlenr = $bundlenr);
+    enumerate-items (#candidates = `$candidates[position () > 1]`,
+                     #bundlenr = `$bundlenr + 1`);
+  }
+}
+
 tpl [Text-Proper] {
   <Text-Proper {
-    apply [*];
-  }
-}
-
-tpl [Variable] {
-  <Variable {
-    @spelling = `@spelling`;
-    @idnr = `@idnr`;
-  }
-}
-
-tpl [Internal-Selector-Term] {
-  <Internal-Selector-Term {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Standard-Type] {
-  <Standard-Type {
-    @spelling = `@spelling`;
-    apply [*];
+    @articleid = `@articleid`;
+    @articleext = `@articleext`;
+    @line = `@line`;
+    @col = `@col`;
+    enumerate-items (#candidates = `Item[@kind != "Reservation"]`,
+                     #bundlenr = "1");
   }
 }
 
 tpl [Item[@kind='Reservation']] {
   // do nothing: We will manage variable reservations ourselves
-}
-
-tpl [Item[@kind='Section-Pragma']] {
-  <Item {
-    @kind = "Section-Pragma";
-  }
-}
-
-tpl [Item[@kind='Per-Cases']] {
-  <Item {
-    @kind = "Per-Cases";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Case-Block']] {
-  <Item {
-    @kind = "Case-Block";
-    apply [*];
-  }
-}
-
-tpl [Block[@kind='Case']] {
-  <Block {
-    @kind = "Case";
-    apply [*];
-  }
-}
-
-tpl [Block[@kind='Suppose']] {
-  <Block {
-    @kind = "Suppose";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Case-Head']] {
-  <Item {
-    @kind = "Case-Head";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Suppose-Head']] {
-  <Item {
-    @kind = "Suppose-Head";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Scheme-Block-Item']] {
-  <Item {
-    @kind="Scheme-Block-Item";
-    apply [*];
-  }
-}
-
-tpl [Block[@kind='Scheme-Block']] {
-  <Block {
-    @kind = "Scheme-Block";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Definition-Item']] {
-  <Item {
-    @kind="Definition-Item";
-    apply [*];
-  }
-}
-
-tpl [Type-Specification] {
-  <Type-Specification {
-    apply [*];
-  }
-}
-
-tpl [Equals] {
-  <Equals;
-}
-
-tpl [Means] {
-  <Means;
-}
-
-tpl [Formula-Expression] {
-  <Formula-Expression;
-}
-
-tpl [Term-Expression] {
-  <Term-Expression;
-}
-
-tpl [it-Term] {
-  <it-Term;
-}
-
-// Standard-Mode elements suck
-tpl [Standard-Mode] {
-  <Standard-Mode {
-    apply [*];
-  }
-}
-
-tpl [Expandable-Mode] {
-  <Expandable-Mode {
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Mode-Definition']] {
-  <Item {
-    @kind = "Mode-Definition";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Predicate-Definition']] {
-  <Item {
-    @kind = "Predicate-Definition";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Functor-Definition']] {
-  <Item {
-    @kind = "Functor-Definition";
-    apply [*];
-  }
-}
-
-tpl [Predicate-Pattern] {
-  <Predicate-Pattern {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Mode-Pattern] {
-  <Mode-Pattern {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Operation-Functor-Pattern] {
-  <Operation-Functor-Pattern {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Block[@kind='Definitional-Block']] {
-  <Block {
-    @kind="Definitional-Block";
-    apply [*];
-  }
-}
-
-tpl [Block[@kind='Registration-Block']] {
-  <Block {
-    @kind="Registration-Block";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Identify']] {
-  <Item {
-    @kind = "Identify";
-    apply [*];
-  }  
-}
-
-tpl [Item[@kind='Cluster']] {
-  <Item {
-    @kind = "Cluster";
-    apply [*];
-  }
-}
-
-tpl [Existence] {
-  <Existence;
-}
-
-tpl [Uniqueness] {
-  <Uniqueness;
-}
-
-tpl [Coherence] {
-  <Coherence;
 }
 
 tpl free-in-proposition-helper (#free_vars, #candidates) {
@@ -278,131 +95,9 @@ tpl [Block[@kind='Proof']](#already_bound) {
   }
 }
 
-tpl [Compatibility] {
-  <Compatibility;
-}
-
-tpl [Consistency] {
-  <Consistency;
-}
-
-tpl [Item[@kind='Correctness-Condition']] {
-  <Item {
-    @kind = "Correctness-Condition";
-    apply [*];
-  }
-}
-
-tpl [Adjective] {
-  <Adjective {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Adjective-Cluster] {
-  <Adjective-Cluster {
-    apply [*];
-  }
-}
-
-tpl [Existential-Registration] {
-  <Existential-Registration {
-    apply [*];
-  }
-}
-
-tpl [Functorial-Registration] {
-  <Functorial-Registration {
-    apply [*];
-  }
-}
-
-tpl [Conditional-Registration] {
-  <Conditional-Registration {
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Loci-Declaration']] {
-  <Item {
-    @kind="Loci-Declaration";
-    apply [*];
-  }
-}
-
 tpl [Definiens] {
   <Definiens {
     apply [*](#already_bound = "", #do_generalize = "1"); // is that OK?
-  }
-}
-
-tpl [Partial-Definiens] {
-  <Partial-Definiens {
-    apply [*];
-  }
-}
-
-tpl [Qualifying-Formula] {
-  <Qualifying-Formula {
-    apply [*];
-  }
-}
-
-tpl [Negated-Formula] {
-  <Negated-Formula {
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Attribute-Definition']] {
-  <Item {
-    @kind="Attribute-Definition";
-    apply [*];
-  }
-}
-
-tpl [Loci] {
-  <Loci {
-    apply [*];
-  }
-}
-
-tpl [Locus] {
-  <Locus { 
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Attribute-Pattern] {
-  <Attribute-Pattern {
-    @spelling=`@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Type-List] {
-  <Type-List {
-    apply [*];
-  }
-}
-
-tpl [Functor-Segment] {
-  <Functor-Segment {
-    apply [*];
-  }
-}
-
-tpl [Predicate-Segment] {
-  <Predicate-Segment {
-    apply [*];
-  }
-}
-
-tpl [Scheme] {
-  <Scheme {
-    @spelling = `@spelling`;
   }
 }
 
@@ -426,176 +121,6 @@ tpl apply-type-of-variable(#spelling) {
       $message = `concat ("Could not determine type of an implicitly qualified variable, ", $spelling, ": it is not bound by a resevation, nor introduced by a type-changing statement!")`;
       die (#message = $message);
     }
-  }
-}
-
-tpl [Implicitly-Qualified-Segment] {
-  <Explicitly-Qualified-Segment {
-    for-each [Variable] {
-      $spelling = `@spelling`;
-      apply [.];
-      apply-type-of-variable (#spelling = $spelling);
-    }
-  }
-}
-
-tpl [Selector] {
-  <Selector {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Field-Segment] {
-  <Field-Segment {
-    apply [*];
-  }
-}
-
-tpl [Structure-Pattern] {
-  <Structure-Pattern {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Ancestors] {
-  <Ancestors {
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Structure-Definition']] {
-  <Item {
-    @kind = "Structure-Definition";
-    apply [*];
-  }
-}
-
-tpl [Explicitly-Qualified-Segment] {
-  <Explicitly-Qualified-Segment {
-    apply [*];
-  }
-}
-
-tpl [Simple-Term] {
-  <Simple-Term {
-    @spelling=`@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Forgetful-Functor-Term] {
-  <Forgetful-Functor-Term {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Aggregate-Term] {
-  <Aggregate-Term {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Selector-Term] {
-  <Selector-Term {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Arguments] {
-  <Arguments {
-    apply [*];
-  }
-}
-
-tpl [Numeral-Term] {
-  <Numeral-Term {
-    @"number" = `@number`;
-  }
-}
-
-tpl [Private-Functor-Term] {
-  <Private-Functor-Term {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Contradiction] {
-  <Contradiction;
-}
-
-tpl [Global-Choice-Term] {
-  <Global-Choice-Term {
-    apply [*];
-  }
-}
-
-tpl [Struct-Type] {
-  <Struct-Type {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Clustered-Type] {
-  <Clustered-Type {
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Constant-Definition']] {
-  <Item {
-    @kind="Constant-Definition";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Private-Functor-Definition']] {
-  <Item {
-    @kind = "Private-Functor-Definition";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Private-Predicate-Definition']] {
-  <Item {
-    @kind = "Private-Predicate-Definition";
-    apply [*];
-  }
-}
-
-tpl [Theorem-Reference] {
-  <Theorem-Reference {
-    @spelling = `@spelling`;
-    @"number" = `@number`;
-    apply [*];
-  }
-}
-
-tpl [Definition-Reference] {
-  <Definition-Reference {
-    @"number" = `@number`;
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Exemplification']] {
-  <Item {
-    @kind="Exemplification";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Generalization']] {
-  <Item {
-    @kind="Generalization";
-    apply [*];
   }
 }
 
@@ -798,37 +323,6 @@ tpl [Existential-Quantifier-Formula](#already_bound, #do_generalize) {
   }
 }
 
-tpl [Placeholder-Term] {
-  <Placeholder-Term {
-    @spelling = `@spelling`;
-  }  
-}
-
-tpl [Thesis] {
-  <Thesis;
-}
-
-tpl [Item[@kind='PropertyRegistration']] { // shouldn't this be "Property-Registration", for parallelism?
-  <Item {
-    @kind = "PropertyRegistration";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Property']] {
-  <Item {
-    @kind = "Property";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind="Correctness"]] {
-  <Item {
-    @kind = "Correctness";
-    apply [*];
-  }
-}
-
 tpl bound-by-quantifier (#variable) {
   $spelling = `local-name ($variable/@spelling)`;
   for-each [$variable[1]] {
@@ -987,136 +481,11 @@ tpl [Proposition](#already_bound) {
   }
 }
 
-tpl [Label] {
-  <Label {
-    @spelling = `@spelling`;
-  }
-}
-
-tpl [Link] {
-  <Link;
-}
-
-tpl [Local-Reference] {
-  <Local-Reference {
-    @spelling=`@spelling`;
-  }
-}
-
-tpl [Scheme-Justification] {
-  <Scheme-Justification {
-    @spelling = `@spelling`;
-    @idnr = `@idnr`;
-    @nr = `@nr`;
-    apply [*];
-  }
-}
-
-tpl [Infix-Term] {
-  <Infix-Term {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Bracket-Functor-Pattern] {
-  <Bracket-Functor-Pattern {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Fraenkel-Term] {
-  <Fraenkel-Term {
-    apply [*];
-  }
-}
-
-tpl [Circumfix-Term] {
-  <Circumfix-Term {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Right-Circumflex-Symbol] {
-  <Right-Circumflex-Symbol {
-    @spelling = `@spelling`;
-    apply [*];
-  }
-}
-
-tpl [Qualification-Term] {
-  <Qualification-Term {
-    apply [*];
-  }
-}
-
 tpl [Item[@kind='Choice-Statement']](#already_bound) {
   <Item {
     @kind="Choice-Statement";
     apply [*](#already_bound = $already_bound);
   }
-}
-
-tpl [Straightforward-Justification] {
-  <Straightforward-Justification {
-    apply [*];
-  }
-}
-
-// Constructor properties
-
-tpl [Projectivity] {
-  <Projectivity;
-}
-
-tpl [Involutiveness] {
-  <Involutiveness;
-}
-
-tpl [Idempotence] {
-  <Idempotence;
-}
-
-tpl [Commutativity] {
-  <Commutativity;
-}
-
-tpl [Reflexivity] {
-  <Reflexivity;
-}
-
-tpl [Irreflexivity] {
-  <Irreflexivity;
-}
-
-tpl [Symmetry] {
-  <Symmetry;
-}
-
-tpl [Asymmetry] {
-  <Asymmetry;
-}
-
-tpl [Connectedness] {
-  <Connectedness;
-}
-
-tpl [Sethood] {
-  <Sethood;
-}
-
-tpl [Compact-Statement] {
-  <Compact-Statement;
-}
-
-tpl [Diffuse-Statement] {
-  <Diffuse-Statement;
-}
-
-tpl [Iterative-Equality] {
-  <Iterative-Equality;
 }
 
 tpl [Single-Assumption](#already_bound) {
@@ -1129,12 +498,6 @@ tpl [Item[@kind='Assumption']](#already_bound) {
   <Item {
     @kind = "Assumption";
     apply [*](#already_bound = $already_bound);
-  }
-}
-
-tpl [Iterative-Step] {
-  <Iterative-Step {
-    apply [*];
   }
 }
 
@@ -1158,62 +521,6 @@ tpl [Item[@kind='Conclusion']](#already_bound) {
   }
 }
 
-tpl [Item[@kind='Mode-Synonym']] {
-  <Item {
-    @kind = "Mode-Synonym";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Func-Synonym']] {
-  <Item {
-    @kind = "Func-Synonym";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Attr-Synonym']] {
-  <Item {
-    @kind = "Attr-Synonym";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Pred-Synonym']] {
-  <Item {
-    @kind = "Pred-Synonym";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Attr-Antonym']] {
-  <Item {
-    @kind = "Attr-Synonym";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Pred-Antonym']] {
-  <Item {
-    @kind = "Pred-Antonym";
-    apply [*];
-  }
-}
-
-tpl [Block[@kind='Notation-Block']] {
-  <Block {
-    @kind = "Notation-Block";
-    apply [*];
-  }
-}
-
-tpl [Item[@kind='Theorem-Item']] {
-  <Item {
-    @kind="Theorem-Item";
-    apply [*](#already_bound = "");
-  }
-}
-
 tpl [Block[@kind='Now-Reasoning']](#already_bound) {
   <Block {
     @kind = "Now-Reasoning";
@@ -1225,19 +532,6 @@ tpl [Block[@kind='Hereby-Reasoning']](#already_bound) {
   <Block {
     @kind = "Hereby-Reasoning";
     apply [*](#already_bound = $already_bound, #do_generalize = "1");
-  }
-}
-
-tpl [Item[@kind='Type-Changing-Statement']] {
-  <Item {
-    @kind = "Type-Changing-Statement";
-    apply [*];
-  }
-}
-
-tpl [Equality] {
-  <Equality {
-    apply [*];
   }
 }
 
@@ -1266,35 +560,60 @@ tpl [Item[@kind='Regular-Statement']](#already_bound) {
   }
 }
 
-tpl [Schematic-Variables] {
-  <Schematic-Variables {
-    apply [*];
+
+
+tpl emit-needed-reservations-helper(#candidates, #seen) {
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    $spelling = `$candidate/@spelling`;
+    $line = `$candidate/@line`;
+    $col = `$candidate/@col`;
+    $var_token = `concat ($spelling, ",")`;
+    if [contains ($seen, $var_token)] {
+      emit-needed-reservations-helper(#candidates = `$candidates[position() > 1]`,
+                                      #seen = $seen);
+    } else {
+      if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
+        for-each [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling][1]] {
+          copy { @spelling = `@spelling`; @line = `@line`; @col = `@col`; }
+        }
+        if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type] {
+          for-each [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type[1]] {
+            copy { @spelling = `@spelling`; @line = `@line`; @col = `@col`; }
+          }
+        } else {
+          $message = `concat ("Unable to determine the type of the variable ", $spelling, " occuring at line ", $line, " and column ", $col)`;
+          die (#message = $message);
+        }
+      } else {
+        $message = `concat ("Unable to find a registration for the variable ", $spelling, " occuring at line ", $line, " and column ", $col)`;
+        die (#message = $message);
+      }
+    }
   }
 }
 
-tpl [Provisional-Formulas] {
-  <Provisional-Formulas {
-    apply [*];
-  }
+// Assumes the context node is a formula of some kind
+tpl emit-needed-reservations {
+  emit-needed-reservations-helper(#candidates = `.//Implicitly-Qualified-Segment/Variable`,
+                    #seen = "");
 }
 
-tpl [Item[@kind='Scheme-Head']] {
-  <Item {
-    @kind = "Scheme-Head";
-    apply [*];
-  }
-}
-
-tpl [Redefine] {
-  <Redefine;
-}
-
-tpl [Negated] {
-  <Negated;
-}
-
-tpl [Text-Proper/Item] {
+tpl [Text-Proper/Item](#bundlenr) {
   <Item-Bundle {
+
+    if [$bundlenr] {
+      @bundlenr = $bundlenr;
+    } else {
+      die (#message = "Cannot process a top-level item without a bundle number");
+    }
+
+    if [.//Implicitly-Qualified-Segment] {
+      <Item {
+        @kind = "Reservation";
+        emit-needed-reservations ();
+      }
+    }
     copy { @kind = `@kind`; @line = `@line`; @col = `@col`; }
     apply [*];
   }
