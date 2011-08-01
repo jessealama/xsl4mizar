@@ -86,41 +86,45 @@ tpl [Text-Proper] {
   }
 }
 
-tpl emit-needed-reservations-helper(#candidates, #seen) {
-  if [$candidates] {
-    $candidate = `$candidates[1]`;
-    $spelling = `$candidate/@spelling`;
-    $line = `$candidate/@line`;
-    $col = `$candidate/@col`;
-    $var_token = `concat ($spelling, ",")`;
-    if [contains ($seen, $var_token)] {
-      emit-needed-reservations-helper(#candidates = `$candidates[position() > 1]`,
-                                      #seen = $seen);
-    } else {
-      if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
-        for-each [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling][1]] {
-          copy { @spelling = `@spelling`; @line = `@line`; @col = `@col`; }
-        }
-        if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type] {
-          for-each [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type[1]] {
-            copy { @spelling = `@spelling`; @line = `@line`; @col = `@col`; }
-          }
-        } else {
-          $message = `concat ("Unable to determine the type of the variable ", $spelling, " occuring at line ", $line, " and column ", $col)`;
-          die (#message = $message);
-        }
+tpl occurs-freely {
+  "1";
+}
+
+tpl needed-reservations-helper(#reservations, #seen, #context) {
+  if [$context] {
+    if [$reservations] {
+      $reservation = `$reservations[1]`;
+      $variable = `$reservation/Variable[1]`;
+      $spelling = `$variable/@spelling`;
+      $line = `$variable/@line`;
+      $col = `$variable/@col`;
+      $var_token = `concat ($spelling, ",")`;
+      if [contains ($seen, $var_token)] {
+        needed-reservations-helper(#reservations = `$reservations[position() > 1]`,
+                                   #seen = $seen,
+                                   #context = $context);
       } else {
-        $message = `concat ("Unable to find a registration for the variable ", $spelling, " occuring at line ", $line, " and column ", $col)`;
-        die (#message = $message);
+        $occurs_freely = occurs-freely (#context);
+        if [$occurs_freely = "1"] {
+          copy-of `$reservation`;
+          needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+                                      #seen = `concat ($seen, $var_token)`,
+                                      #context = $context);
+        } else {
+          die (#message = "Variable does not occur freely!");
+        }
       }
     }
+  } else {
+    die (#message = "Can't process needed reservations without without a context node!");
   }
 }
 
 // Assumes the context node is a formula of some kind
-tpl emit-needed-reservations {
-  emit-needed-reservations-helper(#candidates = `.//Implicitly-Qualified-Segment/Variable`,
-                    #seen = "");
+tpl needed-reservations {
+  needed-reservations-helper(#reservations = `preceding::Item[@kind="Reservation"]`,
+                             #seen = "",
+                             #context = `.`);
 }
 
 tpl [Text-Proper/Item](#bundlenr, #articleid) {
@@ -139,13 +143,7 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
     }
 
     <Text-Proper {
-
-      if [.//Implicitly-Qualified-Segment] {
-        <Item {
-          @kind = "Reservation";
-          emit-needed-reservations ();
-        }
-      }
+      needed-reservations ();
       copy {
         @kind = `@kind`; @line = `@line`; @col = `@col`;
         apply [*];
@@ -154,6 +152,8 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
   }
 }
 
-tpl [Text-Proper/Item[@kind='Reservation']] {
-  // do nothing
+tpl [Text-Proper/Item[@kind="Reservation"]] {
+  if [Variable[2]] {
+    die (#message = "We found a reservation that reserves more than one variable!");
+  }
 }
