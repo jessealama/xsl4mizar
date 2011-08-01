@@ -14,40 +14,6 @@ tpl die(#message) {
   }
 }
 
-// Assumes that the context node is a Variable
-tpl apply-type-of-variable(#spelling) {
-  if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]] {
-    if [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type] {
-      apply [preceding::Item[@kind="Reservation"]/Variable[@spelling = $spelling]/../Standard-Type[1]];
-    } else {
-      $message = `concat ("Unable to determine the type of an implicitly qualified variable, ", $spelling, ", bound by a reservation")`;
-      die (#message = $message);
-    }
-  } else {
-    if [preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]] {
-      if [preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]/../../Standard-Type | preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]/../../Clustered-Type] {
-        apply [(preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]/../../Standard-Type | preceding::Item[@kind="Type-Changing-Statement"]/Equality/Variable[@spelling = $spelling]/../../Clustered-Type)[1]];
-      } else {
-        $message = `concat ("Unable to determine the type of an implicitly qualified variable, ", $spelling, ", introduced by a type-changing statement")`;
-        die (#message = $message);
-      }
-    } else {
-      $message = `concat ("Could not determine type of an implicitly qualified variable, ", $spelling, ": it is not bound by a resevation, nor introduced by a type-changing statement!")`;
-      die (#message = $message);
-    }
-  }
-}
-
-tpl [Implicitly-Qualified-Segment] {
-  <Explicitly-Qualified-Segment {
-    for-each [Variable] {
-      $spelling = `@spelling`;
-      apply [.];
-      apply-type-of-variable (#spelling = $spelling);
-    }
-  }
-}
-
 tpl [*] {
   $element = `local-name ()`;
   <$element {
@@ -86,47 +52,6 @@ tpl [Text-Proper] {
   }
 }
 
-tpl occurs-freely {
-  "1";
-}
-
-tpl needed-reservations-helper(#reservations, #seen, #context) {
-  if [$context] {
-    if [$reservations] {
-      $reservation = `$reservations[1]`;
-      $variable = `$reservation/Variable[1]`;
-      $spelling = `$variable/@spelling`;
-      $line = `$variable/@line`;
-      $col = `$variable/@col`;
-      $var_token = `concat ($spelling, ",")`;
-      if [contains ($seen, $var_token)] {
-        needed-reservations-helper(#reservations = `$reservations[position() > 1]`,
-                                   #seen = $seen,
-                                   #context = $context);
-      } else {
-        $occurs_freely = occurs-freely (#context);
-        if [$occurs_freely = "1"] {
-          copy-of `$reservation`;
-          needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
-                                      #seen = `concat ($seen, $var_token)`,
-                                      #context = $context);
-        } else {
-          die (#message = "Variable does not occur freely!");
-        }
-      }
-    }
-  } else {
-    die (#message = "Can't process needed reservations without without a context node!");
-  }
-}
-
-// Assumes the context node is a formula of some kind
-tpl needed-reservations {
-  needed-reservations-helper(#reservations = `preceding::Item[@kind="Reservation"]`,
-                             #seen = "",
-                             #context = `.`);
-}
-
 tpl [Text-Proper/Item](#bundlenr, #articleid) {
   <Item-Bundle {
 
@@ -142,8 +67,16 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
       die (#message = "Cannot process a top-level item without an article id");
     }
 
+    $context = `.`;
+
     <Text-Proper {
-      needed-reservations ();
+      for-each [preceding::Item[@kind="Reservation"]] {
+        sort data-type="number" order="ascending";
+        $idnr = `@idnr`;
+        if [$context//Simple-Term[@idnr = $idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+          copy-of `.`;
+        }
+      }
       copy {
         @kind = `@kind`; @line = `@line`; @col = `@col`;
         apply [*];
@@ -155,5 +88,8 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
 tpl [Text-Proper/Item[@kind="Reservation"]] {
   if [Variable[2]] {
     die (#message = "We found a reservation that reserves more than one variable!");
+  }
+  if [not(@idnr)] {
+    die (#message = "We found a reservation that lacks an idnr attribute!");
   }
 }
