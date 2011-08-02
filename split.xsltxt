@@ -81,3 +81,21 @@ tpl [Item[@kind="Definition-Item"]] {
     }
   }
 }
+
+tpl split-explicitly-qualified-segment (#variables, #type) {
+  if [$variables] {
+    $variable = `$variables[1]`;
+    <Explicitly-Qualified-Segment {
+      apply [$variable];
+      apply [$type];
+
+    }
+    split-reservation (#variables = `$variables[position() > 1]`,
+                       #type = $type);
+  }
+}
+
+tpl [Explicitly-Qualified-Segment] {
+  split-explicitly-qualified-segment (#variables = `Variable`,
+                                      #type = `*[position() = last()]`);
+}
