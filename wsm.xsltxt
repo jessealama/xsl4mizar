@@ -1487,3 +1487,16 @@ tpl [Item[@kind='Scheme-Head']] {
     die (#message = "Scheme child of a Scheme-Head item is missing!");
   }
 }
+
+tpl [Item[@kind='Canceled-Pragma']] {
+  apply [Canceled];
+}
+
+tpl [Canceled] {
+  if [@number] {
+    "canceled "; `@number`; ";";
+  } else {
+    "canceled;";
+  }
+  "\n";
+}
