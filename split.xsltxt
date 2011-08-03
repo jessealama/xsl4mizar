@@ -50,33 +50,75 @@ tpl [Item[@kind="Reservation"]] {
 }
 
 tpl [Item[@kind="Definition-Item"]] {
-  for-each [Block] {
-    $block_kind = `@kind`;
-    if [$block_kind = "Registration-Block"] {
-      for-each [Item[@kind="Cluster"]] {
-        <Item {
-          @kind = "Definition-Item";
-          <Block {
-            @kind = "Registration-Block";
-            copy-of `.`;
-            for-each [following-sibling::Item[not(@kind = "Cluster")]] {
-              copy-of `.`;
+  apply [Block];
+}
+
+tpl [Block[@kind="Definitional-Block"]] {
+  apply [Item[@kind = "Attribute-Definition" or @kind = "Functor-Definition" or @kind = "Predicate-Definition"]];
+}
+
+tpl [Block[@kind = "Registration-Block"]] {
+  apply [Item[@kind = "Cluster"]];
+}
+
+tpl [Item[@kind = "Cluster"]] {
+  <Item {
+    @kind = "Definition-Item";
+    <Block {
+      @kind = "Registration-Block";
+      copy-of `.`;
+      for-each [following-sibling::Item[not(@kind = "Cluster")]] {
+        copy-of `.`;
+      }
+    }
+  }
+}
+
+tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition"]] {
+  $context = `.`;
+  $def_line = `$context/@line`;
+  $def_col = `$context/@col`;
+  <Item {
+    @kind = "Definition-Item";
+    <Block {
+      @kind = "Definitional-Block";
+      for-each [.//Locus] {
+        $nr = `@nr`;
+        $spelling = `@spelling`;
+        $locus_line = `@line`;
+        $locus_col = `@col`;
+        for-each [$context] { // now go hunting for the type of this Locus
+          if [preceding-sibling::Item[@kind = "Loci-Declaration"]//Variable[@idnr = $nr]] {
+            for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]//Variable[@idnr = $nr][1]] {
+              <Item {
+                @kind = "Loci-Declaration";
+                <Explicitly-Qualified-Segment {
+                  <Variable {
+                    @idnr = $nr;
+                    @spelling = $spelling;
+                  }
+                  if [local-name(..) = "Explicitly-Qualified-Segment"] {
+                    apply [../*[position() = last()]];
+                  } else {
+                    if [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $nr]] {
+                      apply [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $nr]/../*[position() = last()]]; // WOW
+                    } else {
+                      $message = `concat ("While looking for a suitable type for the variable ", $spelling, " at line ", $locus_line, " and column ", $locus_col, ", we found that it is not bound by a previous Loci-Declaration element that explicitly assigns a type to this variable, nor were we able to find an earlier reservation that assigns a type to this varialbe.")`;
+                      die (#message = $message);
+                    }
+                  }
+                }
+              }
             }
+          } else {
+            $message = `concat ("While processing a definition at line ", $def_line, " and column ", $def_col, ", we encountered a pattern in which ", $spelling, " occurs, but we could not find a Loci-Declaration item preceding this locus that binds ", $spelling)`;
+            die (#message = $message);
           }
         }
       }
-    } else {
-      for-each [Item[@kind="Functor-Definition" or @kind="Predicate-Definition" or @kind="Attribute-Definition"]] {
-        <Item {
-          @kind = "Definition-Item";
-          <Block {
-            @kind = $block_kind;
-            copy-of `.`;
-            for-each [following-sibling::Item[not(@kind = "Functor-Definition") and not(@kind = "Predicate-Definition") and not(@kind = "Attribute-Definition") and not(@kind = "Loci-Declaration")]] {
-              copy-of `.`;
-            }
-          }
-        }
+      copy-of `.`;
+      for-each [following-sibling::Item[not(@kind = "Functor-Definition") and not(@kind = "Predicate-Definition") and not(@kind = "Attribute-Definition") and not(@kind = "Loci-Declaration")]] {
+        copy-of `.`;
       }
     }
   }
