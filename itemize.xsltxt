@@ -93,3 +93,109 @@ tpl [Text-Proper/Item[@kind="Reservation"]] {
     die (#message = "We found a reservation that lacks an idnr attribute!");
   }
 }
+
+// Resolving article-local references
+
+tpl [Scheme-Justification[@nr = "0"]] {
+  $context = `.`;
+  if [@idnr] {
+    $idnr = `@idnr`;
+    if [ancestor::Text-Proper/Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr = $idnr]] {
+      $item = `ancestor::Text-Proper/Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr = $idnr]/../../../../..`; // wow
+      if [$item] {
+        for-each [$item] {
+          $position = `count (preceding-sibling::*) + 1`;
+          $spelling = `concat ("CKB", $position)`;
+          <Scheme-Justification {
+            @spelling = $spelling;
+            @promoted = "promoted";
+            apply [`$context/*`];
+          }
+        }
+      } else {
+        $message = `concat ("Something went wrong when finding the Item-Bundle that defines the article-local scheme ", @spelling)`;
+        die (#message = $message);
+      }
+    } else {
+      die (#message = "Unable to resolve a reference to an article-local scheme because we are unable to find a previous scheme under the same name");
+    }
+  } else {
+    die (#message = "We found a Scheme-Justification that lacks an idnr attribute!");
+  }  
+}
+
+tpl [Local-Reference] {
+  $context = `.`;
+  if [@idnr and @line and @col and @spelling] {
+    $idnr = `@idnr`;
+    $line = `@line`;
+    $col = `@col`;
+    $spelling = `@spelling`;
+    // look for a previous unexported toplevel theorem (lemma)
+    if [ancestor::Text-Proper/Item[@kind = "Regular-Statement"]/Proposition/Label[@idnr = $idnr]] {
+      $item = `ancestor::Text-Proper/Item[@kind = "Regular-Statement"]/Proposition/Label[@idnr = $idnr]/../..`; // wow
+      if [$item] {
+        for-each [$item] {
+          $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
+          $new_spelling = `concat ("CKB", $position)`;
+          <Local-Reference {
+            @spelling = $new_spelling;
+            @promoted = "promoted";
+            apply [`$context/*`];
+          }
+        }
+      } else {
+        $message = `concat ("Something went wrong when finding the Item of kind Regular-Statement that defines the article-local reference ", @spelling)`;
+        die (#message = $message);
+      }
+    } else {
+      // look for a previous exported theorem
+      if [ancestor::Text-Proper/Item[@kind = "Theorem-Item"]/Proposition/Label[@idnr = $idnr]] {
+        $item = `ancestor::Text-Proper/Item[@kind = "Theorem-Item"]/Proposition/Label[@idnr = $idnr]/../..`; // wow
+        if [$item] {
+          for-each [$item] {
+            $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
+            $new_spelling = `concat ("CKB", $position)`;
+            <Local-Reference {
+              @spelling = $new_spelling;
+              @promoted = "promoted";
+              apply [`$context/*`];
+            }
+          }
+        } else {
+          $message = `concat ("Something went wrong when finding the Item of kind Theorem-Item that defines the article-local reference ", @spelling)`;
+          die (#message = $message);
+        }
+      } else {
+        // look for a previous definition
+        if [ancestor::Text-Proper/Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition"]/Definiens/Label[@idnr = $idnr]] {
+          $item = `ancestor::Text-Proper/Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition"]/Definiens/Label[@idnr = $idnr]/../../../..`; // wow
+          if [$item] {
+            for-each [$item] {
+              $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
+              $new_spelling = `concat ("CKB", $position)`;
+              <Local-Reference {
+                @spelling = $new_spelling;
+                @promoted = "promoted";
+                apply [`$context/*`];
+              }
+            }
+          } else {
+            $message = `concat ("Something went wrong when finding the Item of kind Definition-Item that defines the article-local reference ", @spelling)`;
+            die (#message = $message);
+          }
+        } else {
+          <Local-Reference {
+            @line = $line;
+            @col = $col;
+            @spelling = $spelling;
+            @idnr = $idnr;
+            apply [*];
+          }
+        }
+      }
+    }
+  } else {
+    die (#message = "We found a Local-Reference item that lacks an idnr attribute!");
+  }
+}
