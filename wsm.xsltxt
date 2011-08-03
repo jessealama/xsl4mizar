@@ -252,11 +252,11 @@ tpl [Means] {
 }
 
 tpl [Formula-Expression] {
-  die (#message = "We are somehow applying the template for a Formula-Expression element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
+  // die (#message = "We are somehow applying the template for a Formula-Expression element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
 }
 
 tpl [Term-Expression] {
-  die (#message = "We are somehow applying the template for a Term-Expression element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
+  // die (#message = "We are somehow applying the template for a Term-Expression element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
 }
 
 tpl [it-Term] {
