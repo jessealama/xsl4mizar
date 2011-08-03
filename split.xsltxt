@@ -73,6 +73,9 @@ tpl [Item[@kind = "Cluster"]] {
     @kind = "Definition-Item";
     <Block {
       @kind = "Registration-Block";
+      // what follows is nearly identical to the definition of the
+      // needed-loci template, but working with Simple-Term elements
+      // rather than with Locus elements.
       for-each [.//Simple-Term] {
         $idnr = `@idnr`;
         $spelling = `@spelling`;
