@@ -148,8 +148,8 @@ tpl split-explicitly-qualified-segment (#variables, #type) {
       apply [$type];
 
     }
-    split-reservation (#variables = `$variables[position() > 1]`,
-                       #type = $type);
+    split-explicitly-qualified-segment (#variables = `$variables[position() > 1]`,
+                                        #type = $type);
   }
 }
 
