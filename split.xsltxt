@@ -230,7 +230,6 @@ tpl needed-loci (#candidates, #context) {
 }
 
 tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym"]] {
-  $context = `.`;
   $def_line = `$context/@line`;
   $def_col = `$context/@col`;
   <Item {
