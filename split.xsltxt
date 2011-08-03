@@ -131,7 +131,7 @@ tpl correctness-conditions (#candidates, #stop) {
   }
 }
 
-tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition"]] {
+tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition"]] {
   $context = `.`;
   $def_line = `$context/@line`;
   $def_col = `$context/@col`;
