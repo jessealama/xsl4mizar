@@ -120,7 +120,7 @@ tpl correctness-conditions (#candidates, #stop) {
       for-each [$candidate] {
         $candidate_name = `local-name(.)`;
         $candidate_kind = `$candidate/@kind`;
-        if [$candidate_name = "Item" and ($candidate_kind = "Correctness-Condition" or $candidate_kind = "Property")] {
+        if [$candidate_name = "Item" and ($candidate_kind = "Correctness-Condition" or $candidate_kind = "Property" or $candidate_kind = "Correctness")] {
           apply [$candidate];
           correctness-conditions (#candidates = `$candidates[position() > 1]`);
         } else {
