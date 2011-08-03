@@ -261,3 +261,16 @@ tpl [Explicitly-Qualified-Segment] {
   split-explicitly-qualified-segment (#variables = `Variable`,
                                       #type = `*[position() = last()]`);
 }
+
+// don't break up explicitly qualified segments inside universal formulas...yet
+tpl [Universal-Quantifier-Formula/Explicitly-Qualified-Segment] {
+  <Explicitly-Qualified-Segment {
+    apply [*];
+  }
+}
+
+tpl [Existential-Quantifier-Formula/Explicitly-Qualified-Segment] {
+  <Explicitly-Qualified-Segment {
+    apply [*];
+  }
+}
