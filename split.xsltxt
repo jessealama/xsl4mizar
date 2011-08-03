@@ -74,6 +74,24 @@ tpl [Item[@kind = "Cluster"]] {
   }
 }
 
+tpl correctness-conditions (#candidates, #stop) {
+  if [not($stop = "1")] {
+    if [$candidates] {
+      $candidate = `$candidates[1]`;
+      for-each [$candidate] {
+        $candidate_name = `local-name(.)`;
+        $candidate_kind = `$candidate/@kind`;
+        if [$candidate_name = "Item" and ($candidate_kind = "Correctness-Condition" or $candidate_kind = "Property")] {
+          apply [$candidate];
+          correctness-conditions (#candidates = `$candidates[position() > 1]`);
+        } else {
+          correctness-conditions (#stop = "1");
+        }
+      }
+    }
+  }
+}
+
 tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition"]] {
   $context = `.`;
   $def_line = `$context/@line`;
@@ -117,9 +135,7 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition"]] {
         }
       }
       copy-of `.`;
-      for-each [following-sibling::Item[not(@kind = "Functor-Definition") and not(@kind = "Predicate-Definition") and not(@kind = "Attribute-Definition") and not(@kind = "Loci-Declaration")]] {
-        copy-of `.`;
-      }
+      correctness-conditions (#candidates = `following-sibling::*`);
     }
   }
 }
