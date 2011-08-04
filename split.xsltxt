@@ -167,7 +167,7 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
     @kind = "Definition-Item";
     <Block {
       @kind = "Definitional-Block";
-      needed-loci (#candidates = `.//Locus`, #context = `.`);
+      needed-loci (#candidates = `.//Locus | .//Simple-Term`, #context = `.`);
       copy-of `.`;
       correctness-conditions (#candidates = `following-sibling::*`, #definitions = $definitions);
     }
