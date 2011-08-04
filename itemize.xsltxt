@@ -52,6 +52,50 @@ tpl [Text-Proper] {
   }
 }
 
+tpl needed-reservations-helper(#reservations, #context, #seen) {
+  if [$reservations] {
+    $reservation = `$reservations[1]`;
+    $idnr = `@idnr`;
+    $token = `concat (",", $idnr, ",")`;
+    if [contains ($seen, $token)] {
+      needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+                                  #context = $context,
+                                  #seen = $seen);
+    } else {
+      if [$context//Simple-Term[@idnr = $idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+        copy-of `.`;
+        needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+                                    #context = $context,
+                                    #seen = `concat ($seen, $token)`);
+      } else {
+        if [$reservation//Simple-Term] {
+          for-each [.//Simple-Term] {
+            $term_idnr = `@idnr`;
+            for-each [$reservation] {
+              for-each [following-sibling::Item[@kind = "Reservation"]] {
+                $other_res_idnr = `@idnr`;
+                if [$context//Simple-Term[@idnr = $other_res_idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $other_res_idnr]] {
+                  copy-of `$reservation`;
+                }
+              }
+            }
+          }
+        } else {
+          needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+                                      #context = $context,
+                                      #seen = `concat ($seen, $token)`);
+        }
+      }
+    }
+  }
+}
+
+tpl needed-reservations(#reservations, #context) {
+  needed-reservations-helper (#reservations = $reservations,
+                             #context = $context,
+                             #seen = "");
+}
+
 tpl [Text-Proper/Item](#bundlenr, #articleid) {
   <Item-Bundle {
 
@@ -70,13 +114,7 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
     $context = `.`;
 
     <Text-Proper {
-      for-each [preceding::Item[@kind="Reservation"]] {
-        sort data-type="number" order="ascending";
-        $idnr = `@idnr`;
-        if [$context//Simple-Term[@idnr = $idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
-          copy-of `.`;
-        }
-      }
+      needed-reservations (#reservations = `preceding::Item[@kind="Reservation"]`, #context = $context);
       copy {
         if [@kind = "Regular-Statement"] {
           @kind = "Theorem-Item";
