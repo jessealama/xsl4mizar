@@ -74,7 +74,7 @@ tpl some-term-present-in-context (#terms, #context) {
 tpl needed-reservations-helper(#reservations, #context, #seen) {
   if [$reservations] {
     $reservation = `$reservations[1]`;
-    $idnr = `@idnr`;
+    $idnr = `$reservation/@idnr`;
     $token = `concat (",", $idnr, ",")`;
     if [contains ($seen, $token)] {
       needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
@@ -82,7 +82,7 @@ tpl needed-reservations-helper(#reservations, #context, #seen) {
                                   #seen = $seen);
     } else {
       if [$context//Simple-Term[@idnr = $idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
-        copy-of `.`;
+        copy-of `$reservation`;
         needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
                                     #context = $context,
                                     #seen = `concat ($seen, $token)`);
