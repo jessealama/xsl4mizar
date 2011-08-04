@@ -109,7 +109,7 @@ tpl [Scheme-Justification[@nr = "0"]] {
       $item = `ancestor::Text-Proper/Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr = $idnr]/../../..`; // wow
       if [$item] {
         for-each [$item] {
-          $position = `count (preceding-sibling::*) + 1`;
+          $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
           $spelling = `concat ("CKB", $position)`;
           <Scheme-Justification {
             @spelling = $spelling;
