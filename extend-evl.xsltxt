@@ -16,14 +16,18 @@ tpl list(#separ,#elems) {
 }
 
 tpl [Environ] {
-  apply [Directive[@name="Vocabularies"]](#extras = $vocabularies); "\n";
-  apply [Directive[@name="Notations"]](#extras = $notations); "\n";
-  apply [Directive[@name="Definitions"]](#extras = $definitions); "\n";
-  apply [Directive[@name="Theorems"]](#extras = $theorems); "\n";
-  apply [Directive[@name="Schemes"]](#extras = $schemes); "\n";
-  apply [Directive[@name="Registrations"]](#extras = $registrations); "\n";
-  apply [Directive[@name="Constructors"]](#extras = $constructors); "\n";
-  apply [Directive[@name="Requirements"]](#extras = $requirements);
+  <Environ {
+    @aid = `@aid`;
+    "\n"; apply [Directive[@name="Vocabularies"]](#extras = $vocabularies);
+    "\n"; apply [Directive[@name="Notations"]](#extras = $notations);
+    "\n"; apply [Directive[@name="Definitions"]](#extras = $definitions);
+    "\n"; apply [Directive[@name="Theorems"]](#extras = $theorems);
+    "\n"; apply [Directive[@name="Schemes"]](#extras = $schemes);
+    "\n"; apply [Directive[@name="Registrations"]](#extras = $registrations);
+    "\n"; apply [Directive[@name="Constructors"]](#extras = $constructors);
+    "\n"; apply [Directive[@name="Requirements"]](#extras = $requirements);
+    "\n";
+  }
 }
 
 tpl [Ident] {
