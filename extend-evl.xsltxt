@@ -46,11 +46,14 @@ tpl write-extras (#extras) {
 tpl [Directive](#extras) {
   <Directive {
     @"name" = `@name`;
-    if [Ident] {
-      "\n";
-    }
     for-each [Ident] {
+      if [position() = 1] {
+        "\n";
+      }
       apply [.]; "\n";
+    }
+    if [$extras and count (Ident) = "0"] {
+      "\n";
     }
     write-extras (#extras = $extras);
   }
