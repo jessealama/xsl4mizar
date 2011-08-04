@@ -54,7 +54,7 @@ tpl [Item[@kind="Definition-Item"]] {
 }
 
 tpl [Block[@kind="Definitional-Block"]] {
-  apply [Item[@kind = "Attribute-Definition" or @kind = "Functor-Definition" or @kind = "Predicate-Definition"]];
+  apply [Item[@kind = "Attribute-Definition" or @kind = "Functor-Definition" or @kind = "Predicate-Definition"]](#definitions = `Item[@kind = "Private-Predicate-Definition"]`);
 }
 
 tpl [Block[@kind = "Registration-Block"]] {
@@ -105,7 +105,7 @@ tpl [Item[@kind = "Cluster"]] {
               }
             }
           } else {
-            $message = `concat ("While processing a definition at line ", $def_line, " and column ", $def_col, ", we encountered a pattern in which ", $spelling, " occurs, but we could not find a Loci-Declaration item preceding this locus that binds ", $spelling)`;
+            $message = `concat ("While processing a cluster at line ", $def_line, " and column ", $def_col, ", we encountered a pattern in which ", $spelling, " occurs, but we could not find a Loci-Declaration item preceding this locus that binds ", $spelling)`;
             die (#message = $message);
           }
         }
@@ -116,7 +116,7 @@ tpl [Item[@kind = "Cluster"]] {
   }
 }
 
-tpl correctness-conditions (#candidates, #stop) {
+tpl correctness-conditions (#candidates, #definitions, #stop) {
   if [not($stop = "1")] {
     if [$candidates] {
       $candidate = `$candidates[1]`;
@@ -124,8 +124,9 @@ tpl correctness-conditions (#candidates, #stop) {
         $candidate_name = `local-name(.)`;
         $candidate_kind = `$candidate/@kind`;
         if [$candidate_name = "Item" and ($candidate_kind = "Correctness-Condition" or $candidate_kind = "Property" or $candidate_kind = "Correctness")] {
-          apply [$candidate];
-          correctness-conditions (#candidates = `$candidates[position() > 1]`);
+          apply [$candidate](#definitions = $definitions);
+          correctness-conditions (#candidates = `$candidates[position() > 1]`,
+                                  #definitions = $definitions);
         } else {
           correctness-conditions (#stop = "1");
         }
@@ -134,78 +135,131 @@ tpl correctness-conditions (#candidates, #stop) {
   }
 }
 
-tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition"]] {
-  $def_line = `$context/@line`;
-  $def_col = `$context/@col`;
+tpl [Item[@kind = "Correctness-Condition" or @kind = "Property" or @kind = "Correctness"]](#definitions) {
   <Item {
-    @kind = "Definition-Item";
-    <Block {
-      @kind = "Definitional-Block";
-      needed-loci (#candidates = `.//Loci`, #context = `.`);
-      copy-of `.`;
-      correctness-conditions (#candidates = `following-sibling::*`);
+    @kind = `@kind`;
+    apply [*[1]];
+    if [Block[@kind = "Proof"]] {
+      apply [Block[@kind = "Proof"]](#definitions = $definitions);
     }
   }
 }
 
-tpl needed-loci-helper (#candidates, #seen, #context) {
+tpl [Block[@kind = "Proof"]](#definitions) {
+  $context = `.`;
+  <Block {
+    @kind = "Proof";
+    if [$definitions] {
+      for-each [$definitions] {
+        if [Variable] {
+          $idnr = `Variable[1]/@idnr`;
+          if [$context//Private-Predicate-Formula[@idnr = $idnr]] {
+            copy-of `.`;
+          }
+        } else {
+          die (#message = "While determining whether to possibly include some local definitions into a proof, we encountered a local definition that lacks a Variable child");
+        }
+      }
+    }
+    apply [*];
+  }
+}
+
+tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition"]](#definitions) {
+  <Item {
+    @kind = "Definition-Item";
+    <Block {
+      @kind = "Definitional-Block";
+      needed-loci-defpreds-and-deffuncs (#candidates = `.//Locus | .//Private-Predicate-Formula`, #context = `.`);
+      copy-of `.`;
+      correctness-conditions (#candidates = `following-sibling::*`, #definitions = $definitions);
+    }
+  }
+}
+
+tpl needed-loci-defpreds-and-deffuncs-helper (#candidates, #seen, #context) {
+  $def_line = `$context/@line`;
+  $def_col = `$context/@col`;
   if [$candidates] {
     $candidate = `$candidates[1]`;
-    $nr = `$candidate/@nr`;
-    for-each [$context] { // now go hunting for the type of this Locus
-      if [preceding-sibling::Item[@kind = "Loci-Declaration"]//Variable[@idnr = $nr]] {
-        for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]//Variable[@idnr = $nr][1]] {
-          $spelling = `@spelling`;
-          $token = `concat ($spelling, ",")`;
-          if [contains ($seen, $token)] {
-            needed-loci-helper (#candidates = `$candidates[position() > 1]`,
-                                #seen = $seen,
-                                #context = $context);
-          } else {
-            <Item {
-              @kind = "Loci-Declaration";
-              <Explicitly-Qualified-Segment {
-                <Variable {
-                  @idnr = $nr;
-                  @spelling = $spelling;
-                }
-                if [local-name(..) = "Explicitly-Qualified-Segment"] {
-                  apply [../*[position() = last()]];
-                } else {
-                  if [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $nr]] {
-                    apply [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $nr]/../*[position() = last()]]; // WOW
+    $candidate_name = `local-name ($candidate)`;
+    if [$candidate_name = "Locus"] {
+      $nr = `$candidate/@nr`;
+      $locus_line = `$candidate/@line`;
+      $locus_col = `$candidate/@col`;
+      for-each [$context] { // now go hunting for the type of this Locus
+        if [preceding-sibling::Item[@kind = "Loci-Declaration"]//Variable[@idnr = $nr]] {
+          for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]//Variable[@idnr = $nr][1]] {
+            $spelling = `@spelling`;
+            $token = `concat ($spelling, ",")`;
+            if [contains ($seen, $token)] {
+              needed-loci-defpreds-and-deffuncs-helper (#candidates = `$candidates[position() > 1]`,
+                                                        #seen = $seen,
+                                                        #context = $context);
+            } else {
+              <Item {
+                @kind = "Loci-Declaration";
+                <Explicitly-Qualified-Segment {
+                  <Variable {
+                    @idnr = $nr;
+                    @spelling = `@spelling`;
+                  }
+                  if [local-name(..) = "Explicitly-Qualified-Segment"] {
+                    apply [../*[position() = last()]];
                   } else {
-                    $message = `concat ("While looking for a suitable type for the variable ", $spelling, " at line ", $locus_line, " and column ", $locus_col, ", we found that it is not bound by a previous Loci-Declaration element that explicitly assigns a type to this variable, nor were we able to find an earlier reservation that assigns a type to this varialbe.")`;
-                    die (#message = $message);
+                    if [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $nr]] {
+                      apply [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $nr]/../*[position() = last()]]; // WOW
+                    } else {
+                      $message = `concat ("While looking for a suitable type for the variable ", $spelling, " at line ", $locus_line, " and column ", $locus_col, ", we found that it is not bound by a previous Loci-Declaration element that explicitly assigns a type to this variable, nor were we able to find an earlier reservation that assigns a type to this varialbe.")`;
+                      die (#message = $message);
+                    }
                   }
                 }
               }
+              needed-loci-defpreds-and-deffuncs-helper (#candidates = `$candidates[position() > 1]`,
+                                                        #seen = `concat ($seen, $token)`,
+                                                        #context = $context);
             }
-            needed-loci-helper (#candidates = `$candidates[position() > 1]`,
-                                #seen = `concat ($seen, $token)`,
-                                #context = $context);
+          }
+        } else {
+          $message = `concat ("While processing a definition at line ", $def_line, " and column ", $def_col, ", we encountered a pattern without a corresponding Loci-Declaration preceding this locus that binds the variable in question")`;
+          die (#message = $message);
+        }
+      }
+    } else {
+      if [$candidate_name = "Private-Predicate-Formula"] {
+        $spelling = `@spelling`;
+        $idnr = `@idnr`;
+        if [$context//Item[@kind = "Private-Predicate-Definition"]/Variable[@idnr = $idnr]] {
+          // do nothing: this Private-Predicate-Formula was introduced by a defpred inside the body of this definition item
+        } else {
+          // go hunting for the defpred that occurs prior to this definition item
+          for-each [$context] {
+            if [preceding-sibling::Item[@kind = "Private-Predicate-Definition"]/Variable[@idnr = $idnr]] {
+              for-each [preceding-sibling::Item[@kind = "Private-Predicate-Definition"]/Variable[@idnr = $idnr][1]] {
+                copy-of `.`;
+              }
+            } else {
+              $message = `concat ("We failed to find a defpred that defines the predicate ", $spelling)`;
+              die (#message = $message);
+            }
           }
         }
-      } else {
-        $message = `concat ("While processing a definition at line ", $def_line, " and column ", $def_col, ", we encountered a pattern in which ", $spelling, " occurs, but we could not find a Loci-Declaration item preceding this locus that binds ", $spelling)`;
-        die (#message = $message);
       }
     }
   }
 }
 
-tpl needed-loci (#candidates, #context) {
-  needed-loci-helper (#candidates = $candidates, #seen = "", #context = $context);
+tpl needed-loci-defpreds-and-deffuncs (#candidates, #context) {
+  needed-loci-defpreds-and-deffuncs-helper (#candidates = $candidates, #seen = "", #context = $context);
 }
 
 tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym"]] {
-  $def_line = `$context/@line`;
-  $def_col = `$context/@col`;
   <Item {
     @kind = "Definition-Item";
     <Block {
       @kind = "Notation-Block";
-      needed-loci (#candidates = `.//Locus`, #context = `.`);
+      needed-loci-defpreds-and-deffuncs (#candidates = `.//Locus`, #context = `.`);
       copy-of `.`;
       correctness-conditions (#candidates = `following-sibling::*`);
     }
