@@ -138,10 +138,7 @@ tpl correctness-conditions (#candidates, #definitions, #stop) {
 tpl [Item[@kind = "Correctness-Condition" or @kind = "Property" or @kind = "Correctness"]](#definitions) {
   <Item {
     @kind = `@kind`;
-    apply [*[1]];
-    if [Block[@kind = "Proof"]] {
-      apply [Block[@kind = "Proof"]](#definitions = $definitions);
-    }
+    apply [*](#definitions = $definitions);
   }
 }
 
