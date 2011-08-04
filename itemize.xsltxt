@@ -113,8 +113,8 @@ tpl [Scheme-Justification[@nr = "0"]] {
           $spelling = `concat ("CKB", $position)`;
           <Scheme-Justification {
             @spelling = $spelling;
-	    @idnr = `@idnr`;
-	    @nr = `@nr`;
+	    @idnr = "1";
+	    @nr = "1"; // might not be right
             @promoted = "promoted";
             apply [`$context/*`];
           }
