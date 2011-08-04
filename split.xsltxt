@@ -167,14 +167,14 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
     @kind = "Definition-Item";
     <Block {
       @kind = "Definitional-Block";
-      needed-loci-defpreds-and-deffuncs (#candidates = `.//Locus | .//Private-Predicate-Formula`, #context = `.`);
+      needed-loci (#candidates = `.//Locus | .//Private-Predicate-Formula`, #context = `.`);
       copy-of `.`;
       correctness-conditions (#candidates = `following-sibling::*`, #definitions = $definitions);
     }
   }
 }
 
-tpl needed-loci-defpreds-and-deffuncs-helper (#candidates, #seen, #context) {
+tpl needed-loci-helper (#candidates, #seen, #context) {
   $def_line = `$context/@line`;
   $def_col = `$context/@col`;
   if [$candidates] {
@@ -190,9 +190,9 @@ tpl needed-loci-defpreds-and-deffuncs-helper (#candidates, #seen, #context) {
             $spelling = `@spelling`;
             $token = `concat ($spelling, ",")`;
             if [contains ($seen, $token)] {
-              needed-loci-defpreds-and-deffuncs-helper (#candidates = `$candidates[position() > 1]`,
-                                                        #seen = $seen,
-                                                        #context = $context);
+              needed-loci-helper (#candidates = `$candidates[position() > 1]`,
+                                  #seen = $seen,
+                                  #context = $context);
             } else {
               <Item {
                 @kind = "Loci-Declaration";
@@ -213,9 +213,9 @@ tpl needed-loci-defpreds-and-deffuncs-helper (#candidates, #seen, #context) {
                   }
                 }
               }
-              needed-loci-defpreds-and-deffuncs-helper (#candidates = `$candidates[position() > 1]`,
-                                                        #seen = `concat ($seen, $token)`,
-                                                        #context = $context);
+              needed-loci-helper (#candidates = `$candidates[position() > 1]`,
+                                  #seen = `concat ($seen, $token)`,
+                                  #context = $context);
             }
           }
         } else {
@@ -247,8 +247,8 @@ tpl needed-loci-defpreds-and-deffuncs-helper (#candidates, #seen, #context) {
   }
 }
 
-tpl needed-loci-defpreds-and-deffuncs (#candidates, #context) {
-  needed-loci-defpreds-and-deffuncs-helper (#candidates = $candidates, #seen = "", #context = $context);
+tpl needed-loci (#candidates, #context) {
+  needed-loci-helper (#candidates = $candidates, #seen = "", #context = $context);
 }
 
 tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym"]] {
@@ -256,7 +256,7 @@ tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym"]] {
     @kind = "Definition-Item";
     <Block {
       @kind = "Notation-Block";
-      needed-loci-defpreds-and-deffuncs (#candidates = `.//Locus`, #context = `.`);
+      needed-loci (#candidates = `.//Locus`, #context = `.`);
       copy-of `.`;
       correctness-conditions (#candidates = `following-sibling::*`);
     }
