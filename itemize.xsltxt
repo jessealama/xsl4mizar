@@ -78,7 +78,12 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
         }
       }
       copy {
-        @kind = `@kind`; @line = `@line`; @col = `@col`;
+        if [@kind = "Regular-Statement"] {
+          @kind = "Theorem-Item";
+        } else {
+          @kind = `@kind`;
+        }
+        @line = `@line`; @col = `@col`;
         apply [*];
       }
     }
