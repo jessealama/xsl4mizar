@@ -145,9 +145,10 @@ tpl [Local-Reference] {
         for-each [$item] {
           $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
           $new_spelling = `concat ("CKB", $position)`;
-          <Local-Reference {
+          <Theorem-Reference {
             @spelling = $new_spelling;
             @promoted = "promoted";
+            @"number" = "1";
             apply [`$context/*`];
           }
         }
@@ -163,9 +164,10 @@ tpl [Local-Reference] {
           for-each [$item] {
             $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
             $new_spelling = `concat ("CKB", $position)`;
-            <Local-Reference {
+            <Theorem-Reference {
               @spelling = $new_spelling;
               @promoted = "promoted";
+              @"number" = "1";
               apply [`$context/*`];
             }
           }
@@ -181,9 +183,10 @@ tpl [Local-Reference] {
             for-each [$item] {
               $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
               $new_spelling = `concat ("CKB", $position)`;
-              <Local-Reference {
+              <Definition-Reference {
                 @spelling = $new_spelling;
                 @promoted = "promoted";
+                @"number" = "1";
                 apply [`$context/*`];
               }
             }
