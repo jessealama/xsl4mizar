@@ -52,6 +52,25 @@ tpl [Text-Proper] {
   }
 }
 
+tpl some-term-present-in-context (#terms, #context) {
+  if [$terms] {
+    $term = `$terms[1]`;
+    if [$term/@idnr] {
+      $idnr = `$term/@idnr`;
+      if [$context//Simple-Term[@idnr = $idnr]] {
+        "1";
+      } else {
+        some-term-present-in-context (#terms = `$terms[position() > 1]`,
+                                      #context = $context);
+      }
+    } else {
+      die (#message = "We found a term that lacks an idnr attribute; we can't check whether it occurs in the given context");
+    }
+  } else {
+    "0";
+  }
+}
+
 tpl needed-reservations-helper(#reservations, #context, #seen) {
   if [$reservations] {
     $reservation = `$reservations[1]`;
@@ -68,19 +87,13 @@ tpl needed-reservations-helper(#reservations, #context, #seen) {
                                     #context = $context,
                                     #seen = `concat ($seen, $token)`);
       } else {
-        if [$reservation//Simple-Term] {
-          for-each [.//Simple-Term] {
-            $term_idnr = `@idnr`;
-            for-each [$reservation] {
-              for-each [following-sibling::Item[@kind = "Reservation"]] {
-                $other_res_idnr = `@idnr`;
-                if [$context//Simple-Term[@idnr = $other_res_idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $other_res_idnr]] {
-                  copy-of `$reservation`;
-                }
-              }
-            }
-          }
+        $term_found = some-term-present-in-context (#terms = `$reservation//Simple-Term`, #context = $context);
+        if [$term_found = "0"] {
+          needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+                                      #context = $context,
+                                      #seen = $seen);
         } else {
+          copy-of `$reservation`;
           needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
                                       #context = $context,
                                       #seen = `concat ($seen, $token)`);
