@@ -195,12 +195,25 @@ tpl [Local-Reference] {
             die (#message = $message);
           }
         } else {
-          <Local-Reference {
-            @line = $line;
-            @col = $col;
-            @spelling = $spelling;
-            @idnr = $idnr;
-            apply [*];
+          if [ancestor::Text-Proper/Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]] {
+            for-each [ancestor::Text-Proper/Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]/../../../../..] {
+              $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
+              $new_spelling = `concat ("CKB", $position)`;
+              <Definition-Reference {
+                @spelling = $new_spelling;
+                @promoted = "promoted";
+                @"number" = "1";
+                apply [`$context/*`];
+              }
+            }
+          } else {
+            <Local-Reference {
+              @line = $line;
+              @col = $col;
+              @spelling = $spelling;
+              @idnr = $idnr;
+              apply [*];
+            }
           }
         }
       }
