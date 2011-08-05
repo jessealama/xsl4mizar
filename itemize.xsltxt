@@ -109,6 +109,28 @@ tpl index-of-reservation-with-maximal-number (#reservations) {
   }
 }
 
+tpl index-of-reservation-with-minimal-number (#reservations) {
+  if [$reservations] {
+    if [$reservations[2]] {
+      $reservation = `$reservations[1]`;
+      $reservation_number = `$reservation/@reservation-number`;
+      $index_for_tail = index-of-reservation-with-maximal-number (#reservations = `$reservations[position() > 1]`);
+      $adjusted_index = `$index_for_tail + 1`;
+      $best_in_tail = `$reservations[$adjusted_index]`;
+      $best_in_tail_reservation_number = `$best_in_tail/@reservation-number`;
+      if [$reservation_number < $best_in_tail_reservation_number] {
+        "1";
+      } else {
+        $adjusted_index;
+      }
+    } else {
+      "1";
+    }
+  } else {
+    die (#message = "We cannot compute the index of something in an empty node set!");
+  }
+}
+
 tpl needed-reservations-helper(#reservations, #context, #seen) {
   if [$reservations] {
     $index_of_max = index-of-reservation-with-maximal-number (#reservations = $reservations);
