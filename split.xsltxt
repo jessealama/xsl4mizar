@@ -57,6 +57,20 @@ tpl [Item[@kind="Reservation"]] {
   }
 }
 
+tpl [Item[@kind = "Loci-Declaration"]] {
+  <Item {
+    @kind = "Loci-Declaration";
+    @line = `@line`;
+    @col = `@col`;
+    $num_preceding = `count (preceding::Item[@kind = "Loci-Declaration"] | ancestor::Item[@kind = "Loci-Declaration"])`;
+    @loci-number = `$num_preceding + 1`;
+    for-each [Implicitly-Qualified-Segment/Variable[1] | Explicitly-Qualified-Segment/Variable[1]] {
+      @idnr = `@idnr`;
+    }
+    apply [*];
+  }
+}
+
 tpl [Item[@kind="Definition-Item"]] {
   apply [Block];
 }
