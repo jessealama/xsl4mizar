@@ -1095,11 +1095,10 @@ tpl [Fraenkel-Term] {
 tpl [Circumfix-Term] {
   ensure-spelling ();
 
-  if [Right-Circumflex-Symbol] {
-    // do nothing: this is just a sanity check
-  } else {
+  if [not(Right-Circumflex-Symbol)] {
     die (#message = "Circumfix-Term lacks a right-Circumflex-Symbol child!");
   }
+
   " ";
   `@spelling`;
   list (#separ = ",", #elems = `*[position() > 1]`); // everything after the Right-Circumflex-Symbol
