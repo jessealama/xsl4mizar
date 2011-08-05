@@ -133,7 +133,7 @@ tpl index-of-reservation-with-minimal-number (#reservations) {
 
 tpl needed-reservations-helper(#reservations, #context, #seen) {
   if [$reservations] {
-    $index_of_max = index-of-reservation-with-maximal-number (#reservations = $reservations);
+    $index_of_max = index-of-reservation-with-minimal-number (#reservations = $reservations);
     $reservation = `$reservations[position() = $index_of_max]`;
     $res_number = `$reservation/@reservation-number`;
     $idnr = `$reservation/@idnr`;
