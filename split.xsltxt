@@ -88,48 +88,16 @@ tpl [Block[@kind = "Notation-Block"]] {
 }
 
 tpl [Item[@kind = "Cluster"]] {
-  $context = `.`;
-  $def_line = `$context/@line`;
-  $def_col = `$context/@col`;
   <Item {
     @kind = "Definition-Item";
+    if [@line] { @line = `@line`; }
+    if [@col] { @col = `@col`; }
     <Block {
       @kind = "Registration-Block";
-      for-each [.//Simple-Term] {
-        $idnr = `@idnr`;
-        $spelling = `@spelling`;
-        $locus_line = `@line`;
-        $locus_col = `@col`;
-        for-each [$context] { // now go hunting for the type of this Locus
-          if [preceding-sibling::Item[@kind = "Loci-Declaration"]//Variable[@spelling = $spelling]] {
-            for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]//Variable[@spelling = $spelling][1]] {
-              <Item {
-                @kind = "Loci-Declaration";
-                <Explicitly-Qualified-Segment {
-                  <Variable {
-                    @idnr = $idnr;
-                    @spelling = $spelling;
-                  }
-                  if [local-name(..) = "Explicitly-Qualified-Segment"] {
-                    apply [../*[position() = last()]];
-                  } else {
-                    if [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $idnr]] {
-                      apply [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $idnr]/../*[position() = last()]]; // WOW
-                    } else {
-                      $message = `concat ("While looking for a suitable type for the variable ", $spelling, " at line ", $locus_line, " and column ", $locus_col, ", we found that it is not bound by a previous Loci-Declaration element that explicitly assigns a type to this variable, nor were we able to find an earlier reservation that assigns a type to this varialbe.")`;
-                      die (#message = $message);
-                    }
-                  }
-                }
-              }
-            }
-          } else {
-            $message = `concat ("While processing a cluster at line ", $def_line, " and column ", $def_col, ", we encountered a pattern in which ", $spelling, " occurs, but we could not find a Loci-Declaration item preceding this locus that binds ", $spelling)`;
-            die (#message = $message);
-          }
-        }
+      <Item {
+        @kind = "Cluster";
+        apply [*];
       }
-      copy-of `.`;
       correctness-conditions (#candidates = `following-sibling::*`);
     }
   }
