@@ -87,32 +87,56 @@ tpl reservation-binds-some-dependent-type-occuring-in-context (#reservation, #mo
   }
 }
 
+tpl index-of-reservation-with-maximal-number (#reservations) {
+  if [$reservations] {
+    if [$reservations[2]] {
+      $reservation = `$reservations[1]`;
+      $reservation_number = `$reservation/@reservation-number`;
+      $index_for_tail = index-of-reservation-with-maximal-number (#reservations = `$reservations[position() > 1]`);
+      $adjusted_index = `$index_for_tail + 1`;
+      $best_in_tail = `$reservations[$adjusted_index]`;
+      $best_in_tail_reservation_number = `$best_in_tail/@reservation-number`;
+      if [$reservation_number > $best_in_tail_reservation_number] {
+        "1";
+      } else {
+        $adjusted_index;
+      }
+    } else {
+      "1";
+    }
+  } else {
+    die (#message = "We cannot compute the index of something in an empty node set!");
+  }
+}
+
 tpl needed-reservations-helper(#reservations, #context, #seen) {
   if [$reservations] {
-    $reservation = `$reservations[1]`;
+    $index_of_max = index-of-reservation-with-maximal-number (#reservations = $reservations);
+    $reservation = `$reservations[position() = $index_of_max]`;
+    $res_number = `$reservation/@reservation-number`;
     $idnr = `$reservation/@idnr`;
     $token = `concat (",", $idnr, ",")`;
     if [contains ($seen, $token)] {
-      needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+      needed-reservations-helper (#reservations = `$reservations[position() != $index_of_max]`,
                                   #context = $context,
                                   #seen = $seen);
     } else {
       if [$context//Simple-Term[@idnr = $idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
         copy-of `$reservation`;
-        needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+        needed-reservations-helper (#reservations = `$reservations[position() != $index_of_max]`,
                                     #context = $context,
                                     #seen = `concat ($seen, $token)`);
       } else {
         $term_found = reservation-binds-some-dependent-type-occuring-in-context (#reservation = $reservation,
-                                                                                 #more-reservations = `$reservations[position() > 1]`,
+                                                                                 #more-reservations = `$reservations[position() != $index_of_max]`,
                                                                                  #context = $context);
         if [$term_found = "0"] {
-          needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+          needed-reservations-helper (#reservations = `$reservations[position() != $index_of_max]`,
                                       #context = $context,
                                       #seen = $seen);
         } else {
           copy-of `$reservation`;
-          needed-reservations-helper (#reservations = `$reservations[position() > 1]`,
+          needed-reservations-helper (#reservations = `$reservations[position() != $index_of_max]`,
                                       #context = $context,
                                       #seen = `concat ($seen, $token)`);
         }
