@@ -367,18 +367,6 @@ tpl [Partial-Definiens] {
   }
 }
 
-tpl [Qualifying-Formula] {
-  <Qualifying-Formula {
-    apply [*];
-  }
-}
-
-tpl [Negated-Formula] {
-  <Negated-Formula {
-    apply [*];
-  }
-}
-
 tpl [Item[@kind='Attribute-Definition']] {
   <Item {
     @kind="Attribute-Definition";
@@ -736,7 +724,29 @@ tpl [Private-Predicate-Formula](#already_bound, #do_generalize) {
   }
 }
 
+tpl [Qualifying-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
+  } else {
+    <Qualifying-Formula {
+      @spelling = `@spelling`;
+      apply [*](#already_bound = $already_bound);
+    }
+  }
+}
+
 // Complex formulas
+
+tpl [Negated-Formula](#already_bound, #do_generalize) {
+  if [$do_generalize = "1"] {
+    generalize (#already_bound = $already_bound);
+  } else {
+    <Negated-Formula {
+      @spelling = `@spelling`;
+      apply [*](#already_bound = $already_bound);
+    }
+  }
+}
 
 tpl [Conjunctive-Formula](#already_bound, #do_generalize) {
   if [$do_generalize = "1"] {
