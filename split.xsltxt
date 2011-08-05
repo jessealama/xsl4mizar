@@ -170,7 +170,7 @@ tpl [Block[@kind = "Proof"]](#definitions) {
         if [Variable] {
           $idnr = `Variable[1]/@idnr`;
           if [$context//Private-Predicate-Formula[@idnr = $idnr]] {
-            copy-of `.`;
+            apply [*];
           }
         } else {
           die (#message = "While determining whether to possibly include some local definitions into a proof, we encountered a local definition that lacks a Variable child");
@@ -189,7 +189,12 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
       for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
         apply [.];
       }
-      copy-of `.`;
+      <Item {
+        @kind = `@kind`;
+        if [@line] { @line = `@line`; }
+        if [@col] { @col = `@col`; }
+        apply [*];
+      }
       correctness-conditions (#candidates = `following-sibling::*`, #definitions = $definitions);
     }
   }
@@ -203,7 +208,12 @@ tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym"]] {
       for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
         apply [.];
       }
-      copy-of `.`;
+      <Item {
+        @kind = `@kind`;
+        if [@line] { @line = `@line`; }
+        if [@col] { @col = `@col`; }
+        apply [*];
+      }
       correctness-conditions (#candidates = `following-sibling::*`);
     }
   }
