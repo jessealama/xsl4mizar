@@ -17,7 +17,7 @@ tpl die(#message) {
 tpl ensure-reservations-have-numbers {
   for-each [//Item[@kind = "Reservation"]] {
     if [not(@reservation-number)] {
-      die (#message = "This stylesheet assumes that all reservation items have a reservation-number attribute, but there is at least one in this document that lacks this attribute.")
+      die (#message = "This stylesheet assumes that all reservation items have a reservation-number attribute, but there is at least one in this document that lacks this attribute.");
     }
   }
 }
