@@ -45,8 +45,16 @@ tpl split-reservation (#variables, #type) {
 }
 
 tpl [Item[@kind="Reservation"]] {
-  split-reservation (#variables = `Variable`,
-                     #type = `*[position() = last()]`);
+  $type = `*[position() = last()]`;
+  for-each [Variable] {
+    <Item {
+      @kind = "Reservation";
+      @idnr = `@idnr`;
+      @reservation-number = `position() + count(preceding::Item[@kind = "Reservation"]/Variable)`;
+      apply [.];
+      apply [$type];
+    }
+  }
 }
 
 tpl [Item[@kind="Definition-Item"]] {
