@@ -81,9 +81,6 @@ tpl [Item[@kind = "Cluster"]] {
     @kind = "Definition-Item";
     <Block {
       @kind = "Registration-Block";
-      // what follows is nearly identical to the definition of the
-      // needed-loci template, but working with Simple-Term elements
-      // rather than with Locus elements.
       for-each [.//Simple-Term] {
         $idnr = `@idnr`;
         $spelling = `@spelling`;
@@ -175,60 +172,12 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
     @kind = "Definition-Item";
     <Block {
       @kind = "Definitional-Block";
-      needed-loci (#candidates = `.//Locus | .//Simple-Term`, #context = `.`);
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
+        apply [.];
+      }
       copy-of `.`;
       correctness-conditions (#candidates = `following-sibling::*`, #definitions = $definitions);
     }
-  }
-}
-
-tpl needed-loci-helper (#candidates, #seen, #variables) {
-  if [$variables] {
-    $variable = `$variables[1]`;
-    $variable_idnr = `$variable/@idnr`;
-    $variable_spelling = `$variable/@spelling`;
-    if [$candidates/@idnr = $variable_idnr or $candidates/@nr = $variable_idnr] {
-      $token = `concat (",", $variable_idnr, ",")`;
-      if [contains ($seen, $token)] {
-        needed-loci-helper (#candidates = $candidates,
-                            #seen = $seen,
-                            #variables = `$variables[position() > 1]`);
-      } else {
-        $loci_declaration = `$variable/../..`; // safe because we know $variable was pulled from a Loci-Declaration
-        if [$loci_declaration/Explicitly-Qualified-Segment/Variable[@idnr = $variable_idnr]] {
-          <Item {
-            @kind = "Loci-Declaration";
-            <Explicitly-Qualified-Segment {
-              apply [$variable];
-              apply [$variable/../*[position() = last()]]; // the type
-            }
-          }
-        } else { // Implicitly-Qualified-Segment case: we need to look up the variable's type earlier
-          <Item {
-            @kind = "Loci-Declaration";
-            <Implicitly-Qualified-Segment {
-              apply [$variable];
-            }
-          }
-        }
-        needed-loci-helper (#candidates = $candidates,
-                            #seen = `concat ($seen, $token)`,
-                            #variables = `$variables[position() > 1]`);
-      }
-    } else {
-      needed-loci-helper (#candidates = $candidates,
-                          #seen = $seen,
-                          #variables = `$variables[position() > 1]`);
-    }
-  }
-}
-
-tpl needed-loci (#candidates, #context) {
-  for-each [$context] {
-    $variables = `preceding-sibling::Item[@kind = "Loci-Declaration"]/*/Variable`;
-    needed-loci-helper (#candidates = $candidates,
-                        #seen = "",
-                        #variables = $variables);
   }
 }
 
@@ -237,7 +186,9 @@ tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym"]] {
     @kind = "Definition-Item";
     <Block {
       @kind = "Notation-Block";
-      needed-loci (#candidates = `.//Locus`, #context = `.`);
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
+        apply [.];
+      }
       copy-of `.`;
       correctness-conditions (#candidates = `following-sibling::*`);
     }
