@@ -1099,8 +1099,8 @@ tpl [Circumfix-Term] {
     die (#message = "Circumfix-Term lacks a right-Circumflex-Symbol child!");
   }
 
-  " ";
   `@spelling`;
+  " ";
   list (#separ = ",", #elems = `*[position() > 1]`); // everything after the Right-Circumflex-Symbol
   apply [Right-Circumflex-Symbol[1]];
 }
