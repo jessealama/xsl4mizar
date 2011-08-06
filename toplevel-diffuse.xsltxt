@@ -25,6 +25,7 @@ tpl [*](#toplevel-diffuse-items) {
     if [@number] { @"number" = `@number`; }
     if [@articleid] { @articleid = `@articleid`; }
     if [@reservation-number] { @reservation-number = `@reservation-number`; }
+    if [@loci-number] { @loci-number = `@loci-number`; }
     if [@kind] { @kind = `@kind`; }
     apply [*](#toplevel-diffuse-items = $toplevel-diffuse-items);
   }
