@@ -58,16 +58,24 @@ tpl [Item[@kind="Reservation"]] {
 }
 
 tpl [Item[@kind = "Loci-Declaration"]] {
-  <Item {
-    @kind = "Loci-Declaration";
-    @line = `@line`;
-    @col = `@col`;
-    $num_preceding = `count (preceding::Item[@kind = "Loci-Declaration"] | ancestor::Item[@kind = "Loci-Declaration"])`;
-    @loci-number = `$num_preceding + 1`;
-    for-each [Implicitly-Qualified-Segment/Variable[1] | Explicitly-Qualified-Segment/Variable[1]] {
-      @idnr = `@idnr`;
+  for-each [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
+    $segment_element_name = `local-name (.)`;
+    for-each [Variable] {
+      <Item {
+        @kind = "Loci-Declaration";
+        @line = `@line`;
+        @col = `@col`;
+        $num_preceding = `count (preceding::Item[@kind = "Loci-Declaration"] | ancestor::Item[@kind = "Loci-Declaration"])`;
+        @loci-number = `$num_preceding + 1`;
+        @idnr = `@idnr`;
+        <$segment_element_name {
+          apply [.]; // variable
+          if [$segment_element_name = "Explicitly-Qualified-Segment"] {
+            apply [../*[position() = last()]]; // the type of the variable
+          }
+        }
+      }
     }
-    apply [*];
   }
 }
 
