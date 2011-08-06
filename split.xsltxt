@@ -166,7 +166,7 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
     @kind = "Definition-Item";
     <Block {
       @kind = "Definitional-Block";
-      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration" or @kind = "Assumption"]] {
         apply [.];
       }
       <Item {
