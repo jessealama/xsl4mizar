@@ -306,8 +306,13 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
     <Text-Proper {
       needed-reservations (#reservations = `preceding::Item[@kind="Reservation"]`, #context = $context);
       copy {
+        // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement"] {
-          @kind = "Theorem-Item";
+          if [Compact-Statement] {
+            @kind = "Theorem-Item";
+          } else {
+            die (#message = "Don't know how to deal with non-Compact-Statement-type toplevel Regular-Statement items!");
+          }
         } else {
           @kind = `@kind`;
         }
