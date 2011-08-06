@@ -80,6 +80,13 @@ tpl [Block[@kind = "Proof"]](#toplevel-diffuse-items) {
   }
 }
 
+tpl [Item[@kind = "Scheme-Head"]](#toplevel-diffuse-items) {
+  copy-of `.`;
+  if [following-sibling::*] { // the scheme has some kind of justification
+    emit-needed-toplevel-diffuse-items (#toplevel-diffuse-items = $toplevel-diffuse-items, #context = `following-sibling::*`);
+  }
+}
+
 tpl enumerate-items (#candidates, #bundlenr, #articleid, #toplevel-diffuse-items) {
   if [$candidates] {
     $candidate = `$candidates[1]`;
