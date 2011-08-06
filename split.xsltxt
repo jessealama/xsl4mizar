@@ -92,7 +92,7 @@ tpl [Block[@kind = "Registration-Block"]] {
 }
 
 tpl [Block[@kind = "Notation-Block"]] {
-  apply [Item[@kind = "Pred-Antonym" or @kind = "Pred-Synonym" or @kind = "Attr-Antonym" or @kind = "Attr-Synonym" or @kind = "Func-Synonym" or @kind = "Func-Antonym"]];
+  apply [Item[@kind = "Pred-Antonym" or @kind = "Pred-Synonym" or @kind = "Attr-Antonym" or @kind = "Attr-Synonym" or @kind = "Func-Synonym" or @kind = "Func-Antonym" or @kind = "Mode-Synonym" or @kind = "Mode-Antonym"]];
 }
 
 tpl [Item[@kind = "Cluster"]] {
@@ -180,7 +180,7 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
   }
 }
 
-tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym" or @kind = "Attr-Synonym" or @kind = "Attr-Antonym" or @kind = "Func-Synonym" or @kind = "Func-Antonym"]] {
+tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym" or @kind = "Attr-Synonym" or @kind = "Attr-Antonym" or @kind = "Func-Synonym" or @kind = "Func-Antonym" or @kind = "Mode-Synonym" or @kind = "Mode-Antonym"]] {
   <Item {
     @kind = "Definition-Item";
     <Block {
