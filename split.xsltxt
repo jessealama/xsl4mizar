@@ -94,6 +94,9 @@ tpl [Item[@kind = "Cluster"]] {
     if [@col] { @col = `@col`; }
     <Block {
       @kind = "Registration-Block";
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
+        apply [.];
+      }
       <Item {
         @kind = "Cluster";
         apply [*];
