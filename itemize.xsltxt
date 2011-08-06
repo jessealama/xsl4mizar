@@ -416,7 +416,7 @@ tpl needed-loci-helper (#loci, #context, #seen) {
                                                                                       #more-loci = $other_loci,
                                                                                       #context = $context);
         if [$term_found = "0"] {
-          if [$context//Simple-Term[@idnr = $idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+          if [$context//Simple-Term[@idnr = $idnr] | $context//Locus[@nr = $idnr]] {
             copy-of `$loci-declaration`;
             needed-loci-helper (#loci = $other_loci,
                                 #context = $context,
