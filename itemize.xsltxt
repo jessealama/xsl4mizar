@@ -22,8 +22,17 @@ tpl ensure-reservations-have-numbers {
   }
 }
 
+tpl ensure-loci-declarations-bind-only-one-variable {
+  for-each [//Item[@kind = "Loci-Declaration"]] {
+    if [*/Variable[2]] {
+      die (#message = "This stylesheet assumes that all loci declarations bind exactly one variable, but there is at least one loci delcaration in this document that binds multiple variables.");
+    }
+  }
+}
+
 tpl [/] {
   ensure-reservations-have-numbers ();
+  ensure-loci-declarations-bind-only-one-variable ();
   apply [*];
 }
 
