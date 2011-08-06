@@ -121,7 +121,7 @@ tpl loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declar
         $another_loci_variable = `$another_loci/*/Variable[1]`;
         $another_loci_idnr = `$another_loci_variable/@idnr`;
         // does the variable bound by $another_loci occur anywhere inside $context?
-        if [$context//@idnr = $another_loci_idnr] {
+        if [$context//@idnr = $another_loci_idnr or $context//@nr = $another_loci_idnr] {
           "1";
         } else {
           loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration = $loci-declaration,
