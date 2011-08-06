@@ -30,9 +30,18 @@ tpl ensure-loci-declarations-bind-only-one-variable {
   }
 }
 
+tpl ensure-loci-have-numbers {
+  for-each [//Item[@kind = "Loci-Declaration"]] {
+    if [not(@loci-number)] {
+      die (#message = "This stylesheet assumes that all loci declarations items have a loci-number attribute, but there is at least one loci declaration in this document that lacks this attribute.");
+    }
+  }
+}
+
 tpl [/] {
   ensure-reservations-have-numbers ();
   ensure-loci-declarations-bind-only-one-variable ();
+  ensure-loci-have-numbers ();
   apply [*];
 }
 
