@@ -109,7 +109,7 @@ tpl loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declar
       // the type occurring in $another_loci is a dependent type.  Are any of the
       // terms bound by its dependent type bound by $loci-declaration?
       if [$another_loci//Simple-Term[@idnr = $loci_idnr]] {
-        $another_loci_variable = `$another_loci/Variable[1]`;
+        $another_loci_variable = `$another_loci/*/Variable[1]`;
         $another_loci_idnr = `$another_loci_variable/@idnr`;
         // does the variable bound by $another_loci occur anywhere inside $context?
         if [$context//@idnr = $another_loci_idnr] {
