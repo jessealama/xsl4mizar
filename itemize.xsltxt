@@ -164,9 +164,13 @@ tpl loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declar
         if [$occurs = "1"] {
           "1";
         } else {
-          loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration = $loci-declaration,
-                                                                          #more-loci = `$more-loci[position() > 1]`,
-                                                                          #context = $context);
+          if [$type//Simple-Term/@idnr = $loci_idnr] {
+            "1";
+          } else {
+            loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration = $loci-declaration,
+                                                                            #more-loci = `$more-loci[position() > 1]`,
+                                                                            #context = $context);
+          }
         }
       } else {
         // the type occurring in $another_loci is not a dependent type
