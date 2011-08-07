@@ -176,7 +176,16 @@ tpl free-variables-of-idnr-bearing-context {
     $idnr = `@idnr`;
     `concat (",", $idnr, ",")`;
   } else {
-    die (#message = "We expected a Simple-Term element to have an idnr attribute, but it doesn't");
+    die (#message = "We expected an element to have an idnr attribute, but it doesn't");
+  }
+}
+
+tpl free-variables-of-nr-bearing-context {
+  if [@nr] {
+    $nr = `@nr`;
+    `concat (",", $nr, ",")`;
+  } else {
+    die (#message = "We expected an element to have an nr attribute, but it doesn't");
   }
 }
 
@@ -186,6 +195,10 @@ tpl [Simple-Term] mode="free-variables" {
 
 tpl [Variable] mode="free-variables" {
   free-variables-of-idnr-bearing-context ();
+}
+
+tpl [Locus] mode="free-variables" {
+  free-variables-of-nr-bearing-context ();
 }
 
 // default aggregation of free-variables
