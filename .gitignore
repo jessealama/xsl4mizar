@@ -15,8 +15,7 @@
 /xboole_0*
 /xboole_1*
 /xboole_2*
-/funct_1*
-/funct_2*
+/funct_*
 /boole*
 /zfmisc*
 /enumset*
@@ -32,3 +31,5 @@
 /partfun*
 /mcart*
 /binop*
+/funcop*
+/domain_*
