@@ -75,7 +75,7 @@ tpl remove-duplicate-tokens (#string) {
         }
       } else {
         $message = `concat ("Cannot remove duplicate elements from a token string that doesn't start with a comma and contain at least one more comma!  (We were given '", $string, "'.")`;
-        die (#message = "We ");
+        die (#message = $message);
       }
     } else {
       $message = `concat ("Cannot remove duplicate elements from a token string that doesn't start with a comma!  (We were given '", $string, "'.")`;
