@@ -1,0 +1,175 @@
+stylesheet 1.0;
+
+output method=xml indent="yes";
+
+tpl die(#message) {
+  if [@line and @col] {
+    $line = `@line`;
+    $col = `@col`;
+    $final_message = `concat ($message, " (line ", $line, ", column ", $col, ")")`;
+    msg terminate="yes" $final_message;
+  } else {
+    $final_message = `concat ($message, " (unable to determine line and column information)")`;
+    msg terminate="yes" $final_message;
+  }
+}
+
+tpl [*] {
+  $element = `local-name ()`;
+  $free = free-variables (#element = `.`);
+  $unique-free = remove-duplicate-tokens (#string = $free);
+  <$element {
+    for-each [@*] {
+      copy-of `.`;
+    }
+    @free-variables = $unique-free;
+    apply [*];
+  }
+}
+
+tpl [Text-Proper] mode="free-variables" {
+  "";
+}
+
+// Computing free variables
+
+tpl remove-duplicate-tokens (#string) {
+  if [$string = ""] {
+    "";
+  } else {
+    if [starts-with ($string, ",")] {
+      $after-first-comma = `substring-after ($string, ",")`;
+      if [contains ($after-first-comma, ",")] {
+        $between-first-and-second-comma = `substring-before ($after-first-comma, ",")`;
+        $initially-commaless-tail = `substring-after ($after-first-comma, ",")`;
+        $token = `concat (",", $between-first-and-second-comma, ",")`;
+        if [$initially-commaless-tail = ""] { // $token was the one and only token in $string
+          $token;
+        } else {
+          $tail = `concat (",", $initially-commaless-tail)`;
+          if [contains ($tail, $token)] {
+            remove-duplicate-tokens (#string = $tail);
+          } else {
+            $duplicate-free-tail = remove-duplicate-tokens (#string = $tail);
+            if [$duplicate-free-tail = ""] { // this seems redundant to me
+              $token;
+            } else {
+              if [starts-with ($duplicate-free-tail, ",")] {
+                $duplicate-free-tail-after-first-comma = `substring-after ($duplicate-free-tail, ",")`;
+                `concat ($token, $duplicate-free-tail-after-first-comma)`;
+              } else {
+                $message = `concat ("When removing duplicates from the string '", $string, "', we removed duplicates from its tail, '", $tail, "'; somehow we obtained '", $duplicate-free-tail, "', which doesn't begin with a comma.  This is not the expected format for a token string, so we can't proceed.")`;
+                die (#message = $message);
+              }
+            }
+          }
+        }
+      } else {
+        $message = `concat ("Cannot remove duplicate elements from a token string that doesn't start with a comma and contain at least one more comma!  (We were given '", $string, "'.")`;
+        die (#message = "We ");
+      }
+    } else {
+      $message = `concat ("Cannot remove duplicate elements from a token string that doesn't start with a comma!  (We were given '", $string, "'.")`;
+      die (#message = $message);
+    }
+  }
+}
+
+tpl free-variables (#element) {
+  apply [$element] mode="free-variables";
+}
+
+tpl append-free-variables (#elements) {
+  if [$elements] {
+    $element = `$elements[1]`;
+    $free-variables = free-variables (#element = $element);
+    if [$free-variables = ""] {
+      append-free-variables (#elements = `$elements[position() > 1]`);
+    } else {
+      if [starts-with ($free-variables, ",")] {
+        $free-in-tail = append-free-variables (#elements = `$elements[position() > 1]`);
+        if [$free-in-tail = ""] {
+          $free-variables;
+        } else {
+          if [starts-with ($free-in-tail, ",")] {
+            $free-in-tail-minus-initial-comma = `substring-after ($free-in-tail, ",")`;
+            `concat ($free-variables, $free-in-tail-minus-initial-comma)`;
+          } else {
+            die (#message = "While computing the list of free variables of a list of elements, we found that the list of free variables for the tail of the list is a string that doesn't start with a comma (,) as we expected.");
+          }
+        }
+      } else {
+        die (#message = "While computing the list of free variables of a list of elements, we found that the list of free variables for one of its terms is a string that doesn't start with a comma (,) as we expected.");
+      }
+    }
+  } else {
+    "";
+  }
+}
+
+// #variables is a list of Variable elements that are somehow bound
+// (by a reservation, by a universal quantifier, etc.).
+// #free-variables is a list of id numbers of variables that are free
+// inside the matrix of whatever is binding #variables.  The task is
+// simply walk through this list and remove id numbers that are equal
+// to the id numbers of variables in #variables
+tpl bind-variables (#variables, #free-variables) {
+  if [$variables] {
+    $variable = `$variables[1]`;
+    if [$variable/@idnr] {
+      $idnr = `$variable/@idnr`;
+      $token = `concat (",", $idnr, ",")`;
+      if [contains ($free-variables, $token)] {
+        $before-token = `substring-before ($free-variables, $token)`;
+        $after-token = `substring-after ($free-variables, $token)`;
+        // we will call this template again *without* taking a subset
+        // of #variables, to deal with the case where the idnr of
+        // $variable occurs multiple times in #free-variables
+        if [$after-token = ""] {
+          $trimmed-free-variables = $before-token;
+          bind-variables (#variables = $variables, #free-variables = $trimmed-free-variables);
+        } else {
+          $trimmed-free-variables = `concat ($before-token, ",", $after-token)`;
+          bind-variables (#variables = $variables, #free-variables = $trimmed-free-variables);
+        }
+      } else {
+        bind-variables (#variables = `$variables[position() > 1]`,
+                        #free-variables = $free-variables);
+      }
+    } else {
+      die (#message = "We cannot bind a variable that lacks an idnr attribute!");
+    }
+  } else {
+    $free-variables;
+  }
+}
+
+tpl [Item[@kind = "Reservation"]] mode="free-variables" {
+  $all-free = append-free-variables (#elements = `*`);
+  bind-variables (#variables = `Variable`, #free-variables = $all-free);
+}
+
+// Terms
+
+tpl free-variables-of-idnr-bearing-context {
+  if [@idnr] {
+    $idnr = `@idnr`;
+    `concat (",", $idnr, ",")`;
+  } else {
+    die (#message = "We expected a Simple-Term element to have an idnr attribute, but it doesn't");
+  }
+}
+
+tpl [Simple-Term] mode="free-variables" {
+  free-variables-of-idnr-bearing-context ();
+}
+
+tpl [Variable] mode="free-variables" {
+  free-variables-of-idnr-bearing-context ();
+}
+
+// default aggregation of free-variables
+
+tpl [*] mode="free-variables" {
+  append-free-variables (#elements = `*`);
+}
