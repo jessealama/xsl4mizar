@@ -129,8 +129,8 @@ tpl bind-variables (#variables, #free-variables) {
       $idnr = `$variable/@idnr`;
       $token = `concat (",", $idnr, ",")`;
       if [contains ($free-variables, $token)] {
-        $before-token = `substring-before ($free-variables, $token)`;
-        $after-token = `substring-after ($free-variables, $token)`;
+        $before-token = `substring-before ($free-variables, $token)`; // might be empty; does not end with a comma
+        $after-token = `substring-after ($free-variables, $token)`; // might be empty; does not start with a comma
         // we will call this template again *without* taking a subset
         // of #variables, to deal with the case where the idnr of
         // $variable occurs multiple times in #free-variables
