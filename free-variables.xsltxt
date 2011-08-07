@@ -206,3 +206,17 @@ tpl [Locus] mode="free-variables" {
 tpl [*] mode="free-variables" {
   append-free-variables (#elements = `*`);
 }
+
+// Formulas
+
+tpl [Universal-Quantifier-Formula] mode="free-variables" {
+  $all-free = append-free-variables (#elements = `*`);
+  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`,
+                  #free-variables = $all-free);
+}
+
+tpl [Existential-Quantifier-Formula] mode="free-variables" {
+  $all-free = append-free-variables (#elements = `*`);
+  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`,
+                  #free-variables = $all-free);
+}
