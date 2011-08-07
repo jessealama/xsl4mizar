@@ -157,9 +157,16 @@ tpl bind-variables (#variables, #free-variables) {
   }
 }
 
+// Reservations bind variables
+
 tpl [Item[@kind = "Reservation"]] mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`);
   bind-variables (#variables = `Variable`, #free-variables = $all-free);
+}
+
+tpl [Item[@kind = "Loci-Declaration"]] mode="free-variables" {
+  $all-free = append-free-variables (#elements = `*`);
+  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`, #free-variables = $all-free);
 }
 
 // Terms
