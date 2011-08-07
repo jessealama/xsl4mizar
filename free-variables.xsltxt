@@ -135,8 +135,12 @@ tpl bind-variables (#variables, #free-variables) {
         // of #variables, to deal with the case where the idnr of
         // $variable occurs multiple times in #free-variables
         if [$after-token = ""] {
-          $trimmed-free-variables = $before-token;
-          bind-variables (#variables = $variables, #free-variables = $trimmed-free-variables);
+          if [$before-token = ""] {
+            "";
+          } else {
+            $trimmed-free-variables = `concat ($before-token, ",")`;
+            bind-variables (#variables = $variables, #free-variables = $trimmed-free-variables);
+          }
         } else {
           $trimmed-free-variables = `concat ($before-token, ",", $after-token)`;
           bind-variables (#variables = $variables, #free-variables = $trimmed-free-variables);
