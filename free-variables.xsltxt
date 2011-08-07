@@ -33,6 +33,15 @@ tpl [Text-Proper] mode="free-variables" {
 
 // Computing free variables
 
+
+// Given a string that looks like
+//
+// ,56,13,193,13,13,
+//
+// remove any duplicate "tokens".  (In this example, the token "13"
+// appears three times.)
+//
+// It is permitted for the string to be empty.
 tpl remove-duplicate-tokens (#string) {
   if [$string = ""] {
     "";
