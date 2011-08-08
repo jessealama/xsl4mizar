@@ -157,6 +157,14 @@ tpl bind-variables (#variables, #free-variables) {
   }
 }
 
+// Binding variables in blocks
+
+tpl [Block/Item] mode="free-variables" {
+  $all-free = append-free-variables (#elements = `*`);
+  bind-variables (#variables = `preceding-sibling::Item[@kind = "Loci-Declaration"]/*/Variable`,
+                  #free-variables = $all-free);
+}
+
 // Reservations bind variables
 
 tpl [Item[@kind = "Reservation"]] mode="free-variables" {
