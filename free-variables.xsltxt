@@ -169,6 +169,13 @@ tpl [Item[@kind = "Loci-Declaration"]] mode="free-variables" {
   bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`, #free-variables = $all-free);
 }
 
+// Private predicate definitions introduce free second-order variables, which I don't care about
+
+tpl [Item[@kind = "Private-Predicate-Definition"]] mode="free-variables" {
+  $all-free = append-free-variables (#elements = `*`);
+  bind-variables (#variables = `Variable`, #free-variables = $all-free);
+}
+
 // Terms
 
 tpl free-variables-of-idnr-bearing-context {
