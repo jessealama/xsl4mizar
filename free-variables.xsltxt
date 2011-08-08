@@ -43,41 +43,46 @@ tpl [Text-Proper] mode="free-variables" {
 //
 // It is permitted for the string to be empty.
 tpl remove-duplicate-tokens (#string) {
-  if [$string = ""] {
-    "";
-  } else {
-    if [starts-with ($string, ",")] {
+  choose {
+    when [$string = ""] { ""; }
+    when [starts-with ($string, ",")] {
       $after-first-comma = `substring-after ($string, ",")`;
-      if [contains ($after-first-comma, ",")] {
-        $between-first-and-second-comma = `substring-before ($after-first-comma, ",")`;
-        $initially-commaless-tail = `substring-after ($after-first-comma, ",")`;
-        $token = `concat (",", $between-first-and-second-comma, ",")`;
-        if [$initially-commaless-tail = ""] { // $token was the one and only token in $string
-          $token;
-        } else {
-          $tail = `concat (",", $initially-commaless-tail)`;
-          if [contains ($tail, $token)] {
-            remove-duplicate-tokens (#string = $tail);
-          } else {
-            $duplicate-free-tail = remove-duplicate-tokens (#string = $tail);
-            if [$duplicate-free-tail = ""] { // this seems redundant to me
-              $token;
-            } else {
-              if [starts-with ($duplicate-free-tail, ",")] {
-                $duplicate-free-tail-after-first-comma = `substring-after ($duplicate-free-tail, ",")`;
-                `concat ($token, $duplicate-free-tail-after-first-comma)`;
-              } else {
-                $message = `concat ("When removing duplicates from the string '", $string, "', we removed duplicates from its tail, '", $tail, "'; somehow we obtained '", $duplicate-free-tail, "', which doesn't begin with a comma.  This is not the expected format for a token string, so we can't proceed.")`;
-                die (#message = $message);
+      choose {
+        when [contains ($after-first-comma, ",")] {
+          $between-first-and-second-comma = `substring-before ($after-first-comma, ",")`;
+          $initially-commaless-tail = `substring-after ($after-first-comma, ",")`;
+          $token = `concat (",", $between-first-and-second-comma, ",")`;
+          $tail = `substring-after ($initially-commaless-tail, ",")`;
+          choose {
+            when [$initially-commaless-tail = ""] { $token; }
+            when [starts-with ($initially-commaless-tail, ",")] {
+              $message = `concat ("We expected to find that the tail, '", $initially-commaless-tail, "' of our token string, does not begin with a comma, but somehow it does")`;
+              die (#message = $message);
+            }
+            when [contains ($tail, $token)] { remove-duplicate-tokens (#string = $tail); }
+            otherwise {
+              $duplicate-free-tail = remove-duplicate-tokens (#string = $tail);
+              choose {
+                when [$duplicate-free-tail = ""] { $token; }
+                when [starts-with ($duplicate-free-tail, ",")] {
+                  $duplicate-free-tail-after-first-comma = `substring-after ($duplicate-free-tail, ",")`;
+                  `concat ($token, $duplicate-free-tail-after-first-comma)`;
+                }
+                otherwise {
+                  $message = `concat ("When removing duplicates from the string '", $string, "', we removed duplicates from its tail, '", $tail, "'; somehow we obtained '", $duplicate-free-tail, "', which doesn't begin with a comma.  This is not the expected format for a token string, so we can't proceed.")`;
+                  die (#message = $message);
+                }
               }
             }
           }
         }
-      } else {
-        $message = `concat ("Cannot remove duplicate elements from a token string that doesn't start with a comma and contain at least one more comma!  (We were given '", $string, "'.")`;
-        die (#message = $message);
+        otherwise {
+          $message = `concat ("Cannot remove duplicate elements from a token string that doesn't start with a comma and contain at least one more comma!  (We were given '", $string, "'.")`;
+          die (#message = $message);
+        }
       }
-    } else {
+    }
+    otherwise {
       $message = `concat ("Cannot remove duplicate elements from a token string that doesn't start with a comma!  (We were given '", $string, "'.")`;
       die (#message = $message);
     }
