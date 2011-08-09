@@ -30,7 +30,7 @@ tpl bound-in-items (#items, #bound-so-far) {
     $item = `$items[1]`;
     $free-in-item = free-variables (#element = $item);
     for-each [$item] {
-      $still-free = bind-variables (#variables = `preceding-sibling::Item[@kind = "Reservation"]/Variable | preceding-sibling::Item[@kind = "Loci-Declaration"]/*/Variable | preceding-sibling::Item[@kind = "Generalization"]/*/Variable`,
+      $still-free = bind-variables (#variables = `preceding-sibling::Item[@kind = "Reservation"]/Variable | preceding-sibling::Item[@kind = "Loci-Declaration"]/*/Variable | preceding-sibling::Item[@kind = "Generalization"]/*/Variable | preceding-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable`,
                                     #free-variables = $free-in-item);
       $newly-bound = append-token-strings (#token-string-a = $bound-so-far,
                                            #token-string-b = $still-free);
@@ -295,6 +295,11 @@ tpl [Item[@kind = "Loci-Declaration"]](#upper-bound) mode="free-variables" {
 tpl [Item[@kind = "Generalization"]](#upper-bound) mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
   bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`, #free-variables = $all-free);
+}
+
+tpl [Item[@kind = "Type-Changing-Statement"]](#upper-bound) mode="free-variables" {
+  $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
+  bind-variables (#variables = `Equality/Variable`, #free-variables = $all-free);
 }
 
 // Private predicate definitions introduce free second-order variables, which I don't care about
