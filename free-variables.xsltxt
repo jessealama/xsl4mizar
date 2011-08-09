@@ -14,10 +14,6 @@ tpl die(#message) {
   }
 }
 
-tpl ensure-sane-token-string (#token-string) {
-  "0"; // just a stub
-}
-
 tpl append-token-strings (#token-string-a, #token-string-b) {
   choose {
     when [$token-string-a = ""] { $token-string-b; }
