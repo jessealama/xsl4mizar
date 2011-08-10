@@ -137,6 +137,13 @@ tpl [Item[@kind = "Correctness-Condition" or @kind = "Property" or @kind = "Corr
   }
 }
 
+tpl [Item[@kind = "Theorem-Item"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*](#definitions = `preceding-sibling::Item[@kind = "Private-Predicate-Definition" or @kind="Private-Functor-Definition"]`);
+  }
+}
+
 tpl [Block[@kind = "Proof"]](#definitions) {
   $context = `.`;
   <Block {
