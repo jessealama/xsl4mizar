@@ -2,6 +2,8 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
+key "R" [/Text-Proper/Item[@kind = "Reservation"]] `@reservation-number`;
+
 tpl die(#message) {
   if [@line and @col] {
     $line = `@line`;
