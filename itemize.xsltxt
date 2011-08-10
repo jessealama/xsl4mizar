@@ -143,7 +143,7 @@ tpl enumerate-items (#candidates, #bundlenr, #articleid) {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[@kind != "Reservation"]`,
+    enumerate-items (#candidates = `Item[@kind != "Reservation" and @kind != "Private-Predicate-Definition" and @kind != "Private-Functor-Definition"]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
