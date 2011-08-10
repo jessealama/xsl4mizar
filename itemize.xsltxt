@@ -112,6 +112,7 @@ tpl ensure-loci-have-numbers {
 
 tpl [/] {
   ensure-reservations-have-numbers ();
+  ensure-reservations-have-unique-numbers ();
   ensure-loci-declarations-bind-only-one-variable ();
   ensure-loci-have-numbers ();
   apply [*];
