@@ -149,12 +149,11 @@ tpl [Block[@kind = "Proof"]](#definitions) {
   <Block {
     @kind = "Proof";
     if [$definitions] {
-      $definition = `$definitions[1]`;
       for-each [$definitions] {
         if [Variable] {
           $idnr = `Variable[1]/@idnr`;
-          if [$context//Private-Predicate-Formula[@idnr = $idnr]] {
-            apply [$definition];
+          if [$context//Private-Predicate-Formula[@idnr = $idnr] or $context//Private-Functor-Term[@idnr = $idnr]] {
+            copy-of `.`;
           }
         } else {
           die (#message = "While determining whether to possibly include some local definitions into a proof, we encountered a local definition that lacks a Variable child");
