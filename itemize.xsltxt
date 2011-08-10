@@ -323,53 +323,216 @@ tpl index-of-loci-declaration-with-minimal-number (#loci) {
   }
 }
 
-tpl needed-reservations-helper(#reservations, #context, #seen) {
-  if [$reservations] {
-    $index_of_max = index-of-reservation-with-minimal-number (#reservations = $reservations);
-    $reservation = `$reservations[position() = $index_of_max]`;
-    $other_reservations = `$reservations[position() != $index_of_max]`;
-    $res_number = `$reservation/@reservation-number`;
-    $idnr = `$reservation/@idnr`;
-    $token = `concat (",", $idnr, ",")`;
-    if [contains ($seen, $token)] {
-      needed-reservations-helper (#reservations = $other_reservations,
-                                  #context = $context,
-                                  #seen = $seen);
+// Determine whether there is a path from the variable bound by
+// $reservation to $context (i.e., whether the variable occurs
+// anywhere inside $context).  $later-reservations is a node set of
+// reservation items that we may need to consult.  $already-handled is
+// a token list of idnr's of variables that we have already dealt
+// with.
+//
+// There is no path when the variable bound by $reservation occurs in
+// $later-reservations (because the variable will be rebound later).
+// If this condition fails, there is a path provided either:
+//
+// * the variable bound by $reservation occurs freely in $context, or
+//
+// * the variable bound by $reservation occurs in an implicitly
+//   qualified segment in $context, or
+//
+// * the variable bound by $reservation occurs as a simple term in
+//   some reservation R in $later-reservations, and there is a path
+//   from R to the context.  (This is where recursive path search
+//   enters.)
+
+tpl exists-path-from-some-reservation-to-context (#reservations, #context, #later-reservations) {
+  if [$reservations = ""] {
+    "0";
+  } else {
+    $reservation-number-token = first-token (#token-string = $reservations);
+    $reservation-number = value-of-token (#token = $reservation-number-token);
+    $reservation = `key ("R", $reservation-number)`;
+    $exists-path = exists-path-from-reservation-to-context (#reservation = $reservation,
+                                                            #context = $context,
+                                                            #later-reservations = $later-reservations);
+    if [$exists-path = "0"] {
+      $reservations-tail = token-string-tail (#token-string = $reservations);
+      exists-path-from-some-reservation-to-context (#reservations = $reservations-tail,
+                                                    #context = $context,
+                                                    #later-reservations = $later-reservations);
     } else {
-      if [$other_reservations/@idnr = $idnr] { // this variable will be reserved by some later reservation; don't emit this earlier one
-        needed-reservations-helper (#reservations = $other_reservations,
-                                    #context = $context,
-                                    #seen = $seen);
-      } else {
-        $term_found = reservation-binds-some-dependent-type-occuring-in-context (#reservation = $reservation,
-                                                                                 #more-reservations = $other_reservations,
-                                                                                 #context = $context);
-        if [$term_found = "0"] {
-          if [$context//Simple-Term[@idnr = $idnr] | $context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
-            copy-of `$reservation`;
-            needed-reservations-helper (#reservations = $other_reservations,
-                                        #context = $context,
-                                        #seen = `concat ($seen, $token)`);
-          } else {
-            needed-reservations-helper (#reservations = $other_reservations,
-                                        #context = $context,
-                                        #seen = $seen);
-          }
-        } else {
-          copy-of `$reservation`;
-          needed-reservations-helper (#reservations = $other_reservations,
-                                      #context = $context,
-                                      #seen = `concat ($seen, $token)`);
-        }
+      "1";
+    }
+  }
+}
+
+// Is the reservation-number attribute of $reservation bigger than the
+// reservation-number attribute of every reservation in $reservations?
+tpl reservation-follows-every-reservation (#reservation-number, #reservations) {
+  if [$reservations = ""] {
+    "1";
+  } else {
+    $potential-spoiler-token = first-token (#token-string = $reservations);
+    $potential-spoiler-number = value-of-token (#token = $potential-spoiler-token);
+    $potential-spoiler = `key ("R", $potential-spoiler-number)`;
+    $potential-spoiler-reservation-number = `$potential-spoiler/@reservation-number`;
+    if [$potential-spoiler-reservation-number < $reservation-number] {
+      reservation-follows-every-reservation (#reservation-number = $reservation-number,
+                                             #reservations = `$reservations[position() > 1]`);
+    } else {
+      "0";
+    }
+  }
+}
+
+// Return the subset of $all-reservations consisting of those
+// reservations whose reservation-number attribute is greater than
+// every reservation in $reservation.
+tpl reservations-following-every-helper (#reservations, #all-reservations, #val) {
+  if [$all-reservations = ""] {
+    $val;
+  } else {
+    $reservation-token = first-token (#token-string = $reservations);
+    $reservation = value-of-token (#token = $reservation-token);
+    $reservations-tail = token-string-tail (#token-string = $all-reservations);
+    $bigger = reservation-follows-every-reservation (#reservation-number = $reservation,
+                                                     #reservations = $reservations);
+    if [$bigger = "0"] {
+      reservations-following-every-helper (#reservations = $reservations,
+                                           #all-reservations = $reservations-tail);
+    } else {
+      $new-value = append-token-strings (#token-string-a = $val,
+                                         #token-string-b = $reservation-token);
+      reservations-following-every-helper (#reservations = $reservations,
+                                           #all-reservations = $reservations-tail,
+                                           #val = $new-value);
+    }
+  }
+}
+
+tpl reservations-following-every (#reservations, #all-reservations) {
+  reservations-following-every-helper (#reservations = $reservations,
+                                       #all-reservations = $all-reservations,
+                                       #val = "");
+}
+
+tpl idnr-occurs-in-dependent-type-of-some-reservation (#idnr, #reservations) {
+  if [$reservations = ""] {
+    "0";
+  } else {
+    $first-reservation-number-token = first-token (#token-string = $reservations);
+    $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
+    $first-reservation = `key ("R", $first-reservation-number)`;
+    if [$first-reservation//Simple-Term[@idnr = $idnr]] {
+      "1";
+    } else {
+      $remaining-reservations = token-string-tail (#token-string = $reservations);
+      idnr-occurs-in-dependent-type-of-some-reservation (#idnr = $idnr,
+                                                         #reservations = $remaining-reservations);
+    }
+  }
+}
+
+tpl dependent-type-reservations-in-which-idnr-occurs-helper (#idnr, #reservations, #val) {
+  $idnr-token = `concat (",", $idnr, ",")`;
+  if [$reservations = ""] {
+    $val;
+  } else {
+    $first-reservation-number-token = first-token (#token-string = $reservations);
+    $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
+    $first-reservation = `key ("R", $first-reservation-number)`;
+    $first-reservation-free-variables = `$first-reservation/@free-variables`;
+    $reservations-tail = token-string-tail (#token-string = $reservations);
+    if [contains ($first-reservation-free-variables, $idnr-token)] {
+      $new-value = append-token-strings (#token-string-a = $val,
+                                         #token-string-b = $first-reservation-number-token);
+      dependent-type-reservations-in-which-idnr-occurs-helper (#idnr = $idnr,
+                                                               #reservations = $reservations-tail,
+                                                               #val = $new-value);
+    } else {
+      dependent-type-reservations-in-which-idnr-occurs-helper (#idnr = $idnr,
+                                                               #reservations = $reservations-tail,
+                                                               #val = $val);
+    }
+  }
+}
+
+tpl dependent-type-reservations-in-which-idnr-occurs (#idnr, #reservations) {
+  dependent-type-reservations-in-which-idnr-occurs-helper (#idnr = $idnr,
+                                                           #reservations = $reservations,
+                                                           #val = "");  
+}
+
+// $reservations is a list of reservation numbers
+tpl idnr-bound-by-some-reservation (#idnr, #reservations) {
+  if [$reservations = ""] {
+    "0";
+  } else {
+    $first-reservation-number-token = first-token (#token-string = $reservations);
+    $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
+    $first-reservation = `key ("R", $first-reservation-number)`;
+    if [$first-reservation/@idnr = $idnr] {
+      "1";
+    } else {
+      $remaining-reservations = token-string-tail (#token-string = $reservations);
+      idnr-bound-by-some-reservation (#idnr = $idnr,
+                                      #reservations = $remaining-reservations);
+    }
+  }
+}
+
+tpl exists-path-from-reservation-to-context (#reservation, #context, #later-reservations) {
+  $idnr = `$reservation/@idnr`;
+  $token = `concat (",", $idnr, ",")`;
+  $bound-later = idnr-bound-by-some-reservation (#idnr = $idnr, #reservations = $later-reservations);
+  if [$bound-later = "1"] {
+    "0";
+  } else {
+    $free-variables-of-context = `$context/@free-variables`;
+    $dependent-type-reservations-with-idnr = dependent-type-reservations-in-which-idnr-occurs (#idnr = $idnr,
+                                                                                               #reservations = $later-reservations);
+    choose {
+      when [contains ($free-variables-of-context, $token)] { "1"; }
+      when [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] { "1"; }
+      when [$dependent-type-reservations-with-idnr = ""] { "0"; }
+      otherwise {
+        $reservations-after-candidates = reservations-following-every (#reservations = $dependent-type-reservations-with-idnr,
+                                                                       #all-reservations = $later-reservations);
+        exists-path-from-some-reservation-to-context (#reservations = $dependent-type-reservations-with-idnr,
+                                                      #context = $context,
+                                                      #later-reservations = $reservations-after-candidates);
       }
     }
   }
 }
 
-tpl needed-reservations(#reservations, #context) {
-  needed-reservations-helper (#reservations = $reservations,
-                             #context = $context,
-                             #seen = "");
+tpl reservation-node-set-to-token-string (#reservations) {
+  if [$reservations] {
+    $reservation = `$reservations[1]`;
+    $reservation-number = `$reservation/@reservation-number`;
+    $token = `concat (",", $reservation-number, ",")`;
+    $tail-token-string = reservation-node-set-to-token-string (#reservations = `$reservations[position() > 1]`);
+    append-token-strings (#token-string-a = $token,
+                          #token-string-b = $tail-token-string);
+  } else {
+    "";
+  }
+}
+
+tpl needed-reservations (#reservations, #context) {
+  if [$reservations] {
+    $index_of_min = index-of-reservation-with-minimal-number (#reservations = $reservations);
+    $reservation = `$reservations[position() = $index_of_min]`;
+    $other-reservations = `$reservations[position() != $index_of_min]`;
+    $other-reservations-as-token-string = reservation-node-set-to-token-string (#reservations = $other-reservations);
+    $exists-path = exists-path-from-reservation-to-context (#reservation = $reservation,
+                                                            #context = $context,
+                                                            #later-reservations = $other-reservations-as-token-string);
+    if [$exists-path = "1"] {
+      copy-of `$reservation`;
+    }
+    needed-reservations (#reservations = $other-reservations,
+                         #context = $context); 
+  }
 }
 
 tpl [Text-Proper/Item](#bundlenr, #articleid) {
