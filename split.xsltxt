@@ -17,14 +17,7 @@ tpl die(#message) {
 tpl [*] {
   $element = `local-name ()`;
   <$element {
-    if [@line] { @line = `@line`; }
-    if [@col] { @col = `@col`; }
-    if [@spelling] { @spelling = `@spelling`; }
-    if [@idnr] { @idnr = `@idnr`; }
-    if [@nr] { @nr = `@nr`; }
-    if [@number] { @"number" = `@number`; }
-    if [@articleid] { @articleid = `@articleid`; }
-    if [@kind] { @kind = `@kind`; }
+    for-each [@*] { copy-of `.`; }
     apply [*];
   }
 }
