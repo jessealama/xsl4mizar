@@ -72,6 +72,10 @@ tpl [Item[@kind = "Loci-Declaration"]] {
   }
 }
 
+tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition"]] {
+  // do nothing.  we are taking care of these in other contexts by folding them into proofs where they're used
+}
+
 tpl [Item[@kind="Definition-Item"]] {
   apply [Block];
 }
