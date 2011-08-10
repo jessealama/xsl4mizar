@@ -94,6 +94,15 @@ tpl ensure-reservations-have-numbers {
   }
 }
 
+tpl ensure-reservations-have-unique-numbers {
+  for-each [//Item[@kind = "Reservation"]] {
+    $reservation-number = `@reservation-number`;
+    if [//Item[@kind = "Reservation" and @reservation-number = $reservation-number][2]] {
+      die (#message = "This stylesheet assumes that each reservation item has a reservation number attribute shared by no other reservation item, but this document has has at least two reservation items sharing the same reservation number.");
+    }
+  }
+}
+
 tpl ensure-loci-declarations-bind-only-one-variable {
   for-each [//Item[@kind = "Loci-Declaration"]] {
     if [*/Variable[2]] {
