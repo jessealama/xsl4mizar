@@ -37,13 +37,52 @@ tpl split-reservation (#variables, #type) {
   }
 }
 
-tpl [Item[@kind="Reservation"]] {
+tpl [Text-Proper/Item[@kind = "Reservation"]] {
   $type = `*[position() = last()]`;
+  $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"])`;
   for-each [Variable] {
     <Item {
+      for-each [@*] { copy-of `.`; }
       @kind = "Reservation";
-      @idnr = `@idnr`;
-      @reservation-number = `position() + count(preceding::Item[@kind = "Reservation"]/Variable)`;
+      @toplevel-binder-number = `position() + $num-previous-toplevel`;
+      apply [.];
+      apply [$type];
+    }
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"]) + 1`;
+  }
+}
+
+// These kinds of statements present problems for my analysis.  One can introduce spurious variables and types, e.g.:
+//
+// consider A being set, B being Jordan-Curve such that A1: A = B or A <> B;
+//
+// Lm: <something about A alone, not B>
+//
+// I can't just split up the choice statement into two separate ones
+// because the property that the introduced variables satisfy involves
+// both variables (A and B occur in "A = B or A <> B")
+tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"]) + 1`;
+    apply [*];
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
+  $type = `*[position() = last()]`;
+  $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"])`;
+  for-each [Variable] {
+    <Item {
+      for-each [@*] { copy-of `.`; }
+      @kind = "Type-Changing-Statement";
+      @toplevel-binder-number = `position() + $num-previous-toplevel`;
       apply [.];
       apply [$type];
     }
@@ -70,10 +109,6 @@ tpl [Item[@kind = "Loci-Declaration"]] {
       }
     }
   }
-}
-
-tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition"]] {
-  // do nothing.  we are taking care of these in other contexts by folding them into proofs where they're used
 }
 
 tpl [Item[@kind="Definition-Item"]] {
