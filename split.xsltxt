@@ -22,21 +22,6 @@ tpl [*] {
   }
 }
 
-tpl split-reservation (#variables, #type) {
-  if [$variables] {
-    $variable = `$variables[1]`;
-    <Item {
-      @kind = "Reservation";
-      @idnr = $variable/@idnr;
-      apply [$variable];
-      apply [$type];
-
-    }
-    split-reservation (#variables = `$variables[position() > 1]`,
-                       #type = $type);
-  }
-}
-
 tpl [Text-Proper/Item[@kind = "Reservation"]] {
   $type = `*[position() = last()]`;
   $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"])`;
