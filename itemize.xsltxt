@@ -2,7 +2,7 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-key "R" [/Text-Proper/Item[@kind = "Reservation"]] `@reservation-number`;
+key "R" [/Text-Proper/Item[@kind = "Reservation"]] `@toplevel-binder-number`;
 
 tpl die(#message) {
   if [@line and @col] {
@@ -88,7 +88,7 @@ tpl value-of-token (#token) {
 
 tpl ensure-reservations-have-numbers {
   for-each [//Item[@kind = "Reservation"]] {
-    if [not(@reservation-number)] {
+    if [not(@toplevel-binder-number)] {
       die (#message = "This stylesheet assumes that all reservation items have a reservation-number attribute, but there is at least one in this document that lacks this attribute.");
     }
   }
@@ -96,8 +96,8 @@ tpl ensure-reservations-have-numbers {
 
 tpl ensure-reservations-have-unique-numbers {
   for-each [//Item[@kind = "Reservation"]] {
-    $reservation-number = `@reservation-number`;
-    if [//Item[@kind = "Reservation" and @reservation-number = $reservation-number][2]] {
+    $reservation-number = `@toplevel-binder-number`;
+    if [//Item[@kind = "Reservation" and @toplevel-binder-number = $reservation-number][2]] {
       die (#message = "This stylesheet assumes that each reservation item has a reservation number attribute shared by no other reservation item, but this document has has at least two reservation items sharing the same reservation number.");
     }
   }
@@ -263,11 +263,11 @@ tpl index-of-reservation-with-maximal-number (#reservations) {
   if [$reservations] {
     if [$reservations[2]] {
       $reservation = `$reservations[1]`;
-      $reservation_number = `$reservation/@reservation-number`;
+      $reservation_number = `$reservation/@toplevel-binder-number`;
       $index_for_tail = index-of-reservation-with-maximal-number (#reservations = `$reservations[position() > 1]`);
       $adjusted_index = `$index_for_tail + 1`;
       $best_in_tail = `$reservations[$adjusted_index]`;
-      $best_in_tail_reservation_number = `$best_in_tail/@reservation-number`;
+      $best_in_tail_reservation_number = `$best_in_tail/@toplevel-binder-number`;
       if [$reservation_number > $best_in_tail_reservation_number] {
         "1";
       } else {
@@ -285,11 +285,11 @@ tpl index-of-reservation-with-minimal-number (#reservations) {
   if [$reservations] {
     if [$reservations[2]] {
       $reservation = `$reservations[1]`;
-      $reservation_number = `$reservation/@reservation-number`;
+      $reservation_number = `$reservation/@toplevel-binder-number`;
       $index_for_tail = index-of-reservation-with-minimal-number (#reservations = `$reservations[position() > 1]`);
       $adjusted_index = `$index_for_tail + 1`;
       $best_in_tail = `$reservations[$adjusted_index]`;
-      $best_in_tail_reservation_number = `$best_in_tail/@reservation-number`;
+      $best_in_tail_reservation_number = `$best_in_tail/@toplevel-binder-number`;
       if [$reservation_number < $best_in_tail_reservation_number] {
         "1";
       } else {
@@ -376,7 +376,7 @@ tpl reservation-follows-every-reservation (#reservation-number, #reservations) {
     $potential-spoiler-token = first-token (#token-string = $reservations);
     $potential-spoiler-number = value-of-token (#token = $potential-spoiler-token);
     $potential-spoiler = `key ("R", $potential-spoiler-number)`;
-    $potential-spoiler-reservation-number = `$potential-spoiler/@reservation-number`;
+    $potential-spoiler-reservation-number = `$potential-spoiler/@toplevel-binder-number`;
     if [$potential-spoiler-reservation-number < $reservation-number] {
       reservation-follows-every-reservation (#reservation-number = $reservation-number,
                                              #reservations = `$reservations[position() > 1]`);
@@ -510,7 +510,7 @@ tpl exists-path-from-reservation-to-context (#reservation, #context, #later-rese
 tpl reservation-node-set-to-token-string (#reservations) {
   if [$reservations] {
     $reservation = `$reservations[1]`;
-    $reservation-number = `$reservation/@reservation-number`;
+    $reservation-number = `$reservation/@toplevel-binder-number`;
     $token = `concat (",", $reservation-number, ",")`;
     $tail-token-string = reservation-node-set-to-token-string (#reservations = `$reservations[position() > 1]`);
     append-token-strings (#token-string-a = $token,
