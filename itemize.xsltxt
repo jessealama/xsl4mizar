@@ -513,12 +513,12 @@ tpl exists-path-from-reservation-to-context (#reservation, #context, #later-rese
   }
 }
 
-tpl reservation-node-set-to-token-string (#reservations) {
-  if [$reservations] {
-    $reservation = `$reservations[1]`;
-    $reservation-number = `$reservation/@toplevel-binder-number`;
-    $token = `concat (",", $reservation-number, ",")`;
-    $tail-token-string = reservation-node-set-to-token-string (#reservations = `$reservations[position() > 1]`);
+tpl toplevel-item-node-set-to-token-string (#items) {
+  if [$items] {
+    $item = `$items[1]`;
+    $toplevel-item-number = `$item/@toplevel-binder-number`;
+    $token = `concat (",", $toplevel-item-number, ",")`;
+    $tail-token-string = toplevel-item-node-set-to-token-string (#items = `$items[position() > 1]`);
     append-token-strings (#token-string-a = $token,
                           #token-string-b = $tail-token-string);
   } else {
@@ -526,20 +526,20 @@ tpl reservation-node-set-to-token-string (#reservations) {
   }
 }
 
-tpl needed-reservations (#reservations, #context) {
-  if [$reservations] {
-    $index_of_min = index-of-reservation-with-minimal-number (#reservations = $reservations);
-    $reservation = `$reservations[position() = $index_of_min]`;
-    $other-reservations = `$reservations[position() != $index_of_min]`;
-    $other-reservations-as-token-string = reservation-node-set-to-token-string (#reservations = $other-reservations);
-    $exists-path = exists-path-from-reservation-to-context (#reservation = $reservation,
-                                                            #context = $context,
-                                                            #later-reservations = $other-reservations-as-token-string);
+tpl needed-toplevel-items (#candidates, #context) {
+  if [$candidates] {
+    $index_of_min = index-of-item-with-minimal-number (#items = $candidates);
+    $candidate = `$candidates[position() = $index_of_min]`;
+    $other-candidates = `$candidates[position() != $index_of_min]`;
+    $other-candidates-as-token-string = toplevel-item-node-set-to-token-string (#items = $other-candidates);
+    $exists-path = exists-path-from-toplevel-item-to-context (#item = $candidate,
+                                                              #context = $context,
+                                                              #later-toplevel-items = $other-candidates-as-token-string);
     if [$exists-path = "1"] {
-      copy-of `$reservation`;
+      copy-of `$candidate`;
     }
-    needed-reservations (#reservations = $other-reservations,
-                         #context = $context); 
+    needed-toplevel-items (#candidates = $other-candidates,
+                           #context = $context); 
   }
 }
 
@@ -561,7 +561,7 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
     $context = `.`;
 
     <Text-Proper {
-      needed-reservations (#reservations = `preceding::Item[@kind="Reservation"]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement"] {
