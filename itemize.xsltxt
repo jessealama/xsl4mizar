@@ -92,6 +92,17 @@ tpl value-of-token (#token) {
 
 // Sanity checks
 
+tpl ensure-toplevel-items-have-distinct-labels {
+  for-each [/Text-Proper/Item[@kind = "Regular-Statement"]/Diffuse-Statement/../Label | /Text-Proper/Item[@kind = "Theorem-Item"]/Proposition/Label | /Text-Proper/Item[@kind = "Regular-Statement"]/Compact-Statement/../Label] {
+    $idnr = `@idnr`;
+    if [count (/Text-Proper/Item[@kind = "Regular-Statement"]/Diffuse-Statement/../Label[@idnr = $idnr] | /Text-Proper/Item[@kind = "Theorem-Item"]/Proposition/Label[@idnr = $idnr] | /Text-Proper/Item[@kind = "Regular-Statement"]/Compact-Statement/../Label[@idnr = $idnr]) > 1] {
+      $spelling = `@spelling`;
+      $message = `concat ("This stylesheet assumes that there the lemmas, theorems, and toplevel diffuse reasoning blocks of the document have distinct labels, but there are at least two items in the document named '", $spelling, "'")`;
+      die (#message = $message);
+    }
+  }
+}
+
 tpl ensure-reservations-have-numbers {
   for-each [//Item[@kind = "Reservation" and not(@toplevel-binder-number)]] {
     die (#message = "This stylesheet assumes that all reservation items have a toplevel-binder-number attribute, but there is at least one reservation in this document that lacks this attribute.");
@@ -127,6 +138,7 @@ tpl ensure-loci-have-numbers {
 }
 
 tpl [/] {
+  ensure-toplevel-items-have-distinct-labels ();
   ensure-reservations-have-numbers ();
   ensure-reservations-have-unique-numbers ();
   ensure-loci-declarations-bind-only-one-variable ();
