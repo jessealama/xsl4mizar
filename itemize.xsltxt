@@ -2,7 +2,7 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-key "R" [/Text-Proper/Item[@kind = "Reservation"]] `@toplevel-binder-number`;
+key "binder" [/Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"]] `@toplevel-binder-number`;
 
 tpl die(#message) {
   if [@line and @col] {
@@ -352,7 +352,7 @@ tpl exists-path-from-some-reservation-to-context (#reservations, #context, #late
   } else {
     $reservation-number-token = first-token (#token-string = $reservations);
     $reservation-number = value-of-token (#token = $reservation-number-token);
-    $reservation = `key ("R", $reservation-number)`;
+    $reservation = `key ("binder", $reservation-number)`;
     $exists-path = exists-path-from-reservation-to-context (#reservation = $reservation,
                                                             #context = $context,
                                                             #later-reservations = $later-reservations);
@@ -375,7 +375,7 @@ tpl reservation-follows-every-reservation (#reservation-number, #reservations) {
   } else {
     $potential-spoiler-token = first-token (#token-string = $reservations);
     $potential-spoiler-number = value-of-token (#token = $potential-spoiler-token);
-    $potential-spoiler = `key ("R", $potential-spoiler-number)`;
+    $potential-spoiler = `key ("binder", $potential-spoiler-number)`;
     $potential-spoiler-reservation-number = `$potential-spoiler/@toplevel-binder-number`;
     if [$potential-spoiler-reservation-number < $reservation-number] {
       reservation-follows-every-reservation (#reservation-number = $reservation-number,
@@ -423,7 +423,7 @@ tpl idnr-occurs-in-dependent-type-of-some-reservation (#idnr, #reservations) {
   } else {
     $first-reservation-number-token = first-token (#token-string = $reservations);
     $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
-    $first-reservation = `key ("R", $first-reservation-number)`;
+    $first-reservation = `key ("binder", $first-reservation-number)`;
     if [$first-reservation//Simple-Term[@idnr = $idnr]] {
       "1";
     } else {
@@ -441,7 +441,7 @@ tpl dependent-type-reservations-in-which-idnr-occurs-helper (#idnr, #reservation
   } else {
     $first-reservation-number-token = first-token (#token-string = $reservations);
     $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
-    $first-reservation = `key ("R", $first-reservation-number)`;
+    $first-reservation = `key ("binder", $first-reservation-number)`;
     $first-reservation-free-variables = `$first-reservation/@free-variables`;
     $reservations-tail = token-string-tail (#token-string = $reservations);
     if [contains ($first-reservation-free-variables, $idnr-token)] {
@@ -471,7 +471,7 @@ tpl idnr-bound-by-some-reservation (#idnr, #reservations) {
   } else {
     $first-reservation-number-token = first-token (#token-string = $reservations);
     $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
-    $first-reservation = `key ("R", $first-reservation-number)`;
+    $first-reservation = `key ("binder", $first-reservation-number)`;
     if [$first-reservation/@idnr = $idnr] {
       "1";
     } else {
