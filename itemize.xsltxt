@@ -97,6 +97,9 @@ tpl ensure-reservations-have-numbers {
     if [not(@toplevel-binder-number)] {
       die (#message = "This stylesheet assumes that all reservation items have a reservation-number attribute, but there is at least one in this document that lacks this attribute.");
     }
+    if [not(@idnr)] {
+      die (#message = "This stylesheet assumes that all reservation items have an idnr-number attribute, but there is at least one in this document that lacks this attribute.");
+    }
   }
 }
 
@@ -573,7 +576,7 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
     $context = `.`;
 
     <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Choice-Statement" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement"] {
