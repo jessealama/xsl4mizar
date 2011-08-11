@@ -30,6 +30,11 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
       for-each [@*] { copy-of `.`; }
       @kind = "Reservation";
       @toplevel-binder-number = `position() + $num-previous-toplevel`;
+      if [@idnr] {
+        @idnr = `@idnr`;
+      } else {
+        die (#message = "We found a variable that lacks an idnr attribute; unable to proceed.");
+      }
       apply [.];
       apply [$type];
     }
