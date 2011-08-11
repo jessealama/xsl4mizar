@@ -411,20 +411,24 @@ tpl items-following-every-helper (#items, #all-items, #val) {
   if [$all-items = ""] {
     $val;
   } else {
-    $item-token = first-token (#token-string = $items);
-    $item = value-of-token (#token = $item-token);
-    $items-tail = token-string-tail (#token-string = $all-items);
-    $bigger = item-follows-every-item (#item-number = $item,
-                                       #items = $all-items);
-    if [$bigger = "0"] {
-      items-following-every-helper (#items = $items,
-                                    #all-items = $items-tail);
+    if [$items = ""] {
+      $all-items;
     } else {
-      $new-value = append-token-strings (#token-string-a = $val,
-                                         #token-string-b = $item-token);
-      items-following-every-helper (#items = $items,
-                                    #all-items = $items-tail,
-                                    #val = $new-value);
+      $item-token = first-token (#token-string = $items);
+      $item = value-of-token (#token = $item-token);
+      $items-tail = token-string-tail (#token-string = $all-items);
+      $bigger = item-follows-every-item (#item-number = $item,
+                                         #items = $all-items);
+      if [$bigger = "0"] {
+        items-following-every-helper (#items = $items,
+                                      #all-items = $items-tail);
+      } else {
+        $new-value = append-token-strings (#token-string-a = $val,
+                                           #token-string-b = $item-token);
+        items-following-every-helper (#items = $items,
+                                      #all-items = $items-tail,
+                                      #val = $new-value);
+      }
     }
   }
 }
@@ -438,6 +442,49 @@ tpl items-following-every (#items, #all-items) {
   items-following-every-helper (#items = $items,
                                 #all-items = $all-items,
                                 #val = "");
+}
+
+
+tpl toplevel-items-in-which-item-occurs (#idnr, #items, #val) {
+  if [$items = ""] {
+    $val;
+  } else {
+    $idnr-token = `concat (",", $idnr, ",")`;
+    $first-toplevel-item-number-token = first-token (#token-string = $items);
+    $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
+    $first-toplevel-item = `key ("binder", $first-toplevel-item-number)`;
+    $remaining-items = token-string-tail (#token-string = $items);
+    $new-val = append-token-strings (#token-string-a = $val,
+                                     #token-string-b = $first-toplevel-item-number-token);
+    if [$first-toplevel-item] {
+      $first-toplevel-item-free-variables = `$first-toplevel-item/@free-variables`;
+      choose {
+        when [contains ($first-toplevel-item-free-variables, $idnr-token)] {
+          toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                               #items = $remaining-items,
+                                               #val = $new-val);
+        }
+        when [$first-toplevel-item//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+          toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                               #items = $remaining-items,
+                                               #val = $new-val);
+        } 
+        when [$first-toplevel-item//Simple-Term[@idnr = $idnr]] {
+          toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                               #items = $remaining-items,
+                                               #val = $new-val);
+        }
+        otherwise {
+          toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                               #items = $remaining-items,
+                                               #val = $val);
+        }
+      }
+    } else {
+      $message = `concat ("We tried to look up the toplevel item whose idnr is ", $first-toplevel-item-number, " (the first element of the token list '", $items, "' of item idnr numbers) but there is no such item")`;
+      die (#message = $message);
+    }
+  }
 }
 
 tpl idnr-occurs-in-dependent-type-of-some-reservation (#idnr, #reservations) {
@@ -584,22 +631,23 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
                                                       #later-items = $items-after-later-users);
     }
   } else {
-    $token = `concat (",", $idnr, ",")`;
     $bound-later = item-bound-by-some-toplevel-item (#item = $item, #items = $later-toplevel-items);
     if [$bound-later = "1"] {
       "0";
     } else {
+      $token = `concat (",", $idnr, ",")`;
       $free-variables-of-context = `$context/@free-variables`;
-      $dependent-type-reservations-with-idnr = dependent-type-reservations-in-which-idnr-occurs (#idnr = $idnr,
-                                                                                                 #reservations = $later-toplevel-items);
-      choose {
-        when [contains ($free-variables-of-context, $token)] { "1"; }
-        when [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] { "1"; }
-        when [$dependent-type-reservations-with-idnr = ""] { "0"; }
-        otherwise {
-          $items-after-candidates = items-following-every (#items = $dependent-type-reservations-with-idnr,
+      if [contains ($free-variables-of-context, $token)] {
+        "1";
+      } else {
+        if [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+          "1";
+        } else {
+          $later-users = toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                                              #items = $later-toplevel-items);
+          $items-after-candidates = items-following-every (#items = $later-users,
                                                            #all-items = $later-toplevel-items);
-          exists-path-from-some-toplevel-item-to-context (#items = $dependent-type-reservations-with-idnr,
+          exists-path-from-some-toplevel-item-to-context (#items = $later-users,
                                                           #context = $context,
                                                           #later-items = $items-after-candidates);
         }
@@ -638,26 +686,23 @@ tpl needed-toplevel-items (#candidates, #context) {
                                                               #context = $context,
                                                               #later-toplevel-items = $other-candidates-as-token-string);
     if [$exists-path = "1"] {
-      copy-of `$candidate`;
+      // copy-of `$candidate`;
+      apply [$candidate];
     }
     needed-toplevel-items (#candidates = $other-candidates,
                            #context = $context); 
   }
 }
 
-tpl [Text-Proper/Item](#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Constant-Definition")]](#bundlenr, #articleid) {
   <Item-Bundle {
 
     if [$bundlenr] {
       @bundlenr = $bundlenr;
-    } else {
-      die (#message = "Cannot process a top-level item without a bundle number");
     }
 
     if [$articleid] {
       @articleid = $articleid;
-    } else {
-      die (#message = "Cannot process a top-level item without an article id");
     }
 
     $context = `.`;
@@ -669,8 +714,6 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
         if [@kind = "Regular-Statement"] {
           if [Compact-Statement] {
             @kind = "Theorem-Item";
-          } else {
-            die (#message = "Don't know how to deal with non-Compact-Statement-type toplevel Regular-Statement items!");
           }
         } else {
           @kind = `@kind`;
@@ -682,12 +725,24 @@ tpl [Text-Proper/Item](#bundlenr, #articleid) {
   }
 }
 
-tpl [Item[@kind="Reservation"]] {
-  if [Variable[2]] {
-    die (#message = "We found a reservation that reserves more than one variable!");
+tpl [Item[@kind = "Reservation"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
   }
-  if [not(@idnr)] {
-    die (#message = "We found a reservation that lacks an idnr attribute!");
+}
+
+tpl [Item[@kind = "Type-Changing-Statement"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Regular-Statement" and child::Diffuse-Statement]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
   }
 }
 
@@ -746,7 +801,7 @@ tpl [Local-Reference] {
       // look for a previous exported toplevel theorem
       when [preceding::Item[@kind = "Theorem-Item"]/Proposition/Label[@idnr = $idnr]] {
         for-each [preceding::Item[@kind = "Theorem-Item"]/Proposition/Label[@idnr = $idnr]/../..] {
-          $position = `count (preceding-sibling::*[not(@kind = "Reservation")]) + 1`;
+          $position = `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Constant-Definition") and not(@kind = "Type-Changing-Statement")]) + 1`;
           $new_spelling = `concat ("CKB", $position)`;
           <Theorem-Reference {
             @spelling = $new_spelling;
