@@ -2,7 +2,7 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-key "binder" [/Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"]] `@toplevel-binder-number`;
+key "binder" [/Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
 
 tpl die(#message) {
   if [@line and @col] {
