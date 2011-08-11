@@ -280,7 +280,7 @@ tpl loci-declarations-preceding-but-below (#node, #upper-bound, #bound-vars) {
   }
 }
 
-// Reservations bind variables
+// Binders
 
 tpl [Text-Proper/Item[@kind = "Reservation"]](#upper-bound) mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
