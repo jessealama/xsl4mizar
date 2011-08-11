@@ -55,6 +55,7 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
   <Item {
     for-each [@*] { copy-of `.`; }
     @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"]) + 1`;
+    apply [*];
   }
 }
 
