@@ -42,9 +42,13 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
 }
 
 tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition"]] {
+  if [Variable[2]] {
+    die (#message = "We assume that private predicate/functor definitions bind at most one variable, but we found one that binds at least two!");
+  }
   <Item {
     for-each [@*] { copy-of `.`; }
     @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement"]) + 1`;
+    @idnr = `Variable[1]/@idnr`;
     apply [*];
   }
 }
