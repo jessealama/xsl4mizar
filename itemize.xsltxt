@@ -513,26 +513,96 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
   }
 }
 
+tpl items-using-toplevel-diffuse-reasoning-item-helper (#diffuse-reasoning-item, #items, #val) {
+  $idnr = `$diffuse-reasoning-item/@idnr`;
+  if [$items = ""] {
+    "";
+  } else {
+    $items-tail = token-string-tail (#token-string = $items);
+    $first-item-number-token = first-token (#token-string = $items);
+    $first-item-number = value-of-token (#token = $first-item-number-token);
+    $item = `key ("binder", $first-item-number)`;
+    if [$item] {
+      if [$item//Local-Reference[@idnr = $idnr]] {
+        $new-val = append-token-strings (#token-string-a = $val,
+                                         #token-string-b = $first-item-number-token);
+        items-using-toplevel-diffuse-reasoning-item-helper (#diffuse-reasoning-item = $diffuse-reasoning-item,
+                                                            #items = $items-tail,
+                                                            #val = $new-val);
+      } else {
+        items-using-toplevel-diffuse-reasoning-item-helper (#diffuse-reasoning-item = $diffuse-reasoning-item,
+                                                            #items = $items-tail,
+                                                            #val = $val);
+      }
+    } else {
+      $message = `concat ("We were unable to find a toplevel item with the idnr attribute ", $first-item-number, "; why not?")`;
+      die (#message = $message);
+    }
+  }
+}
+
+// Given a token list $items of toplevel-binder-numbers and a
+// $diffuse-reasoning-item, return the sub-token list of $items that
+// use $diffuse-reasoning-item in their justification
+tpl items-using-toplevel-diffuse-reasoning-item (#diffuse-reasoning-item, #items) {
+  if [$diffuse-reasoning-item/Label] {
+    if [$diffuse-reasoning-item/@idnr] {
+      items-using-toplevel-diffuse-reasoning-item-helper (#diffuse-reasoning-item = $diffuse-reasoning-item,
+                                                          #items = $items,
+                                                          #val = "");
+    } else {
+      if [$diffuse-reasoning-item/Label/@spelling] {
+        $spelling = `$diffuse-reasoning-item/Label/@spelling`;
+        $message = `concat ("The toplevel diffuse reasoning item with label ", $spelling, " lacks an idnr attribute!")`;
+        die (#message = $message);
+      } else {
+        die (#message = "We found a toplevel diffuse reasoning item that lacks an idnr attribute!");
+      }
+    }
+  } else { // the item lacks a label, so nothing can refer to it
+    "";
+  }
+}
+
 tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-items) {
   $idnr = `$item/@idnr`;
-  $token = `concat (",", $idnr, ",")`;
-  $bound-later = item-bound-by-some-toplevel-item (#item = $item, #items = $later-toplevel-items);
-  if [$bound-later = "1"] {
-    "0";
+  $kind = `$item/@kind`;
+  if [$kind = "Regular-Statement"] {
+    $later-users = items-using-toplevel-diffuse-reasoning-item (#diffuse-reasoning-item = $item,
+                                                               #items = $later-toplevel-items);
+    if [$later-users = ""] { // this toplevel item is not needed to jsutify any of the later items, so look inside $context
+      if [$context//Local-Reference[@idnr = $idnr]] {
+        "1";
+      } else {
+        "0";
+      }
+    } else {
+      $items-after-later-users = items-following-every (#items = $later-users,
+                                                        #all-items = $later-toplevel-items);
+      exists-path-from-some-toplevel-item-to-context (#items = $later-users,
+                                                      #context = $context,
+                                                      #later-items = $items-after-later-users);
+    }
   } else {
-    $free-variables-of-context = `$context/@free-variables`;
-    $dependent-type-reservations-with-idnr = dependent-type-reservations-in-which-idnr-occurs (#idnr = $idnr,
-                                                                                               #reservations = $later-toplevel-items);
-    choose {
-      when [contains ($free-variables-of-context, $token)] { "1"; }
-      when [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] { "1"; }
-      when [$dependent-type-reservations-with-idnr = ""] { "0"; }
-      otherwise {
-        $items-after-candidates = items-following-every (#items = $dependent-type-reservations-with-idnr,
-                                                         #all-items = $later-toplevel-items);
-        exists-path-from-some-toplevel-item-to-context (#items = $dependent-type-reservations-with-idnr,
-                                                        #context = $context,
-                                                        #later-items = $items-after-candidates);
+    $token = `concat (",", $idnr, ",")`;
+    $bound-later = item-bound-by-some-toplevel-item (#item = $item, #items = $later-toplevel-items);
+    if [$bound-later = "1"] {
+      "0";
+    } else {
+      $free-variables-of-context = `$context/@free-variables`;
+      $dependent-type-reservations-with-idnr = dependent-type-reservations-in-which-idnr-occurs (#idnr = $idnr,
+                                                                                                 #reservations = $later-toplevel-items);
+      choose {
+        when [contains ($free-variables-of-context, $token)] { "1"; }
+        when [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] { "1"; }
+        when [$dependent-type-reservations-with-idnr = ""] { "0"; }
+        otherwise {
+          $items-after-candidates = items-following-every (#items = $dependent-type-reservations-with-idnr,
+                                                           #all-items = $later-toplevel-items);
+          exists-path-from-some-toplevel-item-to-context (#items = $dependent-type-reservations-with-idnr,
+                                                          #context = $context,
+                                                          #later-items = $items-after-candidates);
+        }
       }
     }
   }
@@ -541,11 +611,18 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
 tpl toplevel-item-node-set-to-token-string (#items) {
   if [$items] {
     $item = `$items[1]`;
-    $toplevel-item-number = `$item/@toplevel-binder-number`;
-    $token = `concat (",", $toplevel-item-number, ",")`;
-    $tail-token-string = toplevel-item-node-set-to-token-string (#items = `$items[position() > 1]`);
-    append-token-strings (#token-string-a = $token,
-                          #token-string-b = $tail-token-string);
+    if [$item/@toplevel-binder-number] {
+      $toplevel-item-number = `$item/@toplevel-binder-number`;
+      $token = `concat (",", $toplevel-item-number, ",")`;
+      $tail-token-string = toplevel-item-node-set-to-token-string (#items = `$items[position() > 1]`);
+      append-token-strings (#token-string-a = $token,
+                            #token-string-b = $tail-token-string);
+    } else {
+      $item-line = `$item/@line`;
+      $item-col = `$item/@col`;
+      $message = `concat ("We found a toplevel binding item at line ", $item-line, " and column ", $item-col, " that lacks a toplevel-binder-number attribute!")`;
+      die (#message = $message);
+    }
   } else {
     "";
   }
@@ -738,12 +815,14 @@ tpl needed-loci-helper (#loci, #context, #seen) {
         $term_found = loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration = $loci-declaration,
                                                                                       #more-loci = $other_loci,
                                                                                       #context = $context);
+        $new-seen = append-token-strings (#token-string-a = $seen,
+                                          #token-string-b = $token);
         if [$term_found = "0"] {
           if [$context//Simple-Term[@idnr = $idnr] | $context//Locus[@nr = $idnr]] {
             copy-of `$loci-declaration`;
             needed-loci-helper (#loci = $other_loci,
                                 #context = $context,
-                                #seen = `concat ($seen, $token)`);
+                                #seen = $new-seen);
           } else {
             needed-loci-helper (#loci = $other_loci,
                                 #context = $context,
@@ -753,7 +832,7 @@ tpl needed-loci-helper (#loci, #context, #seen) {
           copy-of `$loci-declaration`;
           needed-loci-helper (#loci = $other_loci,
                               #context = $context,
-                              #seen = `concat ($seen, $token)`);
+                              #seen = $new-seen);
         }
       }
     }
