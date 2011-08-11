@@ -506,7 +506,7 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
 tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-items) {
   $idnr = `$item/@idnr`;
   $token = `concat (",", $idnr, ",")`;
-  $bound-later = item-bound-by-some-toplevel-item (#item = $item, #later-items = $later-toplevel-items);
+  $bound-later = item-bound-by-some-toplevel-item (#item = $item, #items = $later-toplevel-items);
   if [$bound-later = "1"] {
     "0";
   } else {
