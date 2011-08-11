@@ -158,7 +158,7 @@ tpl enumerate-items (#candidates, #bundlenr, #articleid) {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[@kind != "Reservation" and @kind != "Private-Predicate-Definition" and @kind != "Private-Functor-Definition"]`,
+    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
