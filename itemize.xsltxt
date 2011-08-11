@@ -4,6 +4,8 @@ output method=xml indent="yes";
 
 key "binder" [/Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
 
+// Say something when dying
+
 tpl die(#message) {
   if [@line and @col] {
     $line = `@line`;
@@ -15,6 +17,8 @@ tpl die(#message) {
     msg terminate="yes" $final_message;
   }
 }
+
+// Tokens
 
 tpl first-token (#token-string) {
   if [$token-string = ""] {
@@ -85,6 +89,8 @@ tpl value-of-token (#token) {
     die (#message = $message);
   }
 }
+
+// Sanity checks
 
 tpl ensure-reservations-have-numbers {
   for-each [//Item[@kind = "Reservation"]] {
