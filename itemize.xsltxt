@@ -287,19 +287,19 @@ tpl index-of-reservation-with-maximal-number (#reservations) {
   }
 }
 
-tpl index-of-reservation-with-minimal-number (#reservations) {
-  if [$reservations] {
-    if [$reservations[2]] {
-      $reservation = `$reservations[1]`;
-      $reservation_number = `$reservation/@toplevel-binder-number`;
-      $index_for_tail = index-of-reservation-with-minimal-number (#reservations = `$reservations[position() > 1]`);
-      $adjusted_index = `$index_for_tail + 1`;
-      $best_in_tail = `$reservations[$adjusted_index]`;
-      $best_in_tail_reservation_number = `$best_in_tail/@toplevel-binder-number`;
-      if [$reservation_number < $best_in_tail_reservation_number] {
+tpl index-of-item-with-minimal-number (#items) {
+  if [$items] {
+    if [$items[2]] {
+      $item = `$items[1]`;
+      $item-number = `$item/@toplevel-binder-number`;
+      $index-for-tail = index-of-item-with-minimal-number (#items = `$items[position() > 1]`);
+      $adjusted-index = `$index-for-tail + 1`;
+      $best-in-tail = `$items[$adjusted-index]`;
+      $best-in-tail-item-number = `$best-in-tail/@toplevel-binder-number`;
+      if [$item-number < $best-in-tail-item-number] {
         "1";
       } else {
-        $adjusted_index;
+        $adjusted-index;
       }
     } else {
       "1";
@@ -352,21 +352,21 @@ tpl index-of-loci-declaration-with-minimal-number (#loci) {
 //   from R to the context.  (This is where recursive path search
 //   enters.)
 
-tpl exists-path-from-some-reservation-to-context (#reservations, #context, #later-reservations) {
-  if [$reservations = ""] {
+tpl exists-path-from-some-toplevel-item-to-context (#items, #context, #later-items) {
+  if [$items = ""] {
     "0";
   } else {
-    $reservation-number-token = first-token (#token-string = $reservations);
-    $reservation-number = value-of-token (#token = $reservation-number-token);
-    $reservation = `key ("binder", $reservation-number)`;
-    $exists-path = exists-path-from-reservation-to-context (#reservation = $reservation,
-                                                            #context = $context,
-                                                            #later-reservations = $later-reservations);
+    $item-number-token = first-token (#token-string = $items);
+    $item-number = value-of-token (#token = $item-number-token);
+    $item = `key ("binder", $item-number)`;
+    $exists-path = exists-path-from-toplevel-item-to-context (#item = $item,
+                                                              #context = $context,
+                                                              #later-items = $later-items);
     if [$exists-path = "0"] {
-      $reservations-tail = token-string-tail (#token-string = $reservations);
-      exists-path-from-some-reservation-to-context (#reservations = $reservations-tail,
-                                                    #context = $context,
-                                                    #later-reservations = $later-reservations);
+      $items-tail = token-string-tail (#token-string = $items);
+      exists-path-from-some-toplevel-item-to-context (#items = $items-tail,
+                                                      #context = $context,
+                                                      #later-items = $later-items);
     } else {
       "1";
     }
@@ -375,52 +375,56 @@ tpl exists-path-from-some-reservation-to-context (#reservations, #context, #late
 
 // Is the reservation-number attribute of $reservation bigger than the
 // reservation-number attribute of every reservation in $reservations?
-tpl reservation-follows-every-reservation (#reservation-number, #reservations) {
-  if [$reservations = ""] {
+tpl item-follows-every-item (#item-number, #items) {
+  if [$items = ""] {
     "1";
   } else {
-    $potential-spoiler-token = first-token (#token-string = $reservations);
+    $potential-spoiler-token = first-token (#token-string = $items);
     $potential-spoiler-number = value-of-token (#token = $potential-spoiler-token);
     $potential-spoiler = `key ("binder", $potential-spoiler-number)`;
-    $potential-spoiler-reservation-number = `$potential-spoiler/@toplevel-binder-number`;
-    if [$potential-spoiler-reservation-number < $reservation-number] {
-      reservation-follows-every-reservation (#reservation-number = $reservation-number,
-                                             #reservations = `$reservations[position() > 1]`);
+    $potential-spoiler-toplevel-item-number = `$potential-spoiler/@toplevel-binder-number`;
+    if [$potential-spoiler-toplevel-item-number < $item-number] {
+      $items-tail = token-string-tail (#token-string = $items);
+      item-follows-every-item (#item-number = $item-number,
+                               #items = $items-tail);
     } else {
       "0";
     }
   }
 }
 
-// Return the subset of $all-reservations consisting of those
-// reservations whose reservation-number attribute is greater than
-// every reservation in $reservation.
-tpl reservations-following-every-helper (#reservations, #all-reservations, #val) {
-  if [$all-reservations = ""] {
+// See the documentation for items-following-every
+tpl items-following-every-helper (#items, #all-items, #val) {
+  if [$all-items = ""] {
     $val;
   } else {
-    $reservation-token = first-token (#token-string = $reservations);
-    $reservation = value-of-token (#token = $reservation-token);
-    $reservations-tail = token-string-tail (#token-string = $all-reservations);
-    $bigger = reservation-follows-every-reservation (#reservation-number = $reservation,
-                                                     #reservations = $reservations);
+    $item-token = first-token (#token-string = $items);
+    $item = value-of-token (#token = $item-token);
+    $items-tail = token-string-tail (#token-string = $all-items);
+    $bigger = item-follows-every-item (#item-number = $item,
+                                       #items = $all-items);
     if [$bigger = "0"] {
-      reservations-following-every-helper (#reservations = $reservations,
-                                           #all-reservations = $reservations-tail);
+      items-following-every-helper (#items = $items,
+                                    #all-items = $items-tail);
     } else {
       $new-value = append-token-strings (#token-string-a = $val,
-                                         #token-string-b = $reservation-token);
-      reservations-following-every-helper (#reservations = $reservations,
-                                           #all-reservations = $reservations-tail,
-                                           #val = $new-value);
+                                         #token-string-b = $item-token);
+      items-following-every-helper (#items = $items,
+                                    #all-items = $items-tail,
+                                    #val = $new-value);
     }
   }
 }
 
-tpl reservations-following-every (#reservations, #all-reservations) {
-  reservations-following-every-helper (#reservations = $reservations,
-                                       #all-reservations = $all-reservations,
-                                       #val = "");
+// Return the subset of $all-items (given as a token string consisting
+// of the values of the toplevel-binder-number attribute) consisting
+// of those items whose toplevel-binder-number attribute is greater
+// than that of every item in $items.  The value is again a token
+// string.
+tpl items-following-every (#items, #all-items) {
+  items-following-every-helper (#items = $items,
+                                #all-items = $all-items,
+                                #val = "");
 }
 
 tpl idnr-occurs-in-dependent-type-of-some-reservation (#idnr, #reservations) {
@@ -471,43 +475,51 @@ tpl dependent-type-reservations-in-which-idnr-occurs (#idnr, #reservations) {
 }
 
 // $reservations is a list of reservation numbers
-tpl idnr-bound-by-some-reservation (#idnr, #reservations) {
-  if [$reservations = ""] {
-    "0";
-  } else {
-    $first-reservation-number-token = first-token (#token-string = $reservations);
-    $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
-    $first-reservation = `key ("binder", $first-reservation-number)`;
-    if [$first-reservation/@idnr = $idnr] {
-      "1";
+tpl item-bound-by-some-toplevel-item (#item, #items) {
+  if [$item/@idnr] {
+    $idnr = `$item/@idnr`;
+    if [$items = ""] {
+      "0";
     } else {
-      $remaining-reservations = token-string-tail (#token-string = $reservations);
-      idnr-bound-by-some-reservation (#idnr = $idnr,
-                                      #reservations = $remaining-reservations);
+      $first-toplevel-item-number-token = first-token (#token-string = $items);
+      $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
+      $first-item = `key ("binder", $first-toplevel-item-number)`;
+      if [$first-item/@idnr = $idnr] {
+        "1";
+      } else {
+        $remaining-items = token-string-tail (#token-string = $items);
+        item-bound-by-some-toplevel-item (#item = $item,
+                                          #items = $remaining-items);
+      }
     }
+  } else {
+    $item-line = `$item/@line`;
+    $item-col = `$item/@col`;
+    $message = `concat ("Don't know how to determine whether the item on line ", $item-line, " and column ", $item-col, " is bound by some other items, because it lacks an idnr attribute.")`;
+    die (#message = $message);
   }
 }
 
-tpl exists-path-from-reservation-to-context (#reservation, #context, #later-reservations) {
-  $idnr = `$reservation/@idnr`;
+tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-items) {
+  $idnr = `$item/@idnr`;
   $token = `concat (",", $idnr, ",")`;
-  $bound-later = idnr-bound-by-some-reservation (#idnr = $idnr, #reservations = $later-reservations);
+  $bound-later = item-bound-by-some-toplevel-item (#item = $item, #later-items = $later-toplevel-items);
   if [$bound-later = "1"] {
     "0";
   } else {
     $free-variables-of-context = `$context/@free-variables`;
     $dependent-type-reservations-with-idnr = dependent-type-reservations-in-which-idnr-occurs (#idnr = $idnr,
-                                                                                               #reservations = $later-reservations);
+                                                                                               #reservations = $later-toplevel-items);
     choose {
       when [contains ($free-variables-of-context, $token)] { "1"; }
       when [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] { "1"; }
       when [$dependent-type-reservations-with-idnr = ""] { "0"; }
       otherwise {
-        $reservations-after-candidates = reservations-following-every (#reservations = $dependent-type-reservations-with-idnr,
-                                                                       #all-reservations = $later-reservations);
-        exists-path-from-some-reservation-to-context (#reservations = $dependent-type-reservations-with-idnr,
-                                                      #context = $context,
-                                                      #later-reservations = $reservations-after-candidates);
+        $items-after-candidates = items-following-every (#items = $dependent-type-reservations-with-idnr,
+                                                         #all-items = $later-toplevel-items);
+        exists-path-from-some-toplevel-item-to-context (#items = $dependent-type-reservations-with-idnr,
+                                                        #context = $context,
+                                                        #later-items = $items-after-candidates);
       }
     }
   }
