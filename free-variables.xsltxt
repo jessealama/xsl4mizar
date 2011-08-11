@@ -46,24 +46,24 @@ tpl [Text-Proper] mode="free-variables" {
   bound-in-items (#items = `*`, #bound-so-far = "");
 }
 
-tpl [Block] (#upper-bound) {
-  $this = `.`;
-  $free = {
-            if [$upper-bound] {
-              free-variables-with-bound (#element = `.`, #upper-bound = $upper-bound);
-            } else {
-              free-variables-with-bound (#element = `.`, #upper-bound = $this);
-            }
-          }
-  $unique-free = remove-duplicate-tokens (#string = $free);
-  <Block {
-    for-each [@*] {
-      copy-of `.`;
-    }
-    @free-variables = $unique-free;
-    apply [*](#upper-bound = $this);
-  }
-}
+// tpl [Block] (#upper-bound) {
+//   $this = `.`;
+//   $free = {
+//             if [$upper-bound] {
+//               free-variables-with-bound (#element = `.`, #upper-bound = $upper-bound);
+//             } else {
+//               free-variables-with-bound (#element = `.`, #upper-bound = $this);
+//             }
+//           }
+//   $unique-free = remove-duplicate-tokens (#string = $free);
+//   <Block {
+//     for-each [@*] {
+//       copy-of `.`;
+//     }
+//     @free-variables = $unique-free;
+//     apply [*](#upper-bound = $this);
+//   }
+// }
 
 tpl [*] (#upper-bound) {
   $element = `local-name ()`;
