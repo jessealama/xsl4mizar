@@ -414,11 +414,11 @@ tpl items-following-every-helper (#items, #all-items, #val) {
     if [$items = ""] {
       $all-items;
     } else {
-      $item-token = first-token (#token-string = $items);
+      $item-token = first-token (#token-string = $all-items);
       $item = value-of-token (#token = $item-token);
       $items-tail = token-string-tail (#token-string = $all-items);
       $bigger = item-follows-every-item (#item-number = $item,
-                                         #items = $all-items);
+                                         #items = $items);
       if [$bigger = "0"] {
         items-following-every-helper (#items = $items,
                                       #all-items = $items-tail);
