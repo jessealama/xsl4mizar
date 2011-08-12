@@ -374,7 +374,7 @@ tpl exists-path-from-some-toplevel-item-to-context (#items, #context, #later-ite
     $item = `key ("binder", $item-number)`;
     $exists-path = exists-path-from-toplevel-item-to-context (#item = $item,
                                                               #context = $context,
-                                                              #later-items = $later-items);
+                                                              #later-toplevel-items = $later-items);
     if [$exists-path = "0"] {
       $items-tail = token-string-tail (#token-string = $items);
       exists-path-from-some-toplevel-item-to-context (#items = $items-tail,
