@@ -112,11 +112,11 @@ tpl ensure-reservations-have-numbers {
   }
 }
 
-tpl ensure-reservations-have-unique-numbers {
-  for-each [//Item[@kind = "Reservation"]] {
-    $reservation-number = `@toplevel-binder-number`;
-    if [//Item[@kind = "Reservation" and @toplevel-binder-number = $reservation-number][2]] {
-      die (#message = "This stylesheet assumes that each reservation item has a reservation number attribute shared by no other reservation item, but this document has has at least two reservation items sharing the same reservation number.");
+tpl ensure-toplevel-binders-have-unique-numbers {
+  for-each [//Item[@toplevel-binder-number]] {
+    $num = `@toplevel-binder-number`;
+    if [//Item[@toplevel-binder-number = $num][2]] {
+      die (#message = "This stylesheet assumes that each toplevel binder item has a toplevel-binder-number attribute shared by no other toplevel binder item, but this document has has at least two such items sharing the same toplevel-binder-number.");
     }
   }
 }
@@ -140,7 +140,7 @@ tpl ensure-loci-have-numbers {
 tpl [/] {
   ensure-toplevel-items-have-distinct-labels ();
   ensure-reservations-have-numbers ();
-  ensure-reservations-have-unique-numbers ();
+  ensure-toplevel-binders-have-unique-numbers ();
   ensure-loci-declarations-bind-only-one-variable ();
   ensure-loci-have-numbers ();
   apply [*];
