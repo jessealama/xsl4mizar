@@ -511,13 +511,17 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
         if [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
           "1";
         } else {
-          $later-users = toplevel-items-in-which-item-occurs (#idnr = $idnr,
-                                                              #items = $later-toplevel-items);
-          $items-after-candidates = items-following-every (#items = $later-users,
-                                                           #all-items = $later-toplevel-items);
-          exists-path-from-some-toplevel-item-to-context (#items = $later-users,
-                                                          #context = $context,
-                                                          #later-items = $items-after-candidates);
+          if [$kind = "Loci-Declaration" and $context//Locus[@nr = $idnr]] {
+            "1";
+          } else {
+            $later-users = toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                                                #items = $later-toplevel-items);
+            $items-after-candidates = items-following-every (#items = $later-users,
+                                                             #all-items = $later-toplevel-items);
+            exists-path-from-some-toplevel-item-to-context (#items = $later-users,
+                                                            #context = $context,
+                                                            #later-items = $items-after-candidates);
+          }
         }
       }
     }
