@@ -177,41 +177,6 @@ tpl [Text-Proper] {
   }
 }
 
-tpl reservation-binds-some-dependent-type-occuring-in-context (#reservation, #more-reservations, #context) {
-  $reservation_variable = `$reservation/Variable[1]`;
-  $reservation_idnr = `$reservation_variable/@idnr`;
-  if [$more-reservations] {
-    $another_reservation = `$more-reservations[1]`;
-    if [$another_reservation//Simple-Term] {
-      // the type occurring in $another_reservation is a dependent type.  Are any of the
-      // terms bound by its dependent type bound by $reservation?
-      if [$another_reservation//Simple-Term[@idnr = $reservation_idnr]] {
-        $another_reservation_variable = `$another_reservation/Variable[1]`;
-        $another_reservation_idnr = `$another_reservation_variable/@idnr`;
-        // does the variable bound by $another_reservation occur anywhere inside $context?
-        if [$context//@idnr = $another_reservation_idnr] {
-          "1";
-        } else {
-          reservation-binds-some-dependent-type-occuring-in-context (#reservation = $reservation,
-                                                                     #more-reservations = `$more-reservations[position() > 1]`,
-                                                                     #context = $context);
-        }
-      } else {
-        reservation-binds-some-dependent-type-occuring-in-context (#reservation = $reservation,
-                                                                   #more-reservations = `$more-reservations[position() > 1]`,
-                                                                   #context = $context);
-      }
-    } else {
-      // the type occurring in $another_reservation is not a dependent type
-      reservation-binds-some-dependent-type-occuring-in-context (#reservation = $reservation,
-                                                                 #more-reservations = `$more-reservations[position() > 1]`,
-                                                                 #context = $context);
-    }
-  } else {
-    "0";
-  }
-}
-
 tpl some-term-occurs-in-context (#terms, #context) {
   if [$terms] {
     $term = `$terms[1]`;
@@ -224,79 +189,6 @@ tpl some-term-occurs-in-context (#terms, #context) {
     }
   } else {
     "0";
-  }
-}
-
-tpl loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration, #more-loci, #context) {
-  $loci_variable = `$loci-declaration/*/Variable[1]`;
-  $loci_idnr = `$loci_variable/@idnr`;
-  if [$more-loci] {
-    $another_loci = `$more-loci[1]`;
-    $another_loci_variable = `$another_loci/*/Variable[1]`;
-    $another_loci_idnr = `$another_loci_variable/@idnr`;
-    if [$another_loci//Simple-Term] {
-      // the type occurring in $another_loci is a dependent type.  Are any of the
-      // terms bound by its dependent type bound by $loci-declaration?
-      if [$another_loci//Simple-Term[@idnr = $loci_idnr]] {
-        // does the variable bound by $another_loci occur anywhere inside $context?
-        if [$context//@idnr = $another_loci_idnr or $context//@nr = $another_loci_idnr] {
-          "1";
-        } else {
-          loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration = $loci-declaration,
-                                                                          #more-loci = `$more-loci[position() > 1]`,
-                                                                          #context = $context);
-        }
-      } else {
-        loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration = $loci-declaration,
-                                                                        #more-loci = `$more-loci[position() > 1]`,
-                                                                        #context = $context);
-      }
-    } else {
-      if [preceding::Item[@kind = "Reservation"]/Variable[@idnr = $another_loci_idnr]] {
-        $type = `preceding::Item[@kind = "Reservation"]/Variable[@idnr = $another_loci_idnr]/../*[position() = last()]`; // type
-        $occurs = some-term-occurs-in-context (#terms = `$type//Simple-Term`, #context = $context);
-        if [$occurs = "1"] {
-          "1";
-        } else {
-          if [$type//Simple-Term/@idnr = $loci_idnr] {
-            "1";
-          } else {
-            loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration = $loci-declaration,
-                                                                            #more-loci = `$more-loci[position() > 1]`,
-                                                                            #context = $context);
-          }
-        }
-      } else {
-        // the type occurring in $another_loci is not a dependent type
-        loci-declaration-binds-some-dependent-type-occuring-in-context (#loci-declaration = $loci-declaration,
-                                                                        #more-loci = `$more-loci[position() > 1]`,
-                                                                        #context = $context);
-      }
-    }
-  } else {
-    "0";
-  }
-}
-
-tpl index-of-reservation-with-maximal-number (#reservations) {
-  if [$reservations] {
-    if [$reservations[2]] {
-      $reservation = `$reservations[1]`;
-      $reservation_number = `$reservation/@toplevel-binder-number`;
-      $index_for_tail = index-of-reservation-with-maximal-number (#reservations = `$reservations[position() > 1]`);
-      $adjusted_index = `$index_for_tail + 1`;
-      $best_in_tail = `$reservations[$adjusted_index]`;
-      $best_in_tail_reservation_number = `$best_in_tail/@toplevel-binder-number`;
-      if [$reservation_number > $best_in_tail_reservation_number] {
-        "1";
-      } else {
-        $adjusted_index;
-      }
-    } else {
-      "1";
-    }
-  } else {
-    die (#message = "We cannot compute the index of something in an empty node set!");
   }
 }
 
@@ -313,28 +205,6 @@ tpl index-of-item-with-minimal-number (#items) {
         "1";
       } else {
         $adjusted-index;
-      }
-    } else {
-      "1";
-    }
-  } else {
-    die (#message = "We cannot compute the index of something in an empty node set!");
-  }
-}
-
-tpl index-of-loci-declaration-with-minimal-number (#loci) {
-  if [$loci] {
-    if [$loci[2]] {
-      $locus = `$loci[1]`;
-      $locus_number = `$locus/@loci-number`;
-      $index_for_tail = index-of-loci-declaration-with-minimal-number (#loci = `$loci[position() > 1]`);
-      $adjusted_index = `$index_for_tail + 1`;
-      $best_in_tail = `$loci[$adjusted_index]`;
-      $best_in_tail_loci_number = `$best_in_tail/@loci-number`;
-      if [$locus_number < $best_in_tail_loci_number] {
-        "1";
-      } else {
-        $adjusted_index;
       }
     } else {
       "1";
