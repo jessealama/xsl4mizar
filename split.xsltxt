@@ -24,7 +24,7 @@ tpl [*] {
 
 tpl [Text-Proper/Item[@kind = "Reservation"]] {
   $type = `*[position() = last()]`;
-  $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)])`;
+  $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"])`;
   for-each [Variable] {
     <Item {
       for-each [@*] { copy-of `.`; }
@@ -47,7 +47,7 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
   }
   <Item {
     for-each [@*] { copy-of `.`; }
-    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]) + 1`;
+    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"]) + 1`;
     @idnr = `Variable[1]/@idnr`;
     apply [*];
   }
@@ -65,14 +65,14 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
 tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
-    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]) + 1`;
+    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"]) + 1`;
     apply [*];
   }
 }
 
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
   $type = `*[position() = last()]`;
-  $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)])`;
+  $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"])`;
   for-each [Variable] {
     <Item {
       for-each [@*] { copy-of `.`; }
@@ -93,7 +93,7 @@ tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
       @idnr = "";
     }
     if [Diffuse-Statement] {
-      $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)])`;
+      $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"])`;
       @toplevel-binder-number = `$num-previous-toplevel + 1`;
     }
     apply [*];
@@ -104,7 +104,7 @@ tpl [Text-Proper/Item[@kind = "Constant-Definition"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     @idnr = `Variable[1]/@idnr`;
-    $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)])`;
+    $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"])`;
     @toplevel-binder-number = `$num-previous-toplevel + 1`;
     apply [*];
   }
@@ -114,22 +114,21 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     @idnr = `Equality/Variable[1]/@idnr`;
-    $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)])`;
+    $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"])`;
     @toplevel-binder-number = `$num-previous-toplevel + 1`;
     apply [*];
   }
 }
 
 tpl [Item[@kind = "Loci-Declaration"]] {
+  $loci = `.`;
   for-each [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
     $segment_element_name = `local-name (.)`;
     for-each [Variable] {
       <Item {
-        @kind = "Loci-Declaration";
-        @line = `@line`;
-        @col = `@col`;
-        $num_preceding = `count (preceding::Item[@kind = "Loci-Declaration"] | ancestor::Item[@kind = "Loci-Declaration"])`;
-        @loci-number = `$num_preceding + 1`;
+        for-each [$loci/@*] { copy-of `.`; }
+        $num_preceding = `count (preceding::Item[@kind = "Loci-Declaration"] | preceding::Item[@kind = "Reservation"] | preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Choice-Statement" and parent::Text-Proper] | preceding::Item[@kind = "Constant-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper] | preceding::Item[@kind = "Regular-Statement" and child::Diffuse-Statement and parent::Text-Proper])`;
+        @toplevel-binder-number = `$num_preceding + 1`;
         @idnr = `@idnr`;
         <$segment_element_name {
           apply [.]; // variable
