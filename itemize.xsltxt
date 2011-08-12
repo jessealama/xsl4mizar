@@ -336,16 +336,32 @@ tpl toplevel-items-in-which-item-occurs (#idnr, #items, #val) {
           toplevel-items-in-which-item-occurs (#idnr = $idnr,
                                                #items = $remaining-items,
                                                #val = $new-val);
-        } 
+        }
         when [$first-toplevel-item//Simple-Term[@idnr = $idnr]] {
           toplevel-items-in-which-item-occurs (#idnr = $idnr,
                                                #items = $remaining-items,
                                                #val = $new-val);
         }
         otherwise {
-          toplevel-items-in-which-item-occurs (#idnr = $idnr,
-                                               #items = $remaining-items,
-                                               #val = $val);
+          // go hunting for the appearance of $idnr as an argument of a dependent type
+          if [$first-toplevel-item//Implicitly-Qualified-Segment] {
+            $variable = `$first-toplevel-item//Implicitly-Qualified-Segment/Variable[1]`; // should I worry about multiple variables?
+            $variable-idnr = `$variable/@idnr`;
+            $type = `preceding::Item[@kind = "Reservation"]/Variable[@idnr = $variable-idnr]/../*[position() = last()]`;
+            if [$type//Simple-Term[@idnr = $idnr]] {
+              toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                                   #items = $remaining-items,
+                                                   #val = $new-val);
+            } else {
+              toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                                   #items = $remaining-items,
+                                                   #val = $val);
+            }
+          } else {
+            toplevel-items-in-which-item-occurs (#idnr = $idnr,
+                                                 #items = $remaining-items,
+                                                 #val = $val);
+          }
         }
       }
     } else {
