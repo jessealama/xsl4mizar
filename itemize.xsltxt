@@ -511,7 +511,7 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
         if [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
           "1";
         } else {
-          if [$kind = "Loci-Declaration" and $context//Locus[@nr = $idnr]] {
+          if [$kind = "Loci-Declaration" and ($context//Locus[@nr = $idnr] or $context//Simple-Term[@idnr = $idnr])] {
             "1";
           } else {
             $later-users = toplevel-items-in-which-item-occurs (#idnr = $idnr,
