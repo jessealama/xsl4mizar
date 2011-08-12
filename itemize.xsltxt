@@ -394,9 +394,7 @@ tpl item-follows-every-item (#item-number, #items) {
   } else {
     $potential-spoiler-token = first-token (#token-string = $items);
     $potential-spoiler-number = value-of-token (#token = $potential-spoiler-token);
-    $potential-spoiler = `key ("binder", $potential-spoiler-number)`;
-    $potential-spoiler-toplevel-item-number = `$potential-spoiler/@toplevel-binder-number`;
-    if [$potential-spoiler-toplevel-item-number < $item-number] {
+    if [$potential-spoiler-number < $item-number] {
       $items-tail = token-string-tail (#token-string = $items);
       item-follows-every-item (#item-number = $item-number,
                                #items = $items-tail);
