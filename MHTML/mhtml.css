@@ -463,10 +463,6 @@ table[frame=hsides] {
 	border: 1px solid #000;
 }
 
-thead {
-	border-bottom: 1px solid #000;
-}
-
 .validate {
 	font-size: 0.7em;
 	text-align: right;
@@ -525,4 +521,24 @@ p.error-message {
 	text-align: center;
 	font-weight: bold;
 	font-style: italic;
+}
+
+legend {
+	text-align: center;
+	font-style: italic;
+	border: thin solid;
+	background-color: #ff201a;
+}
+
+span.ok {
+	color: green;
+}
+
+span.not-ok {
+	color: red;
+}
+
+td.listing-numeral {
+	font: small mono;
+	text-align: center;
 }
