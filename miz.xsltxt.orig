@@ -4087,8 +4087,15 @@ span.p5:hover { color : inherit; background-color : #CAFFCA; }
 span.p0:hover { color : inherit; background-color : #FFBAFF; }
 .default { background-color: white; color: black; } 
 .default:hover { background-color: white; color: black; }
+<<<<<<< HEAD
 "; }
 
+=======
+:target { background: #5D9BF7; border: solid 1px #aaa;}
+";
+	                } 
+        <head {  
+>>>>>>> refs/remotes/origin/itemize-bundle
 <title { 
   if [$mk_header > 0]
   {

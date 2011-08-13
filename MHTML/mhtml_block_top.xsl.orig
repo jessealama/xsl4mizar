@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <xsl:include href="mhtml_reasoning.xsl"/>
 
   <!-- $Revision: 1.19 $ -->
@@ -140,8 +140,11 @@
 
   <xsl:template match="FCluster">
     <xsl:choose>
-      <xsl:when test="Presentation/FCluster">
-        <xsl:apply-templates select="Presentation/FCluster"/>
+      <xsl:when test="$generate_items&gt;0">
+        <!-- <xsl:document href="proofhtml/funcreg/{$anamelc}.{$nr1}" format="html"> -->
+        <xsl:call-template name="fc"/>
+        <!-- </xsl:document> -->
+        <xsl:variable name="bogus" select="1"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="nr1" select="@nr"/>
@@ -1970,7 +1973,7 @@
     </xsl:variable>
     <xsl:variable name="argtypes" select="../Let/Typ"/>
     <xsl:element name="a">
-      <xsl:attribute name="NAME">
+      <xsl:attribute name="name">
         <xsl:value-of select="concat(&quot;N&quot;,@kind,@nr)"/>
       </xsl:attribute>
       <xsl:choose>
