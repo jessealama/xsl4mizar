@@ -40,6 +40,11 @@ strip-space "*";
 // the assumptions of each proposition)
 #do_nd = { "1"; }
 
+// dump the table of Mizar identifiers for propositions;
+// this will probably slow down the processing a bit by 
+// loading the .idx file and by the lookups
+#dump_prop_labels = { "0"; }
+
 // symbols, take care, the spaces are sometimes (e.g. for '~')
 // needed for correct Prolog parsing
 #not_s = { "~ "; }
@@ -76,6 +81,9 @@ key "E" [Proposition|IterEquality|Now] `concat(@nr,":",@plevel)` ;
 // lookup for JustifiedTheorems' propnr (needed in plname)
 key "JT" [/Article/JustifiedTheorem/Proposition] `@propnr`;
 
+// lookup for DefTheorems' propnr (needed in plname)
+key "DT" [/Article/DefTheorem/Proposition] `@propnr`;
+
 // lookup for scheme functors and predicates
 key "f" [SchemeFuncDecl] `concat(@nr,":",@plevel)` ;
 key "p" [SchemePredDecl] `concat(@nr,":",@plevel)` ;
@@ -84,11 +92,30 @@ key "p" [SchemePredDecl] `concat(@nr,":",@plevel)` ;
 key "pf" [DefFunc] `concat(@nr,":",@plevel)` ;
 key "pp" [DefPred] `concat(@nr,":",@plevel)` ;
 
+// lookup for identifiers (propositions)
+// used only if $dump_prop_labels = 1
+key "D_I" [Symbol[@kind='I']] `@nr`;
+
 // name of current article (upper case)
 #aname= { `string(/*/@aid)`; }
 
 // name of current article (lower case)
 #anamelc= { lc(#s=$aname); }
+
+// .idx file with identifier names
+// used only if $dump_prop_labels = 1
+#ids=  { `concat($anamelc, '.idx')`; }
+
+// private - look up the name of id
+tpl get_vid_name(#vid)
+{
+  for-each [document($ids, /)] 
+  { 
+     for-each [key('D_I', $vid)] { `@name`; }
+  }
+}
+
+
 
 // Formulas
 
@@ -344,8 +371,13 @@ tpl plname(#n,#pl)
     {
       for-each [key("JT",$n)] { absr(#el=`..`); }
     } 
+    else { if [key("DT",$n)] 
+    {
+      for-each [key("DT",$n)] { absr(#el=`..`); }
+    } 
+
     else { lemmaname(#n=$n); }
-    }
+    }}
 }
 
 tpl thesisname(#n,#pl) { "i"; $n; addp(#pl=$pl); }
@@ -789,9 +821,30 @@ tpl add_mizar_item
 }
 
 
+tpl dumproptable()
+{
+ if[$dump_prop_labels > 0]
+ {
+
+// <xsl:document href="{$anamelc}.propnames" format="text">
+   for-each [//Proposition|//IterEquality|//Now]
+   {
+    if [@nr>0] 
+    {
+       $pname = plname(#n=`@propnr`, #pl=`@plevel`);
+       $nm = { get_vid_name(#vid = `@vid`); }
+       "propname("; $pname; ",'"; $nm; "').\n";
+    }
+   }
+// </xsl:document>
+       $bogus=`1`;
+ }
+}
+
 tpl [Proposition] 
 { 
     $pname = plname(#n=`@propnr`, #pl=`@plevel`);
+
     $consider_kind =
     { 
       if [((name(..) = "Consider") or (name(..) = "Given"))]
@@ -1132,10 +1185,14 @@ tpl [Let|Given|TakeAsVar|Consider|Set]
 // That should be OK for problem creation using mizar_by - the type
 // statement will be deleted from the axioms, and the rest of BG are just 
 // general theorems, nothing specific about the constant.
+// The proposition is generated before the types and equalities, otherwise in MizAR
+// the article_position is wrong, resulting in bad .allowed_local info
 tpl [Reconsider] 
 { 
+
   $cnr     = `@constnr`; 
   $pl      = `@plevel`; 
+  apply[Proposition](#pl=$pl);
   $prop_nm = plname(#n=`Proposition/@propnr`, #pl=`Proposition/@plevel`);
   for-each [Var|LocusVar|Const|InfConst|Num|Func|PrivFunc|Fraenkel|
 	      QuaTrm|It|ErrorTrm] 
@@ -1552,22 +1609,25 @@ tpl [Abstractness](#el,#arg1,#arg2)
 
 tpl [CCluster] 
 { 
-  if [ErrorCluster] { } else 
+  if [ErrorCluster] { } else {
+  if [(name(..) = "Presentation")] { } 
+  else 
   {
+    $pres = { if[Presentation] { "1"; } else { "0"; } }
     "fof("; absk(#el=`.`,#kind="cc"); ",theorem,";
     $l = `1 + count(ArgTypes/Typ)`;
     apply[ArgTypes];
     "!["; ploci(#nr=$l); " : "; apply[Typ]; "]: ("; 
-    $ante = { `count(*[2]/*)`; }
-    $succ = { `count(*[4]/*)`; }
+    $ante = { `count(*[$pres + 2]/*)`; }
+    $succ = { `count(*[$pres + 4]/*)`; }
     $srt_s; "("; ploci(#nr=$l); ",";
     if [$ante = 0] { "$true"; } else {
-    if [$ante = 1] { apply[*[2]]; } 
-    else { "( "; apply[*[2]]; " )"; } }
+    if [$ante = 1] { apply[*[$pres + 2]]; } 
+    else { "( "; apply[*[$pres + 2]]; " )"; } }
     ")"; $imp_s; $srt_s; "("; ploci(#nr=$l); ",";
     if [$succ = 0] { "$true"; } else {
-    if [$succ = 1] { apply[*[4]]; } 
-    else { "( "; apply[*[4]]; " )"; } }
+    if [$succ = 1] { apply[*[$pres + 4]]; } 
+    else { "( "; apply[*[$pres + 4]]; " )"; } }
     "))"; ",file("; lc(#s=`@aid`); ",";
     absk(#el=`.`,#kind="cc"); "),[mptp_info("; `@nr`; 
     ",[],ccluster,position(0,0),["; 
@@ -1578,7 +1638,7 @@ tpl [CCluster]
     }
     "])]).\n"; 
    }
-}
+}}
 
 // sufficient proof refs can be collected from its coherence 
 // (correctness) proof (the corr_conds are therefore written here, 
@@ -1593,13 +1653,15 @@ tpl [CCluster]
 // ##GRM:                             "consistency" | "existence" | "uniqueness" | "correctness" .
 tpl [FCluster] 
 { 
-  if [ErrorCluster] { } 
+  if [ErrorCluster] { } else {
+  if [(name(..) = "Presentation")] { } 
   else 
   {
+    $pres = { if[Presentation] { "1"; } else { "0"; } }
     "fof("; absk(#el=`.`,#kind="fc"); ",theorem,";
     apply[ArgTypes];
     $succ = { `count(Cluster[1]/*)`; }
-    $srt_s; "("; apply[*[2]];  ",";
+    $srt_s; "("; apply[*[$pres + 2]];  ",";
     if [$succ = 0] { "$true"; } else {
     if [$succ = 1] { apply[Cluster[1]]; } 
     else { "( "; apply[Cluster[1]]; " )"; } }
@@ -1613,7 +1675,7 @@ tpl [FCluster]
     }
     "])]).\n"; 
   }
-}
+}}
 
 // private for clusters
 tpl cluster_correctness_conditions(#el)
@@ -1643,7 +1705,9 @@ tpl cluster_correctness_conditions(#el)
 // aggregate functor (which is defined to be "strict").
 tpl [RCluster] 
 { 
-  if [ErrorCluster] { } else 
+  if [ErrorCluster] { } else {
+  if [(name(..) = "Presentation")] { } 
+  else
   {
     "fof("; absk(#el=`.`,#kind="rc"); ",theorem,";
     $l = `1 + count(ArgTypes/Typ)`;
@@ -1678,7 +1742,7 @@ tpl [RCluster]
     }
     "])]).\n"; 
   }
-}
+}}
 
 // the newer version of Identify
 // sufficient proof refs done as for clusters
@@ -2026,10 +2090,11 @@ tpl [ByExplanations](#i,#pl) { for-each [Typ] { if[position() = 2] { "non"; } "z
  ").\n"; }}
 
 
-tpl [/] { if [$mml="0"] { apply[//Constructor|//Proposition|//Now|//IterEquality|
+tpl [/] { if [$mml="0"] { apply[//Constructor|//Proposition[not(name(..)="Reconsider")]|//Now|//IterEquality|
 	     //Let|//Given|//TakeAsVar|//Consider|//Set|
 	     //Reconsider|//SchemeFuncDecl|//SchemeBlock|
-	     //CCluster|//FCluster|//RCluster|//IdentifyWithExp|//Identify|//Thesis|//PerCasesReasoning|/ByExplanations]; }
+	     //CCluster|//FCluster|//RCluster|//IdentifyWithExp|//Identify|//Thesis|//PerCasesReasoning|/ByExplanations]; 
+           dumproptable(); }
 	  else { apply; } }
 
 

@@ -1353,7 +1353,14 @@
       <xsl:attribute name="class">
         <xsl:value-of select="concat(&quot;p&quot;,$paren_color)"/>
       </xsl:attribute>
+<<<<<<< HEAD
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
+      <xsl:text>{</xsl:text>
+=======
       <xsl:copy-of select="$fraenkel_start"/>
+>>>>>>> refs/remotes/origin/itemize-bundle
       <xsl:element name="span">
         <xsl:attribute name="class">
           <xsl:text>mhtml default</xsl:text>

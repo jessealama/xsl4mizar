@@ -602,12 +602,14 @@ tpl [ThesisExpansions/Pair]
 
   $current = { if [$doc=""] { "1"; } else { "0"; } }
 
-  for-each [document($doc,/)] 
-  {
-     for-each [key('DF',$x)] 
-     {
-        mkref(#aid = `@aid`, #nr = `@defnr`, #k = "D", #c = $current);
-     }
+  if [$doc] {
+    for-each [document($doc,/)] 
+    {
+       for-each [key('DF',$x)] 
+       {
+         mkref(#aid = `@aid`, #nr = `@defnr`, #k = "D", #c = $current);
+       }
+    }
   }
 }
 
