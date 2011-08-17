@@ -1,6 +1,6 @@
 stylesheet 1.0;
 
-output method=html;
+output method=xml;
 
 include mhtml_reasoning.xsl;
 
@@ -30,10 +30,19 @@ tpl [RCluster] {
 tpl rc 
 {
   if [($mml="1") or ($generate_items>0)] { apply[ArgTypes]; }
+<<<<<<< HEAD
+  $nr1 = `1 + count(preceding::RCluster)`;
+  <a {
+    if [$source_article = ""] {
+      @NAME=`concat("RC",$nr1)`;
+    }
+
+=======
   $nr1 = `@nr`;
   <a 
   { 
     @NAME=`concat("RC",$nr1)`;
+>>>>>>> refs/remotes/origin/itemize-bundle
     pkeyword(#str="cluster "); 
   }
   if [ErrorCluster] { "errorcluster"; } else { apply[*[3]](#all="1"); " "; apply[*[2]]; }
@@ -62,9 +71,17 @@ tpl cc
      apply[ArgTypes]; 
   }
   
+<<<<<<< HEAD
+  $nr1 = `1 + count(preceding::CCluster)`;
+  <a {
+    if [$source_article = ""] {
+      @NAME=`concat("CC",$nr1)`;
+    }
+=======
   $nr1 = `@nr`;
   <a { 
        @NAME=`concat("CC",$nr1)`;
+>>>>>>> refs/remotes/origin/itemize-bundle
        pkeyword(#str="cluster "); }
        if [ErrorCluster] { "errorcluster"; }
        else 
@@ -96,8 +113,16 @@ tpl [FCluster] {
 tpl fc
 { 
    if [($mml="1") or ($generate_items>0)] { apply[ArgTypes]; }
+<<<<<<< HEAD
+   $nr1 = `1 + count(preceding::FCluster)`;
+   <a {
+     if [$source_article = ""] { 
+       @NAME=`concat("FC",$nr1)`;
+     }
+=======
    $nr1 = `@nr`;
    <a { @NAME=`concat("FC",$nr1)`;
+>>>>>>> refs/remotes/origin/itemize-bundle
    pkeyword(#str="cluster "); }
    if [ErrorCluster] { "errorcluster"; }
    else { apply[*[2]]; pkeyword(#str=" -> "); apply[*[3]]; apply[Typ];}

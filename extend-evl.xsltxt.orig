@@ -89,7 +89,7 @@ tpl write-extras (#extras) {
   }
 }
 
-tpl [Directive](#extras) {
+tpl [Directive] (#extras) {
   <Directive {
     @"name" = `@name`;
     for-each [Ident] {

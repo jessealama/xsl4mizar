@@ -1,0 +1,207 @@
+
+stylesheet 1.0
+extension-element-prefixes = "dc";
+xmlns dc "http://purl.org/dc/elements/1.1/";
+xmlns "http://www.w3.org/1999/xhtml";
+
+output method=xml;
+//output doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN";
+//output doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+output omit-xml-declaration="yes";
+
+// $Revision: 1.8 $
+//
+// File: mhtml_main.xsltxt - html-ization of Mizar XML, main file
+//
+// Author: Josef Urban
+//
+// License: GPL (GNU GENERAL PUBLIC LICENSE)
+
+
+
+// XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking 
+// XML terms, formulas and types to less verbose format.
+
+// To produce standard XSLT from this do e.g.: 
+// java -jar xsltxt.jar toXSL miz.xsltxt | sed -e 's/<!\-\- *\(<\/*xsl:document.*\) *\-\->/\1/g' >miz.xsl
+// (the sed hack is there because xsl:document is not yet supported by xsltxtx)
+
+// Then e.g.: xsltproc miz.xsl ordinal2.pre >ordinal2.pre1
+
+
+// TODO: number B vars in fraenkel - done since 1.72
+//       handle F and H parenthesis as K parenthesis
+//       article numbering in Ref?
+//       absolute definiens numbers for thesisExpansions? - done
+//       do not display BlockThesis for Proof? - done, should but should be optional for Now
+//       add @nr to canceled
+//       Constructor should know its serial number! - needed in defs
+//       possibly also article?
+//       change globally 'G' to 'L' for types? -> then change the
+//       hacks here and in emacs.el
+//       display definiens? - done
+
+// NOTES: constructor disambiguation is done using the absolute numbers
+//        (attribute 'nr' and 'aid' of the Constructor element.
+//        This info for Constructors not defined in the article is
+//        taken from the .atr file (see variable $constrs)
+
+
+include mhtml_block_top.xsl;  // ##INCLUDE HERE
+
+// Default
+tpl [/] { if [$generate_items = "1"] { 
+    apply[/*/JustifiedTheorem|/*/DefTheorem|/*/SchemeBlock];
+    apply[//RCluster|//CCluster|//FCluster|//Definition|//IdentifyWithExp];
+// top-level lemmas
+   for-each [/*/Proposition] 
+   {
+// <xsl:document href="proofhtml/lemma/{$anamelc}.{@propnr}" format="html">
+      apply[`.`];
+// </xsl:document>
+   $bogus=`1`;
+<<<<<<< HEAD
+   }
+   apply;
+} else {
+  apply;
+=======
+   } 
+}
+
+else { 
+  if [$body_only = "0"] { 
+    <html { 
+
+// output the css defaults for div and p (for indenting)
+        <style { @type="text/css";  "
+div { padding: 0 0 0 0; margin: 0 0 0 0; } 
+div.add { padding-left: 3mm; padding-bottom: 0mm;  margin: 0 0 0 0; } 
+div.box { border-width:thin; border-color:blue; border-style:solid; }
+p { margin: 0 0 0 0; } 
+body {font-family: monospace; margin: 0px;}
+a {text-decoration:none} a:hover { color: red; } 
+a.ref { font-size:x-small; }
+a.ref:link { color:green; } 
+a.ref:hover { color: red; } 
+a.txt:link { color:black; } 
+a.txt:hover { color: red; } 
+.wikiactions ul { background-color: DarkSeaGreen ; color:blue; margin: 0; padding: 6px; list-style-type: none; border-bottom: 1px solid #000; }
+.wikiactions li { display: inline; padding: .2em .4em; }
+.wikiactions a {text-decoration:underline;} 
+span.kw {font-weight: bold; }
+span.lab {font-style: italic; }
+span.comment {font-style: italic; }
+span.hide { display: none; }
+span.p1:hover { color : inherit; background-color : #BAFFFF; } 
+span.p2:hover { color : inherit; background-color : #FFCACA; }
+span.p3:hover { color : inherit; background-color : #FFFFBA; }
+span.p4:hover { color : inherit; background-color : #CACAFF; }
+span.p5:hover { color : inherit; background-color : #CAFFCA; }
+span.p0:hover { color : inherit; background-color : #FFBAFF; }
+.default { background-color: white; color: black; } 
+.default:hover { background-color: white; color: black; }
+:target { background: #5D9BF7; border: solid 1px #aaa;}
+";
+	                } 
+        <head {  
+<title { 
+  if [$mk_header > 0]
+  {
+     $aname; ": "; for-each [document($hdr,/)/Header/dc:title] { `text()`; }
+  }
+  else { $aname; }}
+<script { @type="text/javascript";
+"
+<!-- 
+function hs(obj)
+{
+// document.getElementById('myimage').nextSibling.style.display = 'block';
+if (obj.nextSibling.style.display == 'inline')
+ { obj.nextSibling.style.display = 'none'; }
+else { if (obj.nextSibling.style.display == 'none')
+ { obj.nextSibling.style.display = 'inline'; }
+ else { obj.nextSibling.style.display = 'inline';  }}
+return false;
+}
+
+function hs2(obj)
+{
+if (obj.nextSibling.style.display == 'block')
+ { obj.nextSibling.style.display = 'none'; }
+else { if (obj.nextSibling.style.display == 'none')
+ { obj.nextSibling.style.display = 'block'; }
+ else { obj.nextSibling.style.display = 'none';  }}
+return false;
+}
+function hsNdiv(obj)
+{
+var ndiv = obj;
+while (ndiv.nextSibling.nodeName != 'DIV') { ndiv = ndiv.nextSibling; }
+return hs2(ndiv);
+}
+
+// explorer7 implements XMLHttpRequest in some strange way
+function makeRequest(obj,url) {
+        var http_request = false;
+        if (window.XMLHttpRequest && !(window.ActiveXObject)) { // Mozilla, Safari,...
+            http_request = new XMLHttpRequest();
+            if (http_request.overrideMimeType) {
+                http_request.overrideMimeType('text/xml');
+            }
+        } else if (window.ActiveXObject) { // IE
+            try {
+                http_request = new ActiveXObject('Msxml2.XMLHTTP');
+            } catch (e) {
+                try {
+                    http_request = new ActiveXObject('Microsoft.XMLHTTP');
+                } catch (e) {}
+            }
+        }
+        if (!http_request) {
+            alert('Giving up :( Cannot create an XMLHTTP instance');
+            return false;
+        }
+        http_request.onreadystatechange = function() { insertRequest(obj,http_request); };
+        http_request.open('GET', url, true);
+        http_request.send(null);
+    }
+// commented the 200 state to have local requests too
+function insertRequest(obj,http_request) {
+        if (http_request.readyState == 4) {
+//            if (http_request.status == 200) {
+	    var ndiv = obj;
+	    while (ndiv.nodeName != 'SPAN') { ndiv = ndiv.nextSibling; }
+	    ndiv.innerHTML = http_request.responseText;
+	    obj.onclick = function(){ return hs2(obj) };
+//            } else {
+//                alert('There was a problem with the request.');
+//		alert(http_request.status);
+//            }
+	    }}
+// End -->
+"; }
+if [$idv>0]
+{
+<script { @type="text/javascript";
+"
+<!--
+var tstp_dump;
+function openSoTSTP (dump) {
+var tstp_url = 'http://www.cs.miami.edu/~tptp/cgi-bin/SystemOnTSTP';
+var tstp_browser = window.open(tstp_url, '_blank');
+tstp_dump = dump;
+}
+function getTSTPDump () {
+return tstp_dump;
+}
+// End -->
+";
+>>>>>>> refs/remotes/origin/itemize-bundle
+}}
+
+// Header rules
+tpl [dc:title] { pcomment(#str=`text()`); }
+tpl [dc:creator] { pcomment(#str=`concat("by ", text())`); pcomment(#str=""); }
+tpl [dc:date] { pcomment(#str=`concat("Received ", text())`); }
+tpl [dc:rights] { pcomment(#str=`concat("Copyright ", text())`); }
