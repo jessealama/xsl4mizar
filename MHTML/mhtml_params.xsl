@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <!-- $Revision: 1.24 $ -->
   <!--  -->
   <!-- File: params.xsltxt - html-ization of Mizar XML, top-level parameters -->
@@ -220,6 +220,23 @@
   <!-- it should be done like privname (via the C key, not like now) -->
   <xsl:param name="const_links">
     <xsl:text>0</xsl:text>
+  </xsl:param>
+  <!-- Generate links suitable for the mizar-items namespace -->
+  <xsl:param name="mizar_items">
+    <xsl:text>0</xsl:text>
+  </xsl:param>
+  <!-- in the presence of ajax proofs, generate links to proofs coming -->
+  <!-- from a "base article" that generates many articles. -->
+  <!--  -->
+  <!-- If different from the empty string, AJAX URIs will have the form -->
+  <!--  -->
+  <!-- proofs/$source_article/<article> -->
+  <!--  -->
+  <!-- rather than the default -->
+  <!--  -->
+  <!-- proofs/<article> -->
+  <xsl:param name="source_article">
+    <xsl:text>undefined</xsl:text>
   </xsl:param>
   <!-- tells if proofs are fetched through AJAX; default is off -->
   <!-- value 2 tells to produce the proofs, but not to insert the ajax calls, -->

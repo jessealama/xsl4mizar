@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <xsl:include href="mhtml_params.xsl"/>
   <xsl:include href="mhtml_keys.xsl"/>
 
@@ -36,9 +36,9 @@
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$colored = &quot;1&quot;">
-            <xsl:element name="font">
-              <xsl:attribute name="color">
-                <xsl:value-of select="$varcolor"/>
+            <xsl:element name="span">
+              <xsl:attribute name="class">
+                <xsl:text>varcolor</xsl:text>
               </xsl:attribute>
               <xsl:if test="$titles=&quot;1&quot;">
                 <xsl:attribute name="title">
@@ -65,9 +65,9 @@
     <xsl:param name="nr"/>
     <xsl:choose>
       <xsl:when test="$colored=&quot;1&quot;">
-        <xsl:element name="font">
-          <xsl:attribute name="color">
-            <xsl:value-of select="$varcolor"/>
+        <xsl:element name="span">
+          <xsl:attribute name="class">
+            <xsl:text>varcolor</xsl:text>
           </xsl:attribute>
           <xsl:text>b</xsl:text>
           <xsl:element name="sub">
@@ -88,9 +88,9 @@
     <xsl:param name="nr"/>
     <xsl:choose>
       <xsl:when test="$colored=&quot;1&quot;">
-        <xsl:element name="font">
-          <xsl:attribute name="color">
-            <xsl:value-of select="$constcolor"/>
+        <xsl:element name="span">
+          <xsl:attribute name="class">
+            <xsl:text>constcolor</xsl:text>
           </xsl:attribute>
           <xsl:text>c</xsl:text>
           <xsl:element name="sub">
@@ -137,14 +137,14 @@
           <xsl:when test="($const_links=2)">
             <xsl:element name="a">
               <xsl:attribute name="class">
-                <xsl:text>txt</xsl:text>
+                <xsl:text>mhtml txt</xsl:text>
               </xsl:attribute>
               <xsl:attribute name="href">
                 <xsl:value-of select="concat(&quot;#&quot;,$ctarget)"/>
               </xsl:attribute>
-              <xsl:element name="font">
-                <xsl:attribute name="color">
-                  <xsl:value-of select="$constcolor"/>
+              <xsl:element name="span">
+                <xsl:attribute name="class">
+                  <xsl:text>constcolor</xsl:text>
                 </xsl:attribute>
                 <xsl:if test="$titles=&quot;1&quot;">
                   <xsl:attribute name="title">
@@ -158,9 +158,9 @@
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when test="$colored = &quot;1&quot;">
-                <xsl:element name="font">
-                  <xsl:attribute name="color">
-                    <xsl:value-of select="$constcolor"/>
+                <xsl:element name="span">
+                  <xsl:attribute name="class">
+                    <xsl:text>constcolor</xsl:text>
                   </xsl:attribute>
                   <xsl:if test="$titles=&quot;1&quot;">
                     <xsl:attribute name="title">
@@ -211,9 +211,9 @@
     <xsl:param name="nr"/>
     <xsl:choose>
       <xsl:when test="$colored=&quot;1&quot;">
-        <xsl:element name="font">
-          <xsl:attribute name="color">
-            <xsl:value-of select="$locicolor"/>
+        <xsl:element name="span">
+          <xsl:attribute name="class">
+            <xsl:text>locicolor</xsl:text>
           </xsl:attribute>
           <xsl:text>a</xsl:text>
           <xsl:element name="sub">
@@ -234,9 +234,9 @@
     <xsl:param name="nr"/>
     <xsl:choose>
       <xsl:when test="$colored=&quot;1&quot;">
-        <xsl:element name="font">
-          <xsl:attribute name="color">
-            <xsl:value-of select="$schpcolor"/>
+        <xsl:element name="span">
+          <xsl:attribute name="class">
+            <xsl:text>schpcolor</xsl:text>
           </xsl:attribute>
           <xsl:text>P</xsl:text>
           <xsl:element name="sub">
@@ -257,9 +257,9 @@
     <xsl:param name="nr"/>
     <xsl:choose>
       <xsl:when test="$colored=&quot;1&quot;">
-        <xsl:element name="font">
-          <xsl:attribute name="color">
-            <xsl:value-of select="$schfcolor"/>
+        <xsl:element name="span">
+          <xsl:attribute name="class">
+            <xsl:text>schfcolor</xsl:text>
           </xsl:attribute>
           <xsl:text>F</xsl:text>
           <xsl:element name="sub">
@@ -280,9 +280,9 @@
     <xsl:param name="nr"/>
     <xsl:choose>
       <xsl:when test="$colored=&quot;1&quot;">
-        <xsl:element name="font">
-          <xsl:attribute name="color">
-            <xsl:value-of select="$ppcolor"/>
+        <xsl:element name="span">
+          <xsl:attribute name="class">
+            <xsl:text>ppcolor</xsl:text>
           </xsl:attribute>
           <xsl:text>S</xsl:text>
           <xsl:element name="sub">
@@ -303,9 +303,9 @@
     <xsl:param name="nr"/>
     <xsl:choose>
       <xsl:when test="$colored=&quot;1&quot;">
-        <xsl:element name="font">
-          <xsl:attribute name="color">
-            <xsl:value-of select="$pfcolor"/>
+        <xsl:element name="span">
+          <xsl:attribute name="class">
+            <xsl:text>pfcolor</xsl:text>
           </xsl:attribute>
           <xsl:text>H</xsl:text>
           <xsl:element name="sub">
@@ -335,13 +335,13 @@
         </xsl:variable>
         <xsl:element name="span">
           <xsl:attribute name="class">
-            <xsl:text>lab</xsl:text>
+            <xsl:text>mhtml lab</xsl:text>
           </xsl:attribute>
           <xsl:choose>
             <xsl:when test="$colored = &quot;1&quot;">
-              <xsl:element name="font">
-                <xsl:attribute name="color">
-                  <xsl:value-of select="$labcolor"/>
+              <xsl:element name="span">
+                <xsl:attribute name="class">
+                  <xsl:text>labcolor</xsl:text>
                 </xsl:attribute>
                 <xsl:if test="$titles=&quot;1&quot;">
                   <xsl:attribute name="title">
@@ -379,13 +379,13 @@
     <xsl:param name="nr"/>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>lab</xsl:text>
+        <xsl:text>mhtml lab</xsl:text>
       </xsl:attribute>
       <xsl:choose>
         <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$labcolor"/>
+          <xsl:element name="span">
+            <xsl:attribute name="class">
+              <xsl:text>labcolor</xsl:text>
             </xsl:attribute>
             <xsl:text>E</xsl:text>
             <xsl:value-of select="$nr"/>
@@ -404,13 +404,13 @@
     <xsl:param name="txt"/>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>lab</xsl:text>
+        <xsl:text>mhtml lab</xsl:text>
       </xsl:attribute>
       <xsl:choose>
         <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$labcolor"/>
+          <xsl:element name="span">
+            <xsl:attribute name="class">
+              <xsl:text>labcolor</xsl:text>
             </xsl:attribute>
             <xsl:value-of select="$txt"/>
             <xsl:value-of select="$nr"/>
@@ -428,7 +428,7 @@
     <xsl:param name="str"/>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>kw</xsl:text>
+        <xsl:text>mhtml kw</xsl:text>
       </xsl:attribute>
       <xsl:value-of select="$str"/>
     </xsl:element>
@@ -437,24 +437,20 @@
   <xsl:template name="pcomment0">
     <xsl:param name="str"/>
     <xsl:element name="span">
-      <xsl:attribute name="class">
-        <xsl:text>comment</xsl:text>
-      </xsl:attribute>
       <xsl:choose>
         <xsl:when test="$colored=&quot;1&quot;">
-          <xsl:element name="font">
-            <xsl:attribute name="color">
-              <xsl:value-of select="$commentcolor"/>
-            </xsl:attribute>
-            <xsl:text>:: </xsl:text>
-            <xsl:value-of select="$str"/>
-          </xsl:element>
+          <xsl:attribute name="class">
+            <xsl:text>mhtml comment commentcolor</xsl:text>
+          </xsl:attribute>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:text>:: </xsl:text>
-          <xsl:value-of select="$str"/>
+          <xsl:attribute name="class">
+            <xsl:text>mhtml comment</xsl:text>
+          </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
+      <xsl:text>:: </xsl:text>
+      <xsl:value-of select="$str"/>
     </xsl:element>
   </xsl:template>
 

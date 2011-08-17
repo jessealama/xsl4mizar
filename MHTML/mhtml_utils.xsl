@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <xsl:include href="mhtml_print_simple.xsl"/>
   <!-- $Revision: 1.9 $ -->
   <!--  -->
@@ -850,6 +850,9 @@
     <xsl:param name="elems"/>
     <xsl:for-each select="$elems">
       <xsl:element name="div">
+        <xsl:attribute name="class">
+          <xsl:text>mhtml</xsl:text>
+        </xsl:attribute>
         <xsl:apply-templates select="."/>
         <xsl:if test="not(position()=last())">
           <xsl:copy-of select="$separ"/>
@@ -882,7 +885,7 @@
       <xsl:variable name="nr1" select="$j+position()"/>
       <xsl:if test="$const_links&gt;0">
         <xsl:element name="a">
-          <xsl:attribute name="NAME">
+          <xsl:attribute name="name">
             <xsl:value-of select="concat(&quot;c&quot;,$nr1,$addpl)"/>
           </xsl:attribute>
         </xsl:element>
@@ -1290,50 +1293,50 @@
 
   <xsl:template name="add_hs_attrs">
     <xsl:attribute name="class">
-      <xsl:text>txt</xsl:text>
+      <xsl:text>mhtml txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hs(this)</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="href">
-      <xsl:text>javascript:()</xsl:text>
+      <xsl:text>javascript:void(0)</xsl:text>
     </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="add_hs2_attrs">
     <xsl:attribute name="class">
-      <xsl:text>txt</xsl:text>
+      <xsl:text>mhtml txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hs2(this)</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="href">
-      <xsl:text>javascript:()</xsl:text>
+      <xsl:text>javascript:void(0)</xsl:text>
     </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="add_hsNdiv_attrs">
     <xsl:attribute name="class">
-      <xsl:text>txt</xsl:text>
+      <xsl:text>mhtml txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:text>hsNdiv(this)</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="href">
-      <xsl:text>javascript:()</xsl:text>
+      <xsl:text>javascript:void(0)</xsl:text>
     </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="add_ajax_attrs">
     <xsl:param name="u"/>
     <xsl:attribute name="class">
-      <xsl:text>txt</xsl:text>
+      <xsl:text>mhtml txt</xsl:text>
     </xsl:attribute>
     <xsl:attribute name="onclick">
       <xsl:value-of select="concat(&quot;makeRequest(this,&apos;&quot;,$u,&quot;&apos;)&quot;)"/>
     </xsl:attribute>
     <xsl:attribute name="href">
-      <xsl:text>javascript:()</xsl:text>
+      <xsl:text>javascript:void(0)</xsl:text>
     </xsl:attribute>
   </xsl:template>
 </xsl:stylesheet>

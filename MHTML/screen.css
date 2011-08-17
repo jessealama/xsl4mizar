@@ -1,0 +1,266 @@
+/* This is the default stylesheet for the screen media type. */
+
+/* Copyleft (c) 2002-2004 Jonas Fonseca <fonseca@diku.dk> */
+
+/* General style settings for 'clean' html elements {{{1 */
+
+body {
+	background-color: lightgrey;
+}
+
+table.article-listing {
+	border-style: solid;
+}
+
+ol.fragment-listing {
+}
+
+li.fragment-listing {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+a.fragment-listing:link {
+	text-decoration: none;
+	color: inherit;
+}
+
+a.fragment-listing:visited {
+	text-decoration: none;
+	color: inherit;
+}
+
+td.arrow {
+	font-size: xx-large;
+}
+
+.article-name {
+	text-transform: uppercase;
+	font-family: monospace;
+}
+
+td.article-title {
+	font-style: oblique;
+}
+
+/* Link properties */
+
+a:hover {
+	text-decoration: none;
+}
+
+/* Specifically targeted on screenshoots/index.html */
+
+dt {
+	font-weight: bold;
+	margin-top: 1em;
+}
+
+h1 {
+	font-size: 1.2em;
+	text-align: center;
+	border-style: solid;
+	border-color: black;
+	background-color: white;
+}
+
+h2 {
+	font-size: 1.2em;
+}
+
+h3 {
+	font-size: 1.1em;
+}
+
+h4 {
+	font-size: 1em;
+	text-decoration: underline;
+}
+
+h5 {
+	font-size: 1em;
+	font-style: italic;
+}
+
+h2, h3, h4, h5 {
+	margin-left: 1em;
+	margin-right: 1em;
+	font-weight: bold;
+}
+
+hr {
+	display: none;
+}
+
+/* No borders around image links */
+
+img {
+	border: 0;
+}
+
+pre {
+	padding: 1em;
+	text-align: left;
+	margin: 0.5em 4em;
+}
+
+var {
+	font-family: monospace;
+	font-style: normal;
+}
+
+/* Indent paragraphs etc. a bit to make them look nested. */
+
+ul li, dl, p, div.news {
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
+ul li, dl, p {
+	text-align: justify;
+}
+
+/* Header and footer {{{1 */
+
+.header,
+.footer {
+	padding: 0.4em 1em;
+	margin: 0em;
+}
+
+/*table.header {
+	border-bottom-style: solid;
+}*/
+
+.header {
+	font-size: 1em;
+	font-weight: bold;
+}
+
+.footer {
+	font-size: 0.7em;
+}
+
+.header span.menu,
+.footer span.menu {
+	text-align: right;
+	display: block;
+}
+
+.header span.menu a {
+	font-weight: bold;
+	font-style: italic;
+}
+
+.header #top,
+.footer span.left {
+	float: left;
+	margin: 0em;
+}
+
+.header #top {
+	display: inline;
+}
+
+.footer a,
+.header a,
+.footer a:visited,
+.header a:visited {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.footer a:hover,
+.header a:hover {
+	text-decoration: underline;
+}
+
+.header td {
+	border: none;
+}
+
+/* Various class definitions {{{1 */
+
+div.title {
+	font-weight: bold;
+}
+
+table.releases td,
+table.bugmail th,
+table.bugmail td,
+table.example td,
+table.example {
+	border: none;
+}
+
+.bugmail th {
+	text-align: center;
+}
+
+/*table {
+	margin-left: 4em;
+	margin-right: 4em;
+	border: none;
+}*/
+
+table.code, table.code tr, table.code td {
+	margin: 0em;
+	padding: 0em;
+	border: none;
+	width: 100%;
+}
+
+table[frame=hsides] {
+	border: 1px solid #000;
+}
+
+thead {
+	border-bottom: 1px solid #000;
+}
+
+.validate {
+	font-size: 0.7em;
+	text-align: right;
+	margin: 0.4em 0em;
+}
+
+.hide {
+	display: none;
+}
+
+/* Placement abbreviations that is commonly used. */
+
+.tcenter {
+	text-align: center;
+}
+
+.tright {
+	text-align: right;
+}
+
+.tleft {
+	text-align: left;
+}
+
+.fright {
+	float: right;
+}
+
+.fleft {
+	float: left;
+}
+
+div.miz-example {
+	border-style: solid;
+	font-family: monospace;
+	font-size: large;
+	background-color: lightblue;
+}
+
+tr.fullwidth {
+	width: 100%;
+}
+
+tr.halfwidth {
+	width: 50%;
+}

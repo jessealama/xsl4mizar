@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <!-- $Revision: 1.1 $ -->
   <!--  -->
   <!-- File: keys.xsltxt - html-ization of Mizar XML, definition of keys (indexes) -->

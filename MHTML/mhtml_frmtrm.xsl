@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <xsl:include href="mhtml_print_complex.xsl"/>
 
   <!-- $Revision: 1.12 $ -->
@@ -1353,10 +1353,13 @@
       <xsl:attribute name="class">
         <xsl:value-of select="concat(&quot;p&quot;,$paren_color)"/>
       </xsl:attribute>
-      <xsl:copy-of select="$fraenkel_start"/>
+      <xsl:attribute name="class">
+        <xsl:text>mhtml</xsl:text>
+      </xsl:attribute>
+      <xsl:text>{</xsl:text>
       <xsl:element name="span">
         <xsl:attribute name="class">
-          <xsl:text>default</xsl:text>
+          <xsl:text>mhtml default</xsl:text>
         </xsl:attribute>
         <xsl:text> </xsl:text>
         <!-- first display the term -->
@@ -1734,7 +1737,7 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:if test="$neg=&quot;1&quot;">
-      <xsl:copy-of select="$non_s"/>
+      <xsl:text>non </xsl:text>
     </xsl:if>
     <xsl:call-template name="pp">
       <xsl:with-param name="k">

@@ -1,6 +1,6 @@
 stylesheet 1.0;
 
-output method=html;
+output method=xml;
 
 include mhtml_print_complex.xsl;
 
@@ -403,8 +403,8 @@ tpl [Fraenkel](#p,#i) {
     $par = { if [$p>0] { `$p+1`;} else { "1"; } }
     $inc = { `count(*) - 2`; } // number of vars introduced here
     $paren_color = `$par mod $pcolors_nr`;
-     <span { @class=`concat("p",$paren_color)`; copy-of $fraenkel_start; 
-       <span { @class="default"; " ";
+     <span { @class=`concat("p",$paren_color)`; @class="mhtml"; "{"; 
+       <span { @class="mhtml default"; " ";
          // first display the term
          apply[*[position() = last() - 1]](#p = $par, #i = `$j + $inc`); 
 	 // then the var types

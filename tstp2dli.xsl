@@ -2,7 +2,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="text"/>
-  <!-- $Revision: 1.3 $ -->
+  <!-- $Revision: 1.6 $ -->
   <!--  -->
   <!-- File: mizpl.xsltxt - stylesheet translating TSTP XML solutions to MML Query DLI syntax -->
   <!--  -->

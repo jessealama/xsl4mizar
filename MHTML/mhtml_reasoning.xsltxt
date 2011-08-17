@@ -1,6 +1,6 @@
 stylesheet 1.0;
 
-output method=html;
+output method=xml;
 
 include mhtml_frmtrm.xsl;
 
@@ -16,7 +16,13 @@ include mhtml_frmtrm.xsl;
 
 tpl [Proposition] 
 { 
-    if [$proof_links>0] {<a { @NAME=propname(#n=`@propnr`, #pl=`@plevel`); }}
+    if [$proof_links>0] {
+      if [$source_article = ""] {
+        <a { @NAME=propname(#n=`@propnr`, #pl=`@plevel`); }
+      } else {
+        // don't know what to do yet
+       }
+     }
 
     if [following-sibling::*[1][(name()="By") and (@linked="true")]] 
     { 
@@ -82,7 +88,7 @@ tpl linkbyif(#line,#col,#by)
             if[$ajax_by > 0] { add_ajax_attrs(#u=$byurl); }
 	    else
 	    {
-	       @href=$byurl; @class="txt"; 
+	       @href=$byurl; @class="mhtml txt"; 
 	       if[$linkbytoself > 0] {@target="_self"; } else {@target="byATP";} 
             }
 	    if [$by_titles>0] { @title=mk_by_title(#line=$line,#col=$col); }
@@ -101,7 +107,7 @@ tpl [By	](#nbr)
    if [(count(Ref)>0)] 
    { 
       linkbyif(#line = `@line`, #col = `@col`,#by = "by");
-      <span { @class="lab"; list(#separ = ", ", #elems = `Ref`); } 
+      <span { @class="mhtml lab"; list(#separ = ", ", #elems = `Ref`); } 
       ";"; 
    }
    else 
@@ -115,13 +121,13 @@ tpl [By	](#nbr)
 
 tpl [IterStep/By] { if [(count(Ref)>0)] { 
       linkbyif(#line=`@line`,#col=`@col`,#by="by");
-      <span { @class="lab"; list(#separ=", ", #elems=`Ref`); } }}
+      <span { @class="mhtml lab"; list(#separ=", ", #elems=`Ref`); } }}
 tpl [From](#nbr) 
 { 
     linkbyif(#line=`@line`,#col=`@col`,#by="from");
     <span 
     { 
-        @class="lab";
+        @class="mhtml lab";
         getref(#k="S", #anr=`@articlenr`, #nr=`@nr`); "(";
 	list(#separ=", ", #elems=`Ref`); ")"; ";"; 
 	if [not($nbr="1")] { <br;  } 
@@ -130,7 +136,7 @@ tpl [From](#nbr)
 tpl [IterStep/From] 
 { 
    linkbyif(#line=`@line`,#col=`@col`,#by="from");
-   <span { @class="lab"; getref(#k="S", #anr=`@articlenr`, #nr=`@nr`); "(";
+   <span { @class="mhtml lab"; getref(#k="S", #anr=`@articlenr`, #nr=`@nr`); "(";
         list(#separ=", ", #elems=`Ref`); ")"; } 
 }
 
@@ -159,7 +165,7 @@ tpl top_propname(#el)
 
 	 <a 
 	 { 
-	    @class = "txt"; 
+	    @class = "mhtml txt"; 
 	    @href  = `concat($anamelc, ".", $ext, "#","E",$k2)`;  
 	    if [($print_lab_identifiers > 0) and ($el/@vid > 0)] 
 	    { 
@@ -185,7 +191,7 @@ tpl privname(#nr,#pl) {
 	      $txt= { propname(#n = `@propnr`, #pl = $pl); } 
 	      <a 
 	      { 
-	         @class = "txt"; 
+	         @class = "mhtml txt"; 
 //		 @href  = `concat($anamelc, ".", $ext, "#",$txt)`;
 		 @href  = `concat("#",$txt)`;
 		 pplab(#nr=`@nr`, #vid = `@vid`); 
@@ -417,6 +423,7 @@ tpl [Conclusion]
       {  
          <div 
 	 { 
+	    @class="mhtml";
 	    pkeyword(#str="hereby "); 
 	    try_th_exps();
 	    apply(#nkw = "1");  
@@ -548,7 +555,7 @@ tpl do_thesis(#nd)
 	  pcomment0(#str=" thesis: ");      
 	}
 
-	<span { @class="hide"; " "; apply[*[1]]; }
+	<span { @class="mhtml hide"; " "; apply[*[1]]; }
   }
 }
 
@@ -595,12 +602,14 @@ tpl [ThesisExpansions/Pair]
 
   $current = { if [$doc=""] { "1"; } else { "0"; } }
 
-  for-each [document($doc,/)] 
-  {
-     for-each [key('DF',$x)] 
-     {
-        mkref(#aid = `@aid`, #nr = `@defnr`, #k = "D", #c = $current);
-     }
+  if [$doc] {
+    for-each [document($doc,/)] 
+    {
+       for-each [key('DF',$x)] 
+       {
+         mkref(#aid = `@aid`, #nr = `@defnr`, #k = "D", #c = $current);
+       }
+    }
   }
 }
 
@@ -636,7 +645,7 @@ tpl [PerCases]
 
   <span 
   {
-    @class = "hide";
+    @class = "mhtml hide";
     apply [*[1]];
   }
 

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+  <xsl:output method="xml"/>
   <xsl:include href="mhtml_frmtrm.xsl"/>
 
   <!-- $Revision: 1.37 $ -->
@@ -13,14 +13,19 @@
   <!-- License: GPL (GNU GENERAL PUBLIC LICENSE) -->
   <xsl:template match="Proposition">
     <xsl:if test="$proof_links&gt;0">
-      <xsl:element name="a">
-        <xsl:attribute name="NAME">
-          <xsl:call-template name="propname">
-            <xsl:with-param name="n" select="@propnr"/>
-            <xsl:with-param name="pl" select="@plevel"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:element>
+      <xsl:choose>
+        <xsl:when test="$source_article = &quot;&quot;">
+          <xsl:element name="a">
+            <xsl:attribute name="name">
+              <xsl:call-template name="propname">
+                <xsl:with-param name="n" select="@propnr"/>
+                <xsl:with-param name="pl" select="@plevel"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:element>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
     </xsl:if>
     <xsl:if test="following-sibling::*[1][(name()=&quot;By&quot;) and (@linked=&quot;true&quot;)]">
       <xsl:if test="not((name(..) = &quot;Consider&quot;) or (name(..) = &quot;Reconsider&quot;) 
@@ -120,7 +125,7 @@
                 <xsl:value-of select="$byurl"/>
               </xsl:attribute>
               <xsl:attribute name="class">
-                <xsl:text>txt</xsl:text>
+                <xsl:text>mhtml txt</xsl:text>
               </xsl:attribute>
               <xsl:choose>
                 <xsl:when test="$linkbytoself &gt; 0">
@@ -180,7 +185,7 @@
         </xsl:call-template>
         <xsl:element name="span">
           <xsl:attribute name="class">
-            <xsl:text>lab</xsl:text>
+            <xsl:text>mhtml lab</xsl:text>
           </xsl:attribute>
           <xsl:call-template name="list">
             <xsl:with-param name="separ">
@@ -224,7 +229,7 @@
       </xsl:call-template>
       <xsl:element name="span">
         <xsl:attribute name="class">
-          <xsl:text>lab</xsl:text>
+          <xsl:text>mhtml lab</xsl:text>
         </xsl:attribute>
         <xsl:call-template name="list">
           <xsl:with-param name="separ">
@@ -247,7 +252,7 @@
     </xsl:call-template>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>lab</xsl:text>
+        <xsl:text>mhtml lab</xsl:text>
       </xsl:attribute>
       <xsl:call-template name="getref">
         <xsl:with-param name="k">
@@ -281,7 +286,7 @@
     </xsl:call-template>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>lab</xsl:text>
+        <xsl:text>mhtml lab</xsl:text>
       </xsl:attribute>
       <xsl:call-template name="getref">
         <xsl:with-param name="k">
@@ -344,7 +349,7 @@
           <xsl:variable name="k2" select="key(&quot;E&quot;,$k1)/@propnr"/>
           <xsl:element name="a">
             <xsl:attribute name="class">
-              <xsl:text>txt</xsl:text>
+              <xsl:text>mhtml txt</xsl:text>
             </xsl:attribute>
             <xsl:attribute name="href">
               <xsl:value-of select="concat($anamelc, &quot;.&quot;, $ext, &quot;#&quot;,&quot;E&quot;,$k2)"/>
@@ -394,7 +399,7 @@
               </xsl:variable>
               <xsl:element name="a">
                 <xsl:attribute name="class">
-                  <xsl:text>txt</xsl:text>
+                  <xsl:text>mhtml txt</xsl:text>
                 </xsl:attribute>
                 <!-- @href  = `concat($anamelc, ".", $ext, "#",$txt)`; -->
                 <xsl:attribute name="href">
@@ -649,7 +654,7 @@
                 </xsl:call-template>
               </xsl:variable>
               <xsl:element name="a">
-                <xsl:attribute name="NAME">
+                <xsl:attribute name="name">
                   <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
                 </xsl:attribute>
               </xsl:element>
@@ -696,7 +701,7 @@
                     </xsl:call-template>
                   </xsl:variable>
                   <xsl:element name="a">
-                    <xsl:attribute name="NAME">
+                    <xsl:attribute name="name">
                       <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
                     </xsl:attribute>
                   </xsl:element>
@@ -814,7 +819,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:element name="a">
-        <xsl:attribute name="NAME">
+        <xsl:attribute name="name">
           <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
         </xsl:attribute>
       </xsl:element>
@@ -852,6 +857,9 @@
         <xsl:choose>
           <xsl:when test="Now">
             <xsl:element name="div">
+              <xsl:attribute name="class">
+                <xsl:text>mhtml</xsl:text>
+              </xsl:attribute>
               <xsl:call-template name="pkeyword">
                 <xsl:with-param name="str">
                   <xsl:text>hereby </xsl:text>
@@ -987,7 +995,7 @@
       <xsl:variable name="nr1" select="$j + $p1 - 1"/>
       <xsl:if test="$const_links&gt;0">
         <xsl:element name="a">
-          <xsl:attribute name="NAME">
+          <xsl:attribute name="name">
             <xsl:value-of select="concat(&quot;c&quot;,$nr1,$addpl)"/>
           </xsl:attribute>
         </xsl:element>
@@ -1024,7 +1032,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:element name="a">
-        <xsl:attribute name="NAME">
+        <xsl:attribute name="name">
           <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
         </xsl:attribute>
       </xsl:element>
@@ -1114,7 +1122,7 @@
       </xsl:element>
       <xsl:element name="span">
         <xsl:attribute name="class">
-          <xsl:text>hide</xsl:text>
+          <xsl:text>mhtml hide</xsl:text>
         </xsl:attribute>
         <xsl:text> </xsl:text>
         <xsl:apply-templates select="*[1]"/>
@@ -1243,7 +1251,7 @@
     </xsl:element>
     <xsl:element name="span">
       <xsl:attribute name="class">
-        <xsl:text>hide</xsl:text>
+        <xsl:text>mhtml hide</xsl:text>
       </xsl:attribute>
       <xsl:apply-templates select="*[1]"/>
     </xsl:element>

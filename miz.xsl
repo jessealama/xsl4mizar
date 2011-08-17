@@ -5,8 +5,11 @@
 <!-- So any changes should be done to the MHTML files, running 'make miz.xsl' afterwards. -->
 <!-- The main stylesheet mhtml_main.xsl can be used instead miz.xsl, -->
 <!-- provided the included .xsl files are available in the same directory -->
-<xsl:stylesheet version="1.0" extension-element-prefixes="dc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html"/>
+<xsl:stylesheet version="1.0" extension-element-prefixes="dc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:output method="xml"/>
+  <xsl:output doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"/>
+  <xsl:output doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>
+  <xsl:output omit-xml-declaration="no"/>
   <!-- $Revision: 1.8 $ -->
   <!--  -->
   <!-- File: mhtml_main.xsltxt - html-ization of Mizar XML, main file -->
@@ -6985,84 +6988,7 @@
   </xsl:template>
 
   <!-- private - assumes that is inside DefTheorem -->
-  <xsl:template name="dt">
-    <xsl:variable name="nr1" select="1+count(preceding-sibling::DefTheorem)"/>
-    <xsl:text>:: </xsl:text>
-    <xsl:call-template name="pkeyword">
-      <xsl:with-param name="str">
-        <xsl:text>deftheorem </xsl:text>
-      </xsl:with-param>
-    </xsl:call-template>
-    <xsl:choose>
-      <xsl:when test="($proof_links &gt; 0) and ($print_lab_identifiers = 0)">
-        <xsl:call-template name="plab1">
-          <xsl:with-param name="nr" select="$nr1"/>
-          <xsl:with-param name="txt">
-            <xsl:text>Def</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="Proposition[@nr &gt; 0]">
-          <xsl:call-template name="pplab">
-            <xsl:with-param name="nr" select="@nr"/>
-            <xsl:with-param name="vid" select="@vid"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:text> </xsl:text>
-    <!-- <a { @NAME=`concat("D",$nr1)`; -->
-    <xsl:if test="@constrkind">
-      <xsl:text>  defines </xsl:text>
-      <xsl:call-template name="abs">
-        <xsl:with-param name="k" select="@constrkind"/>
-        <xsl:with-param name="nr" select="@constrnr"/>
-        <xsl:with-param name="sym">
-          <xsl:call-template name="abs1">
-            <xsl:with-param name="k" select="@constrkind"/>
-            <xsl:with-param name="nr" select="@constrnr"/>
-          </xsl:call-template>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-    <xsl:text> </xsl:text>
-    <xsl:element name="a">
-      <xsl:attribute name="onclick">
-        <xsl:text>hs(this)</xsl:text>
-      </xsl:attribute>
-      <xsl:attribute name="href">
-        <xsl:text>javascript:()</xsl:text>
-      </xsl:attribute>
-      <xsl:value-of select="concat($aname, &quot;:def &quot;, $nr1)"/>
-      <xsl:text> : </xsl:text>
-      <xsl:element name="br"/>
-    </xsl:element>
-    <xsl:element name="span">
-      <xsl:attribute name="class">
-        <xsl:text>hide</xsl:text>
-      </xsl:attribute>
-      <!-- ##NOTE: div is not allowed inside span -->
-      <!-- <div -->
-      <!-- { -->
-      <!-- @class = "add"; -->
-      <xsl:choose>
-        <xsl:when test="Proposition/Verum">
-          <xsl:call-template name="pkeyword">
-            <xsl:with-param name="str">
-              <xsl:text>canceled; </xsl:text>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="*[1]/*[1]"/>
-          <xsl:text>;</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-      <!-- } -->
-      <xsl:element name="br"/>
-    </xsl:element>
-  </xsl:template>
+  <xsl:template name="dt"/>
 
   <!-- Property, elProposition, Justification -->
   <xsl:template match="JustifiedProperty">
@@ -8388,12 +8314,13 @@
         <xsl:choose>
           <xsl:when test="$body_only = &quot;0&quot;">
             <xsl:element name="html">
-              <!-- output the css defaults for div and p (for indenting) -->
-              <xsl:element name="style">
-                <xsl:attribute name="type">
-                  <xsl:text>text/css</xsl:text>
-                </xsl:attribute>
-                <xsl:text>
+              <xsl:element name="head">
+                <!-- output the css defaults for div and p (for indenting) -->
+                <xsl:element name="style">
+                  <xsl:attribute name="type">
+                    <xsl:text>text/css</xsl:text>
+                  </xsl:attribute>
+                  <xsl:text>
 div { padding: 0 0 0 0; margin: 0 0 0 0; } 
 div.add { padding-left: 3mm; padding-bottom: 0mm;  margin: 0 0 0 0; } 
 div.box { border-width:thin; border-color:blue; border-style:solid; }
@@ -8422,8 +8349,7 @@ span.p0:hover { color : inherit; background-color : #FFBAFF; }
 .default:hover { background-color: white; color: black; }
 :target { background: #5D9BF7; border: solid 1px #aaa;}
 </xsl:text>
-              </xsl:element>
-              <xsl:element name="head">
+                </xsl:element>
                 <xsl:element name="title">
                   <xsl:choose>
                     <xsl:when test="$mk_header &gt; 0">

@@ -1,0 +1,739 @@
+/* @override http://localhost:4242/mhtml.css */
+
+body {
+	background-color: lightgrey;
+}
+
+td.arrow {
+	font-size: xx-large;
+}
+
+/* Link properties */
+
+a:visited,
+a {
+	text-decoration: underline;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+/* Specifically targeted on screenshoots/index.html */
+
+dt {
+	font-weight: bold;
+	margin-top: 1em;
+}
+
+h1 {
+	font-size: 1.2em;
+	text-align: center;
+	border-style: solid;
+	border-color: black;
+	background-color: white;
+}
+
+h2 {
+	font-size: 1.2em;
+}
+
+h3 {
+	font-size: 1.1em;
+}
+
+h4 {
+	font-size: 1em;
+	text-decoration: underline;
+}
+
+h5 {
+	font-size: 1em;
+	font-style: italic;
+}
+
+h2, h3, h4, h5 {
+	margin-left: 1em;
+	margin-right: 1em;
+	font-weight: bold;
+}
+
+hr {
+	display: none;
+}
+
+/* No borders around image links */
+
+img {
+	border: 0;
+}
+
+pre {
+	padding: 1em;
+	text-align: left;
+	margin: 0.5em 4em;
+}
+
+var {
+	font-family: monospace;
+	font-style: normal;
+}
+
+/* Indent paragraphs etc. a bit to make them look nested. */
+
+ul li, dl, p, div.news {
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
+ul li, dl, p {
+	text-align: justify;
+}
+
+/* Header and footer {{{1 */
+
+.header,
+.footer {
+	padding: 0.4em 1em;
+	margin: 0em;
+}
+
+.header {
+	font-size: 1em;
+	font-weight: bold;
+}
+
+.footer {
+	font-size: 0.7em;
+}
+
+.header span.menu,
+.footer span.menu {
+	text-align: right;
+	display: block;
+}
+
+.header #top,
+.footer span.left {
+	float: left;
+	margin: 0em;
+}
+
+.header #top {
+	display: inline;
+}
+
+.footer a,
+.header a,
+.footer a:visited,
+.header a:visited {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.footer a:hover,
+.header a:hover {
+	text-decoration: underline;
+}
+
+.header td {
+	border: none;
+}
+
+/* Various class definitions {{{1 */
+
+div.title {
+	font-weight: bold;
+}
+
+table.releases td,
+table.bugmail th,
+table.bugmail td,
+table.example td,
+table.example {
+	border: none;
+}
+
+.bugmail th {
+	text-align: center;
+}
+
+table {
+	margin-left: 4em;
+	margin-right: 4em;
+	border: none;
+}
+
+table.code, table.code tr, table.code td {
+	margin: 0em;
+	padding: 0em;
+	border: none;
+	width: 100%;
+}
+
+table[frame=hsides] {
+	border: 1px solid #000;
+}
+
+thead {
+	border-bottom: 1px solid #000;
+}
+
+.validate {
+	font-size: 0.7em;
+	text-align: right;
+	margin: 0.4em 0em;
+}
+
+.hide {
+	display: none;
+}
+
+/* Placement abbreviations that is commonly used. */
+
+.tcenter {
+	text-align: center;
+}
+
+.tright {
+	text-align: right;
+}
+
+.tleft {
+	text-align: left;
+}
+
+.fright {
+	float: right;
+}
+
+.fleft {
+	float: left;
+}
+
+#mhtml {
+	border-style: solid;
+	font-family: monospace;
+	font-size: large;
+	background-color: aliceblue;
+}
+
+.mhtml-text {
+	font-family: monospace;
+	font-size: large;
+	background-color: aliceblue;
+	color: inherit;
+}
+
+div.mhtml-text {
+	text-decoration: none;
+	color: inherit;
+	border-style: solid;
+	border-width: 2px;
+}
+
+/*li.fragment-listing {
+	font-family: monospace;
+	font-size: large;
+	background-color: aliceblue;
+	border-style: solid;
+	border: solid;
+	color: inherit;
+}*/
+
+a:link {
+	text-decoration: none;
+}
+
+div.mhtml {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	font-family: monospace;
+}
+
+div.mhtml.add {
+	padding-left: 3mm;
+	padding-bottom: 0mm;
+	margin: 0 0 0 0;
+}
+
+div.mhtml.box {
+	border-width: thin;
+	border-color: blue;
+	border-style: solid;
+}
+
+p.mhtml {
+	margin: 0 0 0 0;
+}
+
+body.mhtml {
+	font-family: monospace;
+	margin: 0px;
+}
+
+div#mhtml a {
+	text-decoration: none;
+	/* color: inherit; */
+}
+
+a.mhtml {
+	text-decoration: none;
+}
+
+a.mhtml:hover {
+	color: red;
+}
+
+a.mhtml.ref {
+	font-size: small;
+}
+
+a.mhtml.ref:link {
+	color: green;
+}
+
+a.mhtml.ref:hover {
+	color: red;
+}
+
+a.mhtml.txt:link {
+	color: black;
+}
+
+a.mhtml.txt:hover {
+	color: red;
+}
+
+span.mhtml.kw {
+	font-weight: bold;
+}
+
+span.mhtml.lab {
+	font-style: italic;
+	font-size: small
+}
+
+span.mhtml.comment {
+	font-style: italic;
+}
+
+span.mhtml.hide {
+	display: none;
+}
+
+span.mhtml.p1:hover {
+	color: inherit;
+	background-color: #BAFFFF;
+}
+
+span.html.p2:hover {
+	color: inherit;
+	background-color: #FFCACA;
+}
+
+span.mhtml.p3:hover {
+	color: inherit;
+	background-color: #FFFFBA;
+}
+
+span.mhtml.p4:hover {
+	color: inherit;
+	background-color: #CACAFF;
+}
+
+span.mhtml.p5:hover {
+	color: inherit;
+	background-color: #CAFFCA;
+}
+
+span.mhtml.p0:hover {
+	color: inherit;
+	background-color: #FFBAFF;
+}
+
+.mhtml.default {
+	color: black;
+}
+
+.mhtml.default:hover {
+	color: black;
+}
+
+.mhtml:target {
+	border: solid 1px #aaa;
+}
+
+tr.dependence-path-edge {
+	text-align: center;
+}
+
+/* Fixing Josef's xslt-generated FONT stuff */
+
+.varcolor {
+	color: olive;
+}
+
+.constcolor {
+	color: maroon;
+}
+
+.locicolor {
+	color: maroon;
+}
+
+.schpcolor {
+	color: maroon;
+}
+
+.schfcolor {
+	color: maroon;
+}
+
+.ppcolor {
+	color: maroon;
+}
+
+.pfcolor {
+	color: maroon;
+}
+
+.labcolor {
+	color: green;
+}
+
+.commentcolor {
+	color: red;
+}
+
+table.item-actions {
+	margin-left: 0px;
+	margin-right:  0px;
+}
+
+/*table.item-info {
+	margin-left: 10px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	border-left: 0px;
+	border-rigt: 0px;
+	border-spacing: 0px;
+}*/
+
+table.item-table {
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	border-left: 0px;
+	border-rigt: 0px;
+}
+
+ul.path-options {
+	padding-left: 0px;
+}
+
+ul.item-dep-options {
+	padding-left: 0px;
+}
+
+table.item-table td {
+	vertical-align: top;
+}
+
+tr.item-info-row td {
+	border-bottom-style: solid;
+	border-bottom-width: thin;
+}
+
+td.item-info-heading {
+	text-align: center;
+	font-weight: bold;
+	border-bottom-style: none;
+}
+
+td.item-info-value ul {
+	padding-left: 0px;
+}
+
+/* This is the default stylesheet for the screen media type. */
+
+/* Copyleft (c) 2002-2004 Jonas Fonseca <fonseca@diku.dk> */
+
+/* General style settings for 'clean' html elements {{{1 */
+
+body {
+	background-color: lightgrey;
+}
+
+table.article-listing {
+	border-style: solid;
+}
+
+ol.fragment-listing {
+}
+
+li.fragment-listing {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+a.fragment-listing:link {
+	text-decoration: none;
+	color: inherit;
+}
+
+a.fragment-listing:visited {
+	text-decoration: none;
+	color: inherit;
+}
+
+td.arrow {
+	font-size: xx-large;
+}
+
+.article-name {
+	text-transform: uppercase;
+	font-family: monospace;
+}
+
+td.article-title {
+	font-style: oblique;
+}
+
+/* Link properties */
+
+a:hover {
+	text-decoration: none;
+}
+
+/* Specifically targeted on screenshoots/index.html */
+
+dt {
+	font-weight: bold;
+	margin-top: 1em;
+}
+
+h1 {
+	font-size: 1.2em;
+	text-align: center;
+	border-style: solid;
+	border-color: black;
+	background-color: white;
+}
+
+h2 {
+	font-size: 1.2em;
+}
+
+h3 {
+	font-size: 1.1em;
+}
+
+h4 {
+	font-size: 1em;
+	text-decoration: underline;
+}
+
+h5 {
+	font-size: 1em;
+	font-style: italic;
+}
+
+h2, h3, h4, h5 {
+	margin-left: 1em;
+	margin-right: 1em;
+	font-weight: bold;
+}
+
+hr {
+	display: none;
+}
+
+/* No borders around image links */
+
+img {
+	border: 0;
+}
+
+pre {
+	padding: 1em;
+	text-align: left;
+	margin: 0.5em 4em;
+}
+
+var {
+	font-family: monospace;
+	font-style: normal;
+}
+
+/* Indent paragraphs etc. a bit to make them look nested. */
+
+ul li, dl, p, div.news {
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
+ul li, dl, p {
+	text-align: justify;
+}
+
+/* Header and footer {{{1 */
+
+.header,
+.footer {
+	padding: 0.4em 1em;
+	border: none;
+}
+
+/*table.header {
+	border-bottom-style: solid;
+}*/
+
+.header {
+	font-weight: bold;
+}
+
+.footer {
+	font-size: 0.7em;
+	border-top-style: solid;
+	border-top-width: thin;
+}
+
+.header span.menu,
+.footer span.menu {
+	text-align: right;
+	display: block;
+}
+
+.header span.menu a {
+	font-weight: bold;
+	font-style: italic;
+}
+
+.header #top,
+.footer span.left {
+	float: left;
+	margin: 0em;
+}
+
+.header #top {
+	display: inline;
+}
+
+.footer a,
+.header a,
+.footer a:visited,
+.header a:visited {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.footer a:hover,
+.header a:hover {
+	text-decoration: underline;
+}
+
+.header td {
+	border: none;
+}
+
+/* Various class definitions {{{1 */
+
+div.title {
+	font-weight: bold;
+}
+
+table.releases td,
+table.bugmail th,
+table.bugmail td,
+table.example td,
+table.example {
+	border: none;
+}
+
+.bugmail th {
+	text-align: center;
+}
+
+/*table {
+	margin-left: 4em;
+	margin-right: 4em;
+	border: none;
+}*/
+
+table.code, table.code tr, table.code td {
+	margin: 0em;
+	padding: 0em;
+	border: none;
+	width: 100%;
+}
+
+table[frame=hsides] {
+	border: 1px solid #000;
+}
+
+thead {
+	border-bottom: 1px solid #000;
+}
+
+.validate {
+	font-size: 0.7em;
+	text-align: right;
+	margin: 0.4em 0em;
+}
+
+.hide {
+	display: none;
+}
+
+/* Placement abbreviations that is commonly used. */
+
+.tcenter {
+	text-align: center;
+}
+
+.tright {
+	text-align: right;
+}
+
+.tleft {
+	text-align: left;
+}
+
+.fright {
+	float: right;
+}
+
+.fleft {
+	float: left;
+}
+
+div.miz-example {
+	border-style: solid;
+	font-family: monospace;
+	font-size: large;
+	background-color: lightblue;
+}
+
+tr.fullwidth {
+	width: 100%;
+}
+
+tr.halfwidth {
+	width: 50%;
+}
+
+a.ref {
+	color: red;
+}
+
+p.error-message {
+	border-style: solid;
+	background-color: #ff201a;
+	text-transform: none;
+	text-align: center;
+	font-weight: bold;
+	font-style: italic;
+}
