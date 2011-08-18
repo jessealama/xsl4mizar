@@ -58,7 +58,6 @@ tpl [Text-Proper] {
   for-each [document ($evl, /)] {
     apply [*];
   }
-  "begin"; "\n";
   for-each [Item] {
     apply [.];
   }
@@ -72,9 +71,21 @@ tpl ensure-spelling {
   }
 }
 
+tpl ensure-shape {
+  if [not(@shape)] {
+    die (#message = "We expected to find an element with a shape attribute");
+  }
+}
+
 tpl ensure-variable {
   if [not(Variable)] {
     die (#message = "A variable was expected, but none was found!");
+  }
+}
+
+tpl ensure-variables {
+  if [not(Variables)] {
+    die (#message = "A variables list was expected, but none was found!");
   }
 }
 
@@ -83,6 +94,14 @@ tpl apply-variable {
 }
 
 tpl variable-list {
+  if [Variables] {
+    list (#separ = ",", #elems = `Variables/Variable`);
+  } else {
+    list (#separ = ",", #elems = `Variable`);
+  }
+}
+
+tpl [Variables] {
   list (#separ = ",", #elems = `Variable`);
 }
 
@@ -251,14 +270,6 @@ tpl [Means] {
   "means";
 }
 
-tpl [Formula-Expression] {
-  // die (#message = "We are somehow applying the template for a Formula-Expression element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
-}
-
-tpl [Term-Expression] {
-  // die (#message = "We are somehow applying the template for a Term-Expression element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
-}
-
 tpl [it-Term] {
   "it";
 }
@@ -341,14 +352,15 @@ tpl [Item[@kind='Functor-Definition']] {
     " -> "; apply [Type-Specification[1]];
   }
 
-  if [No-Definiens] { // lol
-    ";";
+  ensure-shape ();
+  $shape = `@shape`;
+
+  if [$shape = "No-Definiens"] {
+    ";"; "\n";
   }
 
-  "\n";
-
-  if [Equals] {
-    apply [Equals[1]]; "\n";
+  if [$shape = "Equals"] {
+    " equals "; "\n";
     if [Definiens] {
       apply [Definiens[1]]; ";";
     } else {
@@ -356,8 +368,8 @@ tpl [Item[@kind='Functor-Definition']] {
     }
   }
 
-  if [Means] {
-    apply [Means[1]]; "\n";
+  if [$shape = "Means"] {
+    " means "; "\n";
     if [Definiens] {
       apply [Definiens[1]]; ";";
     } else {
@@ -481,7 +493,10 @@ tpl [Consistency] {
 }
 
 tpl [Item[@kind='Correctness-Condition']] {
-  apply [*[1]]; // I guess there's always at least one child
+  if [not(@condition)] {
+    die (#message = "Correctness-Condition items must have a condition attribute");
+  }
+  `@condition`;
   if [Block[@kind='Proof']] {
     "\n";
     apply [Block[@kind='Proof'][1]];
@@ -492,19 +507,13 @@ tpl [Item[@kind='Correctness-Condition']] {
 
 tpl [Adjective] {
   ensure-spelling ();
-  if [Negated] {
-    "non ";
-    if [*[3]] {
-       "("; list (#separ = ",", #elems = `*[position() > 1]`); ")";
-    } else {
-       apply [*[2]];
-    }
+  if [@negated = "yes"] {
+    "non";
+  }
+  if [*[2]] {
+     "("; list (#separ = ",", #elems = `*`); ")";
   } else {
-    if [*[2]] {
-       "("; list (#separ = ",", #elems = `*`); ")";
-    } else {
-      apply [*[1]]; " ";
-    }
+    apply [*[1]]; " ";
   }
   `@spelling`;
 }
@@ -558,16 +567,15 @@ tpl [Item[@kind='Loci-Declaration']] {
   "let "; apply [*]; ";"; "\n";
 }
 
-tpl [Formula-Expression] {
-  // ???
-}
-
 tpl [Definiens] {
   if [Label] {
     ":"; // special case: labels of definiens look like :this:, not like this:
     apply [Label[1]];
     " ";
   }
+
+  ensure-shape ();
+  $shape = `@shape`;
 
   if [Partial-Definiens] {
     for-each [Partial-Definiens] {
@@ -659,20 +667,23 @@ tpl [Type-List] {
 }
 
 tpl [Functor-Segment] {
-  ensure-variable ();
+  ensure-variables ();
   variable-list ();
   if [Type-List] {
     "("; apply [Type-List[1]]; ")";
-    " -> ";
-    ensure-type ();
-    apply-type ();
+    if [Type-Specification] {
+      " -> ";
+      apply [Type-Specification[1]];
+    } else {
+      die (#message = "Missing Type-Specification child of a Functor-Segment element!");
+    }
   } else {
-    die (#message = "Type-List child of Functor-Segment is missing!");
+    die (#message = "Missing Type-List child of a Functor-Segment element!");
   }
 }
 
 tpl [Predicate-Segment] {
-  ensure-variable ();
+  ensure-variables ();
   variable-list ();
   if [Type-List] {
     "["; apply [Type-List[1]]; "]";
@@ -740,8 +751,8 @@ tpl [Item[@kind='Structure-Definition']] {
 }
 
 tpl [Explicitly-Qualified-Segment](#verb) {
-  ensure-variable ();
-  variable-list ();
+  ensure-variables ();
+  list (#separ = ",", #elems = `Variables/Variable`);
   " ";
   if [$verb = ""] {
     "being";
@@ -941,21 +952,15 @@ tpl [Item[@kind='PropertyRegistration']] { // shouldn't this be "Property-Regist
 }
 
 tpl [Item[@kind='Property']] {
-  if [*[1]] {
-    apply [*[1]];
-    if [*[2]] {
-      if [Block[@kind='Proof']] {
-        "\n";
-        apply [Block[@kind='Proof'][1]];
-      } else {
-        apply [*[2]]; ";"; "\n";
-      }
-
-    } else {
-      die (#message = "Property Item has only one child!");
-    }
+  if [not(@property)] {
+    die (#message = "We expected a Property item to have a property attribute!");
+  }
+  `@property`;
+  if [Block[@kind='Proof']] {
+    "\n";
+    apply [Block[@kind='Proof'][1]];
   } else {
-    die (#message = "Property Item has no children!");
+    ";"; "\n";
   }
 }
 
@@ -1124,13 +1129,17 @@ tpl [Item[@kind='Choice-Statement']] {
   maybe-link ();
   "consider ";
   list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
-  if [Proposition] {
-    " such that ";
-    list (#separ = " and ", #elems = `Proposition`);
-    apply-justification-if-present ();
+  if [Conditions] {
+    if [Conditions/Proposition] {
+      " such that ";
+      list (#separ = " and ", #elems = `Conditions/Proposition`);
+      apply-justification-if-present ();
+    }
+    ";";
+    "\n";
+  } else {
+    die (#message = "We expected to find a Conditions child of a Choice-Statement item, but none was found");
   }
-  ";";
-  "\n";
 }
 
 tpl [Straightforward-Justification] {
@@ -1151,45 +1160,49 @@ tpl [Straightforward-Justification] {
 
 // Constructor properties
 
-tpl [Projectivity] {
-  "projectivity";
-}
+// tpl [Item[@kind = "Property"]] {
+//   die (#message = "Don't know how to deal with this property item");
+// }
 
-tpl [Involutiveness] {
-  "involutiveness";
-}
+// tpl [Item[@kind = "Property" and @property = "projectivity"]] {
+//   "projectivity";
+// }
 
-tpl [Idempotence] {
-  "idempotence";
-}
+// tpl [Item[@kind = "Property" and @property = "involutiveness"]] {
+//   "involutiveness";
+// }
 
-tpl [Commutativity] {
-  "commutativity";
-}
+// tpl [Item[@kind = "Property" and @property = "idempotence"]] {
+//   "idempotence";
+// }
 
-tpl [Reflexivity] {
-  "reflexivity";
-}
+// tpl [Item[@kind = "Property" and @property = "commutativity"]] {
+//   "commutativity";
+// }
 
-tpl [Irreflexivity] {
-  "irreflexivity";
-}
+// tpl [Item[@kind = "Property" and @property = "reflexivity"]] {
+//   "reflexivity";
+// }
 
-tpl [Symmetry] {
-  "symmetry";
-}
+// tpl [Item[@kind = "Property" and @property = "irreflexivity"]] {
+//   "irreflexivity";
+// }
 
-tpl [Asymmetry] {
-  "asymmetry";
-}
+// tpl [Item[@kind = "Property" and @property = "symmetry"]] {
+//   "symmetry";
+// }
 
-tpl [Connectedness] {
-  "connectedness";
-}
+// tpl [Item[@kind = "Property" and @property = "asymmetry"]] {
+//   "asymmetry";
+// }
 
-tpl [Sethood] {
-  "sethood";
-}
+// tpl [Item[@kind = "Property" and @property = "connectedness"]] {
+//   "connectedness";
+// }
+
+// tpl [Item[@kind = "Property" and @property = "sethood"]] {
+//   "sethood";
+// }
 
 tpl [Compact-Statement] {
   die (#message = "We are somehow applying the template for a Compact-Statement element, but this is an error because we aren't supposed to directly handle such elements.  How did we get here?");
@@ -1263,17 +1276,29 @@ tpl apply-justification-if-present(#end) {
 }
 
 tpl [Collective-Assumption] {
-  "assume that"; "\n";
+  if [Conditions] {
+    "assume that"; "\n";
+    list (#separ = "\nand\n", #elems = `Conditions/Proposition`); ";"; "\n";
+  } else {
+    die (#message = "Collective-Assumption elements must have a Conditions child");
+  }
+}
+
+
+tpl [Conditions] {
   list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
 }
 
 tpl [Item[@kind='Existential-Assumption']] {
-  ensure-proposition ();
   if [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
     "given ";
     list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
     " such that"; "\n";
-    list (#separ = "\nand\n", #elems = `Proposition`); ";"; "\n";
+    if [Conditions] {
+      apply [Conditions[1]];
+    } else {
+      die (#message = "Don't know how to deal with an Existential-Assumption item that lacks a Conditions child!");
+    }
     apply-justification-if-present ();
     "\n";
   } else {
@@ -1283,63 +1308,66 @@ tpl [Item[@kind='Existential-Assumption']] {
 
 tpl [Item[@kind='Conclusion']](#case) {
 
-  if [not(Iterative-Equality or Diffuse-Statement or Compact-Statement)] {
-    die (#message = "Don't know how to deal with a conclusion that it not an Iterative-Equality, Diffuse-Statement., nor a Compact-Statement");
-  }
-
   if [Straightforward-Justification/Link | Scheme-Justification/Link] {
     "hence ";
   }
 
-  if [Iterative-Equality] {
-    ensure-proposition ();
-    if [Label] {
-      apply [Label[1]];
-    }
-    if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
-      "thus ";
-    }
-    apply-proposition ();
-    apply-justification-if-present ();
-    "\n";
-    ".= ";
-    list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
-  }
+  ensure-shape ();
+  $shape = `@shape`;
 
-  if [Diffuse-Statement] {
-    if [Block[@kind='Hereby-Reasoning']] {
-      apply [Block[@kind='Hereby-Reasoning'][1]];
-    } else {
-      if [Straightforward-Justification/Link | Scheme-Justification/Link] {
-        "hence ";
-      } else {
-        "thus ";
-      }
+  choose {
+    when [$shape = "Iterative-Equality"] {
+      ensure-proposition ();
       if [Label] {
         apply [Label[1]];
       }
-      apply [Block[1]];
-    }
-  }
-
-  if [Compact-Statement] {
-    if [Label] {
-      apply [Label[1]];
-    }
-    if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
-      "thus ";
-    }
-    apply [Proposition[1]];
-    if [Block[@kind='Proof']] {
-      "\n";
-      apply [Block[@kind='Proof'][1]];
-    } else {
-      if [Straightforward-Justification | Scheme-Justification] {
-        apply [(Straightforward-Justification | Scheme-Justification)[1]]; 
+      if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
+        "thus ";
       }
-      ";";
+      apply-proposition ();
+      apply-justification-if-present ();
+      "\n";
+      ".= ";
+      list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
     }
-    "\n";
+    when [$shape = "Diffuse-Statement"] {
+      if [Block[@kind='Hereby-Reasoning']] {
+        apply [Block[@kind='Hereby-Reasoning'][1]];
+      } else {
+        if [Straightforward-Justification/Link | Scheme-Justification/Link] {
+          "hence ";
+        } else {
+          "thus ";
+        }
+        if [Label] {
+          apply [Label[1]];
+        }
+        apply [Block[1]];
+      }
+    }
+    when [$shape = "Compact-Statement"] {
+      if [Label] {
+        apply [Label[1]];
+      }
+      if [not(Straightforward-Justification/Link) and not(Scheme-Justification/Link)] {
+        "thus ";
+      }
+      apply [Proposition[1]];
+      if [Block[@kind='Proof']] {
+        "\n";
+        apply [Block[@kind='Proof'][1]];
+      } else {
+        if [Straightforward-Justification | Scheme-Justification] {
+          apply [(Straightforward-Justification | Scheme-Justification)[1]]; 
+        }
+        ";";
+      }
+      "\n";
+    }
+    otherwise {
+      $message = `concat ("Don't know how to deal with a Conclusion item whose shape is '", $shape, "'")`;
+      die (#message = $message);
+    }
   }
 }
 
@@ -1453,35 +1481,31 @@ tpl [Equality] {
 
 tpl [Item[@kind='Regular-Statement']] {
   maybe-link ();
-  if [not(Iterative-Equality | Diffuse-Statement | Compact-Statement)] {
-    die (#message = "A Regular-Statement item must have either an Iterative-Equality, Diffuse-Statement, or Compact-Statement child");
-  }
-
-  if [Iterative-Equality] {
-    ensure-proposition ();
-    apply-proposition ();
-    apply-justification-if-present ();
-    "\n";
-    ".= "; list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
-  } else {
-    if [Diffuse-Statement] {
+  ensure-shape ();
+  $shape = `@shape`;
+  choose {
+    when [$shape = "Iterative-Equality"] {
+      ensure-proposition ();
+      apply-proposition ();
+      apply-justification-if-present ();
+      "\n";
+      ".= "; list (#separ = "\n.= ", #elems = `Iterative-Step`); ";"; "\n";
+    }
+    when [$shape = "Diffuse-Statement"] {
       if [Label] {
         apply [Label[1]];
       }
-      if [Block[@kind='Now-Reasoning']] {
-        apply [Block[@kind='Now-Reasoning'][1]];
+      if [Block[@kind='Now-Reasoning' or @kind = 'Hereby-Reasoning']] {
+        apply [Block[@kind='Now-Reasoning' or @kind = 'Hereby-Reasoning'][1]];
       } else {
-        if [Block[@kind='Hereby-Reasoning']] {
-          apply [Block[@kind='Hereby-Reasoning'][1]];
-        } else {
-          die (#message = "Don't know how to handle this piece of diffuse reasoning it is neither a 'now' nor a 'hereby' block.");
-        }
+        die (#message = "Don't know how to handle this piece of diffuse reasoning it is neither a 'now' nor a 'hereby' block.");
       }
-    } else {
-        ensure-proposition ();
-        apply-proposition ();
-        apply-justification-if-present (#end = "1");
-      }
+    }
+    otherwise {
+      ensure-proposition ();
+      apply-proposition ();
+      apply-justification-if-present (#end = "1");
+    }
   }
 }
 

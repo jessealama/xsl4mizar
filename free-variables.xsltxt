@@ -30,7 +30,7 @@ tpl bound-in-items (#items, #bound-so-far) {
     $item = `$items[1]`;
     $free-in-item = free-variables (#element = $item);
     for-each [$item] {
-      $still-free = bind-variables (#variables = `preceding-sibling::Item[@kind = "Reservation"]/Variable | preceding-sibling::Item[@kind = "Loci-Declaration"]/*/Variable | preceding-sibling::Item[@kind = "Generalization"]/*/Variable | preceding-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable | preceding-sibling::Item[@kind = "Constant-Definition"]/Variable | preceding-sibling::Item[@kind = "Choice-Statement"]/*/Variable | preceding-sibling::Item[@kind = "Private-Predicate-Definition"]/Variable | preceding-sibling::Item[@kind = "Private-Functor-Definition"]/Variable | preceding-sibling::Item[@kind = "Exemplification"]/Variable | preceding-sibling::Functor-Segment/Variable | preceding-sibling::Predicate-Segment/Variable | preceding-sibling::Frankel-Term/*/Variable`,
+      $still-free = bind-variables (#variables = `preceding-sibling::Item[@kind = "Reservation"]/Variables/Variable | preceding-sibling::Item[@kind = "Loci-Declaration"]/*/Variable | preceding-sibling::Item[@kind = "Generalization"]/*/Variable | preceding-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable | preceding-sibling::Item[@kind = "Constant-Definition"]/Variable | preceding-sibling::Item[@kind = "Choice-Statement"]/*/Variable | preceding-sibling::Item[@kind = "Private-Predicate-Definition"]/Variable | preceding-sibling::Item[@kind = "Private-Functor-Definition"]/Variable | preceding-sibling::Item[@kind = "Exemplification"]/Variable | preceding-sibling::Functor-Segment/Variable | preceding-sibling::Predicate-Segment/Variable | preceding-sibling::Frankel-Term/*/Variable`,
                                     #free-variables = $free-in-item);
       $newly-bound = append-token-strings (#token-string-a = $bound-so-far,
                                            #token-string-b = $still-free);
@@ -192,7 +192,7 @@ tpl append-variable-idnrs (#variables, #token-string) {
 tpl append-variables-bound-by-binders (#loci-declarations, #bound-variables) {
   if [$loci-declarations] {
     $loci-declaration = `$loci-declarations[1]`;
-    $newly-bound = append-variable-idnrs (#variables = `$loci-declaration/Implicitly-Qualified-Segment/Variable | $loci-declaration/Explicitly-Qualified-Segment/Variable`,
+    $newly-bound = append-variable-idnrs (#variables = `$loci-declaration/Implicitly-Qualified-Segment/Variable | $loci-declaration/Explicitly-Qualified-Segment/Variables/Variable`,
                                           #token-string = $bound-variables);
     append-variables-bound-by-binders (#loci-declarations = `$loci-declarations[position() > 1]`,
                                        #bound-variables = $newly-bound);
@@ -265,17 +265,17 @@ tpl loci-declarations-preceding-but-below (#node, #upper-bound, #bound-vars) {
 
 tpl [Text-Proper/Item[@kind = "Reservation"]](#upper-bound) mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
-  bind-variables (#variables = `Variable`, #free-variables = $all-free);
+  bind-variables (#variables = `Variables/Variable`, #free-variables = $all-free);
 }
 
 tpl [Item[@kind = "Loci-Declaration"]](#upper-bound) mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
-  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`, #free-variables = $all-free);
+  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variables/Variable`, #free-variables = $all-free);
 }
 
 tpl [Item[@kind = "Generalization"]](#upper-bound) mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
-  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`, #free-variables = $all-free);
+  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variables/Variable`, #free-variables = $all-free);
 }
 
 tpl [Item[@kind = "Type-Changing-Statement"]](#upper-bound) mode="free-variables" {
@@ -290,7 +290,7 @@ tpl [Item[@kind = "Constant-Definition"]](#upper-bound) mode="free-variables" {
 
 tpl [Item[@kind = "Choice-Statement"]](#upper-bound) mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
-  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`, #free-variables = $all-free);
+  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variables/Variable`, #free-variables = $all-free);
 }
 
 tpl [Item[@kind = "Exemplification"]](#upper-bound) mode="free-variables" {
@@ -310,7 +310,7 @@ tpl [Item[@kind = "Predicate-Segment"]](#upper-bound) mode="free-variables" {
 
 tpl [Fraenkel-Term] (#upper-bound) mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
-  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`, #free-variables = $all-free);
+  bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variables/Variable`, #free-variables = $all-free);
 }
 
 // Private predicate definitions introduce free second-order variables, which I don't care about
@@ -432,7 +432,7 @@ tpl [*](#upper-bound) mode="free-variables" {
 // Formulas
 
 tpl [Universal-Quantifier-Formula](#upper-bound) mode="free-variables" {
-  $variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`;
+  $variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variables/Variable`;
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
   bind-variables (#variables = $variables,
                   #free-variables = $all-free);
@@ -441,7 +441,7 @@ tpl [Universal-Quantifier-Formula](#upper-bound) mode="free-variables" {
 tpl [Existential-Quantifier-Formula](#upper-bound) mode="free-variables" {
   $line = `@line`;
   $col = `@col`;
-  $variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`;
+  $variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variables/Variable`;
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
   $message-all-free = `concat ("Inside an existential formula at line ", $line, " and column ", $col, ", the following variable (id numbers) occur freely: ", $all-free)`;
   // msg $message-all-free;
