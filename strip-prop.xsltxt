@@ -7,11 +7,6 @@ output method=xml;
 #target_relnr = { "0"; }
 #target_property = { "Whatever"; }
 
-tpl list(#separ,#elems) { 
- for-each [$elems] {
-  apply[.]; if [not(position()=last())] { copy-of $separ; } }
-}
-
 tpl escape-backslash(#str) {
   if [contains ($str, '/')] {
     $before = `substring-before ($str, '/')`;
@@ -27,8 +22,14 @@ tpl [*] {
   $element-name = `local-name (.)`;
   <$element-name {
     for-each [@*] { copy-of `.`; }
-    list (#separ = "\n", #elems = `*`);
+    if [*] {
+      "\n";
+    }
+    for-each [*] {
+      apply [.];
+    }
   }
+  "\n";
 }
 
 tpl [Constructors] {
