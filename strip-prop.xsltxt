@@ -18,6 +18,14 @@ tpl escape-backslash(#str) {
   }
 }
 
+tpl [*] {
+  $element-name = `local-name (.)`;
+  <$element-name {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
 tpl [Constructors] {
   <Constructors { @aid=`@aid`; @mizfiles = escape-backslash (#str = `@mizfiles`);
   "\n";
