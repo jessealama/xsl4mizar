@@ -189,7 +189,7 @@ tpl [Cluster] {
 }
 
 tpl [Num] {
-  <Num { @nr=`@nr`; }
+  <Num { @nr=`@nr`; } "\n";
 }
 
 tpl [ArgTypes] {
