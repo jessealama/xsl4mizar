@@ -232,8 +232,7 @@ tpl [Adjective] {
 
 tpl [Typ] {
   <Typ {
-    @kind=`@kind`;
-    @nr=`@nr`;
+    for-each [@*] { copy-of `.`; }
     "\n";
     apply [*];
   }
