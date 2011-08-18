@@ -66,6 +66,17 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"]) + 1`;
+    choose {
+      when [Explicitly-Qualified-Segment] {
+        @idnr = `Explicitly-Qualified-Segment[1]/Variable/@idnr`;
+      }
+      when [Implicitly-Qualified-Segment] {
+        @idnr = `Implicitly-Qualified-Segment[1]/Variable/@idnr`;
+      }
+      otherwise {
+        die (#message = "We assume that a Choice-Statement has either an Explicitly-Qualified-Segment or Implicitly-Qualified-Segment child, but this Choice-Statement lacks both!");
+      }
+    }
     apply [*];
   }
 }
