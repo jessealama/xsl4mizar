@@ -154,14 +154,8 @@ tpl [Constructor] {
   $aid = { `@aid`; }
   $relnr = { `@relnr`; }
 
-
   <Constructor {
-    @kind=$kind;
-    @nr=$nr;
-    @aid=$aid;
-    @relnr=$relnr;
-    if [@redefnr] { @redefnr=`@redefnr`; }
-    if [@superfluous] { @superfluous=`@superfluous`; }
+    for-each [@*] { copy-of `.`; }
     "\n";
     if [$kind = $target_kind and $nr = $target_nr and $aid = $target_aid and $relnr = $target_relnr] {
       if [$target_property = "all"] {
