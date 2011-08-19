@@ -91,7 +91,7 @@ tpl value-of-token (#token) {
 }
 
 tpl count-preceding-toplevel-items {
-  `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Constant-Definition") and not(@kind = "Type-Changing-Statement")])`;
+  `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Type-Changing-Statement")])`;
 }
 
 // Sanity checks
@@ -186,7 +186,7 @@ tpl enumerate-items (#candidates, #bundlenr, #articleid) {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
+    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Type-Changing-Statement" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
@@ -430,7 +430,7 @@ tpl dependent-type-reservations-in-which-idnr-occurs-helper (#idnr, #reservation
 tpl dependent-type-reservations-in-which-idnr-occurs (#idnr, #reservations) {
   dependent-type-reservations-in-which-idnr-occurs-helper (#idnr = $idnr,
                                                            #reservations = $reservations,
-                                                           #val = "");  
+                                                           #val = "");
 }
 
 // $reservations is a list of reservation numbers
@@ -597,7 +597,60 @@ tpl needed-toplevel-items (#candidates, #context) {
       apply [$candidate];
     }
     needed-toplevel-items (#candidates = $other-candidates,
-                           #context = $context); 
+                           #context = $context);
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Constant-Definition"]] (#bundlenr, #articleid) {
+  $context = `.`;
+  $line = `@line`;
+  $col = `@col`;
+  $variable = `Variable`;
+  $variable-line = `$variable/@line`;
+  $variable-col = `$variable/@col`;
+  $variable-idnr = `$variable/@idnr`;
+  $variable-spelling = `$variable/@spelling`;
+  $definiens = `*[2]`;
+  $definiens-line = `$definiens/@line`;
+  $definiens-col = `$definiens/@col`;
+  <Item-Bundle {
+    if [$bundlenr] { @bundlenr = $bundlenr; }
+    if [$articleid] { @articleid = $articleid; }
+    @promoted = "constant-definition";
+    @spelling = $variable-spelling;
+    <Text-Proper {
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      <Item {
+        @kind = "Definition-Item";
+        @line = $line;
+        @col = $col;
+        <Block {
+          @kind = "Definitional-Block";
+          @line = $line;
+          @col = $col;
+          <Item {
+            @kind = "Functor-Definition";
+            <Operation-Functor-Pattern {
+              @spelling = $variable-spelling;
+              @idnr = $variable-idnr;
+              <Loci;
+              <Loci;
+            }
+            <Equals;
+            <Definiens {
+              @line = $definiens-line;
+              @col = $definiens-col;
+              <Term-Expression;
+              copy-of `$definiens`;
+            }
+          }
+          <Item {
+            @kind = "Correctness";
+            <Straightforward-Justification;
+          }
+        }
+      }
+    }
   }
 }
 
@@ -615,7 +668,7 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
     $context = `.`;
 
     <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Choice-Statement" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement"] {
@@ -683,7 +736,7 @@ tpl [Scheme-Justification[@nr = "0"]] {
     }
   } else {
     die (#message = "We found a Scheme-Justification that lacks either an idnr, spelling, or nr attribute!");
-  }  
+  }
 }
 
 tpl [Local-Reference] {
