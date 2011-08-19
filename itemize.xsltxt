@@ -96,6 +96,16 @@ tpl count-preceding-toplevel-items {
 
 // Sanity checks
 
+tpl ensure-distinct-toplevel-constants {
+  for-each [/Text-Proper/Item[@kind = "Constant-Definition"]] {
+    $spelling = `Variable/@spelling`;
+    if [following-sibling::Item[@kind = "Constant-Definition"]/Variable[@spelling = $spelling]] {
+      $message = `concat ("This stylesheet assumes that distinct toplevel constant definitions bind distinct variables, but there are at least two constant definitions in this document that bind '", $spelling, "'")`;
+      die (#message = $message);
+    }
+  }
+}
+
 tpl ensure-toplevel-items-have-distinct-labels {
   for-each [/Text-Proper/Item[@kind = "Regular-Statement"]/Diffuse-Statement/../Label | /Text-Proper/Item[@kind = "Theorem-Item"]/Proposition/Label | /Text-Proper/Item[@kind = "Regular-Statement"]/Compact-Statement/../Label] {
     $idnr = `@idnr`;
@@ -142,6 +152,7 @@ tpl ensure-loci-have-numbers {
 }
 
 tpl [/] {
+  ensure-distinct-toplevel-constants ();
   ensure-toplevel-items-have-distinct-labels ();
   ensure-reservations-have-numbers ();
   ensure-toplevel-binders-have-unique-numbers ();
