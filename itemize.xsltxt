@@ -816,7 +816,7 @@ tpl [Local-Reference] {
 
 tpl [Text-Proper/*/Straightforward-Justification/Link] {
   for-each [../..] {
-  $num-previous = count-preceding-toplevel-items ();
+    $num-previous = count-preceding-toplevel-items ();
     $label = `concat ("CKB", $num-previous)`;
     <Theorem-Reference {
       @spelling = $label;
