@@ -53,32 +53,141 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
   }
 }
 
-// These kinds of statements present problems for my analysis.  One can introduce spurious variables and types, e.g.:
-//
-// consider A being set, B being Jordan-Curve such that A1: A = B or A <> B;
-//
-// Lm: <something about A alone, not B>
-//
-// I can't just split up the choice statement into two separate ones
-// because the property that the introduced variables satisfy involves
-// both variables (A and B occur in "A = B or A <> B")
+tpl conjoin-formulas (#formulas) {
+  if [$formulas] {
+    $formula = `$formulas[1]`;
+    if [$formulas/*[2]] {
+      <Conjunctive-Formula {
+        apply [$formula];
+        conjoin-formulas (#formulas = `$formulas[position() > 1]`);
+      }
+    } else {
+      apply [$formula];
+    }
+  }
+}
+
+key "spelling" [//*] `@spelling`;
+
+tpl new-spelling-based-on (#base, #try) {
+  $candidate = `concat ($base, $try)`;
+  if [key ("spelling", $candidate)] {
+    new-spelling-based-on (#base = $base,
+                           #try = `$try + 1`);
+  } else {
+    $candidate;
+  }
+}
+
+tpl new-dummy-mode-name {
+  new-spelling-based-on (#base = "DummyMode", #try = "1");
+}
+
 tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
+  // create a dummy mode
+  // create a dummy definition
+  // create a theorem representing the conjunction of the conditions
+  // create, for each condition, a new toplevel theorem
+  if [not (Explicitly-Qualified-Segment | Implicitly-Qualified-Segment)] {
+    die (#message = "We expect a Choice-Statement to have either an Explicitly-Qualified-Segment or an Implicitly-Qualified-Segment child, but this choice statement lacks both");
+  }
+
+  // treat first the case of one variable in a consider
+  $variable = `(Explicitly-Qualified-Segment | Implicitly-Qualified-Segment)/Variable[1]`;
+  $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
+
+  if [not($variable)] {
+    die (#message = "We were unable to access a variable from a choice statement!");
+  }
+
+  // It's not ok if $variable is empty, but it is ok if $type is.  This
+  // arises when we are dealing with an Implicitly-Qualified-Segment.
+
+  if [not($variable/@idnr)] {
+    die (#message = "We encountered a Variable element that lacks an idnr attribute!");
+  }
+  if [not($variable/@spelling)] {
+    die (#message = "We encountered a Variable element that lacks a spelling attribute!");
+  }
+
+  $variable-idnr = $variable/@idnr;
+  $variable-spelling = $variable/@spelling;
+
+  // dummy mode
+  $mode-name = new-dummy-mode-name ();
   <Item {
-    for-each [@*] { copy-of `.`; }
-    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"]) + 1`;
-    choose {
-      when [Explicitly-Qualified-Segment] {
-        @idnr = `Explicitly-Qualified-Segment[1]/Variable/@idnr`;
-      }
-      when [Implicitly-Qualified-Segment] {
-        @idnr = `Implicitly-Qualified-Segment[1]/Variable/@idnr`;
-      }
-      otherwise {
-        die (#message = "We assume that a Choice-Statement has either an Explicitly-Qualified-Segment or Implicitly-Qualified-Segment child, but this Choice-Statement lacks both!");
+    @kind = "Definition-Item";
+    <Block {
+      @kind = "Definitional-Block";
+      <Item {
+        @kind = "Mode-Definition";
+        <Mode-Pattern {
+          @spelling = $mode-name;
+          <Loci;
+        }
+        <Standard-Mode {
+          @kind = "Simple-Definiens";
+          if [$type] {
+            <Type-Specification {
+              apply [$type];
+            }
+          }
+          <Definiens {
+            <Formula-Expression;
+            conjoin-formulas (#formulas = `Proposition`);
+          }
+        }
       }
     }
-    apply [*];
   }
+
+  // dummy functor symbol
+  <Item {
+    @kind = "Definition-Item";
+    <Block {
+      @kind = "Definitional-Block";
+      <Item {
+        @kind = "Functor-Definition";
+        <Operation-Functor-Pattern {
+          @spelling = $variable-spelling;
+          <Loci;
+          <Loci;
+        }
+        if [$type] {
+          <Type-Specification {
+            apply [$type];
+          }
+        }
+        <Equals;
+        <Definiens {
+          @kind = "Simple-Definiens";
+          <Global-Choice-Term {
+            <Standard-Type {
+              @spelling = $mode-name;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // conjunction of the propositions
+  <Item {
+    @kind = "Theorem-Item";
+    <Proposition {
+      conjoin-formulas (#formulas = `Proposition`);
+    }
+  }
+
+  if [Proposition[2]] {
+    for-each [Proposition] {
+      <Item {
+        @kind = "Theorem-Item";
+        apply [.];
+      }
+    }
+  }
+
 }
 
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
