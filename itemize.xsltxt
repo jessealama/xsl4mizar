@@ -2,7 +2,7 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Choice-Statement" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
+key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Choice-Statement" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
 
 // Say something when dying
 
@@ -91,7 +91,7 @@ tpl value-of-token (#token) {
 }
 
 tpl count-preceding-toplevel-items {
-  `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Type-Changing-Statement")])`;
+  `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition")])`;
 }
 
 // Sanity checks
@@ -186,7 +186,7 @@ tpl enumerate-items (#candidates, #bundlenr, #articleid) {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Type-Changing-Statement" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
+    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
@@ -619,7 +619,7 @@ tpl [Text-Proper/Item[@kind = "Constant-Definition"]] (#bundlenr, #articleid) {
     @promoted = "constant-definition";
     @spelling = $variable-spelling;
     <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       <Item {
         @kind = "Definition-Item";
         @line = $line;
@@ -654,7 +654,82 @@ tpl [Text-Proper/Item[@kind = "Constant-Definition"]] (#bundlenr, #articleid) {
   }
 }
 
-tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Constant-Definition") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition")]](#bundlenr, #articleid) {
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid) {
+  $context = `.`;
+  $line = `@line`;
+  $col = `@col`;
+  $equation = `Equality[1]`;
+  if [$equation] {
+    $variable = `$equation/Variable`;
+    if [$variable] {
+      $variable-line = `$variable/@line`;
+      $variable-col = `$variable/@col`;
+      $variable-idnr = `$variable/@idnr`;
+      $variable-spelling = `$variable/@spelling`;
+      $definiens = `$equation/*[2]`;
+      if [$definiens] {
+        $definiens-line = `$definiens/@line`;
+        $definiens-col = `$definiens/@col`;
+        $type = `$context/*[2]`;
+        $justification = `$context/*[3]`;
+        if [$justification] {
+          <Item-Bundle {
+            if [$bundlenr] { @bundlenr = $bundlenr; }
+            if [$articleid] { @articleid = $articleid; }
+            @promoted = "type-changing-statement";
+            @spelling = $variable-spelling;
+            <Text-Proper {
+              needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+              <Item {
+                @kind = "Definition-Item";
+                @line = $line;
+                @col = $col;
+                <Block {
+                  @kind = "Definitional-Block";
+                  @line = $line;
+                  @col = $col;
+                  <Item {
+                    @kind = "Functor-Definition";
+                    <Operation-Functor-Pattern {
+                      @spelling = $variable-spelling;
+                      @idnr = $variable-idnr;
+                      <Loci;
+                      <Loci;
+                    }
+                    <Type-Specification {
+                      copy-of `$type`;
+                    }
+                    <Equals;
+                    <Definiens {
+                      @line = $definiens-line;
+                      @col = $definiens-col;
+                      <Term-Expression;
+                      copy-of `$definiens`;
+                    }
+                  }
+                  <Item {
+                    @kind = "Correctness";
+                    copy-of `$justification`;
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          die (#message = "We expected to find a justification of some kind for the type-changing statement that we're dealing with, but we found none");
+        }
+      } else {
+
+      }
+    } else {
+      die (#message = "We expected to find a Variable child of the Equality child of the current Type-Changing-Statement that we are handling, but we found none.");
+    }
+  } else {
+    die (#message = "We expect a Type-Changing-Statement item to have an Equality child, but we found one that lacks such a child.");
+  }
+}
+
+tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Constant-Definition") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Type-Changing-Statement") and not(@kind = "Choice-Statement")]](#bundlenr, #articleid) {
   <Item-Bundle {
 
     if [$bundlenr] {
@@ -668,7 +743,7 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
     $context = `.`;
 
     <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement"] {
@@ -686,13 +761,6 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
 }
 
 tpl [Item[@kind = "Reservation"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
-  }
-}
-
-tpl [Item[@kind = "Type-Changing-Statement"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     apply [*];
@@ -816,7 +884,7 @@ tpl [Local-Reference] {
 
 tpl [Text-Proper/*/Straightforward-Justification/Link] {
   for-each [../..] {
-  $num-previous = count-preceding-toplevel-items ();
+    $num-previous = count-preceding-toplevel-items ();
     $label = `concat ("CKB", $num-previous)`;
     <Theorem-Reference {
       @spelling = $label;
