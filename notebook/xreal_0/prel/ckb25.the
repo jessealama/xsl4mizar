@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Theorems>
+<Signature>
+<ArticleID name="HIDDEN"/>
+<ArticleID name="XBOOLE_0"/>
+<ArticleID name="ZFMISC_1"/>
+<ArticleID name="SUBSET_1"/>
+<ArticleID name="TARSKI"/>
+<ArticleID name="ORDINAL1"/>
+<ArticleID name="NUMBERS"/>
+<ArticleID name="XCMPLX_0"/>
+</Signature>
+<Theorem kind="T">
+<Pred kind="R" nr="1">
+<Func kind="K" nr="36">
+<Num nr="1"/>
+<Func kind="K" nr="38">
+<Num nr="1"/>
+</Func>
+</Func>
+<Func kind="K" nr="33"/>
+</Pred>
+</Theorem>
+</Theorems>

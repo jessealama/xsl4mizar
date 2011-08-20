@@ -1,0 +1,1377 @@
+<?xml version="1.0"?>
+<Article aid="CKB25C" mizfiles="/sw/share/mizar/">
+<Section/>
+
+<DefinitionBlock line="10" col="10" plevel="" newlevel="1">
+<Let nr="1" plevel="1" constnr="1">
+<Typ kind="M" nr="6" pid="9" vid="25" aid="CKB25A" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+</Typ>
+</Let>
+<Definition kind="M" nr="0" vid="0" line="14" col="3" plevel="1" newlevel="1_1">
+<Existence plevel="1_1">
+<Proposition line="16" col="7" plevel="1_1" propnr="1">
+<Not pid="-4">
+<For pid="-2" vid="0">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<And pid="-5">
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="1" vid="25"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="3"/>
+<Var nr="4"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="1" vid="25"/>
+<Var nr="3"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="2"/>
+<Var nr="4"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="1" vid="25"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="1" vid="25"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</For>
+</Not>
+</Proposition>
+<Proof line="16" col="7" plevel="1_1" newlevel="1_1_1">
+<BlockThesis plevel="1_1_1">
+<Not pid="-4">
+<For pid="-2" vid="0">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<And pid="-5">
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="1" vid="25"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="3"/>
+<Var nr="4"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="1" vid="25"/>
+<Var nr="3"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="2"/>
+<Var nr="4"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="1" vid="25"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="1" vid="25"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</For>
+</Not>
+</BlockThesis>
+<Consider nr="2" plevel="1_1_1" constnr="1">
+<Proposition line="20" col="65" plevel="1_1_1" propnr="1">
+<Not>
+<For pid="0" vid="25">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="3"/>
+<Var nr="4"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="2"/>
+<Var nr="4"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</For>
+</Not>
+</Proposition>
+<By line="21" col="6">
+<Ref nr="1" articlenr="23" kind="T" line="21" col="14" aid="CKB25" absnr="1"/>
+<Ref nr="4" articlenr="7" kind="D" line="21" col="29" aid="XCMPLX_0" absnr="4"/>
+</By>
+<Typ kind="M" nr="2" pid="2" vid="25" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Typ kind="M" nr="2" pid="2" vid="26" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Typ kind="M" nr="2" pid="2" vid="27" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Typ kind="M" nr="2" pid="2" vid="28" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Proposition line="18" col="9" nr="1" vid="29" plevel="1_1_1" propnr="2">
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="2" vid="25"/>
+<Const nr="3" vid="26"/>
+</Func>
+</Pred>
+</Proposition>
+<Proposition line="20" col="10" nr="2" vid="30" plevel="1_1_1" propnr="3">
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="4" vid="27"/>
+<Const nr="5" vid="28"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="2" vid="25"/>
+<Const nr="4" vid="27"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="3" vid="26"/>
+<Const nr="5" vid="28"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Proposition>
+</Consider>
+<Take plevel="1_1_1">
+<Const nr="3" vid="26"/>
+</Take>
+<Thesis plevel="1_1_1">
+<Not>
+<And pid="-5">
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="1" vid="25"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="1" vid="25"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="1" vid="25"/>
+<Const nr="3" vid="26"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="1" vid="25"/>
+<Var nr="1"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="3" vid="26"/>
+<Var nr="2"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</Not>
+<ThesisExpansions/>
+</Thesis>
+<Proposition line="23" col="139" nr="3" vid="31" plevel="1_1_1" propnr="4">
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="2" vid="25"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="2" vid="25"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+</Proposition>
+<By line="23" col="139">
+<Ref nr="1" vid="29" line="23" col="143"/>
+<Ref nr="2" vid="30" line="23" col="148"/>
+</By>
+<Proposition line="24" col="136" nr="4" vid="32" plevel="1_1_1" propnr="5">
+<Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="2" vid="25"/>
+<Const nr="3" vid="26"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="2" vid="25"/>
+<Var nr="1"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="3" vid="26"/>
+<Var nr="2"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</Not>
+</Proposition>
+<By line="24" col="136">
+<Ref nr="1" vid="29" line="24" col="140"/>
+<Ref nr="2" vid="30" line="24" col="145"/>
+</By>
+<Proposition line="25" col="271" nr="5" vid="33" plevel="1_1_1" propnr="6">
+<Not pid="-4">
+<And pid="-5">
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="2" vid="25"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="2" vid="25"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="2" vid="25"/>
+<Const nr="3" vid="26"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="2" vid="25"/>
+<Var nr="1"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="3" vid="26"/>
+<Var nr="2"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</Not>
+</Proposition>
+<By line="25" col="271">
+<Ref nr="3" vid="31" line="25" col="276"/>
+<Ref nr="4" vid="32" line="25" col="281"/>
+</By>
+<Conclusion plevel="1_1_1">
+<Proposition line="26" col="18" plevel="1_1_1" propnr="7">
+<Not>
+<And pid="-5">
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="1" vid="25"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="1" vid="25"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Const nr="1" vid="25"/>
+<Const nr="3" vid="26"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="1" vid="25"/>
+<Var nr="1"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Const nr="3" vid="26"/>
+<Var nr="2"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</Not>
+</Proposition>
+<By line="26" col="18">
+<Ref nr="5" vid="33" line="26" col="23"/>
+</By>
+</Conclusion>
+<Thesis plevel="1_1_1">
+<Verum/>
+<ThesisExpansions/>
+</Thesis>
+<EndPosition line="27" col="5"/>
+</Proof>
+</Existence>
+<Constructor kind="M" nr="1" aid="CKB25C" relnr="7">
+<Properties propertyarg1="0" propertyarg2="0">
+<Sethood/>
+</Properties>
+<ArgTypes>
+<Typ kind="M" nr="6" aid="CKB25A" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+</Typ>
+</ArgTypes>
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+</Constructor>
+<Pattern kind="M" nr="1" aid="CKB25C" formatnr="97" constrkind="M" constrnr="7" relnr="10" constraid="CKB25C" absconstrnr="1">
+<ArgTypes>
+<Typ kind="M" nr="6" aid="CKB25A" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+</Typ>
+</ArgTypes>
+<Visible>
+<Int x="1"/>
+</Visible>
+</Pattern>
+</Definition>
+<EndPosition line="28" col="3"/>
+</DefinitionBlock>
+<Definiens constrkind="M" constrnr="7" aid="CKB25C" defnr="1" relnr="40" nr="1" constraid="CKB25C" absconstrnr="1">
+<Typ kind="M" nr="6" aid="CKB25A" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+</Typ>
+<Typ kind="M" nr="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Essentials>
+<Int x="1"/>
+<Int x="2"/>
+</Essentials>
+<DefMeaning kind="m">
+<Not pid="-4">
+<And pid="-5">
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<LocusVar nr="1"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<LocusVar nr="1"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<LocusVar nr="1"/>
+<LocusVar nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<LocusVar nr="1"/>
+<Var nr="1"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<LocusVar nr="2"/>
+<Var nr="2"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</Not>
+</DefMeaning>
+</Definiens>
+<DefTheorem constrkind="M" constrnr="7" plevel="" aid="CKB25C" kind="D" nr="1">
+<Proposition line="28" col="3" plevel="" propnr="1">
+<For pid="0" vid="25">
+<Typ kind="M" nr="6" pid="9" aid="CKB25A" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+</Typ>
+<For>
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<And pid="-7">
+<Not pid="-4">
+<And pid="-5">
+<Is>
+<Var nr="2"/>
+<Typ kind="M" nr="7" aid="CKB25C" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Var nr="1"/>
+</Typ>
+</Is>
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="4"/>
+<Var nr="5"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="4"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="3"/>
+<Var nr="5"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="3"/>
+<Var nr="4"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="2"/>
+<Var nr="4"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</Not>
+<Not pid="-4">
+<And pid="-5">
+<Not pid="-4">
+<And pid="-5">
+<Not>
+<For pid="0" vid="26">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="4"/>
+<Var nr="5"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="4"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="3"/>
+<Var nr="5"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<For pid="0" vid="27">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<For pid="0" vid="28">
+<Typ kind="M" nr="2" pid="2" aid="SUBSET_1" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42" aid="NUMBERS" absnr="1"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="124" pid="57" aid="XCMPLX_0" absnr="4">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Var nr="3"/>
+<Var nr="4"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1" pid="7" aid="HIDDEN" absnr="1">
+<Func kind="K" nr="114" pid="47" aid="NUMBERS" absnr="6"/>
+<Func kind="K" nr="120" pid="53" aid="ARYTM_0" absnr="5">
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+<Func kind="K" nr="116" pid="49" aid="ARYTM_0" absnr="1">
+<Var nr="2"/>
+<Var nr="4"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</Not>
+<Not pid="-6">
+<Is>
+<Var nr="2"/>
+<Typ kind="M" nr="7" aid="CKB25C" absnr="1">
+<Cluster/>
+<Cluster>
+<Adjective nr="25" kind="V" aid="XCMPLX_0" absnr="1"/>
+</Cluster>
+<Var nr="1"/>
+</Typ>
+</Is>
+</Not>
+</And>
+</Not>
+</And>
+</For>
+</For>
+</Proposition>
+</DefTheorem>
+
+</Article>

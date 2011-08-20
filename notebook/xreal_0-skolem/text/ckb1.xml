@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xml" href="file:///sw/share/mizar/miz.xml"?>
+<Article aid="CKB1" mizfiles="&#47;sw&#47;share&#47;mizar&#47;">
+<Section/>
+
+<DefinitionBlock line="10" col="10">
+<Let nr="1">
+<Typ kind="M" nr="1" pid="5" vid="12">
+<Cluster/>
+<Cluster/>
+</Typ>
+</Let>
+<Definition kind="V" nr="1" vid="13" line="14" col="5">
+<Constructor kind="V" nr="1" aid="CKB1" relnr="29">
+<ArgTypes>
+<Typ kind="M" nr="1">
+<Cluster/>
+<Cluster/>
+</Typ>
+</ArgTypes>
+<Typ kind="M" nr="1">
+<Cluster/>
+<Cluster/>
+</Typ>
+</Constructor>
+<Pattern kind="V" nr="1" aid="CKB1" formatnr="93" constrkind="V" constrnr="29" relnr="20">
+<ArgTypes>
+<Typ kind="M" nr="1">
+<Cluster/>
+<Cluster/>
+</Typ>
+</ArgTypes>
+<Visible>
+<Int x="1"/>
+</Visible>
+</Pattern>
+</Definition>
+<EndPosition line="15" col="3"/>
+</DefinitionBlock>
+<Definiens constrkind="V" constrnr="29" aid="CKB1" defnr="1" vid="13" relnr="1">
+<Typ kind="M" nr="1">
+<Cluster/>
+<Cluster/>
+</Typ>
+<Essentials>
+<Int x="1"/>
+</Essentials>
+<DefMeaning kind="m">
+<Pred kind="R" nr="2" pid="3">
+<LocusVar nr="1"/>
+<Func kind="K" nr="109" pid="42"/>
+</Pred>
+</DefMeaning>
+</Definiens>
+<DefTheorem constrkind="V" constrnr="29">
+<Proposition line="15" col="3" nr="1" vid="13">
+<For pid="0" vid="12">
+<Typ kind="M" nr="1" pid="5">
+<Cluster/>
+<Cluster/>
+</Typ>
+<And pid="-7">
+<Not pid="-4">
+<And pid="-5">
+<Pred kind="V" nr="29">
+<Var nr="1"/>
+</Pred>
+<Not pid="-6">
+<Pred kind="R" nr="2" pid="3">
+<Var nr="1"/>
+<Func kind="K" nr="109" pid="42"/>
+</Pred>
+</Not>
+</And>
+</Not>
+<Not pid="-4">
+<And pid="-5">
+<Pred kind="R" nr="2" pid="3">
+<Var nr="1"/>
+<Func kind="K" nr="109" pid="42"/>
+</Pred>
+<Not pid="-6">
+<Pred kind="V" nr="29">
+<Var nr="1"/>
+</Pred>
+</Not>
+</And>
+</Not>
+</And>
+</For>
+</Proposition>
+</DefTheorem>
+
+</Article>

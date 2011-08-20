@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<Parser>
+<syThreeDots/>
+<Int x="0"/>
+<Int x="0"/>
+<Int x="0"/>
+
+<sySemiColon/>
+<syThreeDots/>
+<Int x="1"/>
+<Int x="3"/>
+<Int x="11"/>
+
+<syThreeDots/>
+<Int x="2"/>
+<Int x="3"/>
+<Int x="4"/>
+
+<syThreeDots/>
+<Int x="2"/>
+<Int x="7"/>
+<Int x="2"/>
+
+<syThreeDots/>
+<Int x="2"/>
+<Int x="11"/>
+<Int x="2"/>
+
+<syThreeDots/>
+<Int x="2"/>
+<Int x="16"/>
+<Int x="2"/>
+
+<syThreeDots/>
+<Int x="2"/>
+<Int x="17"/>
+<Int x="2"/>
+
+<syThreeDots/>
+<Int x="3"/>
+<Int x="27"/>
+<Int x="7"/>
+
+<syThreeDots/>
+<Int x="3"/>
+<Int x="87"/>
+<Int x="9"/>
+
+<syThreeDots/>
+<Int x="5"/>
+<Int x="19"/>
+<Int x="2"/>
+
+<syThreeDots/>
+<Int x="6"/>
+<Int x="5"/>
+<Int x="11"/>
+
+<syThreeDots/>
+<Int x="6"/>
+<Int x="11"/>
+<Int x="1"/>
+
+<syThreeDots/>
+<Int x="12"/>
+<Int x="1"/>
+<Int x="2"/>
+
+<syThreeDots/>
+<Int x="13"/>
+<Int x="1"/>
+<Int x="8"/>
+
+<syThreeDots/>
+<Int x="14"/>
+<Int x="1"/>
+<Int x="9"/>
+
+<sySemiColon/>
+<syThreeDots/>
+<Int x="2"/>
+<Int x="2"/>
+<Int x="14"/>
+
+<syThreeDots/>
+<Int x="6"/>
+<Int x="1"/>
+<Int x="12"/>
+
+<syThreeDots/>
+<Int x="6"/>
+<Int x="5"/>
+<Int x="1"/>
+
+<syThreeDots/>
+<Int x="7"/>
+<Int x="4"/>
+<Int x="1"/>
+
+<syThreeDots/>
+<Int x="9"/>
+<Int x="5"/>
+<Int x="9"/>
+
+<syThreeDots/>
+<Int x="11"/>
+<Int x="1"/>
+<Int x="1"/>
+
+<sySemiColon/>
+</Parser>

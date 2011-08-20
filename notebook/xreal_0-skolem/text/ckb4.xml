@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xml" href="file:///sw/share/mizar/miz.xml"?>
+<Article aid="CKB4" mizfiles="&#47;sw&#47;share&#47;mizar&#47;">
+<Section/>
+
+<RegistrationBlock line="10" col="12">
+<Registration>
+<CCluster aid="CKB4" nr="1">
+<ArgTypes/>
+<Cluster>
+<Adjective nr="24" pid="11"/>
+</Cluster>
+<Typ kind="M" nr="1">
+<Cluster/>
+<Cluster/>
+</Typ>
+<Cluster>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+<Cluster>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+</CCluster>
+</Registration>
+<EndPosition line="19" col="3"/>
+</RegistrationBlock>
+
+</Article>

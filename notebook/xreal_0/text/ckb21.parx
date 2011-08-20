@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<Parser>
+<syBegin line="9" col="5"/>
+<syTheorem/>
+<ikTrmEqConst nr="1"/>
+<Int x="24"/>
+<Pos line="11" col="3"/>
+<syRedefine/>
+<Pos line="11" col="45"/>
+<syNot/>
+<Pos line="11" col="18"/>
+<PredicateSymbol/>
+<Int x="5"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="64"/>
+<Pos line="11" col="13"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="26"/>
+<Pos line="11" col="44"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="6"/>
+<Pos line="11" col="31"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="64"/>
+<Pos line="11" col="27"/>
+<sySemiColon/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="56"/>
+<Pos line="11" col="39"/>
+<sySemiColon/>
+<sySemiColon/>
+<sySemiColon/>
+<EOT/>
+</Parser>

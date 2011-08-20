@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<Parser>
+<syBegin line="9" col="5"/>
+<syTheorem/>
+<ikTrmEqConst nr="0"/>
+<Int x="0"/>
+<Pos line="11" col="1"/>
+<syRedefine/>
+<Pos line="11" col="88"/>
+<syAmpersand/>
+<Pos line="11" col="3"/>
+<PredicateSymbol/>
+<Int x="3"/>
+<syThreeDots/>
+<Numeral/>
+<Numeral nr="1"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="74"/>
+<Pos line="11" col="15"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="97"/>
+<Pos line="11" col="9"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="99"/>
+<Pos line="11" col="12"/>
+<sySemiColon/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="11" col="85"/>
+<syAmpersand/>
+<Pos line="11" col="28"/>
+<PredicateSymbol/>
+<Int x="3"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="79"/>
+<Pos line="11" col="22"/>
+<syThreeDots/>
+<Numeral/>
+<Numeral nr="1"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="74"/>
+<Pos line="11" col="40"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="101"/>
+<Pos line="11" col="34"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="103"/>
+<Pos line="11" col="37"/>
+<sySemiColon/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="11" col="50"/>
+<PredicateSymbol/>
+<Int x="3"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="64"/>
+<Pos line="11" col="46"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="74"/>
+<Pos line="11" col="84"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="70"/>
+<Pos line="11" col="57"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="97"/>
+<Pos line="11" col="61"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="101"/>
+<Pos line="11" col="64"/>
+<sySemiColon/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="70"/>
+<Pos line="11" col="71"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="99"/>
+<Pos line="11" col="75"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="103"/>
+<Pos line="11" col="78"/>
+<sySemiColon/>
+<sySemiColon/>
+<sySemiColon/>
+<sySemiColon/>
+<syFrom/>
+<syBy/>
+<Int x="0"/>
+<Int x="0"/>
+<d/>
+<Int x="31"/>
+<Int x="1"/>
+<Pos line="11" col="101"/>
+<d/>
+<Int x="30"/>
+<Int x="1"/>
+<Pos line="11" col="114"/>
+<sySemiColon/>
+<Pos line="11" col="88"/>
+<EOT/>
+</Parser>

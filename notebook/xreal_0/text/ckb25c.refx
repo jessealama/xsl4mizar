@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<Parser>
+<syThreeDots/>
+<Int x="0"/>
+<Int x="0"/>
+<Int x="0"/>
+
+<sySemiColon/>
+<sySemiColon/>
+<syThreeDots/>
+<Int x="24"/>
+<Int x="1"/>
+<Int x="1"/>
+
+<sySemiColon/>
+</Parser>

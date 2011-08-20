@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<Constructors>
+<Signature>
+<ArticleID name="HIDDEN"/>
+<ArticleID name="XBOOLE_0"/>
+<ArticleID name="ZFMISC_1"/>
+<ArticleID name="SUBSET_1"/>
+<ArticleID name="TARSKI"/>
+<ArticleID name="ORDINAL1"/>
+<ArticleID name="NUMBERS"/>
+<ArticleID name="CKB25A"/>
+<ArticleID name="CKB25C"/>
+<ArticleID name="CKB25E"/>
+</Signature>
+<ConstrCounts>
+<ConstrCount kind="K" nr="1"/>
+</ConstrCounts>
+<Constructor kind="K" nr="1" aid="CKB25H" relnr="136">
+<ArgTypes>
+<Typ kind="M" nr="4">
+<Cluster/>
+</Typ>
+<Typ kind="M" nr="5">
+<Cluster/>
+<LocusVar nr="1"/>
+</Typ>
+<Typ kind="M" nr="6">
+<Cluster/>
+<LocusVar nr="1"/>
+<LocusVar nr="2"/>
+</Typ>
+</ArgTypes>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="28"/>
+</Typ>
+</Constructor>
+</Constructors>

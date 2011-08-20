@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<Constructors>
+<Signature>
+<ArticleID name="HIDDEN"/>
+<ArticleID name="RELAT_1"/>
+<ArticleID name="FUNCT_1"/>
+<ArticleID name="XBOOLE_0"/>
+<ArticleID name="ZFMISC_1"/>
+<ArticleID name="SUBSET_1"/>
+<ArticleID name="PARTFUN1"/>
+<ArticleID name="MCART_1"/>
+<ArticleID name="FUNCT_2"/>
+<ArticleID name="TARSKI"/>
+<ArticleID name="FUNCT_4"/>
+<ArticleID name="ORDINAL1"/>
+<ArticleID name="ARYTM_3"/>
+<ArticleID name="ARYTM_2"/>
+<ArticleID name="ARYTM_1"/>
+<ArticleID name="NUMBERS"/>
+<ArticleID name="ARYTM_0"/>
+<ArticleID name="XCMPLX_0"/>
+<ArticleID name="XXREAL_0"/>
+<ArticleID name="CKB1"/>
+<ArticleID name="CKB20"/>
+<ArticleID name="CKB22"/>
+<ArticleID name="CKB25A"/>
+<ArticleID name="CKB25B"/>
+<ArticleID name="CKB25C"/>
+<ArticleID name="CKB25D"/>
+<ArticleID name="CKB25E"/>
+<ArticleID name="CKB25F"/>
+<ArticleID name="CKB25G"/>
+</Signature>
+<ConstrCounts>
+<ConstrCount kind="K" nr="1"/>
+</ConstrCounts>
+<Constructor kind="K" nr="1" aid="CKB25H" relnr="138">
+<ArgTypes/>
+<Typ kind="M" nr="2" pid="2">
+<Cluster/>
+<Func kind="K" nr="109" pid="42"/>
+</Typ>
+</Constructor>
+</Constructors>
