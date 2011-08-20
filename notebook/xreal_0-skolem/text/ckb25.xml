@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xml" href="file:///sw/share/mizar/miz.xml"?>
+<Article aid="CKB25" mizfiles="&#47;sw&#47;share&#47;mizar&#47;">
+<Section/>
+
+<JustifiedTheorem>
+<Proposition line="11" col="21">
+<Pred kind="R" nr="1" pid="7">
+<Func kind="K" nr="122" pid="55">
+<Num nr="1"/>
+<Func kind="K" nr="124" pid="57">
+<Num nr="1"/>
+</Func>
+</Func>
+<Func kind="K" nr="114" pid="47"/>
+</Pred>
+</Proposition>
+<SkippedProof/>
+</JustifiedTheorem>
+
+</Article>

@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<Theorems>
+<Signature>
+<ArticleID name="HIDDEN"/>
+<ArticleID name="RELAT_1"/>
+<ArticleID name="FUNCT_1"/>
+<ArticleID name="XBOOLE_0"/>
+<ArticleID name="ZFMISC_1"/>
+<ArticleID name="SUBSET_1"/>
+<ArticleID name="TARSKI"/>
+<ArticleID name="ORDINAL1"/>
+<ArticleID name="NUMBERS"/>
+<ArticleID name="ARYTM_0"/>
+<ArticleID name="XCMPLX_0"/>
+<ArticleID name="CKB25A"/>
+</Signature>
+<Theorem kind="D" constrkind="M" constrnr="4">
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="43"/>
+</Typ>
+<And>
+<Not>
+<And>
+<Is>
+<Var nr="1"/>
+<Typ kind="M" nr="4">
+<Cluster/>
+</Typ>
+</Is>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="43"/>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="43"/>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="43"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1">
+<Num nr="1"/>
+<Func kind="K" nr="54">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="58">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="54">
+<Var nr="3"/>
+<Var nr="4"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="48"/>
+<Func kind="K" nr="54">
+<Func kind="K" nr="50">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+<Func kind="K" nr="50">
+<Var nr="2"/>
+<Var nr="4"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</And>
+</Not>
+<Not>
+<And>
+<Not>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="43"/>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="43"/>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="43"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1">
+<Num nr="1"/>
+<Func kind="K" nr="54">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="58">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="54">
+<Var nr="3"/>
+<Var nr="4"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="48"/>
+<Func kind="K" nr="54">
+<Func kind="K" nr="50">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+<Func kind="K" nr="50">
+<Var nr="2"/>
+<Var nr="4"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Not>
+<Not>
+<Is>
+<Var nr="1"/>
+<Typ kind="M" nr="4">
+<Cluster/>
+</Typ>
+</Is>
+</Not>
+</And>
+</Not>
+</And>
+</For>
+</Theorem>
+</Theorems>

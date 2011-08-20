@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<Environ aid="CKB22">
+<Directive name="Vocabularies" argnr="18">
+<Ident name="HIDDEN" line="1" col="1"/>
+<Ident name="ORDINAL1" line="2" col="21"/>
+<Ident name="NUMBERS" line="2" col="29"/>
+<Ident name="XXREAL_0" line="2" col="38"/>
+<Ident name="CARD_1" line="2" col="45"/>
+<Ident name="XCMPLX_0" line="2" col="54"/>
+<Ident name="SUBSET_1" line="2" col="63"/>
+<Ident name="ARYTM_0" line="2" col="71"/>
+<Ident name="FUNCOP_1" line="2" col="80"/>
+<Ident name="ARYTM_1" line="2" col="88"/>
+<Ident name="ARYTM_3" line="2" col="96"/>
+<Ident name="RELAT_1" line="2" col="104"/>
+<Ident name="ARYTM_2" line="2" col="112"/>
+<Ident name="ZFMISC_1" line="2" col="121"/>
+<Ident name="XBOOLE_0" line="2" col="130"/>
+<Ident name="XREAL_0" line="2" col="138"/>
+<Ident name="CKB20" line="2" col="144"/>
+<Ident name="CKB22" line="2" col="150"/>
+</Directive>
+<Directive name="Notations" argnr="15">
+<Ident name="HIDDEN" line="1" col="1"/>
+<Ident name="TARSKI" line="3" col="16"/>
+<Ident name="XBOOLE_0" line="3" col="25"/>
+<Ident name="ZFMISC_1" line="3" col="34"/>
+<Ident name="SUBSET_1" line="3" col="43"/>
+<Ident name="FUNCT_4" line="3" col="51"/>
+<Ident name="ORDINAL1" line="3" col="60"/>
+<Ident name="ARYTM_2" line="3" col="68"/>
+<Ident name="ARYTM_1" line="3" col="76"/>
+<Ident name="NUMBERS" line="3" col="84"/>
+<Ident name="ARYTM_0" line="3" col="92"/>
+<Ident name="XCMPLX_0" line="3" col="101"/>
+<Ident name="XXREAL_0" line="3" col="110"/>
+<Ident name="CKB1" line="3" col="115"/>
+<Ident name="CKB20" line="3" col="121"/>
+</Directive>
+<Directive name="Definitions" argnr="6">
+<Ident name="TARSKI" line="4" col="18"/>
+<Ident name="XCMPLX_0" line="4" col="27"/>
+<Ident name="XXREAL_0" line="4" col="36"/>
+<Ident name="ARYTM_3" line="4" col="44"/>
+<Ident name="CKB1" line="4" col="49"/>
+<Ident name="CKB20" line="4" col="55"/>
+</Directive>
+<Directive name="Theorems" argnr="19">
+<Ident name="XBOOLE_0" line="5" col="17"/>
+<Ident name="ARYTM_1" line="5" col="25"/>
+<Ident name="ZFMISC_1" line="5" col="34"/>
+<Ident name="TARSKI" line="5" col="41"/>
+<Ident name="ARYTM_2" line="5" col="49"/>
+<Ident name="ARYTM_0" line="5" col="57"/>
+<Ident name="XCMPLX_0" line="5" col="66"/>
+<Ident name="NUMBERS" line="5" col="74"/>
+<Ident name="XXREAL_0" line="5" col="83"/>
+<Ident name="ORDINAL1" line="5" col="92"/>
+<Ident name="CKB1" line="5" col="97"/>
+<Ident name="CKB8" line="5" col="102"/>
+<Ident name="CKB15" line="5" col="108"/>
+<Ident name="CKB16" line="5" col="114"/>
+<Ident name="CKB17" line="5" col="120"/>
+<Ident name="CKB18" line="5" col="126"/>
+<Ident name="CKB19" line="5" col="132"/>
+<Ident name="CKB20" line="5" col="138"/>
+<Ident name="CKB21" line="5" col="144"/>
+</Directive>
+<Directive name="Schemes" argnr="0">
+</Directive>
+<Directive name="Registrations" argnr="18">
+<Ident name="ARYTM_2" line="6" col="21"/>
+<Ident name="NUMBERS" line="6" col="29"/>
+<Ident name="XCMPLX_0" line="6" col="38"/>
+<Ident name="XXREAL_0" line="6" col="47"/>
+<Ident name="ORDINAL1" line="6" col="56"/>
+<Ident name="XBOOLE_0" line="6" col="65"/>
+<Ident name="CKB2" line="6" col="70"/>
+<Ident name="CKB3" line="6" col="75"/>
+<Ident name="CKB4" line="6" col="80"/>
+<Ident name="CKB5" line="6" col="85"/>
+<Ident name="CKB6" line="6" col="90"/>
+<Ident name="CKB7" line="6" col="95"/>
+<Ident name="CKB9" line="6" col="100"/>
+<Ident name="CKB10" line="6" col="106"/>
+<Ident name="CKB11" line="6" col="112"/>
+<Ident name="CKB12" line="6" col="118"/>
+<Ident name="CKB13" line="6" col="124"/>
+<Ident name="CKB14" line="6" col="130"/>
+</Directive>
+<Directive name="Constructors" argnr="8">
+<Ident name="HIDDEN" line="1" col="1"/>
+<Ident name="FUNCT_4" line="7" col="20"/>
+<Ident name="ARYTM_1" line="7" col="28"/>
+<Ident name="ARYTM_0" line="7" col="36"/>
+<Ident name="XCMPLX_0" line="7" col="45"/>
+<Ident name="XXREAL_0" line="7" col="54"/>
+<Ident name="CKB1" line="7" col="59"/>
+<Ident name="CKB20" line="7" col="65"/>
+</Directive>
+<Directive name="Requirements" argnr="5">
+<Ident name="HIDDEN" line="1" col="1"/>
+<Ident name="NUMERALS" line="8" col="21"/>
+<Ident name="BOOLE" line="8" col="27"/>
+<Ident name="SUBSET" line="8" col="34"/>
+<Ident name="ARITHM" line="8" col="41"/>
+</Directive>
+</Environ>

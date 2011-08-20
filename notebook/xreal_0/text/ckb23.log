@@ -1,0 +1,195 @@
+Constructors
+  </sw/share/mizar/prel/h/hidden.dco
+  </sw/share/mizar/prel/r/relat_1.dco
+  </sw/share/mizar/prel/f/funct_1.dco
+  </sw/share/mizar/prel/x/xboole_0.dco
+  </sw/share/mizar/prel/z/zfmisc_1.dco
+  </sw/share/mizar/prel/s/subset_1.dco
+  </sw/share/mizar/prel/p/partfun1.dco
+  </sw/share/mizar/prel/m/mcart_1.dco
+  </sw/share/mizar/prel/f/funct_2.dco
+  </sw/share/mizar/prel/t/tarski.dco
+  </sw/share/mizar/prel/f/funct_4.dco
+  </sw/share/mizar/prel/o/ordinal1.dco
+  </sw/share/mizar/prel/a/arytm_3.dco
+  </sw/share/mizar/prel/a/arytm_2.dco
+  </sw/share/mizar/prel/a/arytm_1.dco
+  </sw/share/mizar/prel/n/numbers.dco
+  </sw/share/mizar/prel/a/arytm_0.dco
+  </sw/share/mizar/prel/x/xcmplx_0.dco
+  </sw/share/mizar/prel/x/xxreal_0.dco
+  <prel/ckb1.dco
+  <prel/ckb20.dco
+  <prel/ckb22.dco
+  The list of all imported constructors
+      M   L   V   R   K   U   G
+   +HIDDEN
+     +1          +2            
+      1   0   0   2   0   0   0
+   -RELAT_1
+             +5     +12        
+      1   0   5   2  12   0   0
+   -FUNCT_1
+             +5      +3        
+      1   0  10   2  15   0   0
+   -XBOOLE_0
+             +1  +3  +5        
+      1   0  11   5  20   0   0
+   -ZFMISC_1
+             +1  +5  +4        
+      1   0  12  10  24   0   0
+   -SUBSET_1
+     +2      +1  +2 +10        
+      3   0  13  12  34   0   0
+   -PARTFUN1
+             +1  +1  +7        
+      3   0  14  13  41   0   0
+   -MCART_1
+                    +20        
+      3   0  14  13  61   0   0
+   -FUNCT_2
+     +2      +3  +2 +10        
+      5   0  17  15  71   0   0
+   -TARSKI
+                 +2  +4        
+      5   0  17  17  75   0   0
+   +FUNCT_4
+                     +7        
+      5   0  17  17  82   0   0
+   -ORDINAL1
+             +7  +1  +4        
+      5   0  24  18  86   0   0
+   -ARYTM_3
+                 +3 +12        
+      5   0  24  21  98   0   0
+   -ARYTM_2
+                 +1  +8        
+      5   0  24  22 106   0   0
+   +ARYTM_1
+                     +2        
+      5   0  24  22 108   0   0
+   -NUMBERS
+                     +7        
+      5   0  24  22 115   0   0
+   +ARYTM_0
+                     +5        
+      5   0  24  22 120   0   0
+   +XCMPLX_0
+             +1      +7        
+      5   0  25  22 127   0   0
+   +XXREAL_0
+             +3  +1  +5        
+      5   0  28  23 132   0   0
+   +CKB1
+             +1                
+      5   0  29  23 132   0   0
+   +CKB20
+                     +1        
+      5   0  29  23 133   0   0
+   +CKB22
+                     +1        
+      5   0  29  23 134   0   0
+Requirements
+  </sw/share/mizar/prel/h/hidden.dre
+  </sw/share/mizar/prel/n/numerals.dre
+  </sw/share/mizar/prel/b/boole.dre
+  </sw/share/mizar/prel/s/subset.dre
+  </sw/share/mizar/prel/a/arithm.dre
+Registrations
+  </sw/share/mizar/prel/a/arytm_2.dcl
+  </sw/share/mizar/prel/n/numbers.dcl
+  </sw/share/mizar/prel/f/finset_1.dco
+   The cutting off constructors:
+    - FINSET_1
+  Inaccessible Clusters
+
+   Functor Cluster: 7
+      -*FINSET_1:V1
+
+   Functor Cluster: 7
+      -*FINSET_1:V1
+
+   Functor Cluster: 7
+      -*FINSET_1:V1
+
+   Functor Cluster: 7
+      -*FINSET_1:V1
+
+  </sw/share/mizar/prel/x/xcmplx_0.dcl
+  </sw/share/mizar/prel/x/xxreal_0.dcl
+  </sw/share/mizar/prel/o/ordinal1.dcl
+  </sw/share/mizar/prel/x/xboole_0.dcl
+  <prel/ckb2.dcl
+  <prel/ckb3.dcl
+  <prel/ckb4.dcl
+  <prel/ckb5.dcl
+  <prel/ckb6.dcl
+  <prel/ckb7.dcl
+  <prel/ckb9.dcl
+  <prel/ckb10.dcl
+  <prel/ckb11.dcl
+  <prel/ckb12.dcl
+  <prel/ckb13.dcl
+  <prel/ckb14.dcl
+Notations
+  </sw/share/mizar/prel/h/hidden.dno
+  </sw/share/mizar/prel/t/tarski.dno
+  </sw/share/mizar/prel/x/xboole_0.dno
+  </sw/share/mizar/prel/z/zfmisc_1.dno
+  </sw/share/mizar/prel/s/subset_1.dno
+  </sw/share/mizar/prel/f/funct_4.dno
+  </sw/share/mizar/prel/o/ordinal1.dno
+  </sw/share/mizar/prel/a/arytm_2.dno
+  </sw/share/mizar/prel/a/arytm_1.dno
+  </sw/share/mizar/prel/n/numbers.dno
+  </sw/share/mizar/prel/a/arytm_0.dno
+  </sw/share/mizar/prel/x/xcmplx_0.dno
+  </sw/share/mizar/prel/x/xxreal_0.dno
+  <prel/ckb1.dno
+  <prel/ckb20.dno
+  <prel/ckb22.dno
+Registrations(Identify)
+Registrations(Properties)
+  </sw/share/mizar/prel/x/xcmplx_0.dpr
+  </sw/share/mizar/prel/x/xxreal_0.dpr
+  </sw/share/mizar/prel/o/ordinal1.dpr
+Definitions
+  </sw/share/mizar/prel/t/tarski.def
+  </sw/share/mizar/prel/x/xcmplx_0.def
+  </sw/share/mizar/prel/x/xxreal_0.def
+  </sw/share/mizar/prel/a/arytm_3.def
+  </sw/share/mizar/prel/o/ordinal2.dco
+  </sw/share/mizar/prel/o/ordinal3.dco
+   The cutting off constructors:
+    - ORDINAL2
+    - ORDINAL3
+  <prel/ckb1.def
+  <prel/ckb20.def
+  <prel/ckb22.def
+Theorems
+  </sw/share/mizar/prel/x/xboole_0.the
+  </sw/share/mizar/prel/a/arytm_1.the
+  </sw/share/mizar/prel/z/zfmisc_1.the
+  </sw/share/mizar/prel/e/enumset1.dco
+   The cutting off constructors:
+    - ENUMSET1
+  </sw/share/mizar/prel/t/tarski.the
+  </sw/share/mizar/prel/a/arytm_2.the
+  </sw/share/mizar/prel/o/ordinal2.dco
+   The cutting off constructors:
+    - ORDINAL2
+  </sw/share/mizar/prel/a/arytm_0.the
+  </sw/share/mizar/prel/x/xcmplx_0.the
+  </sw/share/mizar/prel/n/numbers.the
+  </sw/share/mizar/prel/x/xxreal_0.the
+  </sw/share/mizar/prel/o/ordinal1.the
+  <prel/ckb1.the
+  <prel/ckb8.the
+  <prel/ckb15.the
+  <prel/ckb16.the
+  <prel/ckb17.the
+  <prel/ckb18.the
+  <prel/ckb19.the
+  <prel/ckb20.the
+  <prel/ckb21.the
+  <prel/ckb22.the

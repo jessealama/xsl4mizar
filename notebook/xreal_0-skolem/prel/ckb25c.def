@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<Definientia>
+<Signature>
+<ArticleID name="HIDDEN"/>
+<ArticleID name="XBOOLE_0"/>
+<ArticleID name="ZFMISC_1"/>
+<ArticleID name="SUBSET_1"/>
+<ArticleID name="TARSKI"/>
+<ArticleID name="ORDINAL1"/>
+<ArticleID name="NUMBERS"/>
+<ArticleID name="ARYTM_0"/>
+<ArticleID name="XCMPLX_0"/>
+<ArticleID name="CKB25A"/>
+<ArticleID name="CKB25C"/>
+</Signature>
+<Definiens constrkind="M" constrnr="5" aid="CKB25C" defnr="1">
+<Typ kind="M" nr="4">
+<Cluster/>
+</Typ>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="28"/>
+</Typ>
+<Essentials>
+<Int x="1"/>
+<Int x="2"/>
+</Essentials>
+<DefMeaning kind="m">
+<Not>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="28"/>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="28"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1">
+<Num nr="1"/>
+<Func kind="K" nr="39">
+<LocusVar nr="1"/>
+<LocusVar nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="43">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="39">
+<Var nr="1"/>
+<Var nr="2"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="33"/>
+<Func kind="K" nr="39">
+<Func kind="K" nr="35">
+<LocusVar nr="1"/>
+<Var nr="1"/>
+</Func>
+<Func kind="K" nr="35">
+<LocusVar nr="2"/>
+<Var nr="2"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</Not>
+</DefMeaning>
+</Definiens>
+</Definientia>

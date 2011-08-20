@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<Parser>
+<syBegin line="9" col="5"/>
+<RegistrationBlock line="10" col="12">
+<syLet line="11" col="25"/>
+<Q nr="1"/>
+<Identifier nr="21"/>
+<Pos line="11" col="24"/>
+<syAccording/>
+<syThreeDots line="11" col="17"/>
+<syDefinition/>
+<AttributeSymbol nr="93"/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="11" col="24"/>
+<ModeSymbol/>
+<Int x="38"/>
+<sySemiColon/>
+<syLet line="12" col="25"/>
+<Q nr="1"/>
+<Identifier nr="22"/>
+<Pos line="12" col="24"/>
+<syAccording/>
+<syThreeDots line="12" col="17"/>
+<syDefinition/>
+<AttributeSymbol nr="93"/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="12" col="24"/>
+<ModeSymbol/>
+<Int x="38"/>
+<sySemiColon/>
+<f line="13" col="27"/>
+<LeftFunctorBracketSymbol/>
+<Int x="78"/>
+<Pos line="13" col="13"/>
+<syThreeDots/>
+<ikTrmConstant/>
+<Int x="1"/>
+<syThreeDots/>
+<ikTrmConstant/>
+<Int x="2"/>
+<sySemiColon/>
+<syThreeDots line="13" col="26"/>
+<syDefinition/>
+<AttributeSymbol nr="93"/>
+<sySemiColon/>
+<sySemiColon/>
+<EndPosition line="28" col="3"/>
+</RegistrationBlock>
+<EOT/>
+</Parser>

@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<Theorems>
+<Signature>
+<ArticleID name="HIDDEN"/>
+<ArticleID name="RELAT_1"/>
+<ArticleID name="FUNCT_1"/>
+<ArticleID name="XBOOLE_0"/>
+<ArticleID name="ZFMISC_1"/>
+<ArticleID name="SUBSET_1"/>
+<ArticleID name="PARTFUN1"/>
+<ArticleID name="MCART_1"/>
+<ArticleID name="FUNCT_2"/>
+<ArticleID name="TARSKI"/>
+<ArticleID name="FUNCT_4"/>
+<ArticleID name="ORDINAL1"/>
+<ArticleID name="ARYTM_3"/>
+<ArticleID name="ARYTM_2"/>
+<ArticleID name="ARYTM_1"/>
+<ArticleID name="NUMBERS"/>
+<ArticleID name="ARYTM_0"/>
+<ArticleID name="XCMPLX_0"/>
+<ArticleID name="XXREAL_0"/>
+<ArticleID name="CKB1"/>
+</Signature>
+<Theorem kind="T">
+<For>
+<Typ kind="M" nr="1">
+<Cluster>
+<Adjective nr="29"/>
+</Cluster>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="109"/>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="109"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1">
+<Var nr="1"/>
+<Func kind="K" nr="120">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Not>
+<And>
+<Pred kind="R" nr="1">
+<Var nr="3"/>
+<Func kind="K" nr="114"/>
+</Pred>
+<Pred kind="R" nr="1">
+<Var nr="1"/>
+<Var nr="2"/>
+</Pred>
+</And>
+</Not>
+</And>
+</Not>
+</For>
+</For>
+</For>
+</Theorem>
+</Theorems>

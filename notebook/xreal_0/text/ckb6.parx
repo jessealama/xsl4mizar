@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<Parser>
+<syBegin line="9" col="5"/>
+<RegistrationBlock line="10" col="12">
+<syCluster line="11" col="25"/>
+<syThreeDots line="11" col="13"/>
+<syDefinition/>
+<AttributeSymbol nr="93"/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="11" col="24"/>
+<ModeSymbol/>
+<Int x="38"/>
+<sySemiColon/>
+<EndPosition line="17" col="3"/>
+</RegistrationBlock>
+<EOT/>
+</Parser>

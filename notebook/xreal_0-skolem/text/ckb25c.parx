@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<Parser>
+<syBegin line="9" col="5"/>
+<DefinitionBlock line="10" col="10">
+<syLet line="11" col="16"/>
+<Q nr="1"/>
+<Identifier nr="25"/>
+<Pos line="11" col="15"/>
+<ModeSymbol/>
+<Int x="96"/>
+<sySemiColon/>
+<syMode line="12" col="6"/>
+<ModeSymbol nr="97" line="12" col="11"/>
+<MMLIdentifier nr="1"/>
+<sySemiColon/>
+<syArrow/>
+<Pos line="12" col="28"/>
+<ModeSymbol/>
+<Int x="29"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="65"/>
+<Pos line="12" col="36"/>
+<sySemiColon/>
+<sySemiColon/>
+<ikDfsMeans/>
+<ikTrmEqConst nr="0"/>
+<Int x="0"/>
+<Pos line="14" col="4"/>
+<ikDfsMeans/>
+<sySemiColon/>
+<o/>
+<Pos line="14" col="124"/>
+<syEx/>
+<Numeral nr="2"/>
+<Identifier nr="26"/>
+<Identifier nr="27"/>
+<Pos line="14" col="24"/>
+<ModeSymbol/>
+<Int x="29"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="65"/>
+<Pos line="14" col="32"/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="14" col="123"/>
+<syAmpersand/>
+<Pos line="14" col="40"/>
+<PredicateSymbol/>
+<Int x="3"/>
+<syThreeDots/>
+<Numeral/>
+<Numeral nr="1"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="74"/>
+<Pos line="14" col="52"/>
+<syThreeDots/>
+<ikTrmConstant/>
+<Int x="1"/>
+<syThreeDots/>
+<syIt/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="14" col="122"/>
+<syAmpersand/>
+<Pos line="14" col="65"/>
+<PredicateSymbol/>
+<Int x="3"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="79"/>
+<Pos line="14" col="59"/>
+<syThreeDots/>
+<Numeral/>
+<Numeral nr="1"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="74"/>
+<Pos line="14" col="77"/>
+<syThreeDots/>
+<ikTrmBound/>
+<Int x="1"/>
+<syThreeDots/>
+<ikTrmBound/>
+<Int x="2"/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="14" col="87"/>
+<PredicateSymbol/>
+<Int x="3"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="64"/>
+<Pos line="14" col="83"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="74"/>
+<Pos line="14" col="121"/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="70"/>
+<Pos line="14" col="94"/>
+<syThreeDots/>
+<ikTrmConstant/>
+<Int x="1"/>
+<syThreeDots/>
+<ikTrmBound/>
+<Int x="1"/>
+<sySemiColon/>
+<syThreeDots/>
+<LeftFunctorBracketSymbol/>
+<Int x="70"/>
+<Pos line="14" col="108"/>
+<syThreeDots/>
+<syIt/>
+<syThreeDots/>
+<ikTrmBound/>
+<Int x="2"/>
+<sySemiColon/>
+<sySemiColon/>
+<sySemiColon/>
+<EndPosition line="22" col="3"/>
+</DefinitionBlock>
+<EOT/>
+</Parser>

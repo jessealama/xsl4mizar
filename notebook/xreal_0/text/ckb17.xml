@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xml" href="file:///sw/share/mizar/miz.xml"?>
+<Article aid="CKB17" mizfiles="&#47;sw&#47;share&#47;mizar&#47;">
+<Section/>
+
+<Reservation>
+<Ident vid="24"/>
+<Typ kind="M" nr="1" pid="5">
+<Cluster>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+<Cluster>
+<Adjective nr="25"/>
+<Adjective nr="26"/>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+</Typ>
+</Reservation>
+
+<Reservation>
+<Ident vid="25"/>
+<Typ kind="M" nr="1" pid="5">
+<Cluster>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+<Cluster>
+<Adjective nr="25"/>
+<Adjective nr="26"/>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+</Typ>
+</Reservation>
+
+<JustifiedTheorem>
+<Proposition line="13" col="35" nr="1" vid="26">
+<For pid="0" vid="24">
+<Typ kind="M" nr="1" pid="5">
+<Cluster>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+<Cluster>
+<Adjective nr="25"/>
+<Adjective nr="26"/>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+</Typ>
+<For pid="0" vid="25">
+<Typ kind="M" nr="1" pid="5">
+<Cluster>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+<Cluster>
+<Adjective nr="25"/>
+<Adjective nr="26"/>
+<Adjective nr="29" pid="20"/>
+</Cluster>
+</Typ>
+<Not pid="-4">
+<And pid="-5">
+<Pred kind="R" nr="23" pid="18">
+<Var nr="1"/>
+<Var nr="2"/>
+</Pred>
+<Pred kind="R" nr="23" pid="18">
+<Var nr="2"/>
+<Var nr="1"/>
+</Pred>
+<Not pid="-6">
+<Pred kind="R" nr="1" pid="7">
+<Var nr="1"/>
+<Var nr="2"/>
+</Pred>
+</Not>
+</And>
+</Not>
+</For>
+</For>
+</Proposition>
+<SkippedProof/>
+</JustifiedTheorem>
+
+</Article>

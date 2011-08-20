@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<Notations>
+<Signature>
+<ArticleID name="HIDDEN"/>
+<ArticleID name="XBOOLE_0"/>
+<ArticleID name="ZFMISC_1"/>
+<ArticleID name="SUBSET_1"/>
+<ArticleID name="TARSKI"/>
+<ArticleID name="ORDINAL1"/>
+<ArticleID name="NUMBERS"/>
+<ArticleID name="CKB25A"/>
+<ArticleID name="CKB25C"/>
+<ArticleID name="CKB25E"/>
+</Signature>
+<Vocabularies>
+<Vocabulary>
+<ArticleID name="CKB25E"/>
+<SymbolCount kind="G" nr="0"/>
+<SymbolCount kind="K" nr="0"/>
+<SymbolCount kind="L" nr="0"/>
+<SymbolCount kind="M" nr="1"/>
+<SymbolCount kind="O" nr="0"/>
+<SymbolCount kind="R" nr="0"/>
+<SymbolCount kind="U" nr="0"/>
+<SymbolCount kind="V" nr="0"/>
+</Vocabulary>
+</Vocabularies>
+<Pattern kind="M" nr="1" aid="CKB25E" constrkind="M" constrnr="6">
+<Format kind="M" symbolnr="1" argnr="2"/>
+<ArgTypes>
+<Typ kind="M" nr="4">
+<Cluster/>
+</Typ>
+<Typ kind="M" nr="5">
+<Cluster/>
+<LocusVar nr="1"/>
+</Typ>
+</ArgTypes>
+<Visible>
+<Int x="1"/>
+<Int x="2"/>
+</Visible>
+</Pattern>
+</Notations>

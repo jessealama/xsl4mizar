@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<Parser>
+<syBegin line="9" col="5"/>
+<RegistrationBlock line="10" col="12">
+<ikItmCluConditional line="11" col="37"/>
+<syThreeDots line="11" col="16"/>
+<syDefinition/>
+<AttributeSymbol nr="48"/>
+<sySemiColon/>
+<sySemiColon/>
+<syThreeDots line="11" col="25"/>
+<syDefinition/>
+<AttributeSymbol nr="93"/>
+<sySemiColon/>
+<sySemiColon/>
+<Pos line="11" col="36"/>
+<ModeSymbol/>
+<Int x="38"/>
+<sySemiColon/>
+<EndPosition line="19" col="3"/>
+</RegistrationBlock>
+<EOT/>
+</Parser>

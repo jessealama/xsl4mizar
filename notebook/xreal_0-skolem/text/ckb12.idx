@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<Symbol aid="CKB12" mizfiles="/sw/share/mizar/">
+ <Symbol kind="I" nr="1" name="CARD_1"/>
+ <Symbol kind="I" nr="2" name="SUBSET_1"/>
+ <Symbol kind="I" nr="3" name="FUNCOP_1"/>
+ <Symbol kind="I" nr="4" name="ARYTM_3"/>
+ <Symbol kind="I" nr="5" name="RELAT_1"/>
+ <Symbol kind="I" nr="6" name="XREAL_0"/>
+ <Symbol kind="I" nr="7" name="FUNCT_4"/>
+ <Symbol kind="I" nr="8" name="CKB2"/>
+ <Symbol kind="I" nr="9" name="CKB3"/>
+ <Symbol kind="I" nr="10" name="CKB4"/>
+ <Symbol kind="I" nr="11" name="CKB5"/>
+ <Symbol kind="I" nr="12" name="CKB6"/>
+ <Symbol kind="I" nr="13" name="CKB7"/>
+ <Symbol kind="I" nr="14" name="CKB9"/>
+ <Symbol kind="I" nr="15" name="CKB10"/>
+ <Symbol kind="I" nr="16" name="CKB11"/>
+ <Symbol kind="I" nr="17" name="NUMERALS"/>
+ <Symbol kind="I" nr="18" name="BOOLE"/>
+ <Symbol kind="I" nr="19" name="SUBSET"/>
+ <Symbol kind="I" nr="20" name="ARITHM"/>
+ <Symbol kind="I" nr="21" name="x"/>
+ <Symbol kind="I" nr="22" name="y"/>
+ <Symbol kind="I" nr="23" name="x1"/>
+ <Symbol kind="I" nr="24" name="x2"/>
+ <Symbol kind="I" nr="25" name="y1"/>
+ <Symbol kind="I" nr="26" name="y2"/>
+ <Symbol kind="I" nr="27" name="A10"/>
+ <Symbol kind="I" nr="28" name="A11"/>
+ <Symbol kind="I" nr="29" name="A12"/>
+ <Symbol kind="I" nr="30" name="A13"/>
+ <Symbol kind="I" nr="31" name="A14"/>
+ <Symbol kind="I" nr="32" name="A15"/>
+</Symbols>

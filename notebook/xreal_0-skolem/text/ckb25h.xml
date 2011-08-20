@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xml" href="file:///sw/share/mizar/miz.xml"?>
+<Article aid="CKB25H" mizfiles="&#47;sw&#47;share&#47;mizar&#47;">
+<Section/>
+
+<DefinitionBlock line="10" col="10">
+<Let nr="1">
+<Typ kind="M" nr="6" pid="9" vid="25">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+</Typ>
+</Let>
+<Let nr="2">
+<Typ kind="M" nr="7" pid="10" vid="26">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<Const nr="1" vid="25"/>
+</Typ>
+</Let>
+<Let nr="3">
+<Typ kind="M" nr="8" pid="11" vid="27">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<Const nr="1" vid="25"/>
+<Const nr="2" vid="26"/>
+</Typ>
+</Let>
+<Definition kind="K" nr="0" vid="0" line="14" col="49">
+<Constructor kind="K" nr="1" aid="CKB25H" relnr="136">
+<ArgTypes>
+<Typ kind="M" nr="6">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+</Typ>
+<Typ kind="M" nr="7">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<LocusVar nr="1"/>
+</Typ>
+<Typ kind="M" nr="8">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<LocusVar nr="1"/>
+<LocusVar nr="2"/>
+</Typ>
+</ArgTypes>
+<Typ kind="M" nr="2" pid="2">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42"/>
+</Typ>
+</Constructor>
+<Pattern kind="K" nr="1" aid="CKB25H" formatnr="100" constrkind="K" constrnr="136" relnr="69">
+<ArgTypes>
+<Typ kind="M" nr="6">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+</Typ>
+<Typ kind="M" nr="7">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<LocusVar nr="1"/>
+</Typ>
+<Typ kind="M" nr="8">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<LocusVar nr="1"/>
+<LocusVar nr="2"/>
+</Typ>
+</ArgTypes>
+<Visible>
+<Int x="1"/>
+<Int x="2"/>
+<Int x="3"/>
+</Visible>
+</Pattern>
+</Definition>
+<EndPosition line="16" col="3"/>
+</DefinitionBlock>
+<Definiens constrkind="K" constrnr="136" aid="CKB25H" defnr="1" relnr="1">
+<Typ kind="M" nr="6">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+</Typ>
+<Typ kind="M" nr="7">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<LocusVar nr="1"/>
+</Typ>
+<Typ kind="M" nr="8">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<LocusVar nr="1"/>
+<LocusVar nr="2"/>
+</Typ>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<Func kind="K" nr="109" pid="42"/>
+</Typ>
+<Essentials>
+<Int x="1"/>
+<Int x="2"/>
+<Int x="3"/>
+<Int x="4"/>
+</Essentials>
+<DefMeaning kind="e">
+<Choice>
+<Typ kind="M" nr="9" pid="12">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<LocusVar nr="1"/>
+<LocusVar nr="2"/>
+<LocusVar nr="3"/>
+</Typ>
+</Choice>
+</DefMeaning>
+</Definiens>
+<DefTheorem constrkind="K" constrnr="136">
+<Proposition line="16" col="3">
+<For pid="0" vid="25">
+<Typ kind="M" nr="6" pid="9">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+</Typ>
+<For pid="0" vid="26">
+<Typ kind="M" nr="7" pid="10">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<Var nr="1"/>
+</Typ>
+<For pid="0" vid="27">
+<Typ kind="M" nr="8" pid="11">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<Var nr="1"/>
+<Var nr="2"/>
+</Typ>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="136">
+<Var nr="1"/>
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+<Choice>
+<Typ kind="M" nr="9" pid="12">
+<Cluster/>
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+<Var nr="1"/>
+<Var nr="2"/>
+<Var nr="3"/>
+</Typ>
+</Choice>
+</Pred>
+</For>
+</For>
+</For>
+</Proposition>
+</DefTheorem>
+
+</Article>

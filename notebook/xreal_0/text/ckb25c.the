@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<Theorems>
+<Signature>
+<ArticleID name="HIDDEN"/>
+<ArticleID name="RELAT_1"/>
+<ArticleID name="FUNCT_1"/>
+<ArticleID name="XBOOLE_0"/>
+<ArticleID name="ZFMISC_1"/>
+<ArticleID name="SUBSET_1"/>
+<ArticleID name="PARTFUN1"/>
+<ArticleID name="MCART_1"/>
+<ArticleID name="FUNCT_2"/>
+<ArticleID name="TARSKI"/>
+<ArticleID name="FUNCT_4"/>
+<ArticleID name="ORDINAL1"/>
+<ArticleID name="ARYTM_3"/>
+<ArticleID name="ARYTM_2"/>
+<ArticleID name="ARYTM_1"/>
+<ArticleID name="NUMBERS"/>
+<ArticleID name="ARYTM_0"/>
+<ArticleID name="XCMPLX_0"/>
+<ArticleID name="XXREAL_0"/>
+<ArticleID name="CKB1"/>
+<ArticleID name="CKB20"/>
+<ArticleID name="CKB22"/>
+<ArticleID name="CKB25A"/>
+<ArticleID name="CKB25B"/>
+<ArticleID name="CKB25C"/>
+</Signature>
+<Theorem kind="D" constrkind="M" constrnr="7">
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="109"/>
+</Typ>
+<And>
+<Not>
+<And>
+<Is>
+<Var nr="1"/>
+<Typ kind="M" nr="7">
+<Cluster/>
+</Typ>
+</Is>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="109"/>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="109"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120">
+<Func kind="K" nr="135"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="124">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="114"/>
+<Func kind="K" nr="120">
+<Func kind="K" nr="116">
+<Func kind="K" nr="135"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</And>
+</Not>
+<Not>
+<And>
+<Not>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="109"/>
+</Typ>
+<For>
+<Typ kind="M" nr="2">
+<Cluster/>
+<Func kind="K" nr="109"/>
+</Typ>
+<Not>
+<And>
+<Pred kind="R" nr="1">
+<Num nr="1"/>
+<Func kind="K" nr="120">
+<Func kind="K" nr="135"/>
+<Var nr="1"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="124">
+<Num nr="1"/>
+</Func>
+<Func kind="K" nr="120">
+<Var nr="2"/>
+<Var nr="3"/>
+</Func>
+</Pred>
+<Pred kind="R" nr="1">
+<Func kind="K" nr="114"/>
+<Func kind="K" nr="120">
+<Func kind="K" nr="116">
+<Func kind="K" nr="135"/>
+<Var nr="2"/>
+</Func>
+<Func kind="K" nr="116">
+<Var nr="1"/>
+<Var nr="3"/>
+</Func>
+</Func>
+</Pred>
+</And>
+</Not>
+</For>
+</For>
+</Not>
+<Not>
+<Is>
+<Var nr="1"/>
+<Typ kind="M" nr="7">
+<Cluster/>
+</Typ>
+</Is>
+</Not>
+</And>
+</Not>
+</And>
+</For>
+</Theorem>
+</Theorems>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xml" href="file:///sw/share/mizar/miz.xml"?>
+<PropertyRegistration aid="CKB4" mizfiles="&#47;sw&#47;share&#47;mizar&#47;">
+<Property aid="XCMPLX_0" nr="1" x="12">
+<ArgTypes/>
+<Typ kind="M" nr="1">
+<Cluster>
+<Adjective nr="25"/>
+</Cluster>
+</Typ>
+</Property>
+<Property aid="XXREAL_0" nr="1" x="12">
+<ArgTypes/>
+<Typ kind="M" nr="1">
+<Cluster>
+<Adjective nr="26"/>
+</Cluster>
+</Typ>
+</Property>
+<Property aid="ORDINAL1" nr="1" x="12">
+<ArgTypes/>
+<Typ kind="M" nr="1">
+<Cluster>
+<Adjective nr="24"/>
+</Cluster>
+</Typ>
+</Property>
+</PropertyRegistration>
