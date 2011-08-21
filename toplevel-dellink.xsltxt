@@ -1,0 +1,80 @@
+stylesheet 1.0;
+
+output method=xml indent="yes";
+
+tpl die(#message) {
+  if [@line and @col] {
+    $line = `@line`;
+    $col = `@col`;
+    $final_message = `concat ($message, " (line ", $line, ", column ", $col, ")")`;
+    msg terminate="yes" $final_message;
+  } else {
+    $final_message = `concat ($message, " (unable to determine line and column information)")`;
+    msg terminate="yes" $final_message;
+  }
+}
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl new-spelling-based-on (#base, #try) {
+  $candidate = `concat ($base, $try)`;
+  if [key ("spelling", $candidate)] {
+    new-spelling-based-on (#base = $base,
+                           #try = `$try + 1`);
+  } else {
+    $candidate;
+  }
+}
+
+tpl new-label {
+  new-spelling-based-on (#base = "InducedLemma", #try = "1");
+}
+
+key "labels" [//Label] `@spelling`;
+
+tpl [Text-Proper/Item[@kind = "Regular-Statement" and not(child::Proposition/Label) and following-sibling::*/Straightforward-Justification/Link]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    $num-previous = `count (preceding-sibling::*)`;
+    $plus-one = `$num-previous + 1`;
+    $base = `concat ("InducedLemma_", $plus-one, "_")`;
+    $new-label = new-spelling-based-on (#base = $base, #try = "1");
+    @induced-label = $new-label;
+    apply [*[1]]; // should be one of: Compact-Statement, Diffuse-Statement
+    <Proposition {
+      <Label {
+        @spelling = $new-label;
+      }
+      apply [Proposition/*];
+    }
+    for-each [Proposition] {
+      apply [following-sibling::*];
+    }
+  }
+}
+
+tpl [Text-Proper/Item/Straightforward-Justification/Link] {
+  $link = `.`;
+  for-each [../..] {
+    if [preceding-sibling::*[position() = 1 and @induced-label]] {
+      $preceding-item = `preceding-sibling::*[1]`;
+      $induced-label = `$preceding-item/@induced-label`;
+      <Local-Reference {
+        for-each [$link/@*] { copy-of `.`; }
+        @spelling = $induced-label;
+        apply [$link/*];
+      }
+    } else {
+      <Link {
+        for-each [$link/@*] { copy-of `.`; }
+        apply [$link/*];
+      }
+    }
+  }
+}
