@@ -53,16 +53,26 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
   }
 }
 
+tpl [Proposition] (#omit-label) {
+  <Proposition {
+    for-each [@*] { copy-of `.`; }
+    if [Label and not($omit-label = "yes")] {
+      apply [Label];
+    }
+    apply [*[position() = last()]]; // this is the formula of the proposition, regardless of whether it has a label
+  }
+}
+
 tpl conjoin-formulas (#formulas) {
   if [$formulas] {
     $formula = `$formulas[1]`;
     if [$formulas/*[2]] {
       <Conjunctive-Formula {
-        apply [$formula];
+        apply [$formula] (#omit-label = "yes");
         conjoin-formulas (#formulas = `$formulas[position() > 1]`);
       }
     } else {
-      apply [$formula];
+      apply [$formula] (#omit-label = "yes");
     }
   }
 }
