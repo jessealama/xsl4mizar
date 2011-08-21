@@ -1,3 +1,10 @@
+// New stylesheet for doing toplevel dellink: invent labels for
+// unlabeled statements that are linked.
+
+// Two passes are required: one to assign the new labels to the
+// relevant items, and another to change the Link elements into the
+// correct Local-Reference elements.
+
 stylesheet 1.0;
 
 output method=xml indent="yes";
