@@ -39,24 +39,40 @@ tpl new-spelling-based-on (#base, #try) {
   }
 }
 
+tpl fresh-idnr (#start) {
+  if [key ("idnr", $start)] {
+    fresh-idnr (#start = `$start + 1`);
+  } else {
+    $start;
+  }
+}
+
 tpl new-label {
   new-spelling-based-on (#base = "InducedLemma", #try = "1");
 }
 
 key "labels" [//Label] `@spelling`;
+key "idnrs" [//*] `@idnr`;
 
 tpl [Text-Proper/Item[@kind = "Regular-Statement" and not(child::Proposition/Label) and following-sibling::*/Straightforward-Justification/Link]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     $num-previous = `count (preceding-sibling::*)`;
     $plus-one = `$num-previous + 1`;
-    $base = `concat ("InducedLemma_", $plus-one, "_")`;
+    $base = `concat ("InducedLemma", $plus-one)`;
     $new-label = new-spelling-based-on (#base = $base, #try = "1");
     @induced-label = $new-label;
+    $num-preceding-idnrs = `count (preceding::*[@idnr])`;
+    $idnr = fresh-idnr (#start = $num-preceding-idnrs);
+    if [not($idnr)] {
+      die (#message = "We were not able to compute a fresh idnr attribute for a toplevel Regular-Statement item that lacks a label.");
+    }
+    @idnr = $idnr;
     apply [*[1]]; // should be one of: Compact-Statement, Diffuse-Statement
     <Proposition {
       <Label {
         @spelling = $new-label;
+        @idnr = $idnr;
       }
       apply [Proposition/*];
     }
@@ -72,9 +88,11 @@ tpl [Text-Proper/Item/Straightforward-Justification/Link] {
     if [preceding-sibling::*[position() = 1 and @induced-label]] {
       $preceding-item = `preceding-sibling::*[1]`;
       $induced-label = `$preceding-item/@induced-label`;
+      $idnr = `$preceding-item/@idnr`;
       <Local-Reference {
         for-each [$link/@*] { copy-of `.`; }
         @spelling = $induced-label;
+        @idnr = $idnr;
         apply [$link/*];
       }
     } else {
