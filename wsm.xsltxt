@@ -893,7 +893,14 @@ tpl [Private-Predicate-Formula] {
 }
 
 tpl [Conjunctive-Formula] {
-  "("; apply [*[1]]; " & "; apply [*[2]]; ")";
+  if [*[3]] {
+    die (#message = "Don't know how to handle a Conjunctive-Formula that has more than two children!");
+  }
+  if [*[2]] {
+    "("; apply [*[1]]; " & "; apply [*[2]]; ")";
+  } else {
+    die (#message = "Don't know how to handle a Conjunctive-Formula that has fewer than two children!");
+  }
 }
 
 tpl [Disjunctive-Formula] {
