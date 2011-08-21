@@ -3,7 +3,7 @@ output method=text;
 
 // List utilities.  Stolen from Josef.  Thanks, Josef.
 
-tpl list(#separ,#elems) { 
+tpl list(#separ,#elems) {
  for-each [$elems] {
   apply[.]; if [not(position()=last())] { copy-of $separ; } }
 }
@@ -23,7 +23,7 @@ tpl die(#message) {
 // Environment
 
 $lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
-$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; } 
+$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
 // name of current article (upper case)
 #aname= { `string(/*/@articleid)`; }
@@ -154,7 +154,7 @@ tpl [Block[@kind='Case']] {
       "case that ";
       list (#separ = "\nand\n",
            #elems = `Item[@kind='Case-Head'][1]/Collective-Assumption/Proposition`);
-      ";"; "\n"; 
+      ";"; "\n";
       apply [*[position() > 1]];
     } else {
       apply [Item[@kind='Case-Head'][1]]; ";"; "\n";
@@ -173,7 +173,7 @@ tpl [Block[@kind='Suppose']] {
       "suppose that ";
       list (#separ = "\nand\n",
            #elems = `Item[@kind='Suppose-Head'][1]/Collective-Assumption/Proposition`);
-      ";"; "\n"; 
+      ";"; "\n";
       apply [*[position() > 1]];
     } else {
       apply [Item[@kind='Suppose-Head'][1]]; "\n";
@@ -336,7 +336,7 @@ tpl [Item[@kind='Functor-Definition']] {
   } else {
     die (#message = "Functor-Definition lacks both an Operation-Functor-Pattern child and a Bracket-Functor-Pattern child!");
   }
-  
+
   if [Type-Specification] {
     " -> "; apply [Type-Specification[1]];
   }
@@ -447,7 +447,7 @@ tpl [Item[@kind='Identify']] {
   } else {
     die (#message = "Identify item lacks two Operation-Functor-Pattern/Bracket-Functor-Pattern children!");
   }
-  
+
 }
 
 tpl [Item[@kind='Cluster']] {
@@ -632,7 +632,7 @@ tpl [Loci](#parentheses) {
     if [$parentheses = '1'] {
       "(";
     }
- 
+
     list (#separ = ",", #elems = `Locus`);
 
     if [$parentheses = '1'] {
@@ -1145,7 +1145,7 @@ tpl [Straightforward-Justification] {
     if [*[1]] {
       " by ";
       list (#separ = ",", #elems = `*`);
-    } 
+    }
   }
 }
 
@@ -1259,7 +1259,7 @@ tpl apply-justification-if-present(#end) {
   if [Block[@kind='Proof']] {
     "\n";
     apply [Block[@kind='Proof'][1]];
-  } 
+  }
 }
 
 tpl [Collective-Assumption] {
@@ -1335,7 +1335,7 @@ tpl [Item[@kind='Conclusion']](#case) {
       apply [Block[@kind='Proof'][1]];
     } else {
       if [Straightforward-Justification | Scheme-Justification] {
-        apply [(Straightforward-Justification | Scheme-Justification)[1]]; 
+        apply [(Straightforward-Justification | Scheme-Justification)[1]];
       }
       ";";
     }
