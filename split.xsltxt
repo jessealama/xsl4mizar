@@ -85,10 +85,7 @@ tpl new-dummy-mode-name {
 }
 
 tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
-  // create a dummy mode
-  // create a dummy definition
-  // create a theorem representing the conjunction of the conditions
-  // create, for each condition, a new toplevel theorem
+
   if [not (Explicitly-Qualified-Segment | Implicitly-Qualified-Segment)] {
     die (#message = "We expect a Choice-Statement to have either an Explicitly-Qualified-Segment or an Implicitly-Qualified-Segment child, but this choice statement lacks both");
   }
@@ -118,6 +115,8 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
   $mode-name = new-dummy-mode-name ();
   <Item {
     @kind = "Definition-Item";
+    @promoted = "choice-statement-mode";
+    @spelling = $variable-spelling;
     <Block {
       @kind = "Definitional-Block";
       <Item {
@@ -135,7 +134,7 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
           }
           <Definiens {
             <Formula-Expression;
-            conjoin-formulas (#formulas = `Proposition`);
+            conjoin-propositions (#propositions = `Proposition`);
           }
         }
       }
@@ -145,6 +144,8 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
   // dummy functor symbol
   <Item {
     @kind = "Definition-Item";
+    @promoted = "choice-statement-functor";
+    @spelling = $variable-spelling;
     <Block {
       @kind = "Definitional-Block";
       <Item {
@@ -175,16 +176,21 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
   // conjunction of the propositions
   <Item {
     @kind = "Theorem-Item";
+    @promoted = "choice-statement-conditions";
     <Proposition {
-      conjoin-formulas (#formulas = `Proposition`);
+      conjoin-propositions (#propositions = `Proposition`);
     }
+    <Straightforward-Justification;
   }
 
   if [Proposition[2]] {
     for-each [Proposition] {
       <Item {
-        @kind = "Theorem-Item";
+        @kind = "Regular-Statement";
+        @promoted = "choice-statement-condition";
+        <Compact-Statement;
         apply [.];
+        <Straightforward-Justification;
       }
     }
   }
