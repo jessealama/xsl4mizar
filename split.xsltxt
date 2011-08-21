@@ -22,6 +22,24 @@ tpl [*] {
   }
 }
 
+tpl [*] (#idnr) mode="idnr-hunting" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#idnr = $idnr) mode="idnr-hunting";
+  }
+}
+
+tpl [Simple-Term] (#idnr) mode="idnr-hunting" {
+  if [@idnr = $idnr] {
+    <it-Term {
+      @induced = "induced";
+    }
+  } else {
+    apply [.];
+  }
+}
+
 tpl [Text-Proper/Item[@kind = "Reservation"]] {
   $type = `*[position() = last()]`;
   $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)] | preceding::Item[@kind = "Loci-Declaration"])`;
@@ -57,7 +75,7 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
 // explicitly/implicitly qualified segments, form the existential
 // generalization of the conjunction of $propositions over those
 // segments
-tpl existentially-generalize (#variables, #starting-after, #type, #propositions) {
+tpl existentially-generalize (#variables, #starting-after, #idnr-to-it-term, #type, #propositions) {
   $starting-index = `$starting-after + 1`;
   $variable = `$variables[$starting-index]`;
   if [$variable] {
@@ -66,8 +84,9 @@ tpl existentially-generalize (#variables, #starting-after, #type, #propositions)
         apply [$variable];
         apply [$type];
       }
-      existentially-generalize (#variables = `$variables[position() > 1]`,
+      existentially-generalize (#variables = $variables,
                                 #starting-after = $starting-index,
+                                #idnr-to-it-term = $idnr-to-it-term,
                                 #type = $type,
                                 #propositions = $propositions);
     }
@@ -77,13 +96,15 @@ tpl existentially-generalize (#variables, #starting-after, #type, #propositions)
       $formula = `$proposition/*[position() = last()]`; // skip the label, if there is one
       if [$propositions[2]] {
         <Conjunctive-Formula {
-          apply [$formula];
+          apply [$formula] (#idnr = $idnr-to-it-term) mode="idnr-hunting";
           existentially-generalize (#variables = $variables,
                                     #type = $type,
+                                    #starting-after = $starting-after,
+                                    #idnr-to-it-term = $idnr-to-it-term,
                                     #propositions = `$propositions[position() > 1]`);
         }
       } else {
-        apply [$formula];
+        apply [$formula] (#idnr = $idnr-to-it-term) mode="idnr-hunting";
       }
     }
   }
@@ -177,6 +198,7 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
               <Formula-Expression;
               existentially-generalize (#variables = $variables,
                                         #starting-after = $position,
+                                        #idnr-to-it-term = $variable-idnr,
                                         #type = $type,
                                         #propositions = `$context/Proposition`);
             }
@@ -269,8 +291,8 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
 tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
-    if [Label] {
-      @idnr = `Label[1]/@idnr`;
+    if [Proposition/Label] {
+      @idnr = `Proposition/Label[1]/@idnr`;
     } else {
       @idnr = "";
     }
