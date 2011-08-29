@@ -84,3 +84,30 @@ tpl value-of-token (#token) {
     die (#message = $message);
   }
 }
+
+tpl position-of-item-helper (#item, #token-string, #val) {
+  $empty = token-string-is-empty (#token-string = $token-string);
+  if [$empty = "1"] {
+    "0";
+  } else {
+    $head = first-token (#token-string = $token-string);
+    if [$head = $item] {
+      $val;
+    } else {
+      $tail = token-string-tail (#token-string = $token-string);
+      position-of-item-helper (#item = $item,
+                               #token-string = $tail,
+                               #val = `$val + 1`);
+    }
+  }
+}
+
+// The position of $item in $token-string, starting from 1.  It is
+// assumed that $item is the item itself, without any delimiting
+// symbols (e.g., initial and final commas ",").  If the value does
+// not occur in the token string, return 0.
+tpl position-of-item (#item, #token-string) {
+  position-of-item-helper (#item = $item,
+                           #token-string = $token-string,
+                           #val = "1");
+}
