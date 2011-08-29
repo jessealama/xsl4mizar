@@ -13,22 +13,41 @@ tpl [*] {
   }
 }
 
-tpl [*] (#target-idnr) mode="idnr-hunting" {
+tpl [*] (#target-idnr, #earlier-idnrs) mode="idnr-hunting" {
   $element = `local-name ()`;
   <$element {
     for-each [@*] { copy-of `.`; }
-    apply [*] (#target-idnr = $target-idnr) mode="idnr-hunting";
+    apply [*] (#target-idnr = $target-idnr, #earlier-idnrs = $earlier-idnrs) mode="idnr-hunting";
   }
 }
 
-tpl [Simple-Term] (#target-idnr) mode="idnr-hunting" {
+tpl [Simple-Term] (#target-idnr, #earlier-idnrs) mode="idnr-hunting" {
   $our-idnr = `@idnr`;
-  if [$our-idnr = $target-idnr] {
-    <it-Term {
-      @induced = "induced";
+  $token = `concat (",", $our-idnr, ",")`;
+  choose {
+    when [$our-idnr = $target-idnr] {
+      <it-Term {
+        @induced = "induced";
+      }
     }
-  } else {
-    apply [.];
+    when [contains ($earlier-idnrs, $token)] {
+      $pos = position-of-item (#item = $our-idnr,
+                               #token-string = $earlier-idnrs);
+      if [$pos = "0"] {
+        $message = `concat ("We expected to find that the position of the item '", $our-idnr, "' in the token string '", $earlier-idnrs, "' would be non-zero, but we somehow did get zero")`;
+        die (#message = $message);
+      }
+      $earlier-mode-name = new-spelling-based-on (#base = "DummyMode", #try = $pos);
+      <Global-Choice-Term {
+        @induced = "global-choice-term";
+        <Standard-Type {
+          @spelling = $earlier-mode-name;
+        }
+      }
+    }
+    otherwise {
+      apply [.];
+    }
   }
 }
 
@@ -36,11 +55,30 @@ tpl count-preceding-toplevel-items {
   `count (preceding::Item[parent::Text-Proper and not(@kind = "Reservation") and not(@kind = "Private-Functor-Definition") and not(@kind = "Private-Predicate-Definition")])`;
 }
 
+tpl idnr-items-to-token-string (#items) {
+  if [$items] {
+    $item = `$items[1]`;
+    if [$item/@idnr] {
+      $toplevel-item-number = `$item/@idnr`;
+      $token = `concat (",", $toplevel-item-number, ",")`;
+      $tail-token-string = idnr-items-to-token-string (#items = `$items[position() > 1]`);
+      append-token-strings (#token-string-a = $token,
+                            #token-string-b = $tail-token-string);
+    } else {
+      for-each [$item] {
+        die (#message = "In converting a nodeset of items into a token string, we assumed that all items have an idnr attribute, but there is an item that lacks this attribute");
+      }
+    }
+  } else {
+    "";
+  }
+}
+
 // Given a nodeset of propositions and a nodeset of
 // explicitly/implicitly qualified segments, form the existential
 // generalization of the conjunction of $propositions over those
 // segments
-tpl existentially-generalize (#variables, #starting-after, #idnr-to-it-term, #type, #propositions) {
+tpl existentially-generalize (#variables, #starting-after, #idnr-to-it-term, #earlier-idnrs, #type, #propositions) {
   $starting-index = `$starting-after + 1`;
   $variable = `$variables[$starting-index]`;
   if [$variable] {
@@ -52,6 +90,7 @@ tpl existentially-generalize (#variables, #starting-after, #idnr-to-it-term, #ty
       existentially-generalize (#variables = $variables,
                                 #starting-after = $starting-index,
                                 #idnr-to-it-term = $idnr-to-it-term,
+                                #earlier-idnrs = $earlier-idnrs,
                                 #type = $type,
                                 #propositions = $propositions);
     }
@@ -61,15 +100,16 @@ tpl existentially-generalize (#variables, #starting-after, #idnr-to-it-term, #ty
       $formula = `$proposition/*[position() = last()]`; // skip the label, if there is one
       if [$propositions[2]] {
         <Conjunctive-Formula {
-          apply [$formula] (#target-idnr = $idnr-to-it-term) mode="idnr-hunting";
+          apply [$formula] (#target-idnr = $idnr-to-it-term, #earlier-idnrs = $earlier-idnrs) mode="idnr-hunting";
           existentially-generalize (#variables = $variables,
                                     #type = $type,
                                     #starting-after = $starting-after,
+                                    #earlier-idnrs = $earlier-idnrs,
                                     #idnr-to-it-term = $idnr-to-it-term,
                                     #propositions = `$propositions[position() > 1]`);
         }
       } else {
-        apply [$formula] (#target-idnr = $idnr-to-it-term) mode="idnr-hunting";
+        apply [$formula] (#target-idnr = $idnr-to-it-term, #earlier-idnrs = $earlier-idnrs) mode="idnr-hunting";
       }
     }
   }
@@ -155,6 +195,7 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
     $variable-spelling = `@spelling`;
     $position = `position ()`;
     $earlier-variables = `$variables[position() < $position]`;
+    $earlier-idnrs = idnr-items-to-token-string (#items = $earlier-variables);
 
     // dummy mode
     $mode-name = new-spelling-based-on (#base = "DummyMode", #try = $position);
@@ -199,6 +240,7 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
               existentially-generalize (#variables = $variables,
                                         #starting-after = $position,
                                         #idnr-to-it-term = $variable-idnr,
+                                        #earlier-idnrs = $earlier-idnrs,
                                         #type = $type,
                                         #propositions = `$context/Proposition`);
             }
