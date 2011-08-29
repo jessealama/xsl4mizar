@@ -3,6 +3,7 @@ stylesheet 1.0;
 output method=xml indent="yes";
 
 include die.xsl;
+include tokens.xsl;
 
 tpl [*] {
   $element = `local-name ()`;
