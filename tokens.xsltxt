@@ -30,6 +30,11 @@ tpl first-token (#token-string) {
   }
 }
 
+tpl first-item (#token-string) {
+  $first-token = first-token (#token-string = $token-string);
+  value-of-token (#token = $first-token);
+}
+
 tpl token-string-tail (#token-string) {
   if [$token-string = ""] {
     "";
