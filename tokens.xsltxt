@@ -1,0 +1,73 @@
+stylesheet 1.0;
+
+// Tokens
+
+tpl first-token (#token-string) {
+  if [$token-string = ""] {
+    die (#message = "We can't find the first token of an empty token string!");
+  } else {
+    if [starts-with ($token-string, ",")] {
+      $after-first-comma = `substring-after ($token-string, ",")`;
+      $between-first-and-second-comma = `substring-before ($after-first-comma, ",")`;
+      if [$between-first-and-second-comma = ""] {
+        $message = `concat ("We cannot compute the first token of the token string '", $token-string, "', because it starts with two adjacent commas")`;
+        die (#message = $message);
+      } else {
+        `concat (",", $between-first-and-second-comma, ",")`;
+      }
+    } else {
+      $message = `concat ("We cannot compute the first token of the token string '", $token-string, "; because it does not start with a comma and is thus not a valid token string")`;
+      die (#message = $message);
+    }
+  }
+}
+
+tpl token-string-tail (#token-string) {
+  if [$token-string = ""] {
+    "";
+  } else {
+    if [starts-with ($token-string, ",")] {
+      $after-first-comma = `substring-after ($token-string, ",")`;
+      if [contains ($after-first-comma, ",")] {
+        $after-second-comma = `substring-after ($after-first-comma, ",")`;
+        if [$after-second-comma = ""] {
+          "";
+        } else {
+          `concat (",", $after-second-comma)`;
+        }
+      } else {
+        $message = `concat ("We cannot compute the tail of the token string '", $token-string, "', because it contains only one comma; valid token strings contain at least two commas")`;
+        die (#message = $message);
+      }
+    } else {
+      $message = `concat ("We canot take the tail of the token string '", $token-string, "': since it does not begin with a comma, it is not actually a valid token string")`;
+      die (#message = $message);
+    }
+  }
+}
+
+tpl append-token-strings (#token-string-a, #token-string-b) {
+  choose {
+    when [$token-string-a = ""] { $token-string-b; }
+    when [$token-string-b = ""] { $token-string-a; }
+    otherwise {
+      $b-minus-initial-comma = `substring-after ($token-string-b, ",")`;
+      `concat ($token-string-a, $b-minus-initial-comma)`;
+    }
+  }
+}
+
+tpl value-of-token (#token) {
+  if [starts-with ($token, ",")] {
+    $after-first-comma = `substring-after ($token, ",")`;
+    if [contains ($after-first-comma, ",")] {
+      `substring-before ($after-first-comma, ",")`;
+    } else {
+      $message = `concat ("The token '", $token, "' does not contain two commas, so it is not actually a valid token")`;
+      die (#message = $message);
+    }
+  } else {
+    $message = `concat ("The token '", $token, "' does not start with a comma, so it is not actually a valid token")`;
+    die (#message = $message);
+  }
+}
