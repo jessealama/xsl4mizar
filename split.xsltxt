@@ -2,17 +2,7 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-tpl die(#message) {
-  if [@line and @col] {
-    $line = `@line`;
-    $col = `@col`;
-    $final_message = `concat ($message, " (line ", $line, ", column ", $col, ")")`;
-    msg terminate="yes" $final_message;
-  } else {
-    $final_message = `concat ($message, " (unable to determine line and column information)")`;
-    msg terminate="yes" $final_message;
-  }
-}
+include die.xsl;
 
 tpl [*] {
   $element = `local-name ()`;
