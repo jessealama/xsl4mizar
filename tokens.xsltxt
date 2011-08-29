@@ -2,6 +2,14 @@ stylesheet 1.0;
 
 // Tokens
 
+tpl token-string-is-empty (#token-string) {
+  if [$token-string = ""] {
+    "1";
+  } else {
+    "0";
+  }
+}
+
 tpl first-token (#token-string) {
   if [$token-string = ""] {
     die (#message = "We can't find the first token of an empty token string!");
