@@ -498,7 +498,6 @@ tpl needed-toplevel-items (#candidates, #context) {
                                                               #context = $context,
                                                               #later-toplevel-items = $other-candidates-as-token-string);
     if [$exists-path = "1"] {
-      // copy-of `$candidate`;
       apply [$candidate];
     }
     needed-toplevel-items (#candidates = $other-candidates,
