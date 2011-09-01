@@ -421,7 +421,7 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
   if [$kind = "Regular-Statement"] {
     $later-users = items-using-toplevel-diffuse-reasoning-item (#diffuse-reasoning-item = $item,
                                                                #items = $later-toplevel-items);
-    if [$later-users = ""] { // this toplevel item is not needed to jsutify any of the later items, so look inside $context
+    if [$later-users = ""] { // this toplevel item is not needed to justify any of the later items, so look inside $context
       if [$context//Local-Reference[@idnr = $idnr]] {
         "1";
       } else {
