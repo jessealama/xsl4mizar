@@ -373,39 +373,14 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
 
 }
 
-// Dealing with toplevel choice statements
-
-tpl [Block[@kind = "Proof"]] {
-  $proof = `.`;
-  $proof-free-variables = `@free-variables`;
-  <Block {
-    for-each [$proof/@*] { copy-of `.`; }
-    for-each [preceding::Item[@kind = "Choice-Statement" and parent::Text-Proper]] {
-      sort order="ascending";
-      if [not(Explicitly-Qualified-Segment)] {
-        die (#message = "Unable to deal with a Choice-Statement item that lacks an Explicitly-Qualified-Segment child");
-      }
-      for-each [Explicitly-Qualified-Segment/Variable] {
-        $idnr = `@idnr`;
-        $mode-name = `@spelling`;
-        $variable-spelling = `@variable-spelling`;
-        $token = `concat (",", $idnr, ",")`;
-        if [contains ($proof-free-variables, $token)] {
-          <Item {
-            @kind = "Constant-Definition";
-            <Variable {
-              @idnr = $idnr;
-              @spelling = $variable-spelling;
-            }
-            <Global-Choice-Term {
-              <Standard-Type {
-                @spelling = $mode-name;
-              }
-            }
-          }
-        }
-      }
-    }
-    apply [$proof/*];
+tpl [Text-Proper/Item[preceding-sibling::Item[@kind = "Choice-Statement"]]] {
+  $choice-statement = `preceding-sibling::Item[@kind = "Choice-Statement"][1]`;
+  $choice-variables = `$choice-statement/Explicitly-Qualified-Segment/Variable`;
+  $choice-variable-list = idnr-items-to-token-string (#items = $choice-variables);
+  $message = `concat ("choice-variable-list = ", $choice-variable-list)`;
+  msg $message;
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#earlier-idnrs = $choice-variable-list) mode="idnr-hunting";
   }
 }
