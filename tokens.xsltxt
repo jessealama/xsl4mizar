@@ -90,7 +90,7 @@ tpl position-of-item-helper (#item, #token-string, #val) {
   if [$empty = "1"] {
     "0";
   } else {
-    $head = first-token (#token-string = $token-string);
+    $head = first-item (#token-string = $token-string);
     if [$head = $item] {
       $val;
     } else {
