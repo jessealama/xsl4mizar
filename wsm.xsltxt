@@ -1291,7 +1291,7 @@ tpl [Item[@kind='Existential-Assumption']] {
 tpl [Item[@kind='Conclusion']](#case) {
 
   if [not(Iterative-Equality or Diffuse-Statement or Compact-Statement)] {
-    die (#message = "Don't know how to deal with a conclusion that it not an Iterative-Equality, Diffuse-Statement., nor a Compact-Statement");
+    die (#message = "Don't know how to deal with a Conclusion that is not an Iterative-Equality, Diffuse-Statement, nor a Compact-Statement");
   }
 
   if [Straightforward-Justification/Link | Scheme-Justification/Link] {
