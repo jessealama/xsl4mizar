@@ -128,17 +128,18 @@ tpl existentially-instantiate (#variables, #starting-after, #type, #propositions
   apply [$propositions];
 }
 
-tpl conjoin-propositions (#propositions) {
+tpl conjoin-propositions (#propositions, #earlier-idnrs) {
   if [$propositions] {
     $proposition = `$propositions[1]`;
     $formula = `$proposition/*[position() = last()]`; // skip the label, if there is one
     if [$propositions[2]] {
       <Conjunctive-Formula {
-        apply [$formula];
-        conjoin-propositions (#propositions = `$propositions[position() > 1]`);
+        apply [$formula] (#earlier-idnrs = $earlier-idnrs) mode="idnr-hunting";
+        conjoin-propositions (#propositions = `$propositions[position() > 1]`,
+                              #earlier-idnrs = $earlier-idnrs);
       }
     } else {
-      apply [$formula];
+      apply [$formula] (#earlier-idnrs = $earlier-idnrs) mode="idnr-hunting";
     }
   }
 }
@@ -180,6 +181,7 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
   $segment = `Explicitly-Qualified-Segment`;
   $num-variables = `count (Explicitly-Qualified-Segment/Variable)`;
   $variables = `$segment/Variable`;
+  $all-idnrs = idnr-items-to-token-string (#items = $variables);
 
   for-each [$variables] {
 
@@ -259,14 +261,14 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
                 }
                 apply [$type];
               }
-              apply [$context/Proposition];
+              apply [$context/Proposition] (#earlier-idnrs = $earlier-idnrs) mode="idnr-hunting";
               if [$position = 1] {
                 apply [$justification];
               } else {
                 <Straightforward-Justification {
                   <Definition-Reference {
-                    $minus-three = `$num-previous + $position - 3`;
-                    @spelling = `concat ("CKB", $minus-three)`;
+                    $minus-one = `$num-previous + $position - 1`;
+                    @spelling = `concat ("CKB", $minus-one)`;
                     @"number" = "1";
                   }
                 }
@@ -314,19 +316,52 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
     @kind = "Theorem-Item";
     @promoted = "choice-statement-conditions";
     <Proposition {
-      conjoin-propositions (#propositions = `Proposition`);
+      conjoin-propositions (#propositions = `Proposition`,
+                            #earlier-idnrs = $all-idnrs);
     }
-    <Straightforward-Justification {
-      $last-mode = `$num-previous + $num-variables - 1`;
-      $last-functor = `$last-mode + 1`;
-      <Definition-Reference {
-        @spelling = `concat ("CKB", $last-mode)`;
-        @"number" = "1";
+    $last-mode-name = new-spelling-based-on (#base = "DummyMode", #try = $num-variables);
+    <Block {
+      @kind = "Proof";
+      <Item {
+        @kind = "Regular-Statement";
+        <Compact-Statement;
+        <Proposition {
+          <Predicative-Formula {
+            @nr = "1";
+            @spelling = "=";
+            <Arguments {
+              <Global-Choice-Term {
+                <Standard-Type {
+                  @spelling = $last-mode-name;
+                }
+              }
+            }
+            <Arguments {
+              <Global-Choice-Term {
+                <Standard-Type {
+                  @spelling = $last-mode-name;
+                }
+              }
+            }
+          }
+        }
+        <Straightforward-Justification;
       }
-      // <Definition-Reference {
-      //   @spelling = `concat ("CKB", $last-functor)`;
-      //   @"number" = "1";
-      // }
+      <Item {
+        @kind = "Conclusion";
+        <Compact-Statement;
+        <Proposition {
+          <Thesis;
+        }
+        <Straightforward-Justification {
+          <Link;
+          $last-mode = `$num-previous + $num-variables`;
+          <Definition-Reference {
+            @spelling = `concat ("CKB", $last-mode)`;
+            @"number" = "1";
+          }
+        }
+      }
     }
   }
 
