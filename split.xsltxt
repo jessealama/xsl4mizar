@@ -64,10 +64,16 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
 tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
-    if [Proposition/Label] {
-      @idnr = `Proposition/Label[1]/@idnr`;
-    } else {
-      @idnr = "";
+    choose {
+      when [Regular-Statement and Proposition/Label] {
+        @idnr = `Proposition/Label[1]/@idnr`;
+      }
+      when [Diffuse-Statement and Label] {
+        @idnr = `Label[1]/@idnr`;
+      }
+      otherwise {
+        @idnr = "";
+      }
     }
     if [Diffuse-Statement] {
       $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
