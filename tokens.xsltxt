@@ -111,3 +111,26 @@ tpl position-of-item (#item, #token-string) {
                            #token-string = $token-string,
                            #val = "1");
 }
+
+// Remove all of the tokens in $to-remove from $token-string.  Only the
+// first occurrence of an item in $to-remove will be removed from
+// $token-string.
+tpl token-string-difference (#token-string, #to-remove) {
+  $is-empty = token-string-is-empty (#token-string = $to-remove);
+  if [$is-empty = "1"] {
+    $token-string;
+  } else {
+    $first-token = first-token (#token-string = $to-remove);
+    $to-remove-tail = token-string-tail (#token-string = $to-remove);
+    if [contains ($token-string, $first-token)] {
+      $token-string-before = `substring-before ($token-string, $first-token)`;
+      $token-string-after = `substring-after ($token-string, $first-token)`;
+      $cut = `concat ($token-string-before, ",", $token-string-after)`;
+      token-string-difference (#token-string = $cut,
+                               #to-remove = $to-remove-tail);
+    } else {
+      token-string-difference (#token-string = $token-string,
+                               #to-remove = $to-remove-tail);
+    }
+  }
+}
