@@ -403,7 +403,7 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
         @kind = "Regular-Statement";
         @promoted = "choice-statement-condition";
         <Compact-Statement;
-        apply [.];
+        apply [.] (#earlier-idnrs = $all-idnrs) mode="idnr-hunting";
         <Straightforward-Justification {
           $conjunction-position = `$num-previous + $num-variables + 1`;
           <Theorem-Reference {
