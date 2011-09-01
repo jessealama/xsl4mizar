@@ -668,20 +668,6 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
   }
 }
 
-tpl [Item[@kind = "Reservation"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Regular-Statement" and child::Diffuse-Statement]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
-  }
-}
-
 // Resolving article-local references
 
 tpl [Scheme-Justification[@nr = "0"]] {
