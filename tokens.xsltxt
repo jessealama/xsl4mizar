@@ -1,0 +1,136 @@
+stylesheet 1.0;
+
+// Tokens
+
+tpl token-string-is-empty (#token-string) {
+  if [$token-string = ""] {
+    "1";
+  } else {
+    "0";
+  }
+}
+
+tpl first-token (#token-string) {
+  if [$token-string = ""] {
+    die (#message = "We can't find the first token of an empty token string!");
+  } else {
+    if [starts-with ($token-string, ",")] {
+      $after-first-comma = `substring-after ($token-string, ",")`;
+      $between-first-and-second-comma = `substring-before ($after-first-comma, ",")`;
+      if [$between-first-and-second-comma = ""] {
+        $message = `concat ("We cannot compute the first token of the token string '", $token-string, "', because it starts with two adjacent commas")`;
+        die (#message = $message);
+      } else {
+        `concat (",", $between-first-and-second-comma, ",")`;
+      }
+    } else {
+      $message = `concat ("We cannot compute the first token of the token string '", $token-string, "; because it does not start with a comma and is thus not a valid token string")`;
+      die (#message = $message);
+    }
+  }
+}
+
+tpl first-item (#token-string) {
+  $first-token = first-token (#token-string = $token-string);
+  value-of-token (#token = $first-token);
+}
+
+tpl token-string-tail (#token-string) {
+  if [$token-string = ""] {
+    "";
+  } else {
+    if [starts-with ($token-string, ",")] {
+      $after-first-comma = `substring-after ($token-string, ",")`;
+      if [contains ($after-first-comma, ",")] {
+        $after-second-comma = `substring-after ($after-first-comma, ",")`;
+        if [$after-second-comma = ""] {
+          "";
+        } else {
+          `concat (",", $after-second-comma)`;
+        }
+      } else {
+        $message = `concat ("We cannot compute the tail of the token string '", $token-string, "', because it contains only one comma; valid token strings contain at least two commas")`;
+        die (#message = $message);
+      }
+    } else {
+      $message = `concat ("We canot take the tail of the token string '", $token-string, "': since it does not begin with a comma, it is not actually a valid token string")`;
+      die (#message = $message);
+    }
+  }
+}
+
+tpl append-token-strings (#token-string-a, #token-string-b) {
+  choose {
+    when [$token-string-a = ""] { $token-string-b; }
+    when [$token-string-b = ""] { $token-string-a; }
+    otherwise {
+      $b-minus-initial-comma = `substring-after ($token-string-b, ",")`;
+      `concat ($token-string-a, $b-minus-initial-comma)`;
+    }
+  }
+}
+
+tpl value-of-token (#token) {
+  if [starts-with ($token, ",")] {
+    $after-first-comma = `substring-after ($token, ",")`;
+    if [contains ($after-first-comma, ",")] {
+      `substring-before ($after-first-comma, ",")`;
+    } else {
+      $message = `concat ("The token '", $token, "' does not contain two commas, so it is not actually a valid token")`;
+      die (#message = $message);
+    }
+  } else {
+    $message = `concat ("The token '", $token, "' does not start with a comma, so it is not actually a valid token")`;
+    die (#message = $message);
+  }
+}
+
+tpl position-of-item-helper (#item, #token-string, #val) {
+  $empty = token-string-is-empty (#token-string = $token-string);
+  if [$empty = "1"] {
+    "0";
+  } else {
+    $head = first-item (#token-string = $token-string);
+    if [$head = $item] {
+      $val;
+    } else {
+      $tail = token-string-tail (#token-string = $token-string);
+      position-of-item-helper (#item = $item,
+                               #token-string = $tail,
+                               #val = `$val + 1`);
+    }
+  }
+}
+
+// The position of $item in $token-string, starting from 1.  It is
+// assumed that $item is the item itself, without any delimiting
+// symbols (e.g., initial and final commas ",").  If the value does
+// not occur in the token string, return 0.
+tpl position-of-item (#item, #token-string) {
+  position-of-item-helper (#item = $item,
+                           #token-string = $token-string,
+                           #val = "1");
+}
+
+// Remove all of the tokens in $to-remove from $token-string.  Only the
+// first occurrence of an item in $to-remove will be removed from
+// $token-string.
+tpl token-string-difference (#token-string, #to-remove) {
+  $is-empty = token-string-is-empty (#token-string = $to-remove);
+  if [$is-empty = "1"] {
+    $token-string;
+  } else {
+    $first-token = first-token (#token-string = $to-remove);
+    $to-remove-tail = token-string-tail (#token-string = $to-remove);
+    if [contains ($token-string, $first-token)] {
+      $token-string-before = `substring-before ($token-string, $first-token)`;
+      $token-string-after = `substring-after ($token-string, $first-token)`;
+      $cut = `concat ($token-string-before, ",", $token-string-after)`;
+      token-string-difference (#token-string = $cut,
+                               #to-remove = $to-remove-tail);
+    } else {
+      token-string-difference (#token-string = $token-string,
+                               #to-remove = $to-remove-tail);
+    }
+  }
+}

@@ -2,93 +2,10 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Choice-Statement" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
+include die.xsl;
+include tokens.xsl;
 
-// Say something when dying
-
-tpl die(#message) {
-  if [@line and @col] {
-    $line = `@line`;
-    $col = `@col`;
-    $final_message = `concat ($message, " (line ", $line, ", column ", $col, ")")`;
-    msg terminate="yes" $final_message;
-  } else {
-    $final_message = `concat ($message, " (unable to determine line and column information)")`;
-    msg terminate="yes" $final_message;
-  }
-}
-
-// Tokens
-
-tpl first-token (#token-string) {
-  if [$token-string = ""] {
-    die (#message = "We can't find the first token of an empty token string!");
-  } else {
-    if [starts-with ($token-string, ",")] {
-      $after-first-comma = `substring-after ($token-string, ",")`;
-      $between-first-and-second-comma = `substring-before ($after-first-comma, ",")`;
-      if [$between-first-and-second-comma = ""] {
-        $message = `concat ("We cannot compute the first token of the token string '", $token-string, "', because it starts with two adjacent commas")`;
-        die (#message = $message);
-      } else {
-        `concat (",", $between-first-and-second-comma, ",")`;
-      }
-    } else {
-      $message = `concat ("We cannot compute the first token of the token string '", $token-string, "; because it does not start with a comma and is thus not a valid token string")`;
-      die (#message = $message);
-    }
-  }
-}
-
-tpl token-string-tail (#token-string) {
-  if [$token-string = ""] {
-    "";
-  } else {
-    if [starts-with ($token-string, ",")] {
-      $after-first-comma = `substring-after ($token-string, ",")`;
-      if [contains ($after-first-comma, ",")] {
-        $after-second-comma = `substring-after ($after-first-comma, ",")`;
-        if [$after-second-comma = ""] {
-          "";
-        } else {
-          `concat (",", $after-second-comma)`;
-        }
-      } else {
-        $message = `concat ("We cannot compute the tail of the token string '", $token-string, "', because it contains only one comma; valid token strings contain at least two commas")`;
-        die (#message = $message);
-      }
-    } else {
-      $message = `concat ("We canot take the tail of the token string '", $token-string, "': since it does not begin with a comma, it is not actually a valid token string")`;
-      die (#message = $message);
-    }
-  }
-}
-
-tpl append-token-strings (#token-string-a, #token-string-b) {
-  choose {
-    when [$token-string-a = ""] { $token-string-b; }
-    when [$token-string-b = ""] { $token-string-a; }
-    otherwise {
-      $b-minus-initial-comma = `substring-after ($token-string-b, ",")`;
-      `concat ($token-string-a, $b-minus-initial-comma)`;
-    }
-  }
-}
-
-tpl value-of-token (#token) {
-  if [starts-with ($token, ",")] {
-    $after-first-comma = `substring-after ($token, ",")`;
-    if [contains ($after-first-comma, ",")] {
-      `substring-before ($after-first-comma, ",")`;
-    } else {
-      $message = `concat ("The token '", $token, "' does not contain two commas, so it is not actually a valid token")`;
-      die (#message = $message);
-    }
-  } else {
-    $message = `concat ("The token '", $token, "' does not start with a comma, so it is not actually a valid token")`;
-    die (#message = $message);
-  }
-}
+key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
 
 tpl count-preceding-toplevel-items {
   `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition")])`;
@@ -174,7 +91,7 @@ tpl enumerate-items (#candidates, #bundlenr, #articleid) {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
+    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
@@ -504,7 +421,7 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
   if [$kind = "Regular-Statement"] {
     $later-users = items-using-toplevel-diffuse-reasoning-item (#diffuse-reasoning-item = $item,
                                                                #items = $later-toplevel-items);
-    if [$later-users = ""] { // this toplevel item is not needed to jsutify any of the later items, so look inside $context
+    if [$later-users = ""] { // this toplevel item is not needed to justify any of the later items, so look inside $context
       if [$context//Local-Reference[@idnr = $idnr]] {
         "1";
       } else {
@@ -581,7 +498,6 @@ tpl needed-toplevel-items (#candidates, #context) {
                                                               #context = $context,
                                                               #later-toplevel-items = $other-candidates-as-token-string);
     if [$exists-path = "1"] {
-      // copy-of `$candidate`;
       apply [$candidate];
     }
     needed-toplevel-items (#candidates = $other-candidates,
@@ -607,7 +523,7 @@ tpl [Text-Proper/Item[@kind = "Constant-Definition"]] (#bundlenr, #articleid) {
     @promoted = "constant-definition";
     @spelling = $variable-spelling;
     <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       <Item {
         @kind = "Definition-Item";
         @line = $line;
@@ -667,7 +583,7 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid
             @promoted = "type-changing-statement";
             @spelling = $variable-spelling;
             <Text-Proper {
-              needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+              needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
               <Item {
                 @kind = "Definition-Item";
                 @line = $line;
@@ -717,21 +633,25 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid
   }
 }
 
-tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Constant-Definition") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Type-Changing-Statement") and not(@kind = "Choice-Statement")]](#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Constant-Definition") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Type-Changing-Statement")]](#bundlenr, #articleid) {
   <Item-Bundle {
 
-    if [$bundlenr] {
-      @bundlenr = $bundlenr;
-    }
+    if [$bundlenr] { @bundlenr = $bundlenr; }
+    if [$articleid] { @articleid = $articleid; }
 
-    if [$articleid] {
-      @articleid = $articleid;
-    }
+    // check for choice statements that used to exist in the .wsx, but
+    // which have since been manipulated by split.xsl into new
+    // definitions.  For choice statements, split.xsl generates
+    // toplevel items that have a promoted and a spelling attribute.
+    // Pass these along to the main Item-Bundle element.
+
+   if [@promoted] { @promoted = `@promoted`; }
+   if [@spelling] { @spelling = `@spelling`; }
 
     $context = `.`;
 
     <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement"] {
@@ -745,20 +665,6 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
         apply [*];
       }
     }
-  }
-}
-
-tpl [Item[@kind = "Reservation"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Regular-Statement" and child::Diffuse-Statement]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
   }
 }
 
@@ -890,7 +796,7 @@ tpl [Block[@kind = "Definitional-Block"]] {
 }
 
 tpl [Item[@kind = "Functor-Definition" or @kind = "Predicate-Definition" or @kind = "Attribute-Definition" or @kind = "Mode-Definition" or @kind = "Structure-Definition"]] {
-  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`, #context = `*`);
+  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration" or @kind = "Constant-Definition"]`, #context = `*`);
   apply [preceding-sibling::Item[@kind = "Assumption" or @kind = "Existential-Assumption"]];
   <Item {
     for-each [@*] { copy-of `.`; }
