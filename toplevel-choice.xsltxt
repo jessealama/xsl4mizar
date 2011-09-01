@@ -51,6 +51,50 @@ tpl [Simple-Term] (#target-idnr, #earlier-idnrs) mode="idnr-hunting" {
   }
 }
 
+tpl [Item[@kind = "Choice-Statement"]] (#earlier-idnrs, #target-idnr) mode="idnr-hunting" {
+  $variables = `Variable | Explicitly-Qualified-Segment/Variable`;
+  $variable-idnrs = idnr-items-to-token-string (#items = $variables);
+  $difference = token-string-difference (#token-string = $earlier-idnrs,
+                                         #to-remove = $variable-idnrs);
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#earlier-idnrs = $difference, #target-idnr = $target-idnr);
+  }
+}
+
+tpl [Item[@kind = "Type-Changing-Statement"]] (#earlier-idnrs, #target-idnr) mode="idnr-hunting" {
+  $variables = `Equality/Variable`;
+  $variable-idnrs = idnr-items-to-token-string (#items = $variables);
+  $difference = token-string-difference (#token-string = $earlier-idnrs,
+                                         #to-remove = $variable-idnrs);
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#earlier-idnrs = $difference, #target-idnr = $target-idnr);
+  }
+}
+
+tpl [Item[preceding-sibling::Item[@kind = "Choice-Statement"]]] (#earlier-idnrs, #target-idnr) mode="idnr-hunting" {
+  $variables = `Variable | Explicitly-Qualified-Segment/Variable`;
+  $variable-idnrs = idnr-items-to-token-string (#items = $variables);
+  $difference = token-string-difference (#token-string = $earlier-idnrs,
+                                         #to-remove = $variable-idnrs);
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#earlier-idnrs = $difference, #target-idnr = $target-idnr);
+  }
+}
+
+tpl [Item[preceding-sibling::Item[@kind = "Type-Changing-Statement"]]] (#earlier-idnrs, #target-idnr) mode="idnr-hunting" {
+  $variables = `Equality/Variable`;
+  $variable-idnrs = idnr-items-to-token-string (#items = $variables);
+  $difference = token-string-difference (#token-string = $earlier-idnrs,
+                                         #to-remove = $variable-idnrs);
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#earlier-idnrs = $difference, #target-idnr = $target-idnr);
+  }
+}
+
 tpl count-preceding-toplevel-items {
   `count (preceding::Item[parent::Text-Proper and not(@kind = "Reservation") and not(@kind = "Private-Functor-Definition") and not(@kind = "Private-Predicate-Definition")])`;
 }
