@@ -361,7 +361,7 @@ tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
         <Compact-Statement;
         apply [.];
         <Straightforward-Justification {
-          $conjunction-position = `$num-previous + 2*$num-variables + 1`;
+          $conjunction-position = `$num-previous + $num-variables + 1`;
           <Theorem-Reference {
             @spelling = `concat ("CKB", $conjunction-position)`;
             @"number" = "1";
