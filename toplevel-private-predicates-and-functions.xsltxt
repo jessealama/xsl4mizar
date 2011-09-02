@@ -13,6 +13,10 @@ tpl [*] {
   }
 }
 
+tpl count-preceding-toplevel-items {
+  `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition")])`;
+}
+
 // tpl [Text-Proper] {
 //   <Text-Proper {
 //     for-each [@*] { copy-of `.`; }
