@@ -773,7 +773,7 @@ tpl [Local-Reference] {
       }
     }
   } else {
-    die (#message = "We found a Local-Reference item that lacks an idnr attribute!");
+    die (#message = "We found a Local-Reference item that lacks an idnr attribute, a line attribute, a column attribute, or a spelling attribute!");
   }
 }
 
