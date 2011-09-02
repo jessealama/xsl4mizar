@@ -205,3 +205,121 @@ tpl [Private-Predicate-Formula] {
     }
   }
 }
+
+// Create a universal formula that universally generalizes $formula.
+// There will be as many universal quantifiers as there are elements
+// of $types.  The types of the introduced universally quantified
+// variables will be taken from $types.
+tpl universally-generalize (#formula, #types, #variable-number) {
+  if [$variable-number] {
+    if [$types] {
+      $type = `$types[1]`;
+      $variable-spelling = `concat ("x", $variable-number)`;
+      <Universal-Quantifier-Formula {
+        <Explicitly-Qualified-Segment {
+          <Variable {
+            @idnr = "0";
+            @spelling = $variable-spelling;
+          }
+          apply [$type];
+        }
+        universally-generalize (#formula = $formula,
+                                #types = `$types[position() > 1]`,
+                                #variable-number = `$variable-number + 1`);
+      }
+    } else {
+      apply [$formula] mode="rewrite-placeholder-terms";
+    }
+  } else {
+    universally-generalize (#formula = $formula,
+                            #types = $types,
+                            #variable-number = "1");
+  }
+}
+
+tpl [Straightforward-Justification] {
+  if [preceding-sibling::Proposition] {
+    $context = `.`;
+    $proposition = `preceding-sibling::Proposition[1]`;
+    $formula = `$proposition/*[position() = last()]`;
+    for-each [$formula] {
+      if [self::Private-Predicate-Formula] {
+        if [not(@idnr)] {
+          die (#message = "We require that a Private-Predicate-Formula have an idnr attribute!");
+        }
+        $idnr = `@idnr`;
+        if [preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr]] {
+          for-each [preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr][1]/..] {
+            $private-predicate-definition = `.`;
+            $type-list = `$private-predicate-definition/Type-List`;
+            $definiens = `$private-predicate-definition/*[position() = last()]`;
+            $num-previous = count-preceding-toplevel-items ();
+            $num-previous-plus-one = `$num-previous + 1`;
+            $ckb = `concat ("CKB", $num-previous-plus-one)`;
+            $instance-label = "Instance";
+            <Block {
+              @kind = "Proof";
+              <Item {
+                @kind = "Regular-Statement";
+                <Compact-Statement;
+                <Proposition {
+                  <Label {
+                    @spelling = $instance-label;
+                  }
+                  <Biconditional-Formula {
+                    universally-generalize (#formula = $definiens, #types = `$type-list/*`);
+                    apply [$formula];
+                  }
+                }
+                <Straightforward-Justification {
+                  <Definition-Reference {
+                    @"number" = "1";
+                    @spelling = $ckb;
+                  }
+                }
+              }
+              <Item {
+                @kind = "Regular-Statement";
+                <Compact-Statement;
+                <Proposition {
+                  apply [$formula];
+                }
+                <Straightforward-Justification {
+                  apply [$context/*];
+                }
+              }
+              <Item {
+                @kind = "Conclusion";
+                <Compact-Statement;
+                <Proposition {
+                  <Thesis;
+                }
+                <Straightforward-Justification {
+                  <Link;
+                  <Local-Reference {
+                    @idnr = "0";
+                    @line = "0";
+                    @col = "0";
+                    @spelling = $instance-label;
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          <Straightforward-Justification {
+            apply [$context/*];
+          }
+        }
+      } else {
+        <Straightforward-Justification {
+          apply [$context/*];
+        }
+      }
+    }
+  } else {
+    <Straightforward-Justification {
+      apply [*];
+    }
+  }
+}
