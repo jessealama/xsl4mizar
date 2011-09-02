@@ -1,0 +1,203 @@
+stylesheet 1.0;
+
+output method=xml indent="yes";
+
+include die.xsl;
+include tokens.xsl;
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+// tpl [Text-Proper] {
+//   <Text-Proper {
+//     for-each [@*] { copy-of `.`; }
+//     for-each [Item[not(@kind = "Private-Predicate-Definition")]] {
+//       apply [.]; "\n";
+//     }
+//   }
+// }
+
+tpl [*] (#arguments) mode="plug-placeholders" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#arguments = $arguments) mode="plug-placeholders";
+  }
+}
+
+tpl [*] mode="rewrite-placeholder-terms" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] mode="rewrite-placeholder-terms";
+  }
+}
+
+tpl [Placeholder-Term] (#arguments) mode="plug-placeholders" {
+  if [not(@nr)] {
+    die (#message = "We found a placeholder term that lacks an nr attribute!");
+  }
+  $nr = `@nr`;
+  $num-arguments = `count ($arguments)`;
+  if [$num-arguments < $nr] {
+    $message = `concat ("We are asked to plug in an expression for position #", $nr, ", but we have only ", $num-arguments, " available")`;
+    die (#message = $message);
+  }
+  $argument = `$arguments[position() = $nr]`;
+  if [$argument] {
+    apply [$argument];
+  } else {
+    $message = `concat ("We somehow failed to access argument number ", $nr, " from our list of ", $num-arguments, " arguments")`;
+    die (#message = $message);
+  }
+}
+
+tpl [Placeholder-Term] mode="rewrite-placeholder-terms" {
+  if [not(@nr)] {
+    die (#message = "We found a placeholder term that lacks an nr attribute!");
+  }
+  $nr = `@nr`;
+  <Variable {
+    @idnr = "0";
+    $stub-variable-spelling = `concat ("x", $nr)`;
+    @spelling = $stub-variable-spelling;
+  }
+}
+
+key "idnrs" [//*] `@idnr`;
+
+tpl fresh-idnr (#start) {
+  if [key ("idnr", $start)] {
+    fresh-idnr (#start = `$start + 1`);
+  } else {
+    $start;
+  }
+}
+
+// tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition"]] {
+//   // do nothing
+// }
+
+// tpl [Private-Predicate-Formula] {
+//   if [not (@idnr)] {
+//     die (#message = "We found a Private-Predicate-Formula that lacks an idnr attribute");
+//   }
+//   $idnr = `@idnr`;
+//   $arguments = `*`;
+//   if [preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr]] {
+//     for-each [preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr][1]/..] {
+//       $definiens = `*[position () = last ()]`;
+//       apply [$definiens] (#arguments = $arguments); // mode="plug-placeholders";
+//     }
+//   }
+// }
+
+tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition"]] {
+
+  // sanity checks
+  if [not(Variable)] {
+    die (#message = "A Private-Predicate-Definition item is supposed to have a Variable child!");
+  }
+  $variable = `Variable[1]`;
+  if [not($variable/@spelling)] {
+    die (#message = "We found a variable that lacks a spelling!");
+  }
+  if [not($variable/@idnr)] {
+    die (#message = "We found a variable that lacks an nr attribute!");
+  }
+  if [not(Type-List)] {
+    die (#message = "A Private-Predicate-Definition item is supposed to have a Type-List child!");
+  }
+
+  $variable-nr = `$variable/@idnr`;
+  $variable-spelling = `$variable/@spelling`;
+  $type-list = `Type-List[1]`;
+  $definiens = `*[position() = last()]`;
+
+  // emit the new non-private definition
+  <Item {
+    @kind = "Definition-Item";
+    @promoted = "private-predicate-definition";
+    @spelling = $variable-spelling;
+    <Block {
+      @kind = "Definitional-Block";
+      $num-preceding-idnrs = `count (preceding::*[@idnr])`;
+      for-each [$type-list/*] {
+        $pos = `position ()`;
+        $stub-variable-spelling = `concat ("x", $pos)`;
+        $idnr = fresh-idnr (#start = `$num-preceding-idnrs + $pos`);
+        <Item {
+          @kind = "Loci-Declaration";
+          <Explicitly-Qualified-Segment {
+            <Variable {
+              @idnr = "0";
+              @spelling = $stub-variable-spelling;
+            }
+            apply [.];
+          }
+        }
+      }
+      <Item {
+        @kind = "Predicate-Definition";
+        <Predicate-Pattern {
+          @spelling = $variable-spelling;
+          @nr = $variable-nr;
+          <Loci; // empty left-hand side; arguments will be on the right-hand side
+          <Loci {
+            for-each [$type-list/*] {
+              $pos = `position ()`;
+              $stub-variable-spelling = `concat ("x", $pos)`;
+              <Locus {
+                @spelling = $stub-variable-spelling;
+		// In other stylesheets we insist that Locus elements
+		// have an nr attribute.  I don't know what to put
+		// here at the moment, so for now just put in a
+		// constant dummy value.
+                @nr = "0";
+              }
+            }
+          }
+        }
+        <Definiens {
+          <Formula-Expression;
+          apply [$definiens] mode="rewrite-placeholder-terms";
+        }
+      }
+    }
+  }
+}
+
+
+
+tpl [Private-Predicate-Formula] {
+  if [not(@idnr)] {
+    die (#message = "A Private-Predicate-Formula element lacks an idnr attribute!");
+  }
+  $idnr = `@idnr`;
+  if [preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr]] {
+    $toplevel-definition = `preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr]/..`;
+    $toplevel-definition-variable = `$toplevel-definition/Variable`;
+    if [not($toplevel-definition-variable/@spelling)] {
+      die (#message = "We found a Variable element that lacks a spelling!");
+    }
+    $spelling = `$toplevel-definition-variable/@spelling`;
+    <Predicative-Formula {
+      @nr = $idnr;
+      @spelling = $spelling;
+      <Arguments;
+      <Arguments {
+        apply [*];
+      }
+    }
+  } else {
+    <Private-Predicate-Formula {
+      for-each [@*] { copy-of `.`; }
+      apply [*];
+    }
+  }
+}
