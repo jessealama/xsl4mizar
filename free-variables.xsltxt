@@ -2,28 +2,8 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-tpl die(#message) {
-  if [@line and @col] {
-    $line = `@line`;
-    $col = `@col`;
-    $final_message = `concat ($message, " (line ", $line, ", column ", $col, ")")`;
-    msg terminate="yes" $final_message;
-  } else {
-    $final_message = `concat ($message, " (unable to determine line and column information)")`;
-    msg terminate="yes" $final_message;
-  }
-}
-
-tpl append-token-strings (#token-string-a, #token-string-b) {
-  choose {
-    when [$token-string-a = ""] { $token-string-b; }
-    when [$token-string-b = ""] { $token-string-a; }
-    otherwise {
-      $b-minus-initial-comma = `substring-after ($token-string-b, ",")`;
-      `concat ($token-string-a, $b-minus-initial-comma)`;
-    }
-  }
-}
+include die.xsl;
+include tokens.xsl;
 
 tpl bound-in-items (#items, #bound-so-far) {
   if [$items] {
