@@ -36,7 +36,8 @@ tpl ensure-toplevel-binders-have-unique-numbers {
   for-each [//Item[@toplevel-binder-number]] {
     $num = `@toplevel-binder-number`;
     if [//Item[@toplevel-binder-number = $num][2]] {
-      die (#message = "This stylesheet assumes that each toplevel binder item has a toplevel-binder-number attribute shared by no other toplevel binder item, but this document has has at least two such items sharing the same toplevel-binder-number.");
+      $message = `concat ("This stylesheet assumes that each toplevel binder item has a toplevel-binder-number attribute shared by no other toplevel binder item, but this document has has at least two such items sharing the same toplevel-binder-number (", $num, ")")`;
+      die (#message = $message);
     }
   }
 }
