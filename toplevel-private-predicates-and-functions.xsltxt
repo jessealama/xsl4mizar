@@ -73,7 +73,7 @@ tpl [Placeholder-Term] mode="rewrite-placeholder-terms" {
   }
 }
 
-key "idnrs" [//*] `@idnr`;
+key "idnr" [//*] `@idnr`;
 
 tpl fresh-idnr (#start) {
   if [key ("idnr", $start)] {
