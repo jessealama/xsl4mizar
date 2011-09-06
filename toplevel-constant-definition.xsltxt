@@ -20,7 +20,7 @@ tpl [Text-Proper/Item[@kind = "Constant-Definition"]] {
   // do nothing
 }
 
-tpl [Simple-Term[@idnr = preceding::Item[@kind = "Constant-Definition" and parent::Text-Proper]/Variable[@spelling]/@idnr]] {
+tpl [Simple-Term[@idnr = preceding::Item[@kind = "Constant-Definition" and parent::Text-Proper]/Variable/@idnr]] {
   $idnr = `@idnr`;
   $arguments = `*`;
   $toplevel-definition = `preceding::Item[@kind = "Constant-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr][1]/..`;

@@ -48,15 +48,24 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
 }
 
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
-  $type = `*[position() = last()]`;
+  $num-children = `count (*)`;
+  $justification = `*[position() = $num-children]`;
+  $num-children-minus-one = `$num-children - 1`;
+  $type = `*[position() = $num-children-minus-one]`;
   $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-  for-each [Variable] {
+  for-each [Equality] {
+    $variable = `Variable`;
+    $definiens = `*[position() = last()]`;
     <Item {
       for-each [@*] { copy-of `.`; }
       @kind = "Type-Changing-Statement";
       @toplevel-binder-number = `position() + $num-previous-toplevel`;
-      apply [.];
+      <Equality {
+        apply [$variable];
+        apply [$definiens];
+      }
       apply [$type];
+      apply [$justification];
     }
   }
 }
@@ -87,16 +96,6 @@ tpl [Item[@kind = "Constant-Definition"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     @idnr = `Variable[1]/@idnr`;
-    $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-    @toplevel-binder-number = `$num-previous-toplevel + 1`;
-    apply [*];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    @idnr = `Equality/Variable[1]/@idnr`;
     $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
     @toplevel-binder-number = `$num-previous-toplevel + 1`;
     apply [*];
