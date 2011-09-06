@@ -203,7 +203,7 @@ tpl [Placeholder-Term[@nr]] (#arguments) mode="plug-placeholders" {
   }
 }
 
-tpl [Item[@kind = "Correctness-Condition"]/Block[@kind = "Proof" and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr]]] {
+tpl [Item[@kind = "Correctness-Condition" or @kind = "Correctness" or @kind = "Theorem-Item" or (@kind = "Regular-Statement" and parent::Text-Proper)]/Block[(@kind = "Proof" or @kind = "Now-Reasoning") and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr]]] {
   <Block {
     for-each [@*] { copy-of `.`; }
     for-each [descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr and position() = last()]] {
