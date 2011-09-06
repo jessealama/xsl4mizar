@@ -570,6 +570,14 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid
   }
 }
 
+tpl [Simple-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Equality/Variable/@idnr]] {
+  <Infix-Term {
+    for-each [@*] { copy-of `.`; }
+    <Arguments;
+    <Arguments;
+  }
+}
+
 tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Type-Changing-Statement")]](#bundlenr, #articleid) {
   <Item-Bundle {
 
