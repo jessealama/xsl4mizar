@@ -5,23 +5,13 @@ output method=xml indent="yes";
 include die.xsl;
 include tokens.xsl;
 
-key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Constant-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
+key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
 
 tpl count-preceding-toplevel-items {
   `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition")])`;
 }
 
 // Sanity checks
-
-tpl ensure-distinct-toplevel-constants {
-  for-each [/Text-Proper/Item[@kind = "Constant-Definition"]] {
-    $spelling = `Variable/@spelling`;
-    if [following-sibling::Item[@kind = "Constant-Definition"]/Variable[@spelling = $spelling]] {
-      $message = `concat ("This stylesheet assumes that distinct toplevel constant definitions bind distinct variables, but there are at least two constant definitions in this document that bind '", $spelling, "'")`;
-      die (#message = $message);
-    }
-  }
-}
 
 tpl ensure-reservations-have-numbers {
   for-each [//Item[@kind = "Reservation" and not(@toplevel-binder-number)]] {
@@ -59,7 +49,6 @@ tpl ensure-loci-have-numbers {
 }
 
 tpl [/] {
-  ensure-distinct-toplevel-constants ();
   ensure-reservations-have-numbers ();
   ensure-toplevel-binders-have-unique-numbers ();
   ensure-loci-declarations-bind-only-one-variable ();
@@ -506,59 +495,6 @@ tpl needed-toplevel-items (#candidates, #context) {
   }
 }
 
-tpl [Text-Proper/Item[@kind = "Constant-Definition"]] (#bundlenr, #articleid) {
-  $context = `.`;
-  $line = `@line`;
-  $col = `@col`;
-  $variable = `Variable`;
-  $variable-line = `$variable/@line`;
-  $variable-col = `$variable/@col`;
-  $variable-idnr = `$variable/@idnr`;
-  $variable-spelling = `$variable/@spelling`;
-  $definiens = `*[2]`;
-  $definiens-line = `$definiens/@line`;
-  $definiens-col = `$definiens/@col`;
-  <Item-Bundle {
-    if [$bundlenr] { @bundlenr = $bundlenr; }
-    if [$articleid] { @articleid = $articleid; }
-    @promoted = "constant-definition";
-    @spelling = $variable-spelling;
-    <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
-      <Item {
-        @kind = "Definition-Item";
-        @line = $line;
-        @col = $col;
-        <Block {
-          @kind = "Definitional-Block";
-          @line = $line;
-          @col = $col;
-          <Item {
-            @kind = "Functor-Definition";
-            <Operation-Functor-Pattern {
-              @spelling = $variable-spelling;
-              @idnr = $variable-idnr;
-              <Loci;
-              <Loci;
-            }
-            <Equals;
-            <Definiens {
-              @line = $definiens-line;
-              @col = $definiens-col;
-              <Term-Expression;
-              copy-of `$definiens`;
-            }
-          }
-          <Item {
-            @kind = "Correctness";
-            <Straightforward-Justification;
-          }
-        }
-      }
-    }
-  }
-}
-
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid) {
   $context = `.`;
   $line = `@line`;
@@ -634,7 +570,7 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid
   }
 }
 
-tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Constant-Definition") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Type-Changing-Statement")]](#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Type-Changing-Statement")]](#bundlenr, #articleid) {
   <Item-Bundle {
 
     if [$bundlenr] { @bundlenr = $bundlenr; }
@@ -797,7 +733,7 @@ tpl [Block[@kind = "Definitional-Block"]] {
 }
 
 tpl [Item[@kind = "Functor-Definition" or @kind = "Predicate-Definition" or @kind = "Attribute-Definition" or @kind = "Mode-Definition" or @kind = "Structure-Definition"]] {
-  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration" or @kind = "Constant-Definition"]`, #context = `*`);
+  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`, #context = `*`);
   apply [preceding-sibling::Item[@kind = "Assumption" or @kind = "Existential-Assumption"]];
   <Item {
     for-each [@*] { copy-of `.`; }
