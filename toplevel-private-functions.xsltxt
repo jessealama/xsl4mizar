@@ -174,7 +174,7 @@ tpl [*] (#arguments) mode="plug-placeholders" {
   }
 }
 
-tpl [Placeholder-Term[not(@nr)]] {
+tpl [Placeholder-Term[not(@nr)]] mode="plug-placeholders" {
   die (#message = "We found a placeholder term that lacks an nr attribute!");
 }
 
