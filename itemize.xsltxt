@@ -5,10 +5,10 @@ output method=xml indent="yes";
 include die.xsl;
 include tokens.xsl;
 
-key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
+key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Constant-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
 
 tpl count-preceding-toplevel-items {
-  `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition")])`;
+  `count (preceding-sibling::Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition")])`;
 }
 
 // Sanity checks
@@ -92,7 +92,7 @@ tpl enumerate-items (#candidates, #bundlenr, #articleid) {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
+    enumerate-items (#candidates = `Item[not(@kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement))]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
@@ -524,7 +524,7 @@ tpl [Text-Proper/Item[@kind = "Constant-Definition"]] (#bundlenr, #articleid) {
     @promoted = "constant-definition";
     @spelling = $variable-spelling;
     <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       <Item {
         @kind = "Definition-Item";
         @line = $line;
@@ -584,7 +584,7 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid
             @promoted = "type-changing-statement";
             @spelling = $variable-spelling;
             <Text-Proper {
-              needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+              needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
               <Item {
                 @kind = "Definition-Item";
                 @line = $line;
@@ -634,7 +634,7 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid
   }
 }
 
-tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Constant-Definition") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Type-Changing-Statement")]](#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Constant-Definition") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Type-Changing-Statement")]](#bundlenr, #articleid) {
   <Item-Bundle {
 
     if [$bundlenr] { @bundlenr = $bundlenr; }
@@ -652,7 +652,7 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
     $context = `.`;
 
     <Text-Proper {
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement"] {
