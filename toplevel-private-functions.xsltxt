@@ -163,7 +163,8 @@ tpl [Placeholder-Term[@nr]] mode="rewrite-placeholder-terms" {
 // Private-Functor-Terms using the definition
 
 tpl [Text-Proper/Item[@kind = "Private-Functor-Definition"]] {
-  // do nothing
+  // do nothing when we encounter these in the default processing
+  // mode.
 }
 
 tpl [*] (#arguments) mode="plug-placeholders" {
