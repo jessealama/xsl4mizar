@@ -206,7 +206,10 @@ tpl [Placeholder-Term[@nr]] (#arguments) mode="plug-placeholders" {
 tpl [Item[@kind = "Correctness-Condition"]/Block[@kind = "Proof" and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr]]] {
   <Block {
     for-each [@*] { copy-of `.`; }
-    for-each [descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr]] {
+    for-each [descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr and position() = last()]] {
+      // the 'position() = last()' bit is there to ensure that we emit
+      // only one copy of the private functor definitions, not as many
+      // copies as there are occurrences of the private functor term
       $idnr = `@idnr`;
       for-each [(preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr]/..)[1]] {
         copy-of `.`;
