@@ -161,6 +161,14 @@ tpl [Placeholder-Term[@nr]] mode="rewrite-placeholder-terms" {
 // substitute their instances in place.  We thus ignore the definition
 // of the toplevel functors, and instead transform the
 // Private-Functor-Terms using the definition
+//
+// This can fail because sometimes scheme justifications can fail if,
+// syntactically, a term is not given by a private functor.
+
+// A third approach: detect whether a proof uses a private functor
+// whose definition was introduced at the toplevel.  In such a case,
+// simply insert the private predicate definition at the beginning of
+// the proof, then carry on.
 
 tpl [Text-Proper/Item[@kind = "Private-Functor-Definition"]] {
   // do nothing when we encounter these in the default processing
@@ -195,12 +203,15 @@ tpl [Placeholder-Term[@nr]] (#arguments) mode="plug-placeholders" {
   }
 }
 
-tpl [Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable[@spelling]/@idnr]] {
-  $idnr = `@idnr`;
-  $arguments = `*`;
-  $toplevel-definition = `preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr]/..`;
-  for-each [$toplevel-definition] {
-    $definiens = `*[position() = last()]`;
-    apply [$definiens] (#arguments = $arguments) mode="plug-placeholders";
+tpl [Item[@kind = "Correctness-Condition"]/Block[@kind = "Proof" and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr]]] {
+  <Block {
+    for-each [@*] { copy-of `.`; }
+    for-each [descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr]] {
+      $idnr = `@idnr`;
+      for-each [(preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr]/..)[1]] {
+        copy-of `.`;
+      }
+    }
+    apply [*];
   }
 }
