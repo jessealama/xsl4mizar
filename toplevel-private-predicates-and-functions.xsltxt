@@ -327,3 +327,54 @@ tpl [Straightforward-Justification[preceding-sibling::Proposition/Private-Predic
     }
   }
 }
+
+
+tpl [Straightforward-Justification/Local-Reference] {
+
+  // We are about to go check whether this local reference refers to a
+  // private predicate formula whose definition was a toplevel item
+  // (that is, a toplevel defpred).  If this is such a label, we will
+  // add an extra label referring to the exportable definition that we
+  // created earlier.  In any case, we have to copy the current label
+  // anyway.  So:
+
+  <Local-Reference {
+    for-each [@*] { copy-of `.`; }
+      apply [*];
+  }
+
+  // Now that we've copied this local reference, go hunting.
+
+  $idnr = `@idnr`;
+  $proposition = `preceding::Proposition/Label[@idnr = $idnr][1]/..`;
+  if [not($proposition)] {
+    $message = `concat ("We couldn't find a Proposition node whose label is equal to the label we are looking for (", $idnr, ")")`;
+    die (#message = $message);
+  }
+  if [$proposition/Private-Predicate-Formula] {
+    msg "Private-predicate-formula...";
+    $private-predicate-formula = `$proposition/Private-Predicate-Formula`;
+    if [not($private-predicate-formula/@idnr)] {
+      die (#message = "We require that a Private-Predicate-Formula have an idnr attribute, but we found one that lacks this attribute");
+    }
+    $priv-pred-idnr = `$private-predicate-formula/@idnr`;
+    if [preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper]/Variable[@idnr = $priv-pred-idnr]] {
+      msg "found one!";
+      // this is precisely the kind of label we're looking for: the
+      // label refers to a private predicate formula, whose definition
+      // was a toplevel item
+      for-each [preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper]/Variable[@idnr = $priv-pred-idnr][1]/..] {
+        $num-previous = count-preceding-toplevel-items ();
+        $num-previous-plus-one = `$num-previous + 1`;
+        $ckb = `concat ("CKB", $num-previous-plus-one)`;
+        <Definition-Reference {
+          @nr = "0";
+          @"number" = "1";
+          @spelling = $ckb;
+        }
+      }
+    } else {
+      msg "swing and a miss";
+    }
+  }
+}
