@@ -1,0 +1,142 @@
+stylesheet 1.0;
+
+output method=xml indent="yes";
+
+include die.xsl;
+include tokens.xsl;
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl [*] (#arguments) mode="plug-placeholders" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#arguments = $arguments) mode="plug-placeholders";
+  }
+}
+
+tpl [*] mode="rewrite-placeholder-terms" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] mode="rewrite-placeholder-terms";
+  }
+}
+
+tpl [Placeholder-Term] (#arguments) mode="plug-placeholders" {
+  if [not(@nr)] {
+    die (#message = "We found a placeholder term that lacks an nr attribute!");
+  }
+  $nr = `@nr`;
+  $num-arguments = `count ($arguments)`;
+  if [$num-arguments < $nr] {
+    $message = `concat ("We are asked to plug in an expression for position #", $nr, ", but we have only ", $num-arguments, " available")`;
+    die (#message = $message);
+  }
+  $argument = `$arguments[position() = $nr]`;
+  if [$argument] {
+    apply [$argument];
+  } else {
+    $message = `concat ("We somehow failed to access argument number ", $nr, " from our list of ", $num-arguments, " arguments")`;
+    die (#message = $message);
+  }
+}
+
+tpl [Placeholder-Term[not(@nr)]] mode="rewrite-placeholder-terms" {
+  die (#message = "We found a placeholder term that lacks an nr attribute!");
+}
+
+tpl [Placeholder-Term[@nr]] mode="rewrite-placeholder-terms" {
+  $nr = `@nr`;
+  <Simple-Term {
+    @idnr = "0";
+    $stub-variable-spelling = `concat ("x", $nr)`;
+    @spelling = $stub-variable-spelling;
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
+  // do nothing when we encounter these in the default processing
+  // mode.
+}
+
+tpl [*] (#arguments) mode="plug-placeholders" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#arguments = $arguments) mode="plug-placeholders";
+  }
+}
+
+tpl [Placeholder-Term[not(@nr)]] mode="plug-placeholders" {
+  die (#message = "We found a placeholder term that lacks an nr attribute!");
+}
+
+tpl [Placeholder-Term[@nr]] (#arguments) mode="plug-placeholders" {
+  $nr = `@nr`;
+  $num-arguments = `count ($arguments)`;
+  if [$num-arguments < $nr] {
+    $message = `concat ("We are asked to plug in an expression for position #", $nr, ", but we have only ", $num-arguments, " available")`;
+    die (#message = $message);
+  }
+  $argument = `$arguments[position() = $nr]`;
+  if [$argument] {
+    apply [$argument];
+  } else {
+    $message = `concat ("We somehow failed to access argument number ", $nr, " from our list of ", $num-arguments, " arguments")`;
+    die (#message = $message);
+  }
+}
+
+tpl [Item[@kind = "Correctness-Condition" or @kind = "Correctness" or @kind = "Theorem-Item" or (@kind = "Regular-Statement" and parent::Text-Proper)]/Block[(@kind = "Proof" or @kind = "Now-Reasoning") and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Variable/@idnr]]] {
+  $context = `.`;
+  <Block {
+    for-each [@*] { copy-of `.`; }
+    for-each [preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper and child::Variable and Variable/@idnr]] {
+      $toplevel-type-changing-statement = `.`;
+      $idnr = `Variable/@idnr`;
+      if [$context//Private-Functor-Term[@idnr = $idnr]] {
+        copy-of `$toplevel-type-changing-statement`;
+      }
+    }
+    apply [*];
+  }
+}
+
+tpl [*] (#arguments) mode="substitute-private-functor-terms" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] (#arguments = $arguments) mode="substitute-private-functor-terms";
+  }
+}
+
+tpl [Private-Functor-Term[not(@idnr)]] mode="substitute-private-functor-terms" {
+  die (#message = "We expected to find a value for the nr attribute of a Private-Functor-Term, but we found one that lacks an nr attribute");
+}
+
+tpl [Private-Functor-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Variable/@idnr]] mode="substitute-private-functor-terms" {
+  $idnr = `@idnr`;
+  $arguments = `*`;
+  $type-changing-statement = `(preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Variable[@idnr = $idnr]/..)[1]`;
+  $definiens = `$type-changing-statement/*[position() = last()]`;
+  if [not($definiens)] {
+    die (#message = "We can't find a definiens");
+  }
+  apply [$definiens] (#arguments = $arguments) mode="plug-placeholders";
+}
+
+// The case of an unexported lemma whose statement (Proposition) uses
+// a private functor term that was defined earlier on the toplevel.
+// We deal with this case by substituting the definiens of the private
+// functor definition directly into the statement
+tpl [Proposition[parent::Item[@kind = "Regular-Statement" and parent::Text-Proper] and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Variable/@idnr]]] {
+  $arguments = `*`;
+  apply [.] (#arguments = $arguments) mode="substitute-private-functor-terms";
+}
