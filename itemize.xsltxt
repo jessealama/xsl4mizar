@@ -538,19 +538,19 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid
                       <Loci;
                     }
                     <Type-Specification {
-                      copy-of `$type`;
+                      apply [$type];
                     }
                     <Equals;
                     <Definiens {
                       @line = $definiens-line;
                       @col = $definiens-col;
                       <Term-Expression;
-                      copy-of `$definiens`;
+                      apply [$definiens];
                     }
                   }
                   <Item {
                     @kind = "Correctness";
-                    copy-of `$justification`;
+                    apply [$justification];
                   }
                 }
               }
