@@ -206,13 +206,11 @@ tpl [Placeholder-Term[@nr]] (#arguments) mode="plug-placeholders" {
 tpl [Item[@kind = "Correctness-Condition" or @kind = "Correctness" or @kind = "Theorem-Item" or (@kind = "Regular-Statement" and parent::Text-Proper)]/Block[(@kind = "Proof" or @kind = "Now-Reasoning") and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr]]] {
   <Block {
     for-each [@*] { copy-of `.`; }
-    for-each [descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable/@idnr and position() = last()]] {
-      // the 'position() = last()' bit is there to ensure that we emit
-      // only one copy of the private functor definitions, not as many
-      // copies as there are occurrences of the private functor term
-      $idnr = `@idnr`;
-      for-each [(preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper]/Variable[@idnr = $idnr]/..)[1]] {
-        copy-of `.`;
+    for-each [preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper and child::Variable and Variable/@idnr]] {
+      $toplevel-private-functor-definition = `.`;
+      $idnr = `Variable/@idnr`;
+      if [$context//Private-Functor-Term[@idnr = $idnr]] {
+        copy-of `$toplevel-private-functor-definition`;
       }
     }
     apply [*];
