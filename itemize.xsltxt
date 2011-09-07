@@ -646,78 +646,67 @@ tpl [Scheme-Justification[@nr = "0"]] {
   }
 }
 
+// don't know how to resolve; just copy this thing
 tpl [Local-Reference] {
-  $context = `.`;
-  if [@idnr and @line and @col and @spelling] {
-    $idnr = `@idnr`;
-    $line = `@line`;
-    $col = `@col`;
-    $spelling = `@spelling`;
-    choose {
-      // look for a previous unexported toplevel theorem (lemma)
-      when [preceding::Item[@kind = "Regular-Statement" and parent::Text-Proper]/Proposition/Label[@idnr = $idnr]] {
-        for-each [(preceding::Item[@kind = "Regular-Statement" and parent::Text-Proper]/Proposition/Label[@idnr = $idnr]/../..)[position() = last()]] {
-          $num-previous = count-preceding-toplevel-items ();
-          $position = `$num-previous + 1`;
-          $new_spelling = `concat ("CKB", $position)`;
-          <Theorem-Reference {
-            @spelling = $new_spelling;
-            @promoted = "promoted";
-            @"number" = "1";
-          }
-        }
-      }
-      // look for a previous exported toplevel theorem
-      when [preceding::Item[@kind = "Theorem-Item"]/Proposition/Label[@idnr = $idnr]] {
-        for-each [(preceding::Item[@kind = "Theorem-Item"]/Proposition/Label[@idnr = $idnr]/../..)[position() = last()]] {
-          $num-previous = count-preceding-toplevel-items ();
-          $position = `$num-previous + 1`;
-          $new_spelling = `concat ("CKB", $position)`;
-          <Theorem-Reference {
-            @spelling = $new_spelling;
-            @promoted = "promoted";
-            @"number" = "1";
-          }
-        }
-      }
-      // look for a previous non-mode definition
-      when [preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition" or @kind = "Structure-Definition"]/Definiens/Label[@idnr = $idnr]] {
-        for-each [(preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition"]/Definiens/Label[@idnr = $idnr]/../../../..)[position() = last()]] {
-          $num-previous = count-preceding-toplevel-items ();
-          $position = `$num-previous + 1`;
-          $new_spelling = `concat ("CKB", $position)`;
-          <Definition-Reference {
-            @spelling = $new_spelling;
-            @promoted = "promoted";
-            @"number" = "1";
-          }
-        }
-      }
-      // look for a previous mode definition
-      when [preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]] {
-        for-each [(preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]/../../../../..)[position() = last()]] {
-          $num-previous = count-preceding-toplevel-items ();
-          $position = `$num-previous + 1`;
-          $new_spelling = `concat ("CKB", $position)`;
-          <Definition-Reference {
-            @spelling = $new_spelling;
-            @promoted = "promoted";
-            @"number" = "1";
-          }
-        }
-      }
-      // don't know how to resolve; just copy this thing
-      otherwise {
-        <Local-Reference {
-          @line = $line;
-          @col = $col;
-          @spelling = $spelling;
-          @idnr = $idnr;
-        }
-      }
+  copy-of `.`;
+}
+
+// look for a previous unexported toplevel theorem (lemma)
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]/Proposition/Label/@idnr]] {
+  $idnr = `@idnr`;
+  for-each [(preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]/Proposition/Label[@idnr = $idnr]/../..)[position() = last()]] {
+    $num-previous = count-preceding-toplevel-items ();
+    $position = `$num-previous + 1`;
+    $new_spelling = `concat ("CKB", $position)`;
+    <Theorem-Reference {
+      @spelling = $new_spelling;
+      @promoted = "promoted";
+      @"number" = "1";
     }
-  } else {
-    die (#message = "We found a Local-Reference item that lacks an idnr attribute, a line attribute, a column attribute, or a spelling attribute!");
+  }
+}
+
+// look for a previous exported toplevel theorem
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Theorem-Item"]/Proposition/Label/@idnr]] {
+  $idnr = `@idnr`;
+  for-each [(preceding::Item[@kind = "Theorem-Item"]/Proposition/Label[@idnr = $idnr]/../..)[position() = last()]] {
+    $num-previous = count-preceding-toplevel-items ();
+    $position = `$num-previous + 1`;
+    $new_spelling = `concat ("CKB", $position)`;
+    <Theorem-Reference {
+      @spelling = $new_spelling;
+      @promoted = "promoted";
+      @"number" = "1";
+    }
+  }
+}
+
+// look for a previous non-mode definition
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition" or @kind = "Structure-Definition"]/Definiens/Label/@idnr]] {
+  $idnr = `@idnr`;
+  for-each [(preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition"]/Definiens/Label[@idnr = $idnr]/../../../..)[position() = last()]] {
+    $num-previous = count-preceding-toplevel-items ();
+    $position = `$num-previous + 1`;
+    $new_spelling = `concat ("CKB", $position)`;
+    <Definition-Reference {
+      @spelling = $new_spelling;
+      @promoted = "promoted";
+      @"number" = "1";
+    }
+  }
+}
+
+// look for a previous mode definition
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label/@idnr]] {
+  for-each [(preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]/../../../../..)[position() = last()]] {
+    $num-previous = count-preceding-toplevel-items ();
+    $position = `$num-previous + 1`;
+    $new_spelling = `concat ("CKB", $position)`;
+    <Definition-Reference {
+      @spelling = $new_spelling;
+      @promoted = "promoted";
+      @"number" = "1";
+    }
   }
 }
 
