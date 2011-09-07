@@ -357,7 +357,7 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
 tpl items-using-toplevel-diffuse-reasoning-item-helper (#diffuse-reasoning-item, #items, #val) {
   $idnr = `$diffuse-reasoning-item/@idnr`;
   if [$items = ""] {
-    "";
+    $val;
   } else {
     $items-tail = token-string-tail (#token-string = $items);
     $first-item-number-token = first-token (#token-string = $items);
