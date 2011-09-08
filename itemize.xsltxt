@@ -261,24 +261,6 @@ tpl toplevel-items-in-which-item-occurs (#idnr, #items, #val) {
   }
 }
 
-tpl idnr-occurs-in-dependent-type-of-some-reservation (#idnr, #reservations) {
-  if [$reservations = ""] {
-    "0";
-  } else {
-    $first-reservation-number-token = first-token (#token-string = $reservations);
-    $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
-    $first-reservation = `key ("binder", $first-reservation-number)`;
-    if [$first-reservation//Simple-Term[@idnr = $idnr]] {
-      "1";
-    } else {
-      $remaining-reservations = token-string-tail (#token-string = $reservations);
-      idnr-occurs-in-dependent-type-of-some-reservation (#idnr = $idnr,
-                                                         #reservations = $remaining-reservations);
-    }
-  }
-}
-
-
 // $reservations is a list of reservation numbers
 tpl item-bound-by-some-toplevel-item (#item, #items) {
   if [$item/@idnr] {
