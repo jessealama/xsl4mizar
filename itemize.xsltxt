@@ -278,35 +278,6 @@ tpl idnr-occurs-in-dependent-type-of-some-reservation (#idnr, #reservations) {
   }
 }
 
-tpl dependent-type-reservations-in-which-idnr-occurs-helper (#idnr, #reservations, #val) {
-  $idnr-token = `concat (",", $idnr, ",")`;
-  if [$reservations = ""] {
-    $val;
-  } else {
-    $first-reservation-number-token = first-token (#token-string = $reservations);
-    $first-reservation-number = value-of-token (#token = $first-reservation-number-token);
-    $first-reservation = `key ("binder", $first-reservation-number)`;
-    $first-reservation-free-variables = `$first-reservation/@free-variables`;
-    $reservations-tail = token-string-tail (#token-string = $reservations);
-    if [contains ($first-reservation-free-variables, $idnr-token)] {
-      $new-value = append-token-strings (#token-string-a = $val,
-                                         #token-string-b = $first-reservation-number-token);
-      dependent-type-reservations-in-which-idnr-occurs-helper (#idnr = $idnr,
-                                                               #reservations = $reservations-tail,
-                                                               #val = $new-value);
-    } else {
-      dependent-type-reservations-in-which-idnr-occurs-helper (#idnr = $idnr,
-                                                               #reservations = $reservations-tail,
-                                                               #val = $val);
-    }
-  }
-}
-
-tpl dependent-type-reservations-in-which-idnr-occurs (#idnr, #reservations) {
-  dependent-type-reservations-in-which-idnr-occurs-helper (#idnr = $idnr,
-                                                           #reservations = $reservations,
-                                                           #val = "");
-}
 
 // $reservations is a list of reservation numbers
 tpl item-bound-by-some-toplevel-item (#item, #items) {
