@@ -475,90 +475,7 @@ tpl needed-toplevel-items (#candidates, #context) {
   }
 }
 
-tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid) {
-  $context = `.`;
-  $line = `@line`;
-  $col = `@col`;
-  $equation = `Equality[1]`;
-  if [$equation] {
-    $variable = `$equation/Variable`;
-    if [$variable] {
-      $variable-line = `$variable/@line`;
-      $variable-col = `$variable/@col`;
-      $variable-idnr = `$variable/@idnr`;
-      $variable-spelling = `$variable/@spelling`;
-      $definiens = `$equation/*[2]`;
-      if [$definiens] {
-        $definiens-line = `$definiens/@line`;
-        $definiens-col = `$definiens/@col`;
-        $type = `$context/*[2]`;
-        $justification = `$context/*[3]`;
-        if [$justification] {
-          <Item-Bundle {
-            if [$bundlenr] { @bundlenr = $bundlenr; }
-            if [$articleid] { @articleid = $articleid; }
-            @promoted = "type-changing-statement";
-            @spelling = $variable-spelling;
-            <Text-Proper {
-              needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
-              <Item {
-                @kind = "Definition-Item";
-                @line = $line;
-                @col = $col;
-                <Block {
-                  @kind = "Definitional-Block";
-                  @line = $line;
-                  @col = $col;
-                  <Item {
-                    @kind = "Functor-Definition";
-                    <Operation-Functor-Pattern {
-                      @spelling = $variable-spelling;
-                      @idnr = $variable-idnr;
-                      <Loci;
-                      <Loci;
-                    }
-                    <Type-Specification {
-                      apply [$type];
-                    }
-                    <Equals;
-                    <Definiens {
-                      @line = $definiens-line;
-                      @col = $definiens-col;
-                      <Term-Expression;
-                      apply [$definiens];
-                    }
-                  }
-                  <Item {
-                    @kind = "Correctness";
-                    apply [$justification];
-                  }
-                }
-              }
-            }
-          }
-        } else {
-          die (#message = "We expected to find a justification of some kind for the type-changing statement that we're dealing with, but we found none");
-        }
-      } else {
-
-      }
-    } else {
-      die (#message = "We expected to find a Variable child of the Equality child of the current Type-Changing-Statement that we are handling, but we found none.");
-    }
-  } else {
-    die (#message = "We expect a Type-Changing-Statement item to have an Equality child, but we found one that lacks such a child.");
-  }
-}
-
-tpl [Simple-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Equality/Variable/@idnr]] {
-  <Infix-Term {
-    for-each [@*] { copy-of `.`; }
-    <Arguments;
-    <Arguments;
-  }
-}
-
-tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Type-Changing-Statement")]](#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition")]] (#bundlenr, #articleid) {
   <Item-Bundle {
 
     if [$bundlenr] { @bundlenr = $bundlenr; }
@@ -731,5 +648,88 @@ tpl [Item[@kind = "Cluster"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     apply [*];
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#bundlenr, #articleid) {
+  $context = `.`;
+  $line = `@line`;
+  $col = `@col`;
+  $equation = `Equality[1]`;
+  if [$equation] {
+    $variable = `$equation/Variable`;
+    if [$variable] {
+      $variable-line = `$variable/@line`;
+      $variable-col = `$variable/@col`;
+      $variable-idnr = `$variable/@idnr`;
+      $variable-spelling = `$variable/@spelling`;
+      $definiens = `$equation/*[2]`;
+      if [$definiens] {
+        $definiens-line = `$definiens/@line`;
+        $definiens-col = `$definiens/@col`;
+        $type = `$context/*[2]`;
+        $justification = `$context/*[3]`;
+        if [$justification] {
+          <Item-Bundle {
+            if [$bundlenr] { @bundlenr = $bundlenr; }
+            if [$articleid] { @articleid = $articleid; }
+            @promoted = "type-changing-statement";
+            @spelling = $variable-spelling;
+            <Text-Proper {
+              needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement)]`, #context = $context);
+              <Item {
+                @kind = "Definition-Item";
+                @line = $line;
+                @col = $col;
+                <Block {
+                  @kind = "Definitional-Block";
+                  @line = $line;
+                  @col = $col;
+                  <Item {
+                    @kind = "Functor-Definition";
+                    <Operation-Functor-Pattern {
+                      @spelling = $variable-spelling;
+                      @idnr = $variable-idnr;
+                      <Loci;
+                      <Loci;
+                    }
+                    <Type-Specification {
+                      apply [$type];
+                    }
+                    <Equals;
+                    <Definiens {
+                      @line = $definiens-line;
+                      @col = $definiens-col;
+                      <Term-Expression;
+                      apply [$definiens];
+                    }
+                  }
+                  <Item {
+                    @kind = "Correctness";
+                    apply [$justification];
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          die (#message = "We expected to find a justification of some kind for the type-changing statement that we're dealing with, but we found none");
+        }
+      } else {
+
+      }
+    } else {
+      die (#message = "We expected to find a Variable child of the Equality child of the current Type-Changing-Statement that we are handling, but we found none.");
+    }
+  } else {
+    die (#message = "We expect a Type-Changing-Statement item to have an Equality child, but we found one that lacks such a child.");
+  }
+}
+
+tpl [Simple-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Equality/Variable/@idnr]] {
+  <Infix-Term {
+    for-each [@*] { copy-of `.`; }
+    <Arguments;
+    <Arguments;
   }
 }
