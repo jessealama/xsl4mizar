@@ -481,36 +481,33 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
   }
 }
 
+//////////////////////////////////////////////////////////////////////
 // Resolving article-local references
+//////////////////////////////////////////////////////////////////////
 
-tpl [Scheme-Justification[@nr = "0"]] {
+// Resolving scheme references
+
+tpl [Scheme-Justification[@nr = "0" and not(@idnr)]] {
+  die (#message = "We found an article-local Scheme-Justification that lacks an idnr attribute!");
+}
+
+tpl [Scheme-Justification[@nr = "0" and not(@idnr = ancestor::Text-Proper/Item[parent::Text-Proper and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme/@idnr)]] {
+  die (#message = "Unable to resolve a reference to an article-local scheme because we are unable to find a previous scheme under the same name");
+}
+
+tpl [Scheme-Justification[@nr = "0" and @idnr = ancestor::Text-Proper/Item[parent::Text-Proper and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme/@idnr]] {
   $context = `.`;
-  if [@idnr and @spelling and @nr] {
-    $idnr = `@idnr`;
-    if [ancestor::Text-Proper/Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr = $idnr]] {
-      $item = `ancestor::Text-Proper/Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr = $idnr]/../../..`; // wow
-      if [$item] {
-        for-each [$item] {
-          $num-previous = count-preceding-toplevel-items ();
-          $position = `$num-previous + 1`;
-          $spelling = `concat ("CKB", $position)`;
-          <Scheme-Justification {
-            @spelling = $spelling;
-	    @idnr = "1";
-	    @nr = "1"; // might not be right
-            @promoted = "promoted";
-            apply [`$context/*`];
-          }
-        }
-      } else {
-        $message = `concat ("Something went wrong when finding the Item-Bundle that defines the article-local scheme ", @spelling)`;
-        die (#message = $message);
-      }
-    } else {
-      die (#message = "Unable to resolve a reference to an article-local scheme because we are unable to find a previous scheme under the same name");
-    }
-  } else {
-    die (#message = "We found a Scheme-Justification that lacks either an idnr, spelling, or nr attribute!");
+  $idnr = `@idnr`;
+  $item = `ancestor::Text-Proper/Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr = $idnr]/../../..`; // wow
+  $num-previous = count-preceding-toplevel-items ();
+  $position = `$num-previous + 1`;
+  $spelling = `concat ("CKB", $position)`;
+  <Scheme-Justification {
+    @spelling = $spelling;
+    @idnr = "1";
+    @nr = "1"; // might not be right
+    @promoted = "promoted";
+    apply [`$context/*`];
   }
 }
 
