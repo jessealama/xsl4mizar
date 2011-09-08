@@ -13,47 +13,27 @@ tpl count-preceding-toplevel-items {
 
 // Sanity checks
 
-tpl ensure-reservations-have-numbers {
-  for-each [//Item[@kind = "Reservation" and not(@toplevel-binder-number)]] {
-    die (#message = "This stylesheet assumes that all reservation items have a toplevel-binder-number attribute, but there is at least one reservation in this document that lacks this attribute.");
-  }
-  for-each [//Item[@kind = "Reservation" and not(@idnr)]] {
-    die (#message = "This stylesheet assumes that all reservation items have an idnr-number attribute, but there is at least one reservation in this document that lacks this attribute.");
-  }
+tpl [Item[@kind = "Reservation" and not(@toplevel-binder-number)]] {
+  die (#message = "This stylesheet assumes that all reservation items have a toplevel-binder-number attribute, but there is at least one reservation in this document that lacks this attribute.");
 }
 
-tpl ensure-toplevel-binders-have-unique-numbers {
-  for-each [//Item[@toplevel-binder-number]] {
-    $num = `@toplevel-binder-number`;
-    if [//Item[@toplevel-binder-number = $num][2]] {
-      $message = `concat ("This stylesheet assumes that each toplevel binder item has a toplevel-binder-number attribute shared by no other toplevel binder item, but this document has has at least two such items sharing the same toplevel-binder-number (", $num, ")")`;
-      die (#message = $message);
-    }
-  }
+tpl [Item[@kind = "Reservation" and not(@idnr)]] {
+  die (#message = "This stylesheet assumes that all reservation items have an idnr-number attribute, but there is at least one reservation in this document that lacks this attribute.");
 }
 
-tpl ensure-loci-declarations-bind-only-one-variable {
-  for-each [//Item[@kind = "Loci-Declaration"]] {
-    if [*/Variable[2]] {
-      die (#message = "This stylesheet assumes that all loci declarations bind exactly one variable, but there is at least one loci delcaration in this document that binds multiple variables.");
-    }
-  }
+// tpl [Item[@toplevel-binder-number = following::Item/@toplevel-binder-number]] {
+//   $num = `@toplevel-binder-number`;
+//   $message = `concat ("This stylesheet assumes that each toplevel binder item has a toplevel-binder-number attribute shared by no other toplevel binder item, but this document has has at least two such items sharing the same toplevel-binder-number (", $num, ")")`;
+//   die (#message = $message);
+// }
+
+
+tpl [Item[@kind = "Loci-Declaration"]/*/Variable[2]] {
+  die (#message = "This stylesheet assumes that all loci declarations bind exactly one variable, but there is at least one loci delcaration in this document that binds multiple variables.");
 }
 
-tpl ensure-loci-have-numbers {
-  for-each [//Item[@kind = "Loci-Declaration"]] {
-    if [not(@toplevel-binder-number)] {
-      die (#message = "This stylesheet assumes that all loci declarations items have a toplevel-binder-number attribute, but there is at least one loci declaration in this document that lacks this attribute.");
-    }
-  }
-}
-
-tpl [/] {
-  ensure-reservations-have-numbers ();
-  ensure-toplevel-binders-have-unique-numbers ();
-  ensure-loci-declarations-bind-only-one-variable ();
-  ensure-loci-have-numbers ();
-  apply [*];
+tpl [Item[@kind = "Loci-Declaration" and not(@toplevel-binder-number)]] {
+  die (#message = "This stylesheet assumes that all loci declarations items have a toplevel-binder-number attribute, but there is at least one loci declaration in this document that lacks this attribute.");
 }
 
 tpl [*] {
