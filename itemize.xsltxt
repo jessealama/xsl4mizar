@@ -67,21 +67,6 @@ tpl [Text-Proper] {
   }
 }
 
-tpl some-term-occurs-in-context (#terms, #context) {
-  if [$terms] {
-    $term = `$terms[1]`;
-    $term_idnr = `$term/@idnr`;
-    if [$context//@idnr = $term_idnr] {
-      "1";
-    } else {
-      some-term-occurs-in-context (#terms = `$terms[position() > 1]`,
-                                   #context = $context);
-    }
-  } else {
-    "0";
-  }
-}
-
 tpl index-of-item-with-minimal-number (#items) {
   if [$items] {
     if [$items[2]] {
