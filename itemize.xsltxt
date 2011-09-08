@@ -493,7 +493,9 @@ tpl [Scheme-Justification[@nr = "0" and @idnr = ancestor::Text-Proper/Item[paren
   }
 }
 
-// don't know how to resolve; just copy this thing
+// Non-scheme references
+
+// By default, we don't know how to resolve; just copy.
 tpl [Local-Reference] {
   copy-of `.`;
 }
