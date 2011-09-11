@@ -7,8 +7,6 @@ include tokens.xsl;
 include paths.xsl;
 include resolve-references.xsl;
 
-key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement)]] `@toplevel-binder-number`;
-
 tpl count-preceding-toplevel-items {
   `count (preceding::Item[parent::Text-Proper and not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition")])`;
 }
