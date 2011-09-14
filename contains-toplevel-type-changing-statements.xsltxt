@@ -1,0 +1,15 @@
+stylesheet 1.0;
+
+output method=text;
+
+// Detect whether there are any toplevel type-changing statements.  If
+// there are any, simply terminate the processor.  Otherwise, do
+// nothing.
+
+tpl [Text-Proper] {
+  apply [Item[@kind = "Type-Changing-Statement"]];
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
+  msg terminate="yes" "";
+}
