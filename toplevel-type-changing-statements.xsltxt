@@ -13,130 +13,80 @@ tpl [*] {
   }
 }
 
-tpl [*] (#arguments) mode="plug-placeholders" {
-  $element = `local-name ()`;
-  <$element {
-    for-each [@*] { copy-of `.`; }
-    apply [*] (#arguments = $arguments) mode="plug-placeholders";
-  }
-}
-
-tpl [*] mode="rewrite-placeholder-terms" {
-  $element = `local-name ()`;
-  <$element {
-    for-each [@*] { copy-of `.`; }
-    apply [*] mode="rewrite-placeholder-terms";
-  }
-}
-
-tpl [Placeholder-Term] (#arguments) mode="plug-placeholders" {
-  if [not(@nr)] {
-    die (#message = "We found a placeholder term that lacks an nr attribute!");
-  }
-  $nr = `@nr`;
-  $num-arguments = `count ($arguments)`;
-  if [$num-arguments < $nr] {
-    $message = `concat ("We are asked to plug in an expression for position #", $nr, ", but we have only ", $num-arguments, " available")`;
-    die (#message = $message);
-  }
-  $argument = `$arguments[position() = $nr]`;
-  if [$argument] {
-    apply [$argument];
-  } else {
-    $message = `concat ("We somehow failed to access argument number ", $nr, " from our list of ", $num-arguments, " arguments")`;
-    die (#message = $message);
-  }
-}
-
-tpl [Placeholder-Term[not(@nr)]] mode="rewrite-placeholder-terms" {
-  die (#message = "We found a placeholder term that lacks an nr attribute!");
-}
-
-tpl [Placeholder-Term[@nr]] mode="rewrite-placeholder-terms" {
-  $nr = `@nr`;
-  <Simple-Term {
-    @idnr = "0";
-    $stub-variable-spelling = `concat ("x", $nr)`;
-    @spelling = $stub-variable-spelling;
-  }
-}
-
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
   // do nothing when we encounter these in the default processing
   // mode.
 }
 
-tpl [*] (#arguments) mode="plug-placeholders" {
-  $element = `local-name ()`;
-  <$element {
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
+  die (#message = "We expect a Type-Changing-Statement item to have an Equality child, but we found one that lacks such a child.");
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Equality[not(child::Variable)]]] {
+  die (#message = "We expected to find a Variable child of the Equality child of the current Type-Changing-Statement that we are handling, but we found none.");
+}
+
+tpl [Simple-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Equality/Variable/@idnr]] {
+  <Infix-Term {
     for-each [@*] { copy-of `.`; }
-    apply [*] (#arguments = $arguments) mode="plug-placeholders";
+    <Arguments;
+    <Arguments;
   }
 }
 
-tpl [Placeholder-Term[not(@nr)]] mode="plug-placeholders" {
-  die (#message = "We found a placeholder term that lacks an nr attribute!");
+// Toplevel theorems (exported or unexported) are checked for whether
+// they contain any terms that were introduced by a toplevel
+// type-changing statement.  Any such terms are universally
+// generalized, with a relativization to the equation introduced by
+// type-changing statements.  For example, if we see a toplevel
+// type-changing statement
+//
+// reconsider z = 1 as Element of NAT
+//
+// before, say,
+//
+// theorem z is odd;
+//
+// then we rewrite the theorem as:
+//
+// theorem for z being Element of NAT st z = 1 holds z is odd;
+tpl [Proposition[parent::Item[parent::Text-Proper and @kind = "Regular-Statement" or @kind = "Theorem-Item"]]] {
+
 }
 
-tpl [Placeholder-Term[@nr]] (#arguments) mode="plug-placeholders" {
-  $nr = `@nr`;
-  $num-arguments = `count ($arguments)`;
-  if [$num-arguments < $nr] {
-    $message = `concat ("We are asked to plug in an expression for position #", $nr, ", but we have only ", $num-arguments, " available")`;
-    die (#message = $message);
-  }
-  $argument = `$arguments[position() = $nr]`;
-  if [$argument] {
-    apply [$argument];
-  } else {
-    $message = `concat ("We somehow failed to access argument number ", $nr, " from our list of ", $num-arguments, " arguments")`;
-    die (#message = $message);
-  }
+tpl [Block[parent::Item[@kind = "Correctness-Condition"]]] {
+
 }
 
-tpl [Item[@kind = "Correctness-Condition" or @kind = "Correctness" or @kind = "Theorem-Item" or (@kind = "Regular-Statement" and parent::Text-Proper)]/Block[(@kind = "Proof" or @kind = "Now-Reasoning") and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Variable/@idnr]]] {
-  $context = `.`;
-  <Block {
-    for-each [@*] { copy-of `.`; }
-    for-each [preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper and child::Variable and Variable/@idnr]] {
-      $toplevel-type-changing-statement = `.`;
-      $idnr = `Variable/@idnr`;
-      if [$context//Private-Functor-Term[@idnr = $idnr]] {
-        copy-of `$toplevel-type-changing-statement`;
-      }
-    }
-    apply [*];
-  }
-}
-
-tpl [*] (#arguments) mode="substitute-private-functor-terms" {
-  $element = `local-name ()`;
-  <$element {
-    for-each [@*] { copy-of `.`; }
-    apply [*] (#arguments = $arguments) mode="substitute-private-functor-terms";
-  }
-}
-
-tpl [Private-Functor-Term[not(@idnr)]] mode="substitute-private-functor-terms" {
-  die (#message = "We expected to find a value for the nr attribute of a Private-Functor-Term, but we found one that lacks an nr attribute");
-}
-
-tpl [Private-Functor-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Variable/@idnr]] mode="substitute-private-functor-terms" {
-  $idnr = `@idnr`;
-  $arguments = `*`;
-  $type-changing-statement = `(preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Variable[@idnr = $idnr]/..)[1]`;
-  $definiens = `$type-changing-statement/*[position() = last()]`;
-  if [not($definiens)] {
-    die (#message = "We can't find a definiens");
-  }
-  apply [$definiens] (#arguments = $arguments) mode="plug-placeholders";
-}
-
-// The case of an unexported lemma whose statement (Proposition) uses
-// a private functor term that was defined earlier on the toplevel.
-// We deal with this case by substituting the definiens of the private
-// functor definition directly into the statement
-tpl [Proposition[parent::Item[@kind = "Regular-Statement" and parent::Text-Proper] and descendant::Private-Functor-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper]/Variable/@idnr]]] {
-  $arguments = `*`;
-  apply [.] (#arguments = $arguments) mode="substitute-private-functor-terms";
-}
+// * Sometimes type-changing statements don't have an equality: from
+// COLLSP:
+//
+// reconsider Z as non empty set;
+//
+// * It would appear that some toplevel type changing statements can't
+// be eliminated.  An especially problematic case from COLLSP:
+//
+// reconsider RR = {[1,1,1]} as Relation3 of Z by Def1,Lm2;
+// reconsider CLS = CollStr (# Z, RR #) as non empty CollStr;
+//
+// Lm3: now
+//   let a,b,c,p,q,r be Point of CLS;
+//   ...
+// end;
+// ...
+// ::> 50: Nongeneralizable variable in the skeleton of a reasoning
+//
+// One can't just shift those two toplevel type-changing statements
+// into the top of the diffuse reasoning block:
+//
+//
+// Lm3: now
+//   reconsider RR = {[1,1,1]} as Relation3 of Z by Def1,Lm2;
+//   reconsider CLS = CollStr (# Z, RR #) as non empty CollStr;
+//   let a,b,c,p,q,r be Point of CLS;
+// ::>                      *50
+//   ...
+// end;
+//
+// where the explanation of error 50 is: "Nongeneralizable variable in
+// the skeleton of a reasoning".
