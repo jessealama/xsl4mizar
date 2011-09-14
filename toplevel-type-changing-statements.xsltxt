@@ -33,3 +33,60 @@ tpl [Simple-Term[@idnr = preceding::Item[@kind = "Type-Changing-Statement" and p
     <Arguments;
   }
 }
+
+// Toplevel theorems (exported or unexported) are checked for whether
+// they contain any terms that were introduced by a toplevel
+// type-changing statement.  Any such terms are universally
+// generalized, with a relativization to the equation introduced by
+// type-changing statements.  For example, if we see a toplevel
+// type-changing statement
+//
+// reconsider z = 1 as Element of NAT
+//
+// before, say,
+//
+// theorem z is odd;
+//
+// then we rewrite the theorem as:
+//
+// theorem for z being Element of NAT st z = 1 holds z is odd;
+tpl [Proposition[parent::Item[parent::Text-Proper and @kind = "Regular-Statement" or @kind = "Theorem-Item"]]] {
+
+}
+
+tpl [Block[parent::Item[@kind = "Correctness-Condition"]]] {
+
+}
+
+// * Sometimes type-changing statements don't have an equality: from
+// COLLSP:
+//
+// reconsider Z as non empty set;
+//
+// * It would appear that some toplevel type changing statements can't
+// be eliminated.  An especially problematic case from COLLSP:
+//
+// reconsider RR = {[1,1,1]} as Relation3 of Z by Def1,Lm2;
+// reconsider CLS = CollStr (# Z, RR #) as non empty CollStr;
+//
+// Lm3: now
+//   let a,b,c,p,q,r be Point of CLS;
+//   ...
+// end;
+// ...
+// ::> 50: Nongeneralizable variable in the skeleton of a reasoning
+//
+// One can't just shift those two toplevel type-changing statements
+// into the top of the diffuse reasoning block:
+//
+//
+// Lm3: now
+//   reconsider RR = {[1,1,1]} as Relation3 of Z by Def1,Lm2;
+//   reconsider CLS = CollStr (# Z, RR #) as non empty CollStr;
+//   let a,b,c,p,q,r be Point of CLS;
+// ::>                      *50
+//   ...
+// end;
+//
+// where the explanation of error 50 is: "Nongeneralizable variable in
+// the skeleton of a reasoning".
