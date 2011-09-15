@@ -221,7 +221,7 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #variable, 
     die (#message = "We require that Variable elements have an idnr attribute, but we found one that lacks this attribute");
   }
   $variable-idnr = `$variable/@idnr`;
-  $next-type-changing-statement = `following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula]`;
+  $next-type-changing-statement = `following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula][1]`;
   choose {
     // Later type-changing statements might clobber the variable introduced here.
     when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable/@idnr = $variable-idnr and following::* = $formula] {
