@@ -293,9 +293,14 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Variable and 
 tpl [Proposition[parent::Item[parent::Text-Proper and @kind = "Regular-Statement"]]] {
   <Proposition {
     copy-attributes ();
-    apply [Label];
     $formula = `*[position() = last()]`;
-    apply [preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"][position() = last()]] (#formula = $formula) mode="maybe-generalize";
+    if [preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"][position() = last()]] {
+      apply [Label];
+      apply [preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"][position() = last()]] (#formula = $formula) mode="maybe-generalize";
+    } else {
+      // Nothing to do: this proposition doesn't follow a toplevel type-changing statement
+      apply [*];
+    }
   }
 }
 
