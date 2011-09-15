@@ -115,20 +115,14 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #proof, #va
       if [$next-type-changing-statement] {
         apply [$next-type-changing-statement] (#formula = $formula, #proof = $proof) mode="maybe-instantiate";
       } else {
-        <Block {
-          for-each [$proof/@*] { copy-of `.`; }
-          apply [$proof/*];
-        }
+        apply [$proof/*];
       }
     }
     otherwise {
       if [$next-type-changing-statement] {
         apply [$next-type-changing-statement] (#formula = $formula, #proof = $proof) mode="maybe-instantiate"; // move along
       } else {
-        <Block {
-          for-each [$proof/@*] { copy-of `.`; }
-          apply [$proof/*];
-        }
+        apply [$proof/*];
       }
     }
   }
