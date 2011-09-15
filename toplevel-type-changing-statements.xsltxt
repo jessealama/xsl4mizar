@@ -288,7 +288,7 @@ tpl [Proposition[parent::Item[parent::Text-Proper and @kind = "Regular-Statement
   <Proposition {
     copy-attributes ();
     $formula = `*[position() = last()]`;
-    if [preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"][position() = last()]] {
+    if [preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]] {
       apply [Label];
       apply [preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"][position() = last()]] (#formula = $formula) mode="maybe-generalize";
     } else {
