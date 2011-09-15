@@ -256,12 +256,11 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #variable, 
         }
       }
     }
+    when [$next-type-changing-statement] {
+      apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-generalize"; // move along
+    }
     otherwise {
-      if [$next-type-changing-statement] {
-        apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-generalize"; // move along
-      } else {
-        apply [$formula];
-      }
+      apply [$formula];
     }
   }
 }
