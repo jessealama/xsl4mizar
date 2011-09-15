@@ -13,16 +13,6 @@ tpl [*] {
   }
 }
 
-// Yuck: this is the same as the default template.  Unpleasant
-// violation of DRY...
-tpl [*] mode="copy" {
-  $element = `local-name ()`;
-  <$element {
-    for-each [@*] { copy-of `.`; }
-    apply [*] mode="copy";
-  }
-}
-
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
   // do nothing when we encounter these in the default processing
   // mode.
