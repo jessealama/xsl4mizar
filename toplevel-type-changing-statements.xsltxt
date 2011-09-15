@@ -359,8 +359,23 @@ tpl [Block[@kind = "Proof" and parent::Item[parent::Text-Proper and @kind = "Reg
   }
 }
 
-// Eventually we'll need to deal with these...
-//
-// tpl [Block[parent::Item[@kind = "Correctness-Condition"]]] {
-
-// }
+// This humongous pattern matches straightforward justification
+// elements appearing in proofs of toplevel unexported theorems whose
+// proposition uses a term introduced by a toplevel type-changing
+// statement.  We need to append to such Straightforward-Justification
+// elements local references to the labels we introduced earlier.
+tpl [Straightforward-Justification[ancestor::Block[@kind = "Proof" and parent::Item[parent::Text-Proper and @kind = "Regular-Statement"] and preceding-sibling::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]]]] {
+  // $line = `@line`;
+  // $col = `@col`;
+  // $message = `concat ("we're in (line ", $line, ", column ", $col)`;
+  // msg $message;
+  <Straightforward-Justification {
+    copy-attributes ();
+    for-each [*] { apply [.]; }
+    for-each [ancestor::Block[@kind = "Proof" and parent::Item[parent::Text-Proper and @kind = "Regular-Statement"]]] {
+      for-each [preceding-sibling::Proposition] {
+        apply [preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"][position() = last()]] (#formula = `*[position() = last()]`) mode="maybe-emit-local-reference";
+      }
+    }
+  }
+}
