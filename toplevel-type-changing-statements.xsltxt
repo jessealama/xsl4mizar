@@ -56,7 +56,8 @@ tpl new-label {
   new-spelling-based-on (#base = "InducedLemma", #try = "1");
 }
 
-key "idnrs" [//*] `@idnr`;
+key "idnr" [//*] `@idnr`;
+key "spelling" [//*] `@spelling`;
 
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #proof, #variable, #definiens) mode="maybe-instantiate-with-variable" {
   if [not($variable/@idnr)] {
