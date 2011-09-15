@@ -62,10 +62,10 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #proof, #va
   $next-type-changing-statement = `following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula][1]`;
   choose {
     // Later type-changing statements might clobber the variable introduced here.
-    when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable/@idnr = $variable-idnr and following::* = $formula] {
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula]/Equality/Variable/@idnr = $variable-idnr] {
       apply [$next-type-changing-statement] (#formula = $formula, #proof = $proof) mode="maybe-instantiate"; // move along
     }
-    when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Variable/@idnr = $variable-idnr and following::* = $formula] {
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula]/Variable/@idnr = $variable-idnr] {
       apply [$next-type-changing-statement] (#formula = $formula, #proof = $proof) mode="maybe-instantiate"; // move along
     }
     when [$formula//Simple-Term[@idnr = $variable-idnr]] {
@@ -162,10 +162,10 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #variable) 
   $next-type-changing-statement = `following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula][1]`;
   choose {
     // Later type-changing statements might clobber the variable introduced here.
-    when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable/@idnr = $variable-idnr and following::* = $formula] {
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula]/Equality/Variable/@idnr = $variable-idnr] {
       apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-emit-local-reference"; // move along
     }
-    when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Variable/@idnr = $variable-idnr and following::* = $formula] {
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula]/Variable/@idnr = $variable-idnr] {
       apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-emit-local-reference"; // move along
     }
     when [$formula//Simple-Term[@idnr = $variable-idnr]] {
@@ -219,10 +219,10 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #variable, 
   $next-type-changing-statement = `following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula][1]`;
   choose {
     // Later type-changing statements might clobber the variable introduced here.
-    when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable/@idnr = $variable-idnr and following::* = $formula] {
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula]/Equality/Variable/@idnr = $variable-idnr] {
       apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-generalize"; // move along
     }
-    when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Variable/@idnr = $variable-idnr and following::* = $formula] {
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula]/Variable/@idnr = $variable-idnr] {
       apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-generalize"; // move along
     }
     when [$formula//Simple-Term[@idnr = $variable-idnr]] {
