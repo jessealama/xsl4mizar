@@ -44,6 +44,30 @@ tpl [*] (#formula) mode="maybe-generalize" {
 
 // Rewriting a proof of a toplevel unexported theorem according to the terms appearing in it coming from toplevel type-changing statement
 
+tpl new-spelling-based-on (#base, #try) {
+  $candidate = `concat ($base, $try)`;
+  if [key ("spelling", $candidate)] {
+    new-spelling-based-on (#base = $base,
+                           #try = `$try + 1`);
+  } else {
+    $candidate;
+  }
+}
+
+tpl fresh-idnr (#start) {
+  if [key ("idnr", $start)] {
+    fresh-idnr (#start = `$start + 1`);
+  } else {
+    $start;
+  }
+}
+
+tpl new-label {
+  new-spelling-based-on (#base = "InducedLemma", #try = "1");
+}
+
+key "idnrs" [//*] `@idnr`;
+
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #proof, #variable, #definiens) mode="maybe-instantiate-with-variable" {
   if [not($variable/@idnr)] {
     die (#message = "We require that Variable elements have an idnr attribute, but we found one that lacks this attribute");
@@ -72,9 +96,16 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #proof, #va
         @kind = "Assumption";
         <Collective-Assumption {
           <Proposition {
+            $num-previous = `count (preceding-sibling::*)`;
+            $plus-one = `$num-previous + 1`;
+            $base = `concat ("InducedLabel", $plus-one)`;
+            $new-label-spelling = new-spelling-based-on (#base = $base, #try = "1");
+            $num-preceding-idnrs = `count (preceding::*[@idnr])`;
+            $offset = `$num-preceding-idnrs + $num-previous`;
+            $idnr = fresh-idnr (#start = $offset);
             <Label {
-              @idnr = "0";
-              @spelling = "FOO";
+              @idnr = $idnr;
+              @spelling = $new-label-spelling;
             }
             <Predicative-Formula {
               @spelling = "=";
