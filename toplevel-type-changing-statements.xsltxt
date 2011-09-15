@@ -157,6 +157,63 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Variable and 
    mode="maybe-instantiate-with-variable";
 }
 
+// Emitting local references
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #variable) mode="maybe-emit-local-reference-with-variable" {
+  if [not($variable/@idnr)] {
+    die (#message = "We require that Variable elements have an idnr attribute, but we found one that lacks this attribute");
+  }
+  $variable-idnr = `$variable/@idnr`;
+  $next-type-changing-statement = `following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $formula][1]`;
+  choose {
+    // Later type-changing statements might clobber the variable introduced here.
+    when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable/@idnr = $variable-idnr and following::* = $formula] {
+      apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-emit-local-reference"; // move along
+    }
+    when [following-sibling::Item[@kind = "Type-Changing-Statement"]/Variable/@idnr = $variable-idnr and following::* = $formula] {
+      apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-emit-local-reference"; // move along
+    }
+    when [$formula//Simple-Term[@idnr = $variable-idnr]] {
+      $variable-spelling = `$variable/@spelling`;
+      $type = `*[position() = last() - 1]`;
+      $num-previous = `count (preceding-sibling::*)`;
+      $plus-one = `$num-previous + 1`;
+      $base = `concat ("InducedLabel", $plus-one)`;
+      $new-label-spelling = new-spelling-based-on (#base = $base, #try = "1");
+      $num-preceding-idnrs = `count (preceding::*[@idnr])`;
+      $offset = `$num-preceding-idnrs + $num-previous`;
+      $idnr = fresh-idnr (#start = $offset);
+      <Local-Reference {
+        @idnr = $idnr;
+        @spelling = $new-label-spelling;
+      }
+      if [$next-type-changing-statement] {
+        apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-emit-local-reference";
+      }
+    }
+    when [$next-type-changing-statement] {
+      apply [$next-type-changing-statement] (#formula = $formula) mode="maybe-emit-local-reference"; // move along
+    }
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and not(child::Variable) and child::Equality[child::Variable]]] (#formula) mode="maybe-emit-local-reference" {
+  apply [.] (#formula = $formula,
+             #variable = `Equality/Variable`)
+    mode="maybe-emit-local-reference-with-variable";
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Variable and not(child::Equality[child::Variable])]] (#formula) mode="maybe-emit-local-reference" {
+  $variable = `Variable`;
+  $variable-idnr = `$variable/@idnr`;
+  if [not(preceding-sibling::Item[@kind = "Constant-Definition"]/Variable[@idnr = $variable-idnr])] {
+    die (#message = "Unable to infer the definiens for a variable introduced by a type-changing statement that does not have the form of an equation");
+  }
+  apply [.] (#formula = $formula,
+             #variable = `Variable`)
+   mode="maybe-emit-local-reference-with-variable";
+}
+
 // Rewriting a formula by generalizing it according to the terms appearing it coming from toplevel type-changing statements
 
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #variable, #definiens) mode="maybe-generalize-with-variable" {
