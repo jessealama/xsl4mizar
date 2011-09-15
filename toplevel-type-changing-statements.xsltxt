@@ -13,11 +13,6 @@ tpl [*] {
   }
 }
 
-tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
-  // do nothing when we encounter these in the default processing
-  // mode.
-}
-
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Equality[not(child::Variable)]]] {
   die (#message = "We expected to find a Variable child of the Equality child of the current Type-Changing-Statement that we are handling, but we found none.");
 }
