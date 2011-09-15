@@ -347,7 +347,9 @@ tpl [Proposition[parent::Item[parent::Text-Proper and @kind = "Regular-Statement
 // in the proof.
 
 
-// This humongous pattern matches proofs of toplevel unexported theorems whose proposition uses a term introduced by a toplevel type-changing statement
+// This humongous pattern matches proofs of toplevel unexported
+// theorems whose proposition uses a term introduced by a toplevel
+// type-changing statement
 tpl [Block[@kind = "Proof" and parent::Item[parent::Text-Proper and @kind = "Regular-Statement"] and preceding-sibling::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]]] {
   <Block {
     copy-attributes ();
