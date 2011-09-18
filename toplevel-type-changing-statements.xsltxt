@@ -54,6 +54,67 @@ tpl new-label {
 key "idnr" [//*] `@idnr`;
 key "spelling" [//*] `@spelling`;
 
+//////////////////////////////////////////////////////////////////////
+// Existence of paths from toplevel type-changing statements
+//////////////////////////////////////////////////////////////////////
+
+tpl needed-later (#candidates, #item) {
+
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#item, #variable) mode="exists-path-with-variable" {
+  if [not($variable/@idnr)] {
+    die (#message = "We require that Variable elements have an idnr attribute, but we found one that lacks this attribute");
+  }
+  $variable-idnr = `$variable/@idnr`;
+  $next-type-changing-statement = `following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $item][1]`;
+  choose {
+    // Later type-changing statements and constant definitions might clobber the variable introduced here.
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $item]/Equality/Variable/@idnr = $variable-idnr] {
+      "0";
+    }
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $item]/Variable/@idnr = $variable-idnr] {
+      "0";
+    }
+    when [following-sibling::Item[@kind = "Constant-Definition" and following::* = $item]/Variable/@idnr = $variable-idnr] {
+      "0";
+    }
+    // The base case: the variable introduced here directly in the
+    // item.
+    when [$item//Simple-Term[@idnr = $variable-idnr]] {
+      "1";
+    }
+    // The recursive cases: $variable occurs in some later
+    // type-changing statement that is needed
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $item]/Equality/*[position() = last()]//Simple-Term[@idnr = $variable-idnr]] {
+      ...
+    }
+    when [following-sibling::Item[@kind = "Type-Changing-Statement" and following::* = $item]/*[position() = last()]//Simple-Term[@idnr = $variable-idnr]] {
+      "1";
+    }
+    otherwise {
+      "0";
+    }
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and not(child::Variable) and child::Equality[child::Variable]]] (#formula) mode="exists-path" {
+  apply [.] (#formula = $formula,
+             #variable = `Equality/Variable`) mode="exists-path";
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Variable and not(child::Equality[child::Variable])]] (#formula) mode="exists-path" {
+  $variable = `Variable`;
+  $variable-idnr = `$variable/@idnr`;
+  apply [.] (#formula = $formula,
+             #variable = `Variable`) mode="exists-path";
+}
+
+//////////////////////////////////////////////////////////////////////
+// Instantiating variables in a proof that were universally
+// generalized in a toplevel unexported theorem
+//////////////////////////////////////////////////////////////////////
+
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] (#formula, #proof, #variable, #definiens) mode="maybe-instantiate-with-variable" {
   if [not($variable/@idnr)] {
     die (#message = "We require that Variable elements have an idnr attribute, but we found one that lacks this attribute");
