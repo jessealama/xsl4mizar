@@ -74,7 +74,7 @@ tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     choose {
-      when [Regular-Statement and Proposition/Label] {
+      when [Proposition/Label] {
         @idnr = `Proposition/Label[1]/@idnr`;
       }
       when [Diffuse-Statement and Label] {
