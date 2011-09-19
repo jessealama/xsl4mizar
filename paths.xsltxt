@@ -54,63 +54,6 @@ tpl exists-path-from-some-toplevel-item-to-context (#items, #context, #later-ite
   }
 }
 
-// Is the reservation-number attribute of $reservation bigger than the
-// reservation-number attribute of every reservation in $reservations?
-tpl item-follows-every-item (#item-number, #items) {
-  if [$items = ""] {
-    "1";
-  } else {
-    $potential-spoiler-token = first-token (#token-string = $items);
-    $potential-spoiler-number = value-of-token (#token = $potential-spoiler-token);
-    if [$potential-spoiler-number < $item-number] {
-      $items-tail = token-string-tail (#token-string = $items);
-      item-follows-every-item (#item-number = $item-number,
-                               #items = $items-tail);
-    } else {
-      "0";
-    }
-  }
-}
-
-// See the documentation for items-following-every
-tpl items-following-every-helper (#items, #all-items, #val) {
-  if [$all-items = ""] {
-    $val;
-  } else {
-    if [$items = ""] {
-      $all-items;
-    } else {
-      $item-token = first-token (#token-string = $all-items);
-      $item = value-of-token (#token = $item-token);
-      $items-tail = token-string-tail (#token-string = $all-items);
-      $bigger = item-follows-every-item (#item-number = $item,
-                                         #items = $items);
-      if [$bigger = "0"] {
-        items-following-every-helper (#items = $items,
-                                      #all-items = $items-tail);
-      } else {
-        $new-value = append-token-strings (#token-string-a = $val,
-                                           #token-string-b = $item-token);
-        items-following-every-helper (#items = $items,
-                                      #all-items = $items-tail,
-                                      #val = $new-value);
-      }
-    }
-  }
-}
-
-// Return the subset of $all-items (given as a token string consisting
-// of the values of the toplevel-binder-number attribute) consisting
-// of those items whose toplevel-binder-number attribute is greater
-// than that of every item in $items.  The value is again a token
-// string.
-tpl items-following-every (#items, #all-items) {
-  items-following-every-helper (#items = $items,
-                                #all-items = $all-items,
-                                #val = "");
-}
-
-
 tpl toplevel-items-in-which-item-occurs (#idnr, #items, #val) {
   if [$items = ""] {
     $val;
