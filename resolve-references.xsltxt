@@ -42,10 +42,12 @@ tpl [Local-Reference] {
   copy-of `.`;
 }
 
-// look for a previous unexported toplevel theorem (lemma)
-tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]/Proposition/Label/@idnr]] {
+// (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])
+
+// look for a previous unexported-but-exportable toplevel theorem (lemma)
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Regular-Statement" and not(child::Diffuse-Statement) and not(child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])]/Proposition/Label/@idnr]] {
   $idnr = `@idnr`;
-  for-each [(preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]/Proposition/Label[@idnr = $idnr]/../..)[position() = last()]] {
+  for-each [preceding::Item[parent::Text-Proper and @kind = "Regular-Statement" and not(child::Diffuse-Statement) and not(child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])]/Proposition/Label[@idnr = $idnr]] {
     $num-previous = count-preceding-toplevel-items ();
     $position = `$num-previous + 1`;
     $new_spelling = `concat ("CKB", $position)`;
@@ -75,7 +77,7 @@ tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Th
 // look for a previous non-mode definition
 tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition" or @kind = "Structure-Definition"]/Definiens/Label/@idnr]] {
   $idnr = `@idnr`;
-  for-each [(preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition"]/Definiens/Label[@idnr = $idnr]/../../../..)[position() = last()]] {
+  for-each [preceding::Item[parent::Text-Proper and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition" or @kind = "Structure-Definition"]/Definiens/Label[@idnr = $idnr]] {
     $num-previous = count-preceding-toplevel-items ();
     $position = `$num-previous + 1`;
     $new_spelling = `concat ("CKB", $position)`;
