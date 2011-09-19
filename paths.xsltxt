@@ -78,11 +78,6 @@ tpl toplevel-items-in-which-item-occurs (#idnr, #items, #val) {
                                                #items = $remaining-items,
                                                #val = $new-val);
         }
-        when [$first-toplevel-item//Simple-Term[@idnr = $idnr]] {
-          toplevel-items-in-which-item-occurs (#idnr = $idnr,
-                                               #items = $remaining-items,
-                                               #val = $new-val);
-        }
         otherwise {
           // go hunting for the appearance of $idnr as an argument of a dependent type
           if [$first-toplevel-item//Implicitly-Qualified-Segment] {
@@ -122,12 +117,19 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
       $first-toplevel-item-number-token = first-token (#token-string = $items);
       $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
       $first-item = `key ("binder", $first-toplevel-item-number)`;
-      if [$first-item/@idnr = $idnr] {
-        "1";
-      } else {
-        $remaining-items = token-string-tail (#token-string = $items);
-        item-bound-by-some-toplevel-item (#item = $item,
-                                          #items = $remaining-items);
+      $remaining-items = token-string-tail (#token-string = $items);
+      for-each [$first-item] {
+        if [self::Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
+          item-bound-by-some-toplevel-item (#item = $item,
+                                            #items = $remaining-items);
+        } else {
+          if [@idnr = $idnr] {
+            "1";
+          } else {
+            item-bound-by-some-toplevel-item (#item = $item,
+                                              #items = $remaining-items);
+          }
+        }
       }
     }
   } else {
