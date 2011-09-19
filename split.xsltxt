@@ -41,7 +41,8 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
   }
   <Item {
     for-each [@*] { copy-of `.`; }
-    @toplevel-binder-number = count-preceding-eliminable-toplevel-items ();
+    $num-previous = count-preceding-eliminable-toplevel-items ();
+    @toplevel-binder-number = `$num-previous + 1`;
     @idnr = `Variable[1]/@idnr`;
     apply [*];
   }
