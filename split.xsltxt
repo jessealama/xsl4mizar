@@ -109,7 +109,7 @@ tpl [Item[@kind = "Loci-Declaration"]] {
     for-each [Variable] {
       <Item {
         for-each [$loci/@*] { copy-of `.`; }
-        $num_preceding = `count (preceding::Item[@kind = "Loci-Declaration"] | preceding::Item[@kind = "Reservation"] | preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Choice-Statement" and parent::Text-Proper] | preceding::Item[@kind = "Constant-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper] | preceding::Item[@kind = "Private-Predicate-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Regular-Statement" and child::Diffuse-Statement and parent::Text-Proper])`;
+        $num_preceding = count-preceding-eliminable-toplevel-items ();
         @toplevel-binder-number = `$num_preceding + 1`;
         @idnr = `@idnr`;
         <$segment_element_name {
