@@ -106,23 +106,21 @@ tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
         @idnr = "";
       }
     }
-    if [Diffuse-Statement] {
-      $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-      @toplevel-binder-number = `$num-previous-toplevel + 1`;
-    }
-    apply [*];
-  }
-}
-
-tpl [Item[@kind = "Constant-Definition"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    @idnr = `Variable[1]/@idnr`;
     $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
     @toplevel-binder-number = `$num-previous-toplevel + 1`;
     apply [*];
   }
 }
+
+// tpl [Item[@kind = "Constant-Definition"]] {
+//   <Item {
+//     for-each [@*] { copy-of `.`; }
+//     @idnr = `Variable[1]/@idnr`;
+//     $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
+//     @toplevel-binder-number = `$num-previous-toplevel + 1`;
+//     apply [*];
+//   }
+// }
 
 tpl [Item[@kind = "Loci-Declaration"]] {
   $loci = `.`;
