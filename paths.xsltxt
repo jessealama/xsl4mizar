@@ -170,7 +170,7 @@ tpl items-using-toplevel-diffuse-reasoning-item-helper (#diffuse-reasoning-item,
 // $diffuse-reasoning-item, return the sub-token list of $items that
 // use $diffuse-reasoning-item in their justification
 tpl items-using-toplevel-diffuse-reasoning-item (#diffuse-reasoning-item, #items) {
-  if [$diffuse-reasoning-item/Label] {
+  if [$diffuse-reasoning-item/Proposition/Label] {
     if [$diffuse-reasoning-item/@idnr] {
       items-using-toplevel-diffuse-reasoning-item-helper (#diffuse-reasoning-item = $diffuse-reasoning-item,
                                                           #items = $items,
