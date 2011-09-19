@@ -8,7 +8,7 @@ include paths.xsl;
 include resolve-references.xsl;
 
 tpl count-preceding-toplevel-items {
-  `count (preceding::Item[parent::Text-Proper and not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition")])`;
+  `count (preceding::Item[parent::Text-Proper and (@kind = "Theorem-Item" or @kind = "Definition-Item" or @kind = "Scheme-Block-Item" or (@kind = "Regular-Statement" and not(child::Diffuse-Statement) and not(child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])))])`;
 }
 
 // Sanity checks
