@@ -191,6 +191,44 @@ tpl items-using-toplevel-diffuse-reasoning-item (#diffuse-reasoning-item, #items
   }
 }
 
+// Given $item, of positive natural number, and a token list #items of
+// positive natural numbers, select the sub-token list of $items whose
+// token are strictly larger than $item
+
+tpl items-following-item (#item, #items) {
+  if [not($item/@toplevel-binder-number)] {
+    for-each [$item] {
+      die (#message = "To determine the items following the current item, we need to know the value of its toplevel-binder-number attribute, but this attribute is missing");
+    }
+  }
+  $item-number = `$item/@toplevel-binder-number`;
+  items-following-item-helper (#item = $item-number,
+                               #items = $items,
+                               #val = "");
+}
+
+tpl items-following-item-helper (#item, #items, #val) {
+  $empty = token-string-is-empty (#token-string = $items);
+  if [$empty = "1"] {
+    $val;
+  } else {
+    $first-item = first-item (#token-string = $items);
+    $tail = token-string-tail (#token-string = $items);
+    $new-val = cons-token-string-at-end (#item = $first-item,
+                                         #token-string = $val);
+
+    if [$first-item > $item] {
+      items-following-item-helper (#item = $item,
+                                   #items = $tail,
+                                   #val = $new-val);
+    } else {
+      items-following-item-helper (#item = $item,
+                                   #items = $tail,
+                                   #val = $val);
+    }
+  }
+}
+
 tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-items) {
   $idnr = `$item/@idnr`;
   $kind = `$item/@kind`;
