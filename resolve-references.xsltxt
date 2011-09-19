@@ -91,6 +91,7 @@ tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "De
 
 // look for a previous mode definition
 tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label/@idnr]] {
+  $idnr = `@idnr`;
   for-each [(preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]/../../../../..)[position() = last()]] {
     $num-previous = count-preceding-toplevel-items ();
     $position = `$num-previous + 1`;
