@@ -134,3 +134,13 @@ tpl token-string-difference (#token-string, #to-remove) {
     }
   }
 }
+
+tpl cons-token-string (#item, #token-string) {
+  append-token-strings (#token-string-a = `concat (",", $item, ",")`,
+                        #token-string-b = $token-string);
+}
+
+tpl cons-token-string-at-end (#item, #token-string) {
+  append-token-strings (#token-string-b = `concat (",", $item, ",")`,
+                        #token-string-a = $token-string);
+}
