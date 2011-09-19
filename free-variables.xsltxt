@@ -10,7 +10,7 @@ tpl bound-in-items (#items, #bound-so-far) {
     $item = `$items[1]`;
     $free-in-item = free-variables (#element = $item);
     for-each [$item] {
-      $still-free = bind-variables (#variables = `preceding-sibling::Item[@kind = "Reservation"]/Variable | preceding-sibling::Item[@kind = "Loci-Declaration"]/*/Variable | preceding-sibling::Item[@kind = "Generalization"]/*/Variable | preceding-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable | preceding-sibling::Item[@kind = "Constant-Definition"]/Variable | preceding-sibling::Item[@kind = "Choice-Statement"]/*/Variable | preceding-sibling::Item[@kind = "Private-Predicate-Definition"]/Variable | preceding-sibling::Item[@kind = "Private-Functor-Definition"]/Variable | preceding-sibling::Item[@kind = "Exemplification"]/Variable | preceding-sibling::Functor-Segment/Variable | preceding-sibling::Predicate-Segment/Variable | preceding-sibling::Frankel-Term/*/Variable`,
+      $still-free = bind-variables (#variables = `preceding-sibling::Item[@kind = "Reservation"]/Variable | preceding-sibling::Item[@kind = "Loci-Declaration"]/*/Variable | preceding-sibling::Item[@kind = "Generalization"]/*/Variable | preceding-sibling::Item[@kind = "Type-Changing-Statement"]/Equality/Variable | preceding-sibling::Item[@kind = "Constant-Definition"]/Variable | preceding-sibling::Item[@kind = "Choice-Statement"]/*/Variable | preceding-sibling::Item[@kind = "Private-Predicate-Definition"]/Variable | preceding-sibling::Item[@kind = "Private-Functor-Definition"]/Variable | preceding-sibling::Functor-Segment/Variable | preceding-sibling::Predicate-Segment/Variable | preceding-sibling::Frankel-Term/*/Variable`,
                                     #free-variables = $free-in-item);
       $newly-bound = append-token-strings (#token-string-a = $bound-so-far,
                                            #token-string-b = $still-free);
@@ -273,10 +273,10 @@ tpl [Item[@kind = "Choice-Statement"]](#upper-bound) mode="free-variables" {
   bind-variables (#variables = `Implicitly-Qualified-Segment/Variable | Explicitly-Qualified-Segment/Variable`, #free-variables = $all-free);
 }
 
-tpl [Item[@kind = "Exemplification"]](#upper-bound) mode="free-variables" {
-  $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
-  bind-variables (#variables = `Variable`, #free-variables = $all-free);
-}
+// tpl [Item[@kind = "Exemplification"]](#upper-bound) mode="free-variables" {
+//   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
+//   bind-variables (#variables = `Variable`, #free-variables = $all-free);
+// }
 
 tpl [Item[@kind = "Functor-Segment"]](#upper-bound) mode="free-variables" {
   $all-free = append-free-variables (#elements = `*`, #upper-bound = $upper-bound);
