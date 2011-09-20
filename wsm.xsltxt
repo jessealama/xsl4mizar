@@ -879,14 +879,10 @@ tpl [Item[@kind='Exemplification']] {
 }
 
 tpl [Item[@kind='Generalization']] { // very ugly.  I've asked Czeslaw to refactor
-  "let "; list (#separ = ",", #elems = `*`);
-  // look at the following sibling
-  // if [following-sibling::Item[@kind='Assumption']/Collective-Assumption] {
-  //   " such that"; "\n";
-  //   list (#separ = "\nand\n",
-  //         #elems = `following-sibling::Item[@kind='Assumption']/Collective-Assumption/Proposition`);
-  // }
+  "let ";
+  apply [Explicitly-Qualified-Segment | Implicitly-Qualified-Segment];
   ";"; "\n";
+  apply [*[position() > 1]];
 }
 
 tpl [Private-Predicate-Formula] {
