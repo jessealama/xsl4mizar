@@ -130,69 +130,19 @@ tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
 
 tpl [Item[@kind = "Loci-Declaration" and child::Explicitly-Qualified-Segment]] {
   $loci = `.`;
-  for-each [Explicitly-Qualified-Segment] {
-    $segment_element_name = `local-name (.)`;
-    for-each [Variable] {
-      <Item {
-        for-each [$loci/@*] { copy-of `.`; }
-        $num_preceding = count-preceding-eliminable-toplevel-items ();
-        @toplevel-binder-number = `$num_preceding + 1`;
-        @idnr = `@idnr`;
-        <Explicitly-Qualified-Segment {
+  $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
+  $num_preceding = count-preceding-eliminable-toplevel-items ();
+  for-each [Explicitly-Qualified-Segment/Variables/Variable] {
+    $pos = `position ()`;
+    <Item {
+      for-each [$loci/@*] { copy-of `.`; }
+      @toplevel-binder-number = `$num_preceding + $pos`;
+      @idnr = `@idnr`;
+      <Explicitly-Qualified-Segment {
+        <Variables {
           apply [.]; // variable
-          if [$segment_element_name = "Explicitly-Qualified-Segment"] {
-            apply [../*[position() = last()]]; // the type of the variable
-          }
         }
-      }
-    }
-  }
-}
-
-tpl [Item[@kind = "Loci-Declaration"]] {
-  $loci = `.`;
-  for-each [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
-    $segment_element_name = `local-name (.)`;
-    for-each [Variable] {
-      <Item {
-        for-each [$loci/@*] { copy-of `.`; }
-        $num_preceding = count-preceding-eliminable-toplevel-items ();
-        @toplevel-binder-number = `$num_preceding + 1`;
-        @idnr = `@idnr`;
-        <$segment_element_name {
-          apply [.]; // variable
-          if [$segment_element_name = "Explicitly-Qualified-Segment"] {
-            apply [../*[position() = last()]]; // the type of the variable
-          }
-        }
-      }
-    }
-  }
-  if [Explicitly-Qualified-Segment] {
-    for-each [Explicitly-Qualified-Segment] {
-      if [Variables] {
-        for-each [Variables] {
-          if [Variable] {
-            for-each [Variable] {
-              <Item {
-                for-each [$loci/@*] { copy-of `.`; }
-                $num_preceding = `count (preceding::Item[@kind = "Loci-Declaration"] | preceding::Item[@kind = "Reservation"] | preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Choice-Statement" and parent::Text-Proper] | preceding::Item[@kind = "Constant-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper] | preceding::Item[@kind = "Regular-Statement" and @shape = "Diffuse-Statement" and parent::Text-Proper])`;
-                @toplevel-binder-number = `$num_preceding + 1`;
-                @idnr = `@idnr`;
-                <Explicitly-Qualified-Segment {
-                  <Variables {
-                    apply [.]; // variable
-                  }
-                  apply [../../*[position() = last()]]; // the type of the variable
-                }
-              }
-            }
-          } else {
-            die (#message = "We expected to find at least one Variable child of the current Variables element, but there is no such child");
-          }
-        }
-      } else {
-          die (#message = "We expected to find a Variables child of the current Explicitly-Qualified-Segment child, but there is no such child.");
+        apply [$type]; // the type of the variable
       }
     }
   }
