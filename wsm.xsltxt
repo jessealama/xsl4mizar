@@ -495,11 +495,12 @@ tpl [Item[@kind='Correctness-Condition']] {
   }
 }
 
+tpl [NegatedAdjective] {
+  "non "; apply [Adjective];
+}
+
 tpl [Adjective] {
   ensure-spelling ();
-  if [@negated = "yes"] {
-    "non";
-  }
   if [*[2]] {
      "("; list (#separ = ",", #elems = `*`); ")";
   } else {
@@ -509,7 +510,7 @@ tpl [Adjective] {
 }
 
 tpl [Adjective-Cluster] {
-  list (#separ = " ", #elems = `Adjective`);
+  list (#separ = " ", #elems = `*`);
 }
 
 tpl [Existential-Registration] {
