@@ -10,7 +10,7 @@ output method=xml;
 // such as reservations or loci delcarations) to some item.
 //////////////////////////////////////////////////////////////////////
 
-key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind="Regular-Statement" and child::Diffuse-Statement) or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and @toplevel-binder-number) or @kind = "Type-Changing-Statement"]] `@toplevel-binder-number`;
+key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind="Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and @toplevel-binder-number) or @kind = "Type-Changing-Statement"]] `@toplevel-binder-number`;
 
 // Determine whether there is a path from the variable bound by
 // $reservation to $context (i.e., whether the variable occurs
