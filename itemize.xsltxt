@@ -109,10 +109,8 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
       needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement) or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement"]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
-        if [@kind = "Regular-Statement"] {
-          if [Compact-Statement] {
-            @kind = "Theorem-Item";
-          }
+        if [@kind = "Regular-Statement" and @shape = "Compact-Statement"] {
+          @kind = "Theorem-Item";
         } else {
           @kind = `@kind`;
         }
