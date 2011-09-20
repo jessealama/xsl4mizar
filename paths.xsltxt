@@ -2,8 +2,8 @@ stylesheet 1.0;
 
 output method=xml;
 
-include die.xsl;
-include tokens.xsl;
+// include die.xsl;
+// include tokens.xsl;
 
 //////////////////////////////////////////////////////////////////////
 // Computing (existence of) paths from a set of items (e.g., binders,
