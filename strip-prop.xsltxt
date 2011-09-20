@@ -18,6 +18,20 @@ tpl escape-backslash(#str) {
   }
 }
 
+tpl [*] {
+  $element-name = `local-name (.)`;
+  <$element-name {
+    for-each [@*] { copy-of `.`; }
+    if [*] {
+      "\n";
+    }
+    for-each [*] {
+      apply [.];
+    }
+  }
+  "\n";
+}
+
 tpl [Constructors] {
   <Constructors { @aid=`@aid`; @mizfiles = escape-backslash (#str = `@mizfiles`);
   "\n";
@@ -154,14 +168,8 @@ tpl [Constructor] {
   $aid = { `@aid`; }
   $relnr = { `@relnr`; }
 
-
   <Constructor {
-    @kind=$kind;
-    @nr=$nr;
-    @aid=$aid;
-    @relnr=$relnr;
-    if [@redefnr] { @redefnr=`@redefnr`; }
-    if [@superfluous] { @superfluous=`@superfluous`; }
+    for-each [@*] { copy-of `.`; }
     "\n";
     if [$kind = $target_kind and $nr = $target_nr and $aid = $target_aid and $relnr = $target_relnr] {
       if [$target_property = "all"] {
@@ -189,7 +197,7 @@ tpl [Cluster] {
 }
 
 tpl [Num] {
-  <Num { @nr=`@nr`; }
+  <Num { @nr=`@nr`; } "\n";
 }
 
 tpl [ArgTypes] {
@@ -224,8 +232,7 @@ tpl [Adjective] {
 
 tpl [Typ] {
   <Typ {
-    @kind=`@kind`;
-    @nr=`@nr`;
+    for-each [@*] { copy-of `.`; }
     "\n";
     apply [*];
   }

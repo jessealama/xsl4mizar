@@ -1,0 +1,15 @@
+stylesheet 1.0;
+
+output method=xml indent="yes";
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl [] {
+
+}

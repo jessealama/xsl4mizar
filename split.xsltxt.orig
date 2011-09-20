@@ -18,6 +18,26 @@ tpl count-preceding-eliminable-toplevel-items {
 
 tpl [Text-Proper/Item[@kind = "Reservation"]] {
   $type = `*[position() = last()]`;
+<<<<<<< HEAD
+  $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement")] | preceding::Item[@kind = "Loci-Declaration"])`;
+  for-each [Variables] {
+    if [Variable] {
+      for-each [Variable] {
+        <Item {
+          for-each [@*] { copy-of `.`; }
+          @kind = "Reservation";
+          @toplevel-binder-number = `position() + $num-previous-toplevel`;
+          if [@idnr] {
+            @idnr = `@idnr`;
+          } else {
+            die (#message = "We found a variable that lacks an idnr attribute; unable to proceed.");
+          }
+          <Variables {
+            apply [.];
+          }
+          apply [$type];
+        }
+=======
   $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
   for-each [Variable] {
     <Item {
@@ -28,6 +48,7 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
         @idnr = `@idnr`;
       } else {
         die (#message = "We found a variable that lacks an idnr attribute; unable to proceed.");
+>>>>>>> develop
       }
     } else {
       die (#message = "We expected to find at least one Variable child of a Variables element, but there are no such children");
@@ -41,13 +62,40 @@ tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private
   }
   <Item {
     for-each [@*] { copy-of `.`; }
+<<<<<<< HEAD
+    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement")] | preceding::Item[@kind = "Loci-Declaration"]) + 1`;
+=======
     $num-previous = count-preceding-eliminable-toplevel-items ();
     @toplevel-binder-number = `$num-previous + 1`;
+>>>>>>> develop
     @idnr = `Variable[1]/@idnr`;
     apply [*];
   }
 }
 
+<<<<<<< HEAD
+// These kinds of statements present problems for my analysis.  One can introduce spurious variables and types, e.g.:
+//
+// consider A being set, B being Jordan-Curve such that A1: A = B or A <> B;
+//
+// Lm: <something about A alone, not B>
+//
+// I can't just split up the choice statement into two separate ones
+// because the property that the introduced variables satisfy involves
+// both variables (A and B occur in "A = B or A <> B")
+tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    @toplevel-binder-number = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement")] | preceding::Item[@kind = "Loci-Declaration"]) + 1`;
+    apply [*];
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Type-Changing-Statement"]] {
+  $type = `*[position() = last()]`;
+  $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement")] | preceding::Item[@kind = "Loci-Declaration"])`;
+  for-each [Variable] {
+=======
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Equality]] {
   $num-children = `count (*)`;
   $justification = `*[position() = $num-children]`;
@@ -58,6 +106,7 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Equality]] {
     $variable = `Variable`;
     $variable-idnr = `$variable/@idnr`;
     $definiens = `*[position() = last()]`;
+>>>>>>> develop
     <Item {
       for-each [@*] { copy-of `.`; }
       @kind = "Type-Changing-Statement";
@@ -73,6 +122,29 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Equality]] {
   }
 }
 
+<<<<<<< HEAD
+tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    if [Label] {
+      @idnr = `Label[1]/@idnr`;
+    } else {
+      @idnr = "";
+    }
+    if [@shape = "Diffuse-Statement"] {
+      $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement")] | preceding::Item[@kind = "Loci-Declaration"])`;
+      @toplevel-binder-number = `$num-previous-toplevel + 1`;
+    }
+    apply [*];
+  }
+}
+
+tpl [Text-Proper/Item[@kind = "Constant-Definition"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    @idnr = `Variable[1]/@idnr`;
+    $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement")] | preceding::Item[@kind = "Loci-Declaration"])`;
+=======
 tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
   $num-children = `count (*)`;
   $justification = `*[position() = $num-children]`;
@@ -84,6 +156,7 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and not(child::Equality)
   <Item {
     for-each [@*] { copy-of `.`; }
     @kind = "Type-Changing-Statement";
+>>>>>>> develop
     @toplevel-binder-number = `$num-previous-toplevel + 1`;
     @idnr = $variable-idnr;
     apply [$variable];
@@ -95,6 +168,10 @@ tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and not(child::Equality)
 tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
   <Item {
     for-each [@*] { copy-of `.`; }
+<<<<<<< HEAD
+    @idnr = `Equality/Variable[1]/@idnr`;
+    $num-previous-toplevel = `count (preceding-sibling::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement")] | preceding::Item[@kind = "Loci-Declaration"])`;
+=======
     choose {
       when [Proposition/Label] {
         @idnr = `Proposition/Label[1]/@idnr`;
@@ -107,6 +184,7 @@ tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
       }
     }
     $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
+>>>>>>> develop
     @toplevel-binder-number = `$num-previous-toplevel + 1`;
     apply [*];
   }
@@ -124,18 +202,19 @@ tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
 
 tpl [Item[@kind = "Loci-Declaration"]] {
   $loci = `.`;
-  for-each [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
-    $segment_element_name = `local-name (.)`;
-    for-each [Variable] {
-      <Item {
-        for-each [$loci/@*] { copy-of `.`; }
-        $num_preceding = count-preceding-eliminable-toplevel-items ();
-        @toplevel-binder-number = `$num_preceding + 1`;
-        @idnr = `@idnr`;
-        <$segment_element_name {
-          apply [.]; // variable
-          if [$segment_element_name = "Explicitly-Qualified-Segment"] {
-            apply [../*[position() = last()]]; // the type of the variable
+<<<<<<< HEAD
+  if [Implicitly-Qualified-Segment] {
+    for-each [Implicitly-Qualified-Segment] {
+      if [Variable] {
+        for-each [Variable] {
+          <Item {
+            for-each [$loci/@*] { copy-of `.`; }
+            $num_preceding = `count (preceding::Item[@kind = "Loci-Declaration"] | preceding::Item[@kind = "Reservation"] | preceding::Item[@kind = "Private-Functor-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Choice-Statement" and parent::Text-Proper] | preceding::Item[@kind = "Constant-Definition" and parent::Text-Proper] | preceding::Item[@kind = "Type-Changing-Statement" and parent::Text-Proper] | preceding::Item[@kind = "Regular-Statement" and @shape = "Diffuse-Statement" and parent::Text-Proper])`;
+            @toplevel-binder-number = `$num_preceding + 1`;
+            @idnr = `@idnr`;
+            <Implicitly-Qualified-Segment {
+              apply [.]; // variable
+            }
           }
         }
       } else {
@@ -164,6 +243,20 @@ tpl [Item[@kind = "Loci-Declaration"]] {
             }
           } else {
             die (#message = "We expected to find at least one Variable child of the current Variables element, but there is no such child");
+=======
+  for-each [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
+    $segment_element_name = `local-name (.)`;
+    for-each [Variable] {
+      <Item {
+        for-each [$loci/@*] { copy-of `.`; }
+        $num_preceding = count-preceding-eliminable-toplevel-items ();
+        @toplevel-binder-number = `$num_preceding + 1`;
+        @idnr = `@idnr`;
+        <$segment_element_name {
+          apply [.]; // variable
+          if [$segment_element_name = "Explicitly-Qualified-Segment"] {
+            apply [../*[position() = last()]]; // the type of the variable
+>>>>>>> develop
           }
         }
       } else {
@@ -264,7 +357,11 @@ tpl [Block[@kind = "Proof"]](#definitions) {
 
 tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition" or @kind = "Mode-Definition" or @kind = "Structure-Definition"]](#definitions, #context) {
   <Item {
+<<<<<<< HEAD
+    for-each [@*] { copy-of `.`; }
+=======
     for-each [$context/@*] { copy-of `.`; }
+>>>>>>> develop
     @kind = "Definition-Item";
     <Block {
       @kind = "Definitional-Block";
@@ -313,8 +410,13 @@ tpl split-explicitly-qualified-segment (#variables, #type) {
   }
 }
 
+<<<<<<< HEAD
+tpl [Explicitly-Qualified-Segment] {
+  split-explicitly-qualified-segment (#variables = `Variables/Variable`,
+=======
 tpl [Explicitly-Qualified-Segment[not(parent::Item[@kind = "Choice-Statement"])]] {
   split-explicitly-qualified-segment (#variables = `Variable`,
+>>>>>>> develop
                                       #type = `*[position() = last()]`);
 }
 

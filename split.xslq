@@ -1,0 +1,733 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:output method="xml" indent="yes"/>
+
+  <xsl:template name="die">
+    <xsl:param name="message"/>
+    <xsl:choose>
+      <xsl:when test="@line and @col">
+        <xsl:variable name="line" select="@line"/>
+        <xsl:variable name="col" select="@col"/>
+        <xsl:variable name="final_message" select="concat ($message, &quot; (line &quot;, $line, &quot;, column &quot;, $col, &quot;)&quot;)"/>
+        <xsl:message terminate="yes">
+          <xsl:value-of select="$final_message"/>
+        </xsl:message>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="final_message" select="concat ($message, &quot; (unable to determine line and column information)&quot;)"/>
+        <xsl:message terminate="yes">
+          <xsl:value-of select="$final_message"/>
+        </xsl:message>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="*">
+    <xsl:variable name="element" select="local-name ()"/>
+    <xsl:element name="{$element}">
+      <xsl:for-each select="@*">
+        <xsl:copy-of select="."/>
+      </xsl:for-each>
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Text-Proper/Item[@kind = &quot;Reservation&quot;]">
+    <xsl:variable name="type" select="*[position() = last()]"/>
+    <xsl:variable name="num-previous-toplevel" select="count (preceding-sibling::Item[@kind = &quot;Reservation&quot; or @kind = &quot;Private-Functor-Definition&quot; or @kind = &quot;Choice-Statement&quot; or @kind = &quot;Constant-Definition&quot; or @kind = &quot;Type-Changing-Statement&quot; or @kind = &quot;Private-Predicate-Definition&quot; or (@kind = &quot;Regular-Statement&quot; and child::Diffuse-Statement)] | preceding::Item[@kind = &quot;Loci-Declaration&quot;])"/>
+    <xsl:for-each select="Variable">
+      <xsl:element name="Item">
+        <xsl:for-each select="@*">
+          <xsl:copy-of select="."/>
+        </xsl:for-each>
+        <xsl:attribute name="kind">
+          <xsl:text>Reservation</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="toplevel-binder-number">
+          <xsl:value-of select="position() + $num-previous-toplevel"/>
+        </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="@idnr">
+            <xsl:attribute name="idnr">
+              <xsl:value-of select="@idnr"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="die">
+              <xsl:with-param name="message">
+                <xsl:text>We found a variable that lacks an idnr attribute; unable to proceed.</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:apply-templates select="."/>
+        <xsl:apply-templates select="$type"/>
+      </xsl:element>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="Text-Proper/Item[@kind = &quot;Private-Predicate-Definition&quot; or @kind = &quot;Private-Functor-Definition&quot; or @kind = &quot;Constant-Definition&quot;]">
+    <xsl:if test="Variable[2]">
+      <xsl:call-template name="die">
+        <xsl:with-param name="message">
+          <xsl:text>We assume that private predicate/functor definitions bind at most one variable, but we found one that binds at least two!</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    <xsl:element name="Item">
+      <xsl:for-each select="@*">
+        <xsl:copy-of select="."/>
+      </xsl:for-each>
+      <xsl:attribute name="toplevel-binder-number">
+        <xsl:value-of select="count (preceding-sibling::Item[@kind = &quot;Reservation&quot; or @kind = &quot;Private-Functor-Definition&quot; or @kind = &quot;Choice-Statement&quot; or @kind = &quot;Constant-Definition&quot; or @kind = &quot;Type-Changing-Statement&quot; or @kind = &quot;Private-Predicate-Definition&quot; or (@kind = &quot;Regular-Statement&quot; and child::Diffuse-Statement)] | preceding::Item[@kind = &quot;Loci-Declaration&quot;]) + 1"/>
+      </xsl:attribute>
+      <xsl:attribute name="idnr">
+        <xsl:value-of select="Variable[1]/@idnr"/>
+      </xsl:attribute>
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+
+  <!-- Given a nodeset of propositions and a nodeset of -->
+  <!-- explicitly/implicitly qualified segments, form the existential -->
+  <!-- generalization of the conjunction of $propositions over those -->
+  <!-- segments -->
+  <xsl:template name="existentially-generalize">
+    <xsl:param name="variables"/>
+    <xsl:param name="type"/>
+    <xsl:param name="propositions"/>
+    <xsl:choose>
+      <xsl:when test="$variables">
+        <xsl:variable name="variable" select="$variables[1]"/>
+        <xsl:element name="Existential-Quantifier-Formula">
+          <xsl:element name="Explicitly-Qualified-Segment">
+            <xsl:apply-templates select="$variable"/>
+            <xsl:apply-templates select="$type"/>
+          </xsl:element>
+          <xsl:call-template name="existentially-generalize">
+            <xsl:with-param name="variables" select="$variables[position() &gt; 1]"/>
+            <xsl:with-param name="type" select="$type"/>
+            <xsl:with-param name="propositions" select="$propositions"/>
+          </xsl:call-template>
+        </xsl:element>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="$propositions">
+          <xsl:variable name="proposition" select="$propositions[1]"/>
+          <xsl:variable name="formula" select="$proposition/*[position() = last()]"/>
+          <!-- skip the label, if there is one -->
+          <xsl:choose>
+            <xsl:when test="$propositions[2]">
+              <xsl:element name="Conjunctive-Formula">
+                <xsl:apply-templates select="$formula"/>
+                <xsl:call-template name="existentially-generalize">
+                  <xsl:with-param name="propositions" select="$propositions[position() &gt; 1]"/>
+                </xsl:call-template>
+              </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="$formula"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="conjoin-propositions">
+    <xsl:param name="propositions"/>
+    <xsl:if test="$propositions">
+      <xsl:variable name="proposition" select="$propositions[1]"/>
+      <xsl:variable name="formula" select="$proposition/*[position() = last()]"/>
+      <!-- skip the label, if there is one -->
+      <xsl:choose>
+        <xsl:when test="$propositions[2]">
+          <xsl:element name="Conjunctive-Formula">
+            <xsl:apply-templates select="$formula"/>
+            <xsl:call-template name="conjoin-propositions">
+              <xsl:with-param name="propositions" select="$propositions[position() &gt; 1]"/>
+            </xsl:call-template>
+          </xsl:element>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="$formula"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  <xsl:key name="spelling" match="//*" use="@spelling"/>
+
+  <xsl:template name="new-spelling-based-on">
+    <xsl:param name="base"/>
+    <xsl:param name="try"/>
+    <xsl:variable name="candidate" select="concat ($base, $try)"/>
+    <xsl:choose>
+      <xsl:when test="key (&quot;spelling&quot;, $candidate)">
+        <xsl:call-template name="new-spelling-based-on">
+          <xsl:with-param name="base" select="$base"/>
+          <xsl:with-param name="try" select="$try + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$candidate"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="new-dummy-mode-name">
+    <xsl:call-template name="new-spelling-based-on">
+      <xsl:with-param name="base">
+        <xsl:text>DummyMode</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="try">
+        <xsl:text>1</xsl:text>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template match="Text-Proper/Item[@kind = &quot;Choice-Statement&quot;]">
+    <xsl:if test="not (Explicitly-Qualified-Segment | Implicitly-Qualified-Segment)">
+      <xsl:call-template name="die">
+        <xsl:with-param name="message">
+          <xsl:text>We expect a Choice-Statement to have either an Explicitly-Qualified-Segment or an Implicitly-Qualified-Segment child, but this choice statement lacks both</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    <!-- treat first the case of one variable in a consider -->
+    <xsl:if test="not(Explicitly-Qualified-Segment)">
+      <xsl:call-template name="die">
+        <xsl:with-param name="message">
+          <xsl:text>We don&apos;t yet know how to deal with a choice statement that lacks an explicit type for the variables it introduces.</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    <xsl:if test="Explicitly-Qualified-Segment[2]">
+      <xsl:call-template name="die">
+        <xsl:with-param name="message">
+          <xsl:text>We don&apos;t know yet how to deal with toplevel choice statements that involve binding variables of different types</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    <xsl:variable name="type" select="Explicitly-Qualified-Segment/*[position() = last()]"/>
+    <xsl:variable name="variables" select="Explicitly-Qualified-Segment/Variable"/>
+    <xsl:for-each select="$variables">
+      <xsl:if test="not(@idnr)">
+        <xsl:call-template name="die">
+          <xsl:with-param name="message">
+            <xsl:text>We encountered a Variable element that lacks an idnr attribute!</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:if test="not(@spelling)">
+        <xsl:call-template name="die">
+          <xsl:with-param name="message">
+            <xsl:text>We encountered a Variable element that lacks a spelling attribute!</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:variable name="variable-idnr" select="@idnr"/>
+      <xsl:variable name="variable-spelling" select="@spelling"/>
+      <xsl:variable name="position" select="position ()"/>
+      <!-- dummy mode -->
+      <xsl:variable name="mode-name">
+        <xsl:call-template name="new-spelling-based-on">
+          <xsl:with-param name="base">
+            <xsl:text>DummyMode</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="try" select="$position"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:element name="Item">
+        <xsl:attribute name="kind">
+          <xsl:text>Definition-Item</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="promoted">
+          <xsl:text>choice-statement-mode</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="spelling">
+          <xsl:value-of select="$mode-name"/>
+        </xsl:attribute>
+        <xsl:element name="Block">
+          <xsl:attribute name="kind">
+            <xsl:text>Definitional-Block</xsl:text>
+          </xsl:attribute>
+          <xsl:element name="Item">
+            <xsl:attribute name="kind">
+              <xsl:text>Mode-Definition</xsl:text>
+            </xsl:attribute>
+            <xsl:element name="Mode-Pattern">
+              <xsl:attribute name="spelling">
+                <xsl:value-of select="$mode-name"/>
+              </xsl:attribute>
+              <xsl:element name="Loci"/>
+            </xsl:element>
+            <xsl:element name="Standard-Mode">
+              <xsl:attribute name="kind">
+                <xsl:text>Simple-Definiens</xsl:text>
+              </xsl:attribute>
+              <xsl:if test="$type">
+                <xsl:element name="Type-Specification">
+                  <xsl:apply-templates select="$type"/>
+                </xsl:element>
+              </xsl:if>
+              <xsl:element name="Definiens">
+                <xsl:element name="Formula-Expression"/>
+                <xsl:call-template name="existentially-generalize">
+                  <xsl:with-param name="variables" select="$variables"/>
+                  <xsl:with-param name="type" select="$type"/>
+                  <xsl:with-param name="propositions" select="Proposition"/>
+                </xsl:call-template>
+              </xsl:element>
+            </xsl:element>
+            <xsl:element name="Item">
+              <xsl:attribute name="kind">
+                <xsl:text>Correctness-Condition</xsl:text>
+              </xsl:attribute>
+              <xsl:element name="Existence"/>
+              <xsl:element name="Straightforward-Justification"/>
+            </xsl:element>
+          </xsl:element>
+        </xsl:element>
+      </xsl:element>
+      <!-- dummy functor symbol -->
+      <xsl:element name="Item">
+        <xsl:attribute name="kind">
+          <xsl:text>Definition-Item</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="promoted">
+          <xsl:text>choice-statement-functor</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="spelling">
+          <xsl:value-of select="$variable-spelling"/>
+        </xsl:attribute>
+        <xsl:element name="Block">
+          <xsl:attribute name="kind">
+            <xsl:text>Definitional-Block</xsl:text>
+          </xsl:attribute>
+          <xsl:element name="Item">
+            <xsl:attribute name="kind">
+              <xsl:text>Functor-Definition</xsl:text>
+            </xsl:attribute>
+            <xsl:element name="Operation-Functor-Pattern">
+              <xsl:attribute name="spelling">
+                <xsl:value-of select="$variable-spelling"/>
+              </xsl:attribute>
+              <xsl:element name="Loci"/>
+              <xsl:element name="Loci"/>
+            </xsl:element>
+            <xsl:if test="$type">
+              <xsl:element name="Type-Specification">
+                <xsl:apply-templates select="$type"/>
+              </xsl:element>
+            </xsl:if>
+            <xsl:element name="Equals"/>
+            <xsl:element name="Definiens">
+              <xsl:attribute name="kind">
+                <xsl:text>Simple-Definiens</xsl:text>
+              </xsl:attribute>
+              <xsl:element name="Global-Choice-Term">
+                <xsl:element name="Standard-Type">
+                  <xsl:attribute name="spelling">
+                    <xsl:value-of select="$mode-name"/>
+                  </xsl:attribute>
+                </xsl:element>
+              </xsl:element>
+            </xsl:element>
+          </xsl:element>
+        </xsl:element>
+      </xsl:element>
+    </xsl:for-each>
+    <!-- conjunction of the propositions -->
+    <xsl:element name="Item">
+      <xsl:attribute name="kind">
+        <xsl:text>Theorem-Item</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="promoted">
+        <xsl:text>choice-statement-conditions</xsl:text>
+      </xsl:attribute>
+      <xsl:element name="Proposition">
+        <xsl:call-template name="conjoin-propositions">
+          <xsl:with-param name="propositions" select="Proposition"/>
+        </xsl:call-template>
+      </xsl:element>
+      <xsl:element name="Straightforward-Justification"/>
+    </xsl:element>
+    <xsl:if test="Proposition[2]">
+      <xsl:for-each select="Proposition">
+        <xsl:element name="Item">
+          <xsl:attribute name="kind">
+            <xsl:text>Regular-Statement</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="promoted">
+            <xsl:text>choice-statement-condition</xsl:text>
+          </xsl:attribute>
+          <xsl:element name="Compact-Statement"/>
+          <xsl:apply-templates select="."/>
+          <xsl:element name="Straightforward-Justification"/>
+        </xsl:element>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="Text-Proper/Item[@kind = &quot;Type-Changing-Statement&quot;]">
+    <xsl:variable name="type" select="*[position() = last()]"/>
+    <xsl:variable name="num-previous-toplevel" select="count (preceding-sibling::Item[@kind = &quot;Reservation&quot; or @kind = &quot;Private-Functor-Definition&quot; or @kind = &quot;Choice-Statement&quot; or @kind = &quot;Constant-Definition&quot; or @kind = &quot;Type-Changing-Statement&quot; or @kind = &quot;Private-Predicate-Definition&quot; or (@kind = &quot;Regular-Statement&quot; and child::Diffuse-Statement)] | preceding::Item[@kind = &quot;Loci-Declaration&quot;])"/>
+    <xsl:for-each select="Variable">
+      <xsl:element name="Item">
+        <xsl:for-each select="@*">
+          <xsl:copy-of select="."/>
+        </xsl:for-each>
+        <xsl:attribute name="kind">
+          <xsl:text>Type-Changing-Statement</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="toplevel-binder-number">
+          <xsl:value-of select="position() + $num-previous-toplevel"/>
+        </xsl:attribute>
+        <xsl:apply-templates select="."/>
+        <xsl:apply-templates select="$type"/>
+      </xsl:element>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="Text-Proper/Item[@kind = &quot;Regular-Statement&quot;]">
+    <xsl:element name="Item">
+      <xsl:for-each select="@*">
+        <xsl:copy-of select="."/>
+      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="Label">
+          <xsl:attribute name="idnr">
+            <xsl:value-of select="Label[1]/@idnr"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="idnr">
+            <xsl:text/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:if test="Diffuse-Statement">
+        <xsl:variable name="num-previous-toplevel" select="count (preceding-sibling::Item[@kind = &quot;Reservation&quot; or @kind = &quot;Private-Functor-Definition&quot; or @kind = &quot;Choice-Statement&quot; or @kind = &quot;Constant-Definition&quot; or @kind = &quot;Type-Changing-Statement&quot; or @kind = &quot;Private-Predicate-Definition&quot; or (@kind = &quot;Regular-Statement&quot; and child::Diffuse-Statement)] | preceding::Item[@kind = &quot;Loci-Declaration&quot;])"/>
+        <xsl:attribute name="toplevel-binder-number">
+          <xsl:value-of select="$num-previous-toplevel + 1"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Text-Proper/Item[@kind = &quot;Constant-Definition&quot;]">
+    <xsl:element name="Item">
+      <xsl:for-each select="@*">
+        <xsl:copy-of select="."/>
+      </xsl:for-each>
+      <xsl:attribute name="idnr">
+        <xsl:value-of select="Variable[1]/@idnr"/>
+      </xsl:attribute>
+      <xsl:variable name="num-previous-toplevel" select="count (preceding-sibling::Item[@kind = &quot;Reservation&quot; or @kind = &quot;Private-Functor-Definition&quot; or @kind = &quot;Choice-Statement&quot; or @kind = &quot;Constant-Definition&quot; or @kind = &quot;Type-Changing-Statement&quot; or @kind = &quot;Private-Predicate-Definition&quot; or (@kind = &quot;Regular-Statement&quot; and child::Diffuse-Statement)] | preceding::Item[@kind = &quot;Loci-Declaration&quot;])"/>
+      <xsl:attribute name="toplevel-binder-number">
+        <xsl:value-of select="$num-previous-toplevel + 1"/>
+      </xsl:attribute>
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Text-Proper/Item[@kind = &quot;Type-Changing-Statement&quot;]">
+    <xsl:element name="Item">
+      <xsl:for-each select="@*">
+        <xsl:copy-of select="."/>
+      </xsl:for-each>
+      <xsl:attribute name="idnr">
+        <xsl:value-of select="Equality/Variable[1]/@idnr"/>
+      </xsl:attribute>
+      <xsl:variable name="num-previous-toplevel" select="count (preceding-sibling::Item[@kind = &quot;Reservation&quot; or @kind = &quot;Private-Functor-Definition&quot; or @kind = &quot;Choice-Statement&quot; or @kind = &quot;Constant-Definition&quot; or @kind = &quot;Type-Changing-Statement&quot; or @kind = &quot;Private-Predicate-Definition&quot; or (@kind = &quot;Regular-Statement&quot; and child::Diffuse-Statement)] | preceding::Item[@kind = &quot;Loci-Declaration&quot;])"/>
+      <xsl:attribute name="toplevel-binder-number">
+        <xsl:value-of select="$num-previous-toplevel + 1"/>
+      </xsl:attribute>
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Item[@kind = &quot;Loci-Declaration&quot;]">
+    <xsl:variable name="loci" select="."/>
+    <xsl:for-each select="Implicitly-Qualified-Segment | Explicitly-Qualified-Segment">
+      <xsl:variable name="segment_element_name" select="local-name (.)"/>
+      <xsl:for-each select="Variable">
+        <xsl:element name="Item">
+          <xsl:for-each select="$loci/@*">
+            <xsl:copy-of select="."/>
+          </xsl:for-each>
+          <xsl:variable name="num_preceding" select="count (preceding::Item[@kind = &quot;Loci-Declaration&quot;] | preceding::Item[@kind = &quot;Reservation&quot;] | preceding::Item[@kind = &quot;Private-Functor-Definition&quot; and parent::Text-Proper] | preceding::Item[@kind = &quot;Choice-Statement&quot; and parent::Text-Proper] | preceding::Item[@kind = &quot;Constant-Definition&quot; and parent::Text-Proper] | preceding::Item[@kind = &quot;Type-Changing-Statement&quot; and parent::Text-Proper] | preceding::Item[@kind = &quot;Private-Predicate-Definition&quot; and parent::Text-Proper] | preceding::Item[@kind = &quot;Regular-Statement&quot; and child::Diffuse-Statement and parent::Text-Proper])"/>
+          <xsl:attribute name="toplevel-binder-number">
+            <xsl:value-of select="$num_preceding + 1"/>
+          </xsl:attribute>
+          <xsl:attribute name="idnr">
+            <xsl:value-of select="@idnr"/>
+          </xsl:attribute>
+          <xsl:element name="{$segment_element_name}">
+            <xsl:apply-templates select="."/>
+            <!-- variable -->
+            <xsl:if test="$segment_element_name = &quot;Explicitly-Qualified-Segment&quot;">
+              <xsl:apply-templates select="../*[position() = last()]"/>
+            </xsl:if>
+          </xsl:element>
+        </xsl:element>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="Item[@kind=&quot;Definition-Item&quot;]">
+    <xsl:variable name="context" select="."/>
+    <xsl:apply-templates select="Block">
+      <xsl:with-param name="context" select="$context"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <xsl:template match="Block[@kind=&quot;Definitional-Block&quot;]">
+    <xsl:param name="context"/>
+    <xsl:apply-templates select="Item[@kind = &quot;Attribute-Definition&quot; or @kind = &quot;Functor-Definition&quot; or @kind = &quot;Predicate-Definition&quot; or @kind = &quot;Mode-Definition&quot; or @kind = &quot;Structure-Definition&quot;]">
+      <xsl:with-param name="definitions" select="Item[@kind = &quot;Private-Predicate-Definition&quot; or @kind=&quot;Private-Functor-Definition&quot;]"/>
+      <xsl:with-param name="context" select="$context"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <xsl:template match="Block[@kind = &quot;Registration-Block&quot;]">
+    <xsl:apply-templates select="Item[@kind = &quot;Cluster&quot;]"/>
+  </xsl:template>
+
+  <xsl:template match="Block[@kind = &quot;Notation-Block&quot;]">
+    <xsl:apply-templates select="Item[@kind = &quot;Pred-Antonym&quot; or @kind = &quot;Pred-Synonym&quot; or @kind = &quot;Attr-Antonym&quot; or @kind = &quot;Attr-Synonym&quot; or @kind = &quot;Func-Synonym&quot; or @kind = &quot;Func-Antonym&quot; or @kind = &quot;Mode-Synonym&quot; or @kind = &quot;Mode-Antonym&quot;]"/>
+  </xsl:template>
+
+  <xsl:template match="Item[@kind = &quot;Cluster&quot;]">
+    <xsl:element name="Item">
+      <xsl:attribute name="kind">
+        <xsl:text>Definition-Item</xsl:text>
+      </xsl:attribute>
+      <xsl:if test="@line">
+        <xsl:attribute name="line">
+          <xsl:value-of select="@line"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@col">
+        <xsl:attribute name="col">
+          <xsl:value-of select="@col"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:element name="Block">
+        <xsl:attribute name="kind">
+          <xsl:text>Registration-Block</xsl:text>
+        </xsl:attribute>
+        <xsl:for-each select="preceding-sibling::Item[@kind = &quot;Loci-Declaration&quot;]">
+          <xsl:apply-templates select="."/>
+        </xsl:for-each>
+        <xsl:element name="Item">
+          <xsl:attribute name="kind">
+            <xsl:text>Cluster</xsl:text>
+          </xsl:attribute>
+          <xsl:apply-templates select="*"/>
+        </xsl:element>
+        <xsl:call-template name="correctness-conditions">
+          <xsl:with-param name="candidates" select="following-sibling::*"/>
+        </xsl:call-template>
+      </xsl:element>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template name="correctness-conditions">
+    <xsl:param name="candidates"/>
+    <xsl:param name="definitions"/>
+    <xsl:param name="stop"/>
+    <xsl:if test="not($stop = &quot;1&quot;)">
+      <xsl:if test="$candidates">
+        <xsl:variable name="candidate" select="$candidates[1]"/>
+        <xsl:for-each select="$candidate">
+          <xsl:variable name="candidate_name" select="local-name(.)"/>
+          <xsl:variable name="candidate_kind" select="$candidate/@kind"/>
+          <xsl:choose>
+            <xsl:when test="$candidate_name = &quot;Item&quot; and ($candidate_kind = &quot;Correctness-Condition&quot; or $candidate_kind = &quot;Property&quot; or $candidate_kind = &quot;Correctness&quot;)">
+              <xsl:apply-templates select="$candidate">
+                <xsl:with-param name="definitions" select="$definitions"/>
+              </xsl:apply-templates>
+              <xsl:call-template name="correctness-conditions">
+                <xsl:with-param name="candidates" select="$candidates[position() &gt; 1]"/>
+                <xsl:with-param name="definitions" select="$definitions"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="correctness-conditions">
+                <xsl:with-param name="stop">
+                  <xsl:text>1</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="Item[@kind = &quot;Correctness-Condition&quot; or @kind = &quot;Property&quot; or @kind = &quot;Correctness&quot;]">
+    <xsl:param name="definitions"/>
+    <xsl:element name="Item">
+      <xsl:attribute name="kind">
+        <xsl:value-of select="@kind"/>
+      </xsl:attribute>
+      <xsl:apply-templates select="*">
+        <xsl:with-param name="definitions" select="$definitions"/>
+      </xsl:apply-templates>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Item[@kind = &quot;Theorem-Item&quot;]">
+    <xsl:element name="Item">
+      <xsl:for-each select="@*">
+        <xsl:copy-of select="."/>
+      </xsl:for-each>
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Block[@kind = &quot;Proof&quot;]">
+    <xsl:param name="definitions"/>
+    <xsl:variable name="context" select="."/>
+    <xsl:element name="Block">
+      <xsl:attribute name="kind">
+        <xsl:text>Proof</xsl:text>
+      </xsl:attribute>
+      <xsl:if test="$definitions">
+        <xsl:for-each select="$definitions">
+          <xsl:choose>
+            <xsl:when test="Variable">
+              <xsl:variable name="idnr" select="Variable[1]/@idnr"/>
+              <xsl:if test="$context//Private-Predicate-Formula[@idnr = $idnr] or $context//Private-Functor-Term[@idnr = $idnr]">
+                <xsl:copy-of select="."/>
+              </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="die">
+                <xsl:with-param name="message">
+                  <xsl:text>While determining whether to possibly include some local definitions into a proof, we encountered a local definition that lacks a Variable child</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:if>
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Item[@kind = &quot;Functor-Definition&quot; or @kind = &quot;Attribute-Definition&quot; or @kind = &quot;Predicate-Definition&quot; or @kind = &quot;Mode-Definition&quot; or @kind = &quot;Structure-Definition&quot;]">
+    <xsl:param name="definitions"/>
+    <xsl:param name="context"/>
+    <xsl:element name="Item">
+      <xsl:for-each select="$context/@*">
+        <xsl:copy-of select="."/>
+      </xsl:for-each>
+      <xsl:attribute name="kind">
+        <xsl:text>Definition-Item</xsl:text>
+      </xsl:attribute>
+      <xsl:element name="Block">
+        <xsl:attribute name="kind">
+          <xsl:text>Definitional-Block</xsl:text>
+        </xsl:attribute>
+        <xsl:for-each select="preceding-sibling::Item[@kind = &quot;Loci-Declaration&quot; or @kind = &quot;Assumption&quot; or @kind = &quot;Existential-Assumption&quot;]">
+          <xsl:apply-templates select="."/>
+        </xsl:for-each>
+        <xsl:element name="Item">
+          <xsl:attribute name="kind">
+            <xsl:value-of select="@kind"/>
+          </xsl:attribute>
+          <xsl:if test="@line">
+            <xsl:attribute name="line">
+              <xsl:value-of select="@line"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@col">
+            <xsl:attribute name="col">
+              <xsl:value-of select="@col"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:apply-templates select="*"/>
+        </xsl:element>
+        <xsl:call-template name="correctness-conditions">
+          <xsl:with-param name="candidates" select="following-sibling::*"/>
+          <xsl:with-param name="definitions" select="$definitions"/>
+        </xsl:call-template>
+      </xsl:element>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Item[@kind = &quot;Pred-Synonym&quot; or @kind = &quot;Pred-Antonym&quot; or @kind = &quot;Attr-Synonym&quot; or @kind = &quot;Attr-Antonym&quot; or @kind = &quot;Func-Synonym&quot; or @kind = &quot;Func-Antonym&quot; or @kind = &quot;Mode-Synonym&quot; or @kind = &quot;Mode-Antonym&quot;]">
+    <xsl:element name="Item">
+      <xsl:attribute name="kind">
+        <xsl:text>Definition-Item</xsl:text>
+      </xsl:attribute>
+      <xsl:element name="Block">
+        <xsl:attribute name="kind">
+          <xsl:text>Notation-Block</xsl:text>
+        </xsl:attribute>
+        <xsl:for-each select="preceding-sibling::Item[@kind = &quot;Loci-Declaration&quot;]">
+          <xsl:apply-templates select="."/>
+        </xsl:for-each>
+        <xsl:element name="Item">
+          <xsl:attribute name="kind">
+            <xsl:value-of select="@kind"/>
+          </xsl:attribute>
+          <xsl:if test="@line">
+            <xsl:attribute name="line">
+              <xsl:value-of select="@line"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@col">
+            <xsl:attribute name="col">
+              <xsl:value-of select="@col"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:apply-templates select="*"/>
+        </xsl:element>
+        <xsl:call-template name="correctness-conditions">
+          <xsl:with-param name="candidates" select="following-sibling::*"/>
+        </xsl:call-template>
+      </xsl:element>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template name="split-explicitly-qualified-segment">
+    <xsl:param name="variables"/>
+    <xsl:param name="type"/>
+    <xsl:if test="$variables">
+      <xsl:variable name="variable" select="$variables[1]"/>
+      <xsl:element name="Explicitly-Qualified-Segment">
+        <xsl:apply-templates select="$variable"/>
+        <xsl:apply-templates select="$type"/>
+      </xsl:element>
+      <xsl:call-template name="split-explicitly-qualified-segment">
+        <xsl:with-param name="variables" select="$variables[position() &gt; 1]"/>
+        <xsl:with-param name="type" select="$type"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="Explicitly-Qualified-Segment">
+    <xsl:call-template name="split-explicitly-qualified-segment">
+      <xsl:with-param name="variables" select="Variable"/>
+      <xsl:with-param name="type" select="*[position() = last()]"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- don't break up explicitly qualified segments inside universal formulas...yet -->
+  <xsl:template match="Universal-Quantifier-Formula/Explicitly-Qualified-Segment">
+    <xsl:element name="Explicitly-Qualified-Segment">
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="Existential-Quantifier-Formula/Explicitly-Qualified-Segment">
+    <xsl:element name="Explicitly-Qualified-Segment">
+      <xsl:apply-templates select="*"/>
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>
