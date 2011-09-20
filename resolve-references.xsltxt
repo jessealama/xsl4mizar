@@ -22,16 +22,17 @@ tpl [Scheme-Justification[@nr = "0" and not(@idnr = ancestor::Text-Proper/Item[p
 tpl [Scheme-Justification[@nr = "0" and @idnr = ancestor::Text-Proper/Item[parent::Text-Proper and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme/@idnr]] {
   $context = `.`;
   $idnr = `@idnr`;
-  $item = `ancestor::Text-Proper/Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr = $idnr]/../../..`; // wow
-  $num-previous = count-preceding-toplevel-items ();
-  $position = `$num-previous + 1`;
-  $spelling = `concat ("CKB", $position)`;
-  <Scheme-Justification {
-    @spelling = $spelling;
-    @idnr = "1";
-    @nr = "1"; // might not be right
-    @promoted = "promoted";
-    apply [`$context/*`];
+  for-each [preceding::Item[parent::Text-Proper and @kind = "Scheme-Block-Item" and descendant::Scheme[@idnr = $idnr]]] {
+    $num-previous = count-preceding-toplevel-items ();
+    $position = `$num-previous + 1`;
+    $spelling = `concat ("CKB", $position)`;
+    <Scheme-Justification {
+      @spelling = $spelling;
+      @idnr = "1";
+      @nr = "1"; // might not be right
+      @promoted = "promoted";
+      apply [`$context/*`];
+    }
   }
 }
 
