@@ -128,6 +128,27 @@ tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
 //   }
 // }
 
+tpl [Item[@kind = "Loci-Declaration" and child::Explicitly-Qualified-Segment]] {
+  $loci = `.`;
+  for-each [Explicitly-Qualified-Segment] {
+    $segment_element_name = `local-name (.)`;
+    for-each [Variable] {
+      <Item {
+        for-each [$loci/@*] { copy-of `.`; }
+        $num_preceding = count-preceding-eliminable-toplevel-items ();
+        @toplevel-binder-number = `$num_preceding + 1`;
+        @idnr = `@idnr`;
+        <Explicitly-Qualified-Segment {
+          apply [.]; // variable
+          if [$segment_element_name = "Explicitly-Qualified-Segment"] {
+            apply [../*[position() = last()]]; // the type of the variable
+          }
+        }
+      }
+    }
+  }
+}
+
 tpl [Item[@kind = "Loci-Declaration"]] {
   $loci = `.`;
   for-each [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
@@ -144,8 +165,6 @@ tpl [Item[@kind = "Loci-Declaration"]] {
             apply [../*[position() = last()]]; // the type of the variable
           }
         }
-      } else {
-        die (#message = "We expected to find at least one Variable child of the current Variables element, but there is no such child");
       }
     }
   }
