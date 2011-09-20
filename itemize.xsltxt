@@ -8,7 +8,7 @@ include paths.xsl;
 include resolve-references.xsl;
 
 tpl count-preceding-toplevel-items {
-  `count (preceding::Item[parent::Text-Proper and (@kind = "Theorem-Item" or @kind = "Definition-Item" or @kind = "Scheme-Block-Item" or (@kind = "Regular-Statement" and not(child::Diffuse-Statement) and not(child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])))])`;
+  `count (preceding::Item[parent::Text-Proper and (@kind = "Theorem-Item" or @kind = "Definition-Item" or @kind = "Scheme-Block-Item" or @kind = "Identify" or (@kind = "Regular-Statement" and not(@shape = "Diffuse-Statement") and not(child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])))])`;
 }
 
 // Sanity checks
@@ -64,7 +64,7 @@ tpl [Item[@kind = "Section-Pragma"]] {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[not(@kind = "Section-Pragma" or @kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement) or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement")]`,
+    enumerate-items (#candidates = `Item[not(@kind = "Section-Pragma" or @kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement")]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
@@ -87,7 +87,7 @@ tpl needed-toplevel-items (#candidates, #context) {
   }
 }
 
-tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and child::Diffuse-Statement) and not(@kind = "Private-Predicate-Definition") and not(@kind = "Constant-Definition") and not(@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and @shape = "Diffuse-Statement") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Constant-Definition") and not(@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
   <Item-Bundle {
 
     if [$bundlenr] { @bundlenr = $bundlenr; }
@@ -106,7 +106,7 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
 
     <Text-Proper {
       <Item { @kind = "Section-Pragma"; }
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and child::Diffuse-Statement) or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement"]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement"]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement" and @shape = "Compact-Statement"] {
