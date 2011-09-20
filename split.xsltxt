@@ -288,6 +288,22 @@ tpl split-explicitly-qualified-segment (#variables, #type) {
   }
 }
 
+tpl [Item[@kind = "Generalization" and child::Explicitly-Qualified-Segment]] {
+  $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
+  for-each [Explicitly-Qualified-Segment/Variables/Variable] {
+    <Item {
+      for-each [@*] { copy-of `.`; }
+      @kind = "Generalization";
+      <Explicitly-Qualified-Segment {
+        <Variables {
+          apply [.];
+        }
+        apply [$type];
+      }
+    }
+  }
+}
+
 tpl [Explicitly-Qualified-Segment[not(parent::Item[@kind = "Choice-Statement"])]] {
   split-explicitly-qualified-segment (#variables = `Variables/Variable`,
                                       #type = `*[position() = last()]`);
