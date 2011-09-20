@@ -148,7 +148,14 @@ tpl [Block[@kind="Definitional-Block"]] (#context) {
 }
 
 tpl [Block[@kind = "Registration-Block"]] {
-  apply [Item[@kind = "Cluster"]];
+  choose {
+    when [Item[@kind = "Cluster"]] {
+      apply [Item[@kind = "Cluster"]];
+    }
+    when [Item[@kind = "Identify"]] {
+      apply [Item[@kind = "Identify"]];
+    }
+  }
 }
 
 tpl [Block[@kind = "Notation-Block"]] {
@@ -167,6 +174,25 @@ tpl [Item[@kind = "Cluster"]] {
       }
       <Item {
         @kind = "Cluster";
+        apply [*];
+      }
+      correctness-conditions (#candidates = `following-sibling::*`);
+    }
+  }
+}
+
+tpl [Item[@kind = "Identify"]] {
+  <Item {
+    @kind = "Definition-Item";
+    if [@line] { @line = `@line`; }
+    if [@col] { @col = `@col`; }
+    <Block {
+      @kind = "Registration-Block";
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
+        apply [.];
+      }
+      <Item {
+        @kind = "Identify";
         apply [*];
       }
       correctness-conditions (#candidates = `following-sibling::*`);
