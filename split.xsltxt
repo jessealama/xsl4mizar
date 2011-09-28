@@ -41,6 +41,15 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
   }
 }
 
+tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
+  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    @toplevel-binder-number = `$num-previous-toplevel + 1`;
+    apply [*];
+  }
+}
+
 tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition"]] {
   if [Variable[2]] {
     die (#message = "We assume that private predicate/functor definitions bind at most one variable, but we found one that binds at least two!");
