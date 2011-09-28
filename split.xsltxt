@@ -142,20 +142,13 @@ tpl [Item[@kind = "Loci-Declaration" and child::Implicitly-Qualified-Segment]] {
   $loci = `.`;
   $variable = `Implicitly-Qualified-Segment/Variable[1]`;
   $variable-idnr = `$variable/@idnr`;
-  if [not(preceding::Item[@kind = "Reservation"]/Variables/Variable[@idnr = $variable-idnr])] {
-    die (#message = "We were unable to find a type for an implicitly qualified variable by searching among preceding reservations!");
-  }
-  $type = `preceding::Item[@kind = "Reservation"]/Variables/Variable[@idnr = $variable-idnr]/../../*[position() = last()]`;
   $num_preceding = count-preceding-eliminable-toplevel-items ();
   <Item {
     for-each [$loci/@*] { copy-of `.`; }
     @toplevel-binder-number = `$num_preceding + 1`;
-    @idnr = `@idnr`;
-    <Explicitly-Qualified-Segment {
-      <Variables {
-        apply [$variable]; // variable
-      }
-      apply [$type]; // the type of the variable
+    @idnr = $variable-idnr;
+    <Implicitly-Qualified-Segment {
+      apply [$variable];
     }
   }
 }
