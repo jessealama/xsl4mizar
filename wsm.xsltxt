@@ -945,23 +945,30 @@ tpl [Item[@kind='PropertyRegistration']] { // shouldn't this be "Property-Regist
   }
 }
 
-tpl [Item[@kind='Property']] {
-  if [not(@property)] {
-    die (#message = "We expected a Property item to have a property attribute!");
-  }
-  `@property`;
-  choose {
-    when [Block[@kind='Proof']] {
-      "\n";
-      apply [Block[@kind='Proof'][1]];
-    }
-    when [Straightforward-Justification] {
-      apply [Straightforward-Justification]; ";"; "\n";
-    }
-    otherwise {
-      ";"; "\n";
-    }
-  }
+//////////////////////////////////////////////////////////////////////
+// Properties
+//////////////////////////////////////////////////////////////////////
+
+tpl [Item[@kind = "Property" and not(@property)]] {
+  die (#message = "We expected a Property item to have a property attribute!");
+}
+
+tpl [Item[@kind = "Property" and child::Block[@kind = "Proof"] and child::Straightforward-Justification]] {
+  die (#message = "Don't know how to handle a Property item that has both a Proof block child and a Straightforward-Justificiation child!");
+}
+
+tpl [Item[@kind = "Property" and @property and child::Block[@kind = "Proof"] and not(child::Straightforward-Justification)]] {
+  `@property`; "\n";
+   apply [Block[@kind='Proof'][1]];
+}
+
+tpl [Item[@kind = "Property" and @property and not(child::Block[@kind = "Proof"]) and child::Straightforward-Justification]] {
+  `@property`; "\n";
+  apply [Straightforward-Justification]; ";"; "\n";
+}
+
+tpl [Item[@kind = "Property" and @property and not(child::Straightforward-Justification) and not(child::Block[@kind = "Proof"])]] {
+  ";"; "\n";
 }
 
 tpl [Item[@kind="Correctness"]] {
