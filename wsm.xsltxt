@@ -179,23 +179,23 @@ tpl [Block[@kind='Case' and not(child::Item[@kind = "Case-Head"])]] {
   die (#message = "Don't know how to deal with a Case block that lacks a Case-Head item child!");
 }
 
-tpl [Block[@kind='Suppose']] {
-  if [Item[@kind='Suppose-Head']] {
-    if [Item[@kind='Suppose-Head'][1]/Collective-Assumption] {
-      // skip applying the Suppose-Head template; we'll do the work here
-      "suppose that ";
-      list (#separ = "\nand\n",
-           #elems = `Item[@kind='Suppose-Head'][1]/Collective-Assumption/Conditions/Proposition`);
-      ";"; "\n";
-      apply [*[position() > 1]];
-    } else {
-      apply [Item[@kind='Suppose-Head'][1]]; "\n";
-      apply [*[position() > 1]];
-    }
-    "end;"; "\n";
+tpl [Block[@kind='Suppose' and child::Item[@kind = "Suppose-Head"]]] {
+  if [Item[@kind='Suppose-Head'][1]/Collective-Assumption] {
+    // skip applying the Suppose-Head template; we'll do the work here
+    "suppose that ";
+    list (#separ = "\nand\n",
+         #elems = `Item[@kind='Suppose-Head'][1]/Collective-Assumption/Conditions/Proposition`);
+    ";"; "\n";
+    apply [*[position() > 1]];
   } else {
-    die (#message = "Don't know how to deal with a Suppose block that lacks a Suppose-Head child!");
+    apply [Item[@kind='Suppose-Head'][1]]; "\n";
+    apply [*[position() > 1]];
   }
+  "end;"; "\n";
+}
+
+tpl [Block[@kind='Suppose' and not(child::Item[@kind = "Suppose-Head"])]] {
+  die (#message = "Don't know how to deal with a Suppose block that lacks a Suppose-Head child!");
 }
 
 tpl [Item[@kind='Case-Head' and child::Single-Assumption]] {
