@@ -54,55 +54,78 @@ tpl exists-path-from-some-toplevel-item-to-context (#items, #context, #later-ite
   }
 }
 
-tpl toplevel-items-in-which-item-occurs (#idnr, #items, #val) {
+tpl toplevel-items-in-which-items-occur (#items, #toplevel-items, #val) {
+  if [$items] {
+    $item = `$items[1]`;
+    $users = toplevel-items-in-which-item-occurs (#item = `$items[1]`,
+                                                  #items = $toplevel-items,
+                                                  #val = $val);
+    toplevel-items-in-which-items-occur (#items = `$items[position() > 1]`,
+                                         #toplevel-items = $toplevel-items,
+                                         #val = $users);
+  } else {
+    $val;
+  }
+}
+
+tpl toplevel-items-in-which-item-occurs (#item, #items, #val) {
   if [$items = ""] {
     $val;
   } else {
-    $idnr-token = `concat (",", $idnr, ",")`;
-    $first-toplevel-item-number-token = first-token (#token-string = $items);
-    $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
-    $first-toplevel-item = `key ("binder", $first-toplevel-item-number)`;
-    $remaining-items = token-string-tail (#token-string = $items);
-    $new-val = append-token-strings (#token-string-a = $val,
-                                     #token-string-b = $first-toplevel-item-number-token);
-    if [$first-toplevel-item] {
-      $first-toplevel-item-free-variables = `$first-toplevel-item/@free-variables`;
-      choose {
-        when [contains ($first-toplevel-item-free-variables, $idnr-token)] {
-          toplevel-items-in-which-item-occurs (#idnr = $idnr,
-                                               #items = $remaining-items,
-                                               #val = $new-val);
-        }
-        when [$first-toplevel-item//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
-          toplevel-items-in-which-item-occurs (#idnr = $idnr,
-                                               #items = $remaining-items,
-                                               #val = $new-val);
-        }
-        otherwise {
-          // go hunting for the appearance of $idnr as an argument of a dependent type
-          if [$first-toplevel-item//Implicitly-Qualified-Segment] {
-            $variable = `$first-toplevel-item//Implicitly-Qualified-Segment/Variable[1]`; // should I worry about multiple variables?
-            $variable-idnr = `$variable/@idnr`;
-            $type = `preceding::Item[@kind = "Reservation"]/Variable[@idnr = $variable-idnr]/../*[position() = last()]`;
-            if [$type//Simple-Term[@idnr = $idnr]] {
-              toplevel-items-in-which-item-occurs (#idnr = $idnr,
+    for-each [$item] {
+      if [self::Item[@kind = "Choice-Statement"]] {
+        toplevel-items-in-which-items-occur (#items = `Explicitly-Qualified-Segment/Variables/Variable | Implicitly-Qualified-Segment/Variable`,
+                                             #toplevel-items = $items,
+                                             #val = "");
+      } else {
+        $idnr = `$item/@idnr`;
+        $idnr-token = `concat (",", $idnr, ",")`;
+        $first-toplevel-item-number-token = first-token (#token-string = $items);
+        $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
+        $first-toplevel-item = `key ("binder", $first-toplevel-item-number)`;
+        $remaining-items = token-string-tail (#token-string = $items);
+        $new-val = append-token-strings (#token-string-a = $val,
+                                         #token-string-b = $first-toplevel-item-number-token);
+        if [$first-toplevel-item] {
+          $first-toplevel-item-free-variables = `$first-toplevel-item/@free-variables`;
+          choose {
+            when [contains ($first-toplevel-item-free-variables, $idnr-token)] {
+              toplevel-items-in-which-item-occurs (#item = $item,
                                                    #items = $remaining-items,
                                                    #val = $new-val);
-            } else {
-              toplevel-items-in-which-item-occurs (#idnr = $idnr,
-                                                   #items = $remaining-items,
-                                                   #val = $val);
             }
-          } else {
-            toplevel-items-in-which-item-occurs (#idnr = $idnr,
-                                                 #items = $remaining-items,
-                                                 #val = $val);
+            when [$first-toplevel-item//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+              toplevel-items-in-which-item-occurs (#item = $item,
+                                                   #items = $remaining-items,
+                                                   #val = $new-val);
+            }
+            otherwise {
+              // go hunting for the appearance of $idnr as an argument of a dependent type
+              if [$first-toplevel-item//Implicitly-Qualified-Segment] {
+                $variable = `$first-toplevel-item//Implicitly-Qualified-Segment/Variable[1]`; // should I worry about multiple variables?
+                $variable-idnr = `$variable/@idnr`;
+                $type = `preceding::Item[@kind = "Reservation"]/Variable[@idnr = $variable-idnr]/../*[position() = last()]`;
+                if [$type//Simple-Term[@idnr = $idnr]] {
+                  toplevel-items-in-which-item-occurs (#item = $item,
+                                                       #items = $remaining-items,
+                                                       #val = $new-val);
+                } else {
+                  toplevel-items-in-which-item-occurs (#item = $item,
+                                                       #items = $remaining-items,
+                                                       #val = $val);
+                }
+              } else {
+                toplevel-items-in-which-item-occurs (#item = $item,
+                                                     #items = $remaining-items,
+                                                     #val = $val);
+              }
+            }
           }
+        } else {
+          $message = `concat ("We tried to look up the toplevel item whose idnr is ", $first-toplevel-item-number, " (the first element of the token list '", $items, "' of item idnr numbers) but there is no such item")`;
+          die (#message = $message);
         }
       }
-    } else {
-      $message = `concat ("We tried to look up the toplevel item whose idnr is ", $first-toplevel-item-number, " (the first element of the token list '", $items, "' of item idnr numbers) but there is no such item")`;
-      die (#message = $message);
     }
   }
 }
@@ -126,6 +149,9 @@ tpl every-item-bound-by-some-toplevel-item (#items, #toplevel-items) {
 tpl item-bound-by-some-toplevel-item (#item, #items) {
   for-each [$item] {
     choose {
+      when [$items = ""] {
+        "0";
+      }
       when [self::Item[@kind = "Choice-Statement"]] {
         // a choice statement is smashed only when all of its variables are smashed
         $every-variable-smashed = every-item-bound-by-some-toplevel-item (#items = `descendant::Variable`,
@@ -134,29 +160,25 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
       }
       when [$item/@idnr] {
         $idnr = `$item/@idnr`;
-        if [$items = ""] {
-          "0";
-        } else {
-          $first-toplevel-item-number-token = first-token (#token-string = $items);
-          $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
-          $first-item = `key ("binder", $first-toplevel-item-number)`;
-          $remaining-items = token-string-tail (#token-string = $items);
-          for-each [$first-item] {
-            choose {
-              when [self::Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
-                item-bound-by-some-toplevel-item (#item = $item,
-                                                  #items = $remaining-items);
-              }
-              when [@idnr = $idnr] {
-                "1";
-              }
-              when [self::Item[@kind = "Choice-Statement" and child::Explicitly-Qualified-Segment/Variables/Variable[@idnr = $idnr]]] {
-                "1";
-              }
-              otherwise {
-                item-bound-by-some-toplevel-item (#item = $item,
-                                                  #items = $remaining-items);
-              }
+        $first-toplevel-item-number-token = first-token (#token-string = $items);
+        $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
+        $first-item = `key ("binder", $first-toplevel-item-number)`;
+        $remaining-items = token-string-tail (#token-string = $items);
+        for-each [$first-item] {
+          choose {
+            when [self::Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
+              item-bound-by-some-toplevel-item (#item = $item,
+                                                #items = $remaining-items);
+            }
+            when [@idnr = $idnr] {
+              "1";
+            }
+            when [self::Item[@kind = "Choice-Statement" and child::Explicitly-Qualified-Segment/Variables/Variable[@idnr = $idnr]]] {
+              "1";
+            }
+            otherwise {
+              item-bound-by-some-toplevel-item (#item = $item,
+                                                #items = $remaining-items);
             }
           }
         }
@@ -400,7 +422,7 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
             if [$kind = "Private-Predicate-Definition" and $context//Private-Predicate-Formula[@idnr = $idnr]] {
               "1";
             } else {
-              $later-users = toplevel-items-in-which-item-occurs (#idnr = $idnr,
+              $later-users = toplevel-items-in-which-item-occurs (#item = $item,
                                                                   #items = $all-later-toplevel-items);
               exists-path-from-some-toplevel-item-to-context (#items = $later-users,
                                                               #context = $context,
