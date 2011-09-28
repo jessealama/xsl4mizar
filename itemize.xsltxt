@@ -87,17 +87,11 @@ tpl needed-toplevel-items (#candidates, #context) {
   }
 }
 
-tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and @shape = "Diffuse-Statement") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Constant-Definition") and not(@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and @shape = "Diffuse-Statement") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Constant-Definition") and not(@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) and not(@kind = "Choice-Statement") and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
   <Item-Bundle {
 
-    if [$bundlenr] { @bundlenr = $bundlenr; }
-    if [$articleid] { @articleid = $articleid; }
-
-    // check for choice statements that used to exist in the .wsx, but
-    // which have since been manipulated by split.xsl into new
-    // definitions.  For choice statements, split.xsl generates
-    // toplevel items that have a promoted and a spelling attribute.
-    // Pass these along to the main Item-Bundle element.
+   @bundlenr = $bundlenr;
+   @articleid = $articleid;
 
    if [@promoted] { @promoted = `@promoted`; }
    if [@spelling] { @spelling = `@spelling`; }
@@ -106,7 +100,7 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
 
     <Text-Proper {
       <Item { @kind = "Section-Pragma"; }
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement"]`, #context = $context);
+      needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Reservation" or @kind = "Private-Predicate-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement"]`, #context = $context);
       copy {
         // possibly promote toplevel Regular-Statement items to theorems
         if [@kind = "Regular-Statement" and @shape = "Compact-Statement"] {
