@@ -10,7 +10,7 @@ output method=xml;
 // such as reservations or loci declarations) to some item.
 //////////////////////////////////////////////////////////////////////
 
-key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind="Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and @toplevel-binder-number) or @kind = "Type-Changing-Statement"]] `@toplevel-binder-number`;
+key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Choice-Statement" or @kind = "Private-Predicate-Definition" or (@kind="Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and @toplevel-binder-number) or @kind = "Type-Changing-Statement"]] `@toplevel-binder-number`;
 
 // Determine whether there is a path from the variable bound by
 // $reservation to $context (i.e., whether the variable occurs
@@ -107,36 +107,67 @@ tpl toplevel-items-in-which-item-occurs (#idnr, #items, #val) {
   }
 }
 
+tpl every-item-bound-by-some-toplevel-item (#items, #toplevel-items) {
+  if [$items] {
+    $bound = item-bound-by-some-toplevel-item (#item = `$items[1]`,
+                                               #items = $toplevel-items);
+    if [$bound = "1"] {
+      every-item-bound-by-some-toplevel-item (#items = `$items[position() > 1]`,
+                                              #toplevel-items = $toplevel-items);
+    } else {
+      "0";
+    }
+  } else {
+    "1";
+  }
+}
+
 // $reservations is a list of reservation numbers
 tpl item-bound-by-some-toplevel-item (#item, #items) {
-  if [$item/@idnr] {
-    $idnr = `$item/@idnr`;
-    if [$items = ""] {
-      "0";
-    } else {
-      $first-toplevel-item-number-token = first-token (#token-string = $items);
-      $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
-      $first-item = `key ("binder", $first-toplevel-item-number)`;
-      $remaining-items = token-string-tail (#token-string = $items);
-      for-each [$first-item] {
-        if [self::Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
-          item-bound-by-some-toplevel-item (#item = $item,
-                                            #items = $remaining-items);
+  for-each [$item] {
+    choose {
+      when [self::Item[@kind = "Choice-Statement"]] {
+        // a choice statement is smashed only when all of its variables are smashed
+        $every-variable-smashed = every-item-bound-by-some-toplevel-item (#items = `descendant::Variable`,
+                                                                          #toplevel-items = $items);
+        $every-variable-smashed;
+      }
+      when [$item/@idnr] {
+        $idnr = `$item/@idnr`;
+        if [$items = ""] {
+          "0";
         } else {
-          if [@idnr = $idnr] {
-            "1";
-          } else {
-            item-bound-by-some-toplevel-item (#item = $item,
-                                              #items = $remaining-items);
+          $first-toplevel-item-number-token = first-token (#token-string = $items);
+          $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
+          $first-item = `key ("binder", $first-toplevel-item-number)`;
+          $remaining-items = token-string-tail (#token-string = $items);
+          for-each [$first-item] {
+            choose {
+              when [self::Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
+                item-bound-by-some-toplevel-item (#item = $item,
+                                                  #items = $remaining-items);
+              }
+              when [@idnr = $idnr] {
+                "1";
+              }
+              when [self::Item[@kind = "Choice-Statement" and child::Explicitly-Qualified-Segment/Variables/Variable[@idnr = $idnr]]] {
+                "1";
+              }
+              otherwise {
+                item-bound-by-some-toplevel-item (#item = $item,
+                                                  #items = $remaining-items);
+              }
+            }
           }
         }
       }
+      otherwise {
+        $item-line = `$item/@line`;
+        $item-col = `$item/@col`;
+        $message = `concat ("Don't know how to determine whether the item on line ", $item-line, " and column ", $item-col, " is bound by some other items, because it lacks an idnr attribute.")`;
+        die (#message = $message);
+      }
     }
-  } else {
-    $item-line = `$item/@line`;
-    $item-col = `$item/@col`;
-    $message = `concat ("Don't know how to determine whether the item on line ", $item-line, " and column ", $item-col, " is bound by some other items, because it lacks an idnr attribute.")`;
-    die (#message = $message);
   }
 }
 
