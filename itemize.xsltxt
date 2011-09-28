@@ -68,7 +68,7 @@ tpl [Item[@kind = "Pragma"]] {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[not(@kind = "Section-Pragma" or @kind = "Pragma" or @kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement")]`,
+    enumerate-items (#candidates = `Item[not(@kind = "Section-Pragma" or @kind = "Pragma" or @kind = "Reservation" or @kind = "Choice-Statement" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement")]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
