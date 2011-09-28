@@ -594,7 +594,7 @@ tpl [Definiens] {
 }
 
 tpl [Partial-Definiens] {
-  apply [*[2]]; " if "; apply [*[3]]; // hmm...
+  apply [*[1]]; " if "; apply [*[2]]; // hmm...
 }
 
 tpl [Qualifying-Formula] {
