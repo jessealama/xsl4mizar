@@ -181,7 +181,7 @@ tpl [Block[@kind='Suppose']] {
       // skip applying the Suppose-Head template; we'll do the work here
       "suppose that ";
       list (#separ = "\nand\n",
-           #elems = `Item[@kind='Suppose-Head'][1]/Collective-Assumption/Proposition`);
+           #elems = `Item[@kind='Suppose-Head'][1]/Collective-Assumption/Conditions/Proposition`);
       ";"; "\n";
       apply [*[position() > 1]];
     } else {
