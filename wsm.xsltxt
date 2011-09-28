@@ -140,39 +140,43 @@ tpl [Item[@kind='Section-Pragma']] {
   "begin"; "\n";
 }
 
+//////////////////////////////////////////////////////////////////////
+// Case blocks
+//////////////////////////////////////////////////////////////////////
+
 tpl [Item[@kind='Per-Cases']] {
   "per cases "; apply-justification-if-present (#end = "1");
 }
 
-tpl [Item[@kind='Case-Block']] {
-  if [Block[@kind='Suppose']] {
-    apply [Block[@kind='Suppose'][1]]; // could there be more than one?
-  } else {
-    if [Block[@kind='Case']] {
-      apply [Block[@kind='Case'][1]];
-    } else {
-      die (#message = "Don't know how to deal with a Case-Block item that lacks both a Suppose block and Case block child!");
-    }
-  }
+tpl [Item[@kind='Case-Block' and child::Block[@kind = "Suppose"]]] {
+  apply [Block[@kind='Suppose'][1]]; // could there be more than one?
 }
 
-tpl [Block[@kind='Case']] {
-  if [Item[@kind='Case-Head']] {
-    if [Item[@kind='Case-Head'][1]/Collective-Assumption] {
-      // skip applying the Case-Head template; we'll do the work here
-      "case that ";
-      list (#separ = "\nand\n",
-           #elems = `Item[@kind='Case-Head'][1]/Collective-Assumption/Proposition`);
-      ";"; "\n";
-      apply [*[position() > 1]];
-    } else {
-      apply [Item[@kind='Case-Head'][1]]; ";"; "\n";
-      apply [*[position() > 1]];
-    }
-    "end;"; "\n";
+tpl [Item[@kind='Case-Block' and child::Block[@kind = "Case"]]] {
+  apply [Block[@kind='Case'][1]];
+}
+
+tpl [Item[@kind='Case-Block' and not(child::Block[@kind = "Case"]) and not(child::Block[@kind = "Suppose"])]] {
+  die (#message = "Don't know how to deal with a Case-Block item that lacks both a Suppose block and Case block child!");
+}
+
+tpl [Block[@kind='Case' and child::Item[@kind = "Case-Head"]]] {
+  if [Item[@kind='Case-Head'][1]/Collective-Assumption] {
+    // skip applying the Case-Head template; we'll do the work here
+    "case that ";
+    list (#separ = "\nand\n",
+         #elems = `Item[@kind='Case-Head'][1]/Collective-Assumption/Proposition`);
+    ";"; "\n";
+    apply [*[position() > 1]];
   } else {
-    die (#message = "Don't know how to deal with a Case block that lacks a Case-Head item child!");
+    apply [Item[@kind='Case-Head'][1]]; ";"; "\n";
+    apply [*[position() > 1]];
   }
+  "end;"; "\n";
+}
+
+tpl [Block[@kind='Case' and not(child::Item[@kind = "Case-Head"])]] {
+  die (#message = "Don't know how to deal with a Case block that lacks a Case-Head item child!");
 }
 
 tpl [Block[@kind='Suppose']] {
@@ -194,54 +198,53 @@ tpl [Block[@kind='Suppose']] {
   }
 }
 
-tpl [Item[@kind='Case-Head']] {
-  if [Single-Assumption | Collective-Assumption] {
-    "case ";
-    if [Single-Assumption] {
-      apply [Single-Assumption[1]];
-    } else {
-      apply [Collective-Assumption[1]];
-    }
-  } else {
-    die (#message = "Don't know how to deal with a Case-Head item that lacks a Single-Assumption child and a Collective-Assumption child!");
-  }
+tpl [Item[@kind='Case-Head' and child::Single-Assumption]] {
+  "case "; apply [Single-Assumption[1]];
 }
 
-tpl [Item[@kind='Suppose-Head']] {
-  if [Single-Assumption] {
-    "suppose "; apply [Single-Assumption[1]]; ";"; "\n";
-  } else {
-    die (#message = "Don't know how to deal with a Suppose-Head item that lacks a Single-Assumption child!");
-  }
+tpl [Item[@kind='Case-Head' and child::Collective-Assumption]] {
+  "case "; apply [Collective-Assumption[1]];
 }
 
-tpl [Item[@kind='Scheme-Block-Item']] {
-
-  // sanity check: there is one and only one Scheme-Block child
-  if [Block[@kind='Scheme-Block']] {
-    apply[Block[@kind='Scheme-Block'][1]];
-  } else {
-    die(#message = "Scheme-Block child of a Scheme-Block-Item is missing!");
-  }
+tpl [Item[@kind='Case-Head' and not(child::Single-Assumption) and not(child::Collective-Assumption)]] {
+  die (#message = "Don't know how to deal with a Case-Head item that lacks a Single-Assumption child and a Collective-Assumption child!");
 }
 
-tpl [Block[@kind='Scheme-Block']] {
+tpl [Item[@kind='Suppose-Head' and child::Single-Assumption]] {
+  "suppose "; apply [Single-Assumption[1]]; ";"; "\n";
+}
 
-  // sanity check: there is one and only one Scheme-Head child
-  if [Item[@kind='Scheme-Head']] {
-    apply [Item[@kind='Scheme-Head'][1]];
-    if [*[2]] { // I guess this is the proof
-      "\n";
-      "proof";
-      "\n";
-      apply [*[position() > 1]];
-      "end";
-      ";";
-      "\n";
-    }
-  } else {
-    die (#message = "Scheme-Head child of Scheme-Block is missing!");
+tpl [Item[@kind='Suppose-Head' and not(child::Single-Assumption)]] {
+  die (#message = "Don't know how to deal with a Suppose-Head item that lacks a Single-Assumption child!");
+}
+
+//////////////////////////////////////////////////////////////////////
+// Schemes
+//////////////////////////////////////////////////////////////////////
+
+tpl [Item[@kind='Scheme-Block-Item' and child::Block[@kind = "Scheme-Block"]]] {
+  apply[Block[@kind='Scheme-Block'][1]];
+}
+
+tpl [Item[@kind='Scheme-Block-Item' and not(child::Block[@kind = "Scheme-Block"])]] {
+  die(#message = "Scheme-Block child of a Scheme-Block-Item is missing!");
+}
+
+tpl [Block[@kind='Scheme-Block' and child::Item[@kind = "Scheme-Head"]]] {
+  apply [Item[@kind='Scheme-Head'][1]];
+  if [*[2]] { // I guess this is the proof
+   "\n";
+    "proof";
+    "\n";
+    apply [*[position() > 1]];
+    "end";
+    ";";
+    "\n";
   }
+}}
+
+tpl [Block[@kind='Scheme-Block' and not(child::Item[@kind = "Scheme-Head"])]] {
+  die (#message = "Scheme-Head child of Scheme-Block is missing!");
 }
 
 tpl [Item[@kind='Definition-Item']] {
