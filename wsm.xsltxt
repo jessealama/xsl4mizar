@@ -950,11 +950,17 @@ tpl [Item[@kind='Property']] {
     die (#message = "We expected a Property item to have a property attribute!");
   }
   `@property`;
-  if [Block[@kind='Proof']] {
-    "\n";
-    apply [Block[@kind='Proof'][1]];
-  } else {
-    ";"; "\n";
+  choose {
+    when [Block[@kind='Proof']] {
+      "\n";
+      apply [Block[@kind='Proof'][1]];
+    }
+    when [Straightforward-Justification] {
+      apply [Straightforward-Justification]; ";"; "\n";
+    }
+    otherwise {
+      ";"; "\n";
+    }
   }
 }
 
