@@ -7,7 +7,7 @@ output method=xml;
 
 //////////////////////////////////////////////////////////////////////
 // Computing (existence of) paths from a set of items (e.g., binders,
-// such as reservations or loci delcarations) to some item.
+// such as reservations or loci declarations) to some item.
 //////////////////////////////////////////////////////////////////////
 
 key "binder" [Item[@kind = "Loci-Declaration"] | /Text-Proper/Item[@kind = "Reservation" or @kind = "Private-Predicate-Definition" or (@kind="Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and @toplevel-binder-number) or @kind = "Type-Changing-Statement"]] `@toplevel-binder-number`;
