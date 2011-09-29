@@ -241,7 +241,7 @@ tpl [Block[@kind='Scheme-Block' and child::Item[@kind = "Scheme-Head"]]] {
     ";";
     "\n";
   }
-}}
+}
 
 tpl [Block[@kind='Scheme-Block' and not(child::Item[@kind = "Scheme-Head"])]] {
   die (#message = "Scheme-Head child of Scheme-Block is missing!");

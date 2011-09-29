@@ -13,7 +13,7 @@ tpl [*] {
 }
 
 tpl count-preceding-eliminable-toplevel-items {
-  `count (preceding::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])] | preceding::Item[@kind = "Loci-Declaration"])`;
+  `count (preceding::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or @kind = "Regular-Statement" or @kind = "Loci-Declaration"])`;
 }
 
 tpl [Text-Proper/Item[@kind = "Reservation" and not(child::Variables)]] {
