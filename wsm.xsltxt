@@ -1592,8 +1592,12 @@ tpl [Item[@kind='Scheme-Head']] {
   }
 }
 
-tpl [Item[@kind='Canceled-Pragma']] {
+tpl [Item[@kind='Canceled-Pragma' and not(@number)]] {
   apply [Canceled];
+}
+
+tpl [Item[@kind='Canceled-Pragma' and @number]] {
+  "canceled "; `@number`; ";"; "\n";
 }
 
 tpl [Canceled] {

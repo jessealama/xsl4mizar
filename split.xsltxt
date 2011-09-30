@@ -361,3 +361,27 @@ tpl [Existential-Quantifier-Formula/Explicitly-Qualified-Segment] {
     apply [*];
   }
 }
+
+tpl [Item[@kind = "Canceled-Pragma" and not(@number)]] {
+  die (#message = "Don't know how to deal with a 'canceled' pragma that lacks a number! ");
+}
+
+tpl emit-canceled-theorem (#times, #line, #col) {
+  if [$times > "0"] {
+    <Item {
+      @kind = "Canceled-Pragma";
+      @line = `@line`;
+      @col = `@col`;
+      @"number" = "1";
+    }
+    emit-canceled-theorem (#times = `$times - 1`,
+                           #line = $line,
+                           #col = $col);
+  }
+}
+
+tpl [Item[@kind = "Canceled-Pragma" and @number]] {
+  emit-canceled-theorem (#times = `@number`,
+                         #line = `@line`,
+                         #col = `@col`);
+}
