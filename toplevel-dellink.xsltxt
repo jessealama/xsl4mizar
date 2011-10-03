@@ -68,7 +68,6 @@ tpl [Text-Proper/Item[@kind = "Regular-Statement" and not(child::Proposition/Lab
       die (#message = "We were not able to compute a fresh idnr attribute for a toplevel Regular-Statement item that lacks a label.");
     }
     @idnr = $idnr;
-    apply [*[1]]; // should be one of: Compact-Statement, Diffuse-Statement
     <Proposition {
       <Label {
         @spelling = $new-label;
