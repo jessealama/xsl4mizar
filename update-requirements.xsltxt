@@ -19,7 +19,8 @@ include die.xsl;
 //
 //  FOO1,BAR,BA5_4
 //
-// It is assumed that HIDDEN is not among the tokens of $new-requirements.
+// If HIDDEN is among the tokens of $new-requirements, it will appear
+// twice in the output.
 
 #new-requirements = { ""; }
 
@@ -64,8 +65,10 @@ tpl [Directive[@name = "Requirements"]] {
   } else {
     <Directive {
       @"name" = "Requirements";
-      <Ident {
-        @"name" = "HIDDEN";
+      if [not(contains $new-requirements, ",HIDDEN,")] {
+        <Ident {
+          @"name" = "HIDDEN";
+        }
       }
       emit-identifiers (#identifier-token-string = $new-requirements);
     }
