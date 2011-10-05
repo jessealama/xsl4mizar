@@ -1,0 +1,65 @@
+stylesheet 1.0;
+
+output method=xml indent="yes";
+
+include die.xsl;
+
+// The target constructor kind
+#kind = { ""; }
+
+// The target constructor nr
+#nr = { ""; }
+
+// The target constructor relnr
+#relnr = { ""; }
+
+// The target constructor's article
+#aid = { ""; }
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl [/] {
+  apply [Constructors];
+}
+
+tpl [Constructors] {
+  apply [Constructor];
+}
+
+tpl [Constructor[$kind = "M" and @kind = "M" and @nr = $nr and @relnr = $relnr and @aid = $aid]] {
+  <Constructor {
+    for-each [@*] { copy-of `.`; }
+    @promoted = "yes";
+    <ArgTypes {
+      for-each [ArgTypes/*] {
+        <Typ {
+          @kind = "M";
+          @nr = "1";
+          <Cluster;
+        }
+      }
+    }
+  }
+}
+
+tpl [Constructor[$kind = "R" and @kind = "R" and @nr = $nr and @relnr = $relnr and @aid = $aid]] {
+  <Constructor {
+    for-each [@*] { copy-of `.`; }
+    @promoted = "yes";
+    <ArgTypes {
+      for-each [ArgTypes/*] {
+        <Typ {
+          @kind = "M";
+          @nr= "1";
+          <Cluster;
+        }
+      }
+    }
+  }
+}
