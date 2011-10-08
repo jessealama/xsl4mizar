@@ -32,19 +32,72 @@ tpl [Constructors] {
   apply [Constructor];
 }
 
+tpl [ArgTypes] mode="promote" {
+  <ArgTypes {
+    for-each [ArgTypes/*] {
+      <Typ {
+        @kind = "M";
+        @nr = "1";
+        <Cluster;
+      }
+    }
+  }
+}
+
+tpl [Typ] mode="promote" {
+  <Typ {
+    @kind = "M";
+    @nr = "1";
+  }
+}
+
 tpl [Constructor[$kind = "M" and @kind = "M" and @nr = $nr and @relnr = $relnr and @aid = $aid]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
     @promoted = "yes";
-    <ArgTypes {
-      for-each [ArgTypes/*] {
-        <Typ {
-          @kind = "M";
-          @nr = "1";
-          <Cluster;
-        }
-      }
+    apply [ArgTypes] mode="promote";
+  }
+}
+
+// For right functor brackets, there is nothing to do
+tpl [Constructor[$kind = "L" and @kind = "L"] {
+  message ("Promoting a right functor bracket; there is nothing to do.");
+  <Constructor {
+    for-each [@*] { copy-of `.`; }
+    @promoted = "yes";
+    apply [*];
+  }
+}
+
+tpl [Constructor[$kind = "G" and @kind = "G" and @nr = $nr and @relnr = $relnr and @aid = $aid]] {
+  <Constructor {
+    for-each [@*] { copy-of `.`; }
+    @promoted = "yes";
+    apply [ArgTypes] mode="promote";
+    // result type: "mere structure".  We might also experiment with making the return type 'set'.  But this might screw up too much.
+    <Typ {
+      @kind = "G";
+      @nr = "1";
+      <Cluster;
     }
+    apply [Fields]; // nothing to do here
+  }
+}
+
+tpl [Constructor[$kind = "U" and @kind = "U" and @nr = $nr and @relnr = $relnr and @aid = $aid]] {
+  <Constructor {
+    for-each [@*] { copy-of `.`; }
+    @promoted = "yes";
+    apply [ArgTypes] mode="promote";
+    apply [Typ] mode="promote";
+  }
+}
+
+tpl [Constructor[$kind = "V" and @kind = "V" and @nr = $nr and @relnr = $relnr and @aid = $aid]] {
+  <Constructor {
+    for-each [@*] { copy-of `.`; }
+    @promoted = "yes";
+    apply [ArgTypes] mode="promote"; // argument types
   }
 }
 
@@ -52,14 +105,15 @@ tpl [Constructor[$kind = "R" and @kind = "R" and @nr = $nr and @relnr = $relnr a
   <Constructor {
     for-each [@*] { copy-of `.`; }
     @promoted = "yes";
-    <ArgTypes {
-      for-each [ArgTypes/*] {
-        <Typ {
-          @kind = "M";
-          @nr= "1";
-          <Cluster;
-        }
-      }
-    }
+    apply [ArgTypes] mode="promote"; // argument types
+  }
+}
+
+tpl [Constructor[$kind = "K" and @kind = "K" and @nr = $nr and @relnr = $relnr and @aid = $aid]] {
+  <Constructor {
+    for-each [@*] { copy-of `.`; }
+    @promoted = "yes";
+    apply [ArgTypes] mode="promote"; // argument types
+    apply [Typ] mode="promote"; // result type
   }
 }
