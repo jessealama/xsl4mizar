@@ -1,6 +1,6 @@
 stylesheet 1.0;
 
-output method=xml indent="yes";
+output method=xml indent="no";
 
 include die.xsl;
 
@@ -18,9 +18,18 @@ include die.xsl;
 
 tpl [*] {
   $element = `local-name ()`;
-  <$element {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
+  if [*] {
+    <$element {
+      for-each [@*] { copy-of `.`; }
+      "\n";
+      for-each [*] {
+        apply [.]; "\n";
+      }
+    }
+  } else {
+    <$element {
+      for-each [@*] { copy-of `.`; }
+    }
   }
 }
 
@@ -28,10 +37,25 @@ tpl [/] {
   apply [Constructors];
 }
 
+tpl escape-backslash(#str) {
+  if [contains ($str, '/')] {
+    $before = `substring-before ($str, '/')`;
+    $after = `substring-after ($str, '/')`;
+    $tail = escape-backslash (#str = $after);
+    `concat ($before, "&amp;#47;", $tail)`;
+  } else {
+    $str;
+  }
+}
+
 tpl [Constructors] {
   <Constructors {
-    for-each [@*] { copy-of `.`; }
-    apply [Constructor];
+    @aid = `@aid`;
+    @mizfiles = escape-backslash (#str = `@mizfiles`);
+    "\n";
+    for-each [Constructor] {
+      apply [.]; "\n";
+    }
   }
 }
 
@@ -40,6 +64,7 @@ tpl [ArgTypes] mode="promote" {
   <ArgTypes {
     for-each [*] {
       apply [.] mode="promote";
+      "\n";
     }
   }
 }
@@ -53,7 +78,9 @@ tpl [Typ] mode="promote" {
   <Typ {
     @kind = "M";
     @nr = "1";
+    "\n";
     <Cluster;
+    "\n";
   }
 }
 
@@ -62,10 +89,19 @@ tpl [Constructor[@kind = "M"]] {
     for-each [@*] { copy-of `.`; }
     if [$kind = "M" and $nr = @nr and @relnr = $relnr and @aid = $aid] {
       @promoted = "yes";
+      "\n";
+      apply [Properties] mode="promote";
+      "\n";
       apply [ArgTypes] mode="promote"; // argument types
+      "\n";
+      apply [Typ] mode="promote";
+      "\n";
     } else {
       @promoted = "no";
-      apply [ArgTypes];
+      "\n";
+      for-each [*] {
+        apply [.]; "\n";
+      }
     }
   }
 }
@@ -80,7 +116,10 @@ tpl [Constructor[@kind = "L"]] {
     } else {
       @promoted = "no";
     }
-    apply [*];
+    "\n";
+    for-each [*] {
+      apply [.]; "\n";
+    }
   }
 }
 
@@ -89,17 +128,25 @@ tpl [Constructor[@kind = "G"]] {
     for-each [@*] { copy-of `.`; }
     if [$kind = "G" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
       @promoted = "yes";
+      "\n";
       apply [ArgTypes] mode="promote"; // argument types
+      "\n";
       // result type: "mere structure".  We might also experiment with making the return type 'set'.  But this might screw up too much.
       <Typ {
         @kind = "G";
         @nr = "1";
         <Cluster;
+        "\n";
       }
+      "\n";
       apply [Fields]; // nothing to do here
+      "\n";
     } else {
       @promoted = "no";
-      apply [*];
+      "\n";
+      for-each [*] {
+        apply [.]; "\n";
+      }
     }
   }
 }
@@ -109,11 +156,17 @@ tpl [Constructor[@kind = "U"]] {
     for-each [@*] { copy-of `.`; }
     if [$kind = "U" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
       @promoted = "yes";
+      "\n";
       apply [ArgTypes] mode="promote"; // argument types
+      "\n";
       apply [Typ] mode="promote"; // result type
+      "\n";
     } else {
       @promoted = "no";
-      apply [*];
+      "\n";
+      for-each [*] {
+        apply [.]; "\n";
+      }
     }
   }
 }
@@ -123,10 +176,15 @@ tpl [Constructor[@kind = "V"]] {
     for-each [@*] { copy-of `.`; }
     if [$kind = "V" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
       @promoted = "yes";
+      "\n";
       apply [ArgTypes] mode="promote"; // argument types
+      "\n";
     } else {
       @promoted = "no";
-      apply [*];
+      "\n";
+      for-each [*] {
+        apply [.]; "\n";
+      }
     }
   }
 }
@@ -136,11 +194,17 @@ tpl [Constructor[@kind = "R"]] {
     for-each [@*] { copy-of `.`; }
     if [$kind = "R" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
       @promoted = "yes";
+      "\n";
       apply [Properties] mode="promote"; // ignore properties
+      "\n";
       apply [ArgTypes] mode="promote"; // argument types
+      "\n";
     } else {
       @promoted = "no";
-      apply [*];
+      "\n";
+      for-each [*] {
+        apply [.]; "\n";
+      }
     }
   }
 }
@@ -150,12 +214,19 @@ tpl [Constructor[@kind = "K"]] {
     for-each [@*] { copy-of `.`; }
     if [$kind = "K" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
       @promoted = "yes";
+      "\n";
       apply [Properties] mode="promote"; // ignore properties
+      "\n";
       apply [ArgTypes] mode="promote"; // argument types
+      "\n";
       apply [Typ] mode="promote"; // result type
+      "\n";
     } else {
       @promoted = "no";
-      apply [*];
+      "\n";
+      for-each [*] {
+        apply [.]; "\n";
+      }
     }
   }
 }
