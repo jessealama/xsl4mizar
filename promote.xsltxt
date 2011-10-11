@@ -53,7 +53,36 @@ tpl [*] {
   }
 }
 
+tpl ensure-valid-token-strings {
+  $kind-ok = ensure-token-string (#string = $aid);
+  if [$kind-ok = "1"] {
+    $nr-ok = ensure-token-string (#string = $nr);
+    if [$nr-ok = "1"] {
+      $relnr-ok = ensure-token-string (#string = $relnr);
+      if [$relnr-ok = "1"] {
+        $aid-ok = ensure-token-string (#string = $aid);
+        if [$aid-ok = "1"] {
+          "1";
+        } else {
+          $message = `concat ("The aid token string '", $aid, "' is not a valid token string")`;
+          die (#message = $message);
+        }
+      } else {
+        $message = `concat ("The relnr token string '", $relnr, "' is not a valid token string")`;
+        die (#message = $message);
+      }
+    } else {
+      $message = `concat ("The nr token string '", $nr, "' is not a valid token string")`;
+      die (#message = $message);
+    }
+  } else {
+    $message = `concat ("The kind token string '", $kind, "' is not a valid token string")`;
+    die (#message = $message);
+  }
+}
+
 tpl [/] {
+  ensure-valid-token-strings ();
   apply [Constructors];
 }
 
