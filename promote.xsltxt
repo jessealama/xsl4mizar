@@ -29,16 +29,16 @@ include tokens.xsl;
  // type" of a 'mere structure', and not the type 'set'.)
 
 // The target constructor kind
-#kind = { ""; }
+#kind-list = { ""; }
 
 // The target constructor nr
-#nr = { ""; }
+#nr-list = { ""; }
 
 // The target constructor relnr
-#relnr = { ""; }
+#relnr-list = { ""; }
 
 // The target constructor's article
-#aid = { ""; }
+#aid-list = { ""; }
 
 tpl [*] {
   $element = `local-name ()`;
@@ -55,52 +55,52 @@ tpl [*] {
 }
 
 tpl ensure-valid-token-strings {
-  $kind-ok = ensure-token-string (#string = $kind);
+  $kind-ok = ensure-token-string (#string = $kind-list);
   if [$kind-ok = "1"] {
-    $nr-ok = ensure-token-string (#string = $nr);
+    $nr-ok = ensure-token-string (#string = $nr-list);
     if [$nr-ok = "1"] {
-      $relnr-ok = ensure-token-string (#string = $relnr);
+      $relnr-ok = ensure-token-string (#string = $relnr-list);
       if [$relnr-ok = "1"] {
-        $aid-ok = ensure-token-string (#string = $aid);
+        $aid-ok = ensure-token-string (#string = $aid-list);
         if [$aid-ok = "1"] {
           "1";
         } else {
-          $message = `concat ("The aid token string '", $aid, "' is not a valid token string")`;
+          $message = `concat ("The aid token string '", $aid-list, "' is not a valid token string")`;
           die (#message = $message);
         }
       } else {
-        $message = `concat ("The relnr token string '", $relnr, "' is not a valid token string")`;
+        $message = `concat ("The relnr token string '", $relnr-list, "' is not a valid token string")`;
         die (#message = $message);
       }
     } else {
-      $message = `concat ("The nr token string '", $nr, "' is not a valid token string")`;
+      $message = `concat ("The nr token string '", $nr-list, "' is not a valid token string")`;
       die (#message = $message);
     }
   } else {
-    $message = `concat ("The kind token string '", $kind, "' is not a valid token string")`;
+    $message = `concat ("The kind token string '", $kind-list, "' is not a valid token string")`;
     die (#message = $message);
   }
 }
 
 tpl ensure-equal-length-token-strings {
-  $kind-length = token-string-length (#token-string = $kind);
-  $nr-length = token-string-length (#token-string = $nr);
+  $kind-length = token-string-length (#token-string = $kind-list);
+  $nr-length = token-string-length (#token-string = $nr-list);
   if [$kind-length = $nr-length] {
-    $relnr-length = token-string-length (#token-string = $relnr);
+    $relnr-length = token-string-length (#token-string = $relnr-list);
     if [$kind-length = $relnr-length] {
-      $aid-length = token-string-length (#token-string = $aid);
+      $aid-length = token-string-length (#token-string = $aid-list);
       if [$kind-length = $aid-length] {
         "1";
       } else {
-        $message = `concat ("The kind token string '", $kind, "' has ", $kind-length, " items, whereas the aid token string '", $aid, "' has ", $aid-length, " items.  Since these are different, we cannot proceed.")`;
+        $message = `concat ("The kind token string '", $kind-list, "' has ", $kind-length, " items, whereas the aid token string '", $aid-list, "' has ", $aid-length, " items.  Since these are different, we cannot proceed.")`;
         die (#message = $message);
       }
     } else {
-      $message = `concat ("The kind token string '", $kind, "' has ", $kind-length, " items, whereas the relnr token string '", $relnr, "' has ", $relnr-length, " items.  Since these are different, we cannot proceed.")`;
+      $message = `concat ("The kind token string '", $kind-list, "' has ", $kind-length, " items, whereas the relnr token string '", $relnr-list, "' has ", $relnr-length, " items.  Since these are different, we cannot proceed.")`;
       die (#message = $message);
     }
   } else {
-    $message = `concat ("The kind token string '", $kind, "' has ", $kind-length, " items, whereas the nr token string '", $nr, "' has ", $nr-length, " items.  Since these are different, we cannot proceed.")`;
+    $message = `concat ("The kind token string '", $kind-list, "' has ", $kind-length, " items, whereas the nr token string '", $nr-list, "' has ", $nr-length, " items.  Since these are different, we cannot proceed.")`;
     die (#message = $message);
   }
 }
