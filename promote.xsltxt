@@ -122,6 +122,85 @@ tpl escape-backslash (#str) {
   }
 }
 
+tpl found-helper (#target-item-one, #token-string-one, #target-item-two, #token-string-two, #target-item-three, #token-string-three, #target-item-four, #token-string-four) {
+  if [$token-string-one = ""] {
+    "0";
+  } else {
+    $tail-one = token-string-tail (#token-string = $token-string-one);
+    $tail-two = token-string-tail (#token-string = $token-string-two);
+    $tail-three = token-string-tail (#token-string = $token-string-three);
+    $tail-four = token-string-tail (#token-string = $token-string-four);
+    $item-one = first-item (#token-string = $token-string-one);
+    if [$item-one = $target-item-one] {
+      $item-two = first-item (#token-string = $token-string-two);
+      if [$item-two = $target-item-two] {
+        $item-three = first-item (#token-string = $token-string-three);
+        if [$item-three = $target-item-three] {
+          $item-four = first-item (#token-string = $token-string-four);
+          if [$item-four = $target-item-four] {
+            "1";
+          } else {
+            found-helper (#target-item-one = $target-item-one,
+                          #target-item-two = $target-item-two,
+                          #target-item-three = $target-item-three,
+                          #target-item-four = $target-item-four,
+                          #token-string-one = $tail-one,
+                          #token-string-two = $tail-two,
+                          #token-string-three = $tail-three,
+                          #token-string-four = $tail-four);
+          }
+        } else {
+          found-helper (#target-item-one = $target-item-one,
+                        #target-item-two = $target-item-two,
+                        #target-item-three = $target-item-three,
+                        #target-item-four = $target-item-four,
+                        #token-string-one = $tail-one,
+                        #token-string-two = $tail-two,
+                        #token-string-three = $tail-three,
+                        #token-string-four = $tail-four);
+        }
+      } else {
+        found-helper (#target-item-one = $target-item-one,
+                      #target-item-two = $target-item-two,
+                      #target-item-three = $target-item-three,
+                      #target-item-four = $target-item-four,
+                      #token-string-one = $tail-one,
+                      #token-string-two = $tail-two,
+                      #token-string-three = $tail-three,
+                      #token-string-four = $tail-four);
+      }
+    } else {
+      found-helper (#target-item-one = $target-item-one,
+                   #target-item-two = $target-item-two,
+                   #target-item-three = $target-item-three,
+                   #target-item-four = $target-item-four,
+                   #token-string-one = $tail-one,
+                   #token-string-two = $tail-two,
+                   #token-string-three = $tail-three,
+                   #token-string-four = $tail-four);
+    }
+  }
+}
+
+// Determine whether there is a position N such that
+//
+// * the Nth item of $kind-list is $kind,
+// * the Nth item of $nr-list is $nr,
+// * the Nth item of $relnr-list is $relnr,
+// * the Nth item of $aid-list is $aid
+//
+// Returns "1" or "0".
+tpl found (#kind, #nr, #relnr, #aid) {
+  found-helper (#target-item-one = $kind,
+                #token-string-one = $kind-list,
+                #target-item-two = $nr,
+                #token-string-two = $nr-list,
+                #target-item-three = $relnr,
+                #token-string-three = $relnr-list,
+                #target-item-four = $aid,
+                #token-string-four = $aid-list);
+}
+
 tpl [Constructors] {
   <Constructors {
     @aid = `@aid`;
@@ -155,7 +234,8 @@ tpl [Typ] mode="promote" {
 tpl [Constructor[@kind = "M"]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    if [$kind = "M" and $nr = @nr and @relnr = $relnr and @aid = $aid] {
+    $found = found (#kind = "M", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    if [$found = "1"] {
       @promoted = "yes";
       apply [Properties] mode="promote";
       apply [ArgTypes] mode="promote"; // argument types
@@ -184,7 +264,8 @@ tpl [Constructor[@kind = "L"]] {
 tpl [Constructor[@kind = "G"]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    if [$kind = "G" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
+    $found = found (#kind = "G", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
       // result type: "mere structure".  We might also experiment with making the return type 'set'.  But this might screw up too much.
@@ -204,7 +285,8 @@ tpl [Constructor[@kind = "G"]] {
 tpl [Constructor[@kind = "U"]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    if [$kind = "U" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
+    $found = found (#kind = "U", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
       apply [Typ] mode="promote"; // result type
@@ -218,7 +300,8 @@ tpl [Constructor[@kind = "U"]] {
 tpl [Constructor[@kind = "V"]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    if [$kind = "V" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
+    $found = found (#kind = "V", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
     } else {
@@ -231,7 +314,8 @@ tpl [Constructor[@kind = "V"]] {
 tpl [Constructor[@kind = "R"]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    if [$kind = "R" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
+    $found = found (#kind = "R", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    if [$found = "1"] {
       @promoted = "yes";
       apply [Properties] mode="promote"; // ignore properties
       apply [ArgTypes] mode="promote"; // argument types
@@ -245,7 +329,8 @@ tpl [Constructor[@kind = "R"]] {
 tpl [Constructor[@kind = "K"]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    if [$kind = "K" and @nr = $nr and @relnr = $relnr and @aid = $aid] {
+    $found = found (#kind = "K", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    if [$found = "1"] {
       @promoted = "yes";
       apply [Properties] mode="promote"; // ignore properties
       apply [ArgTypes] mode="promote"; // argument types
