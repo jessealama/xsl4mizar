@@ -14,16 +14,18 @@ include die.xsl;
 // * aid
 //
 // and searches a given .atr file for a constructor identified by
-// these four criteria. If there is no constructor that matches all
-// these criteria, the result is an unchanged .atr file ("unchanged"
-// means: up to whitespace differences and any XSL processing
-// instructions). Any constructor that matches these criteria (there
-// should be only one) will be "promoted" in the sense that its
-// arguments (if there are any) will be assumed to take terms of type
-// 'set', and the "result value", if any, will also be promoted to the
-// type 'set'. (There is an exception to this rule: structure
-// constructors will be promoted to have the "result type" of a 'mere
-// structure', and not the type 'set'.)
+// these four criteria. Each of these four parameters should be token
+// lists; the interpretation is the the four parameters specify a set
+// of constructors.  If there is no constructor that matches all these
+ // criteria, the result is an unchanged .atr file ("unchanged"
+ // means: up to whitespace differences and any XSL processing
+ // instructions). Any constructor that matches these criteria
+ // (there should be only one) will be "promoted" in the sense that
+ // its arguments (if there are any) will be assumed to take terms
+ // of type 'set', and the "result value", if any, will also be
+ // promoted to the type 'set'. (There is an exception to this rule:
+ // structure constructors will be promoted to have the "result
+ // type" of a 'mere structure', and not the type 'set'.)
 
 // The target constructor kind
 #kind = { ""; }
