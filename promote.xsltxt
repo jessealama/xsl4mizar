@@ -34,7 +34,7 @@ tpl [/] {
   apply [Constructors];
 }
 
-tpl escape-backslash(#str) {
+tpl escape-backslash (#str) {
   if [contains ($str, '/')] {
     $before = `substring-before ($str, '/')`;
     $after = `substring-after ($str, '/')`;
