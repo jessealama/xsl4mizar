@@ -82,8 +82,32 @@ tpl ensure-valid-token-strings {
   }
 }
 
+tpl ensure-equal-length-token-strings {
+  $kind-length = token-string-length (#token-string = $kind);
+  $nr-length = token-string-length (#token-string = $nr);
+  if [$kind-length = $nr-length] {
+    $relnr-length = token-string-length (#token-string = $relnr);
+    if [$kind-length = $relnr-length] {
+      $aid-length = token-string-length (#token-string = $aid);
+      if [$kind-length = $aid-length] {
+        "1";
+      } else {
+        $message = `concat ("The kind token string '", $kind, "' has ", $kind-length, " items, whereas the aid token string '", $aid, "' has ", $aid-length, " items.  Since these are different, we cannot proceed.")`;
+        die (#message = $message);
+      }
+    } else {
+      $message = `concat ("The kind token string '", $kind, "' has ", $kind-length, " items, whereas the relnr token string '", $relnr, "' has ", $relnr-length, " items.  Since these are different, we cannot proceed.")`;
+      die (#message = $message);
+    }
+  } else {
+    $message = `concat ("The kind token string '", $kind, "' has ", $kind-length, " items, whereas the nr token string '", $nr, "' has ", $nr-length, " items.  Since these are different, we cannot proceed.")`;
+    die (#message = $message);
+  }
+}
+
 tpl [/] {
   ensure-valid-token-strings ();
+  ensure-equal-length-token-strings ();
   apply [Constructors];
 }
 
