@@ -55,7 +55,7 @@ tpl [*] {
 }
 
 tpl ensure-valid-token-strings {
-  $kind-ok = ensure-token-string (#string = $aid);
+  $kind-ok = ensure-token-string (#string = $kind);
   if [$kind-ok = "1"] {
     $nr-ok = ensure-token-string (#string = $nr);
     if [$nr-ok = "1"] {
