@@ -84,6 +84,16 @@ tpl token-string-tail (#token-string) {
   }
 }
 
+tpl token-string-length (#token-string) {
+  if [$token-string = ""] {
+    "0";
+  } else {
+    $tail = token-string-tail (#token-string = $token-string);
+    $tail-length = token-string-length (#token-string = $tail);
+    `1 + $tail-length`;
+  }
+}
+
 tpl append-token-strings (#token-string-a, #token-string-b) {
   choose {
     when [$token-string-a = ""] { $token-string-b; }
