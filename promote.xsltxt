@@ -106,9 +106,17 @@ tpl ensure-equal-length-token-strings {
 }
 
 tpl [/] {
-  ensure-valid-token-strings ();
-  ensure-equal-length-token-strings ();
-  apply [Constructors];
+  $valid-token-strings = ensure-valid-token-strings ();
+  if [$valid-token-strings = "1"] {
+    $equal-lengths = ensure-equal-length-token-strings ();
+    if [$equal-lengths = "1"] {
+      apply [Constructors];
+    } else {
+      die (#message = "Something went wrong when checking that all the parameter token strings have the same length!");
+    }
+  } else {
+    die (#message = "Something went wrong when checking that the paramter token strings really are token strings!");
+  }
 }
 
 tpl escape-backslash (#str) {
