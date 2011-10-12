@@ -239,7 +239,7 @@ tpl [Typ] mode="promote" {
   }
 }
 
-tpl [Constructor[@kind = "M"]] {
+tpl [Constructor[@kind = "M" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
     $found = found (#kind = "M", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
@@ -269,7 +269,7 @@ tpl [Constructor[@kind = "L"]] {
   }
 }
 
-tpl [Constructor[@kind = "G"]] {
+tpl [Constructor[@kind = "G" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
     $found = found (#kind = "G", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
@@ -290,7 +290,7 @@ tpl [Constructor[@kind = "G"]] {
   }
 }
 
-tpl [Constructor[@kind = "U"]] {
+tpl [Constructor[@kind = "U" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
     $found = found (#kind = "U", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
@@ -305,7 +305,7 @@ tpl [Constructor[@kind = "U"]] {
   }
 }
 
-tpl [Constructor[@kind = "V"]] {
+tpl [Constructor[@kind = "V" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
     $found = found (#kind = "V", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
@@ -319,7 +319,7 @@ tpl [Constructor[@kind = "V"]] {
   }
 }
 
-tpl [Constructor[@kind = "R"]] {
+tpl [Constructor[@kind = "R" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
     $found = found (#kind = "R", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
@@ -334,7 +334,7 @@ tpl [Constructor[@kind = "R"]] {
   }
 }
 
-tpl [Constructor[@kind = "K"]] {
+tpl [Constructor[@kind = "K" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
     $found = found (#kind = "K", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
