@@ -1,7 +1,7 @@
 stylesheet 1.0;
 output method=text;
 
-include die.xsl;
+include ../utils/die.xsl;
 
 // List utilities.  Stolen from Josef.  Thanks, Josef.
 

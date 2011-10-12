@@ -1,8 +1,8 @@
 stylesheet 1.0;
 output method=xml indent="yes";
 
-include tokens.xsl;
-include die.xsl;
+include ../utils/tokens.xsl;
+include ../utils/die.xsl;
 
 // Applied to a .evl file, reprint the .evl file with the requirements directive replaced by the contents
 // content.  The stylesheet parameter

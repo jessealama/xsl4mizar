@@ -2,8 +2,8 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-// include die.xsl;
-// include tokens.xsl;
+// include ../utils/die.xsl;
+// include ../utils/tokens.xsl;
 
 //////////////////////////////////////////////////////////////////////
 // Resolving article-local references
