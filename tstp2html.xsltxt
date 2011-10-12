@@ -18,6 +18,11 @@ tpl [/] {
       <title {
         "hey there";
       }
+      <link {
+        @rel = "stylesheet";
+        @type = "text/css";
+        @href = "tstp.css";
+      }
     }
     <body {
       apply [*];
