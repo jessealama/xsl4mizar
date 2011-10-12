@@ -107,7 +107,7 @@ tpl [*[child::*[3]]] mode="binary-connective" {
 }
 
 tpl [*] (#connective) mode="binary-connective" {
-  apply [*[1]]; copy-of $connective; apply [*[2]];
+  apply [*[1]]; `$connective`; apply [*[2]];
 }
 
 tpl [implication] {
