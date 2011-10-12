@@ -1,0 +1,208 @@
+stylesheet "1.0";
+
+output method="html";
+output doctype-public="-//W3C//DTD XHTML 1.1//EN";
+output doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd";
+output omit-xml-declaration="no";
+
+include utils/die.xsl;
+
+tpl list (#separ, #elems) {
+ for-each [$elems] {
+  apply[.]; if [not(position()=last())] { copy-of $separ; } }
+}
+
+tpl [/] {
+  <html {
+    <head {
+      <title {
+        "hey there";
+      }
+    }
+    <body {
+      apply [*];
+    }
+  }
+}
+
+tpl [comment] {
+  <p {
+    @class = "comment";
+    `.`;
+  }
+}
+
+tpl [formula[not(@name)]] {
+  die (#message = "We require that a formula element have a name attribute!");
+}
+
+tpl [formula[@name]] {
+  <div {
+    @class = "formula";
+    @"id" = `@name`;
+    apply [*[1]];
+    apply [source];
+    apply [useful-info];
+  }
+}
+
+// variables
+
+tpl [variable[not(@name)]] {
+  die (#message = "We require that variables have a name attribute!");
+}
+
+tpl [variable[@name]] {
+  <span {
+    @class = "variable";
+    `@name`;
+  }
+}
+
+// formula shapes
+
+tpl [predicate[not(@name)]] {
+  die (#message = "We require that a variable have a name attribute!");
+}
+
+tpl [predicate[@name]] {
+  <span {
+    @class = "predicate";
+    `@name`;
+  }
+  "(";
+  list (#separ = " , ", #elems = `*`);
+  ")";
+}
+
+tpl [function[not(@name)]] {
+  die (#message = "We require that a function have a name attribute!");
+}
+
+tpl [function[@name]] {
+  <span {
+    @class = "function";
+    `@name`;
+  }
+  "(";
+  list (#separ = " , ", #elems = `*`);
+  ")";
+}
+
+tpl [*[not(child::*[2])]] mode="binary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent binary connectives, but we have found such an element that lacks two children")`;
+  die (#message = $message);
+}
+
+tpl [*[child::*[3]]] mode="binary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent binary connectives, but we have found such an element that has more than two children")`;
+  die (#message = $message);
+}
+
+tpl [*] (#connective) mode="binary-connective" {
+  apply [*[1]]; copy-of $connective; apply [*[2]];
+}
+
+tpl [implication] {
+  apply [.] (#connective = "&#8594;") mode="binary-connective";
+}
+
+tpl [equivalence] {
+  apply [.] (#connective = "&#8596;") mode="binary-connective";
+}
+
+// unary connectives
+
+tpl [*[not(child::*)]] mode="unary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent unary connectives, but we have found such an element that lacks a child!")`;
+  die (#message = $message);
+}
+
+tpl [*[child::*[3]]] mode="unary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent unary connectives, but we have found such an element that has more than one child")`;
+  die (#message = $message);
+}
+
+tpl [*] (#connective) mode="unary-connective" {
+  copy-of $connective; apply [*[1]];
+}
+
+tpl [negation] {
+  apply [.] (#connective = "&#172;") mode="unary-connective";
+}
+
+// quantifiers
+
+tpl [quantifier[not(@type)]] {
+  die (#message = "Quantifiers must have a type attribute, but we found one that lacks this attribute!");
+}
+
+tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] {
+  die (#message = "We assume that quantifiers are either universal or existential!");
+}
+
+tpl [quantifer[not(child::variable)]] {
+  die (#message = "We require that quantifiers have at least one variable child!");
+}
+
+tpl [quantifier[not(child::*[2])]] {
+  die (#message = "We require that quantifiers have at least two child elements!");
+}
+
+tpl [quantifier[@type = "universal" or @type = "existential"]] {
+  $type = `@type`;
+  if [$type = "universal"] {
+    "&#8704;";
+  } else {
+    "&#8707;";
+  }
+  list (#elems = `variable`,
+        #separ = " , ");
+  "["; apply [*[position() = last()]]; "]";
+}
+
+// equivalence
+
+tpl [equivalence[not(child::*[2])]] {
+  die (#message = "We require that an equivalence element have at least two children!");
+}
+
+tpl [equivalence[child::*[3]]] {
+  die (#message = "We require that an equivalence element have fewer than three children!");
+}
+
+// sources
+
+tpl [source] {
+  <div {
+    @class = "source";
+    apply [*];
+  }
+}
+
+tpl [non-logical-data[not(@name)]] {
+  "["; list (#elems = `*`, #separ = ","); "]";
+}
+
+tpl [non-logical-data[@name]] {
+  "["; `@name`; list (#elems = `*`, #separ = ","); "]";
+}
+
+tpl [useful-info] {
+  <div {
+    @class = "useful-info";
+    apply [*];
+  }
+}
+
+tpl [number[not(@name)]] {
+  die (#message = "We require that numbe elements have a name attribute!");
+}
+
+tpl [number[@name]] {
+  `@name`;
+}
