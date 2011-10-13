@@ -51,7 +51,6 @@ tpl [tstp] {
           <col;
           <col;
           <col;
-          <col;
         }
         <thead {
           <tr {
@@ -59,7 +58,6 @@ tpl [tstp] {
             <th { "Status"; }
             <th { "Formula"; }
             <th { "Source"; }
-            <th { "Info"; }
           }
         }
         <tbody {
@@ -121,10 +119,10 @@ tpl [formula[@name]] {
       @class = "source";
       apply [source];
     }
-    <td {
-      @class = "useful-info";
-      apply [useful-info];
-    }
+    // <td {
+    //   @class = "useful-info";
+    //   apply [useful-info];
+    // }
   }
 }
 
