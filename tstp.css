@@ -15,8 +15,8 @@ table.tstp-problem tbody tr {
 	border-left: solid thin black;
 }
 
-table.tstp-problem tbody td {
-	text-align: center;
+td.formula {
+	text-align:center;	
 }
 
 span.variable {
@@ -35,4 +35,31 @@ span.article {
 
 span.constructor {
 	font-weight: bold;
+}
+
+td.variable-list {
+	white-space: nowrap;
+}
+
+table.formula tbody td {
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+table.binary-connective tbody tr td {
+	white-space: nowrap;
+	text-align: center;
+}
+
+table.binary-connective {
+ 	border-left-style: solid;
+	border-right-style: solid;
+	border-right-width: thin;
+	border-left-width: thin;
+	border-width: thin;
+	border-style: solid;
+}
+
+td.status {
+	text-align: center;
 }
