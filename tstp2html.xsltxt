@@ -58,12 +58,13 @@ tpl [tstp] {
             <th { "Status"; }
             <th { "Formula"; }
             <th { "Source"; }
+	    <th { "Users"; }
           }
         }
         <tbody {
           apply [formula[child::source/non-logical-data[@name = "file"]]];
         }
-        <tobdy {
+        <tbody {
           apply [formula[not(child::source/non-logical-data[@name = "file"])]];
         }
       }
@@ -101,11 +102,13 @@ tpl [defined-predicate[@name and not(@name = "true")]] {
 }
 
 tpl [formula[@name]] {
+  $n = `@name`;
+  $context = `.`;
   <tr {
     <td {
       @"id" = `@name`;
       @class = "formula-name";
-      `@name`;
+      `$n`;
      }
      <td {
        @class = "status";
@@ -119,10 +122,23 @@ tpl [formula[@name]] {
       @class = "source";
       apply [source];
     }
-    // <td {
-    //   @class = "useful-info";
-    //   apply [useful-info];
-    // }
+    <td {
+      if [//formula[not(self::* = $context) and @name and descendant::non-logical-data[@name = $n]]] {
+        <ul {
+          for-each [//formula[not(self::* = $context) and @name and descendant::non-logical-data[@name = $n]]] {
+            $formula-name = `@name`;
+            <li {
+              <a {
+                @href = `concat ("#", $formula-name)`;
+                `$formula-name`;
+              }
+            }
+          }
+        }
+      } else {
+        <em { "(none)"; }
+      }
+    }
   }
 }
 
@@ -349,6 +365,78 @@ tpl [source[not(child::non-logical-data[@name = "file"])]] {
   }
 }
 
+tpl [*] mode="inference-references" {
+  "References:";
+  if [child::non-logical-data[@name = "inference"]/non-logical-data[position() = last()]/*] {
+    <ul {
+      for-each [non-logical-data[@name = "inference"]/non-logical-data[position() = last()]/*] {
+        <li {
+          apply [.] mode="link";
+        }
+      }
+    }
+  } else {
+    <em { " (none)"; }
+  }
+}
+
+tpl [*] mode="open-assumptions" {
+  "Open assumptions:";
+  if [descendant::non-logical-data[@name = "assumptions"]/non-logical-data/*] {
+    <ul {
+      for-each [descendant::non-logical-data[@name = "assumptions"]/non-logical-data/*] {
+        <li {
+          apply [.] mode="link";
+        }
+      }
+    }
+  } else {
+    <em { " (none)"; }
+  }
+}
+
+tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "assumption"] and child::non-logical-data[child::non-logical-data[@name = "file"]]]]] {
+  "Assumption about ";
+  apply [non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "file"]/non-logical-data[position() = last()]] mode="link";
+}
+
+tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "discharge_asm"]]]] {
+  <span {
+    @class = "keyword";
+    "discharge assumption";
+  }
+  <br;
+  <br;
+  apply [.] mode="inference-references";
+  apply [.] mode="open-assumptions";
+}
+
+tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "conclusion"]]]] {
+  <span {
+    @class = "keyword";
+    "conclusion";
+  }
+  <br;
+  <br;
+  apply [.] mode="inference-references";
+  apply [.] mode="open-assumptions";
+}
+
+tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "mizar_by"]]]] {
+  <span {
+    @class = "keyword";
+    "by";
+  }
+  <br;
+  <br;
+  apply [.] mode="inference-references";
+  apply [.] mode="open-assumptions";
+}
+
+tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "tautology"]]]] {
+  "Reference: "; apply [non-logical-data[@name = "introduced"]/non-logical-data/non-logical-data[@name = "file"]/non-logical-data[position() = last()]] mode="link";
+}
+
 tpl [source[child::non-logical-data[@name = "file" and not(child::non-logical-data[2])]]] {
   die (#message = "We require that non-logical-data elements whose name is 'file' have at least two non-logical-data child elements!");
 }
@@ -382,7 +470,12 @@ tpl [non-logical-data[not(@name)]] {
   "["; list (#elems = `*`, #separ = ","); "]";
 }
 
-tpl [non-logical-data[@name]] {
+tpl [non-logical-data[@name and parent::source]] {
+  `@name`;
+  apply [*];
+}
+
+tpl [non-logical-data[@name and not(parent::source)]] {
   "[";
   $n = `@name`;
   if [@name and (key ("formulas", $n) or key ("symbols", $n))] {
@@ -428,10 +521,6 @@ tpl [non-logical-data[@name = "inference" and child::non-logical-data[@name = "l
 
 // tpl [non-logical-data[@name = "introduced"]] {
 //   apply [*[1]]; " : "; apply [*[position() > 1]];
-// }
-
-// tpl [non-logical-data[@name = "introduced" and child::non-logical-data/@name = "tautology"]] {
-//   apply [non-logical-data[preceding-sibling::non-logical-data[@name = "tautology"]]];
 // }
 
 tpl [non-logical-data[not(@name)]] mode="link" {
