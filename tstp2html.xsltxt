@@ -142,7 +142,7 @@ tpl [predicate[@name and not(@name = "=")]] {
     `@name`;
   }
   "(";
-  list (#separ = " , ", #elems = `*`);
+  list (#separ = ", ", #elems = `*`);
   ")";
 }
 
@@ -156,7 +156,7 @@ tpl [function[@name]] {
     `@name`;
   }
   "(";
-  list (#separ = " , ", #elems = `*`);
+  list (#separ = ", ", #elems = `*`);
   ")";
 }
 
@@ -232,7 +232,7 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
     "&#8707;";
   }
   list (#elems = `variable`,
-        #separ = " , ");
+        #separ = ", ");
   "["; apply [*[position() = last()]]; "]";
 }
 
