@@ -354,17 +354,6 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
 
 // sources
 
-tpl [source[not(child::non-logical-data[@name = "file"])]] {
-  <div {
-    @class = "source";
-    if [descendant::non-logical-data[@name = "new_symbol"]] {
-      $symbol = `descendant::non-logical-data[@name = "new_symbol"]/non-logical-data/@name`;
-      @"id" = `$symbol`;
-    }
-    apply [*];
-  }
-}
-
 tpl [*] mode="inference-references" {
   "References:";
   if [child::non-logical-data[@name = "inference"]/non-logical-data[position() = last()]/*] {
@@ -398,6 +387,11 @@ tpl [*] mode="open-assumptions" {
 tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "assumption"] and child::non-logical-data[child::non-logical-data[@name = "file"]]]]] {
   "Assumption about ";
   apply [non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "file"]/non-logical-data[position() = last()]] mode="link";
+}
+
+tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "definition"] and child::non-logical-data[child::non-logical-data[@name = "new_symbol"]]]]] {
+  "New constant: ";
+  apply [non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "new_symbol"]/non-logical-data[position() = last()]] mode="link";
 }
 
 tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "discharge_asm"]]]] {
@@ -468,11 +462,6 @@ tpl [source[child::non-logical-data[@name = "file"]]] {
 
 tpl [non-logical-data[not(@name)]] {
   "["; list (#elems = `*`, #separ = ","); "]";
-}
-
-tpl [non-logical-data[@name and parent::source]] {
-  `@name`;
-  apply [*];
 }
 
 tpl [non-logical-data[@name and not(parent::source)]] {
