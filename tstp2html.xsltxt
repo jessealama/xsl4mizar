@@ -31,6 +31,7 @@ tpl [/] {
         <thead {
           <tr {
             <th { "Name"; }
+            <th { "Status"; }
             <th { "Formula"; }
             <th { "Source"; }
             <th { "Info"; }
@@ -47,7 +48,7 @@ tpl [/] {
 tpl [comment] {
   <tr {
     <td {
-      @colspan = "4";
+      @colspan = "5";
       @class = "comment";
       `.`;
     }
@@ -58,12 +59,29 @@ tpl [formula[not(@name)]] {
   die (#message = "We require that a formula element have a name attribute!");
 }
 
+tpl [formula[not(@status)]] {
+  die (#message = "We require that a formula element have a status attribute!");
+}
+
+tpl [defined-predicate[@name = "true"]] {
+  "&#8868;";
+}
+
+tpl [defined-predicate[not(@name = "true")]] {
+  $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $name, "'")`;
+  die (#message = $message);
+}
+
 tpl [formula[@name]] {
   <tr {
     <td {
       @"id" = `@name`;
       @class = "formula-name";
       `@name`;
+     }
+     <td {
+       @class = "status";
+       `@status`;
      }
      <td {
       @class = "formula";
