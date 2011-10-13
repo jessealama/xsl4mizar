@@ -27,15 +27,30 @@ tpl [/] {
       }
     }
     <body {
-      apply [*];
+      <table {
+        <thead {
+          <tr {
+            <th { "Name"; }
+            <th { "Formula"; }
+            <th { "Source"; }
+            <th { "Info"; }
+          }
+        }
+        <tbody {
+          apply [*];
+        }
+      }
     }
   }
 }
 
 tpl [comment] {
-  <p {
-    @class = "comment";
-    `.`;
+  <tr {
+    <td {
+      @colspan = "4";
+      @class = "comment";
+      `.`;
+    }
   }
 }
 
@@ -44,12 +59,24 @@ tpl [formula[not(@name)]] {
 }
 
 tpl [formula[@name]] {
-  <div {
-    @class = "formula";
-    @"id" = `@name`;
-    apply [*[1]];
-    apply [source];
-    apply [useful-info];
+  <tr {
+    <td {
+      @"id" = `@name`;
+      @class = "formula-name";
+      `@name`;
+     }
+     <td {
+      @class = "formula";
+      apply [*[1]];
+    }
+    <td {
+      @class = "source";
+      apply [source];
+    }
+    <td {
+      @class = "useful-info";
+      apply [useful-info];
+    }
   }
 }
 
