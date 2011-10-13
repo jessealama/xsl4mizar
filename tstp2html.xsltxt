@@ -194,8 +194,18 @@ tpl [function[not(@name)]] {
 
 tpl [function[@name]] {
   $n = `@name`;
-  $constructor = `substring-before ($n, "_")`;
-  $article = `substring-after ($n, "_")`;
+  $constructor = { if [contains ($n, "__")] {
+                     `substring-before ($n, "__")`;
+                   } else {
+                     `substring-before ($n, "_")`;
+                   }
+                 }
+  $article = { if [contains ($n, "__")] {
+                 `substring-after ($n, "__")`;
+               } else {
+                 `substring-after ($n, "_")`;
+               }
+             }
   <span {
     @class = "function";
     <span {
@@ -295,6 +305,10 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
 tpl [source[not(child::non-logical-data[@name = "file"])]] {
   <div {
     @class = "source";
+    if [descendant::non-logical-data[@name = "new_symbol"]] {
+      $symbol = `descendant::non-logical-data[@name = "new_symbol"]/non-logical-data/@name`;
+      @"id" = `$symbol`;
+    }
     apply [*];
   }
 }
@@ -324,20 +338,26 @@ tpl [source[child::non-logical-data[@name = "file"]]] {
   }
 }
 
+//////////////////////////////////////////////////////////////////////
+/// Non-logical data
+//////////////////////////////////////////////////////////////////////
+
 tpl [non-logical-data[not(@name)]] {
   "["; list (#elems = `*`, #separ = ","); "]";
 }
 
-tpl [non-logical-data[@name and not(@name = "assumptions")]] {
-  "["; `@name`; list (#elems = `*`, #separ = ","); "]";
-}
-
-tpl [non-logical-data[@name = "assumptions"]] {
+tpl [non-logical-data[@name]] {
   "[";
-  for-each [non-logical-data/non-logical-data] {
+  $n = `@name`;
+  if [@name and (key ("formulas", $n) or key ("symbols", $n))] {
     apply [.] mode="link";
-    if [not(position() = last())] {
-      ",";
+  } else {
+    `@name`;
+  }
+  for-each [non-logical-data] {
+    apply [.];
+    if [not(position()=last())] {
+      ", ";
     }
   }
   "]";
