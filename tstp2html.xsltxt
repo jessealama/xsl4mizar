@@ -117,7 +117,26 @@ tpl [predicate[not(@name)]] {
   die (#message = "We require that a variable have a name attribute!");
 }
 
-tpl [predicate[@name]] {
+tpl [predicate[@name = "=" and not(child::*[2])]] {
+  die (#message = "We require that an equality predicate element have at least two children!");
+}
+
+tpl [predicate[@name = "=" and child::*[3]]] {
+  die (#message = "We require that an equality predicate element have fewer than three children!");
+}
+
+tpl [predicate[@name = "="]] {
+  "(";
+  apply [*[1]];
+  <span {
+    @class = "predicate";
+    " = ";
+  }
+  apply [*[2]];
+  ")";
+}
+
+tpl [predicate[@name and not(@name = "=")]] {
   <span {
     @class = "predicate";
     `@name`;
