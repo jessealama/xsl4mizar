@@ -77,7 +77,8 @@ tpl [comment] {
   `.`;
 }
 
-key "formula" [//formula[@name]] `@name`;
+key "formulas" [/tstp/formula[@name]] `@name`;
+key "symbols" [/tstp/formula/source[descendant::non-logical-data[@name = "new_symbol"]]] `descendant::non-logical-data[@name = "new_symbol"]/non-logical-data/@name`;
 
 tpl [formula[not(@name)]] {
   die (#message = "We require that a formula element have a name attribute!");
