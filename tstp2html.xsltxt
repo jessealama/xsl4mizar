@@ -253,6 +253,14 @@ tpl [equivalence] {
   apply [.] (#connective = "&#8596;") mode="binary-connective";
 }
 
+tpl [disjunction] {
+  apply [.] (#connective = "&#8744;") mode="binary-connective";
+}
+
+tpl [conjunction] {
+  apply [.] (#connective = "&#8743;") mode="binary-connective";
+}
+
 // unary connectives
 
 tpl [*[not(child::*)]] mode="unary-connective" {
