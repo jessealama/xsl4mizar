@@ -96,8 +96,9 @@ tpl [defined-predicate[@name = "true"]] {
   "&#8868;";
 }
 
-tpl [defined-predicate[not(@name = "true")]] {
-  $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $name, "'")`;
+tpl [defined-predicate[@name and not(@name = "true")]] {
+  $n = `@name`;
+  $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $n, "'")`;
   die (#message = $message);
 }
 
