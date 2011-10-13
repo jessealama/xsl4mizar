@@ -88,6 +88,10 @@ tpl [formula[not(@status)]] {
   die (#message = "We require that a formula element have a status attribute!");
 }
 
+tpl [defined-predicate[not(@name)]] {
+  die (#message = "We require that a defined-predicate element have a name attribute!");
+}
+
 tpl [defined-predicate[@name = "true"]] {
   "&#8868;";
 }
