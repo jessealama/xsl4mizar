@@ -391,6 +391,41 @@ tpl [non-logical-data[@name]] {
   "]";
 }
 
+tpl [non-logical-data[@name = "status"]] {
+  // ignore
+}
+
+tpl [non-logical-data[descendant::non-logical-data[@name = "new_symbol"]]] {
+  apply [descendant::non-logical-data[@name = "new_symbol"]];
+}
+
+tpl [non-logical-data[@name = "new_symbol"]] {
+  $symbol = `non-logical-data[1]/@name`;
+  "fresh symbol: ";
+  <span {
+    @class = "symbol";
+    `$symbol`;
+  }
+}
+
+tpl [non-logical-data[@name = "inference" and child::non-logical-data[@name = "let"]]] {
+  <span {
+    @class = "rule-of-inference";
+    "&#8704;-I";
+  }
+  " from ";
+  list (#elems = `*[position() = last()]/*`, #separ = ", ");
+
+}
+
+// tpl [non-logical-data[@name = "introduced"]] {
+//   apply [*[1]]; " : "; apply [*[position() > 1]];
+// }
+
+// tpl [non-logical-data[@name = "introduced" and child::non-logical-data/@name = "tautology"]] {
+//   apply [non-logical-data[preceding-sibling::non-logical-data[@name = "tautology"]]];
+// }
+
 tpl [non-logical-data[not(@name)]] mode="link" {
   die (#message = "We cannot link a non-logical-data element that lacks a name attribute!");
 }
