@@ -236,16 +236,6 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
   "["; apply [*[position() = last()]]; "]";
 }
 
-// equivalence
-
-tpl [equivalence[not(child::*[2])]] {
-  die (#message = "We require that an equivalence element have at least two children!");
-}
-
-tpl [equivalence[child::*[3]]] {
-  die (#message = "We require that an equivalence element have fewer than three children!");
-}
-
 // sources
 
 tpl [source] {
