@@ -235,7 +235,14 @@ tpl [*[child::*[3]]] mode="binary-connective" {
 }
 
 tpl [*] (#connective) mode="binary-connective" {
-  "("; apply [*[1]]; `$connective`; apply [*[2]]; ")";
+  <table {
+    @class = "binary-connective";
+    <tbody {
+      <tr { <td { apply [*[1]]; } }
+      <tr { <td { `$connective`; } }
+      <tr { <td { apply [*[2]]; } }
+    }
+  }
 }
 
 tpl [implication] {
@@ -261,7 +268,16 @@ tpl [*[child::*[3]]] mode="unary-connective" {
 }
 
 tpl [*] (#connective) mode="unary-connective" {
-  copy-of $connective; apply [*[1]];
+  <table {
+    @class = "unary-connective";
+    <tr {
+      <td { `$connective`; }
+      <td {
+        @class = "formula";
+        apply [*[1]];
+      }
+    }
+  }
 }
 
 tpl [negation] {
@@ -288,14 +304,28 @@ tpl [quantifier[not(child::*[2])]] {
 
 tpl [quantifier[@type = "universal" or @type = "existential"]] {
   $type = `@type`;
-  if [$type = "universal"] {
-    "&#8704;";
-  } else {
-    "&#8707;";
+  <table {
+    @class = "formula";
+    <tbody {
+      <tr {
+        <td {
+          if [$type = "universal"] {
+            "&#8704;";
+          } else {
+            "&#8707;";
+          }
+        }
+        <td {
+          @class = "variable-list";
+          list (#elems = `variable`, #separ = ", ");
+        }
+        <td {
+          @class = "quantifier-matrix";
+          apply [*[position() = last()]];
+        }
+      }
+    }
   }
-  list (#elems = `variable`,
-        #separ = ", ");
-  "["; apply [*[position() = last()]]; "]";
 }
 
 // sources
