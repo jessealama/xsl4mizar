@@ -77,6 +77,8 @@ tpl [comment] {
   `.`;
 }
 
+key "formula" [//formula[@name]] `@name`;
+
 tpl [formula[not(@name)]] {
   die (#message = "We require that a formula element have a name attribute!");
 }
