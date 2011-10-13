@@ -519,10 +519,6 @@ tpl [non-logical-data[@name = "inference" and child::non-logical-data[@name = "l
 
 }
 
-// tpl [non-logical-data[@name = "introduced"]] {
-//   apply [*[1]]; " : "; apply [*[position() > 1]];
-// }
-
 tpl [non-logical-data[not(@name)]] mode="link" {
   die (#message = "We cannot link a non-logical-data element that lacks a name attribute!");
 }
