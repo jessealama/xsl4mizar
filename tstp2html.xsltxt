@@ -12,7 +12,16 @@ tpl list (#separ, #elems) {
   apply[.]; if [not(position()=last())] { copy-of $separ; } }
 }
 
+$lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
+$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+
+tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
+
 tpl [/] {
+  apply [tstp];
+}
+
+tpl [tstp] {
   <html {
     @"xmlns" = "http://www.w3.org/1999/xhtml";
     @xml:lang="en";
@@ -28,6 +37,22 @@ tpl [/] {
     }
     <body {
       <table {
+        @class = "tstp-problem";
+        @rules = "all";
+        if [comment] {
+          @summary = `comment[1]/text()`;
+          <caption {
+            @class = "tstp-problem-caption";
+            apply [comment[1]];
+          }
+        }
+        <colgroup {
+          <col;
+          <col;
+          <col;
+          <col;
+          <col;
+        }
         <thead {
           <tr {
             <th { "Name"; }
@@ -38,7 +63,10 @@ tpl [/] {
           }
         }
         <tbody {
-          apply [*];
+          apply [formula[child::source/non-logical-data[@name = "file"]]];
+        }
+        <tobdy {
+          apply [formula[not(child::source/non-logical-data[@name = "file"])]];
         }
       }
     }
@@ -46,13 +74,7 @@ tpl [/] {
 }
 
 tpl [comment] {
-  <tr {
-    <td {
-      @colspan = "5";
-      @class = "comment";
-      `.`;
-    }
-  }
+  `.`;
 }
 
 tpl [formula[not(@name)]] {
@@ -137,9 +159,21 @@ tpl [predicate[@name = "="]] {
 }
 
 tpl [predicate[@name and not(@name = "=")]] {
+  $n = `@name`;
+  $constructor = `substring-before ($n, "_")`;
+  $article = `substring-after ($n, "_")`;
   <span {
     @class = "predicate";
-    `@name`;
+    <span {
+      @class = "constructor";
+      `$constructor`;
+    }
+    <sub {
+      <span {
+        @class = "article";
+        `$article`;
+      }
+    }
   }
   "(";
   list (#separ = ", ", #elems = `*`);
@@ -151,13 +185,25 @@ tpl [function[not(@name)]] {
 }
 
 tpl [function[@name]] {
+  $n = `@name`;
+  $constructor = `substring-before ($n, "_")`;
+  $article = `substring-after ($n, "_")`;
   <span {
     @class = "function";
-    `@name`;
+    <span {
+      @class = "constructor";
+      `$constructor`;
+     }
+    <sub {
+      <span {
+        @class = "article";
+        `$article`;
+      }
+    }
   }
-  "(";
-  list (#separ = ", ", #elems = `*`);
-  ")";
+  if [*] {
+    "("; list (#separ = ", ", #elems = `*`); ")";
+  }
 }
 
 tpl [*[not(child::*[2])]] mode="binary-connective" {
@@ -238,10 +284,35 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
 
 // sources
 
-tpl [source] {
+tpl [source[not(child::non-logical-data[@name = "file"])]] {
   <div {
     @class = "source";
     apply [*];
+  }
+}
+
+tpl [source[child::non-logical-data[@name = "file" and not(child::non-logical-data[2])]]] {
+  die (#message = "We require that non-logical-data elements whose name is 'file' have at least two non-logical-data child elements!");
+}
+
+tpl [source[child::non-logical-data[@name = "file" and child::non-logical-data[not(@name)]]]] {
+  die (#message = "We require that non-logical-data elements whose name is 'file' have non-logical-data child elements that have a name attribute!");
+}
+
+tpl [source[child::non-logical-data[@name = "file"]]] {
+  $article = `non-logical-data[@name = "file"]/non-logical-data[1]/@name`;
+  $fully-qualified-constructor = `non-logical-data[@name = "file"]/non-logical-data[2]/@name`;
+  $constructor-kind = `substring ($fully-qualified-constructor, 1, 1)`;
+  $constructor-kind-uc = uppercase (#string = $constructor-kind);
+  $after-constructor-kind = `substring-after ($fully-qualified-constructor, $constructor-kind)`;
+  $constructor-number = `substring-before ($after-constructor-kind, "_")`;
+  <a {
+    @href = `concat ("http://mizar.org/version/current/html/", $article, ".html#", $constructor-kind-uc, $constructor-number)`;
+   `concat ($constructor-kind, $constructor-number)`; " of ";
+   <span {
+    @class = "article";
+    `$article`;
+    }
   }
 }
 
