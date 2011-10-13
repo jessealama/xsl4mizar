@@ -1,3 +1,38 @@
 td.comment {
 	display: none;
 }
+
+caption.tstp-problem-caption {
+	caption-side: bottom;	
+}
+
+table.tstp-problem {
+	border-style: solid;
+}
+
+table.tstp-problem tbody tr {
+	border-bottom: solid thin black;
+	border-left: solid thin black;
+}
+
+table.tstp-problem tbody td {
+	text-align: center;
+}
+
+span.variable {
+	font-style: italic;
+}
+
+td.formula-name {
+	text-align: center;
+	font-family: "Courier New", Courier, mono;
+}
+
+span.article {
+	text-transform: uppercase;
+	font: smaller "Courier New", Courier, mono;
+}
+
+span.constructor {
+	font-weight: bold;
+}
