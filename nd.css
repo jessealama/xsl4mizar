@@ -65,10 +65,14 @@ td.status {
 }
 
 td.rule-conclusion {
-	border-bottom-style: solid;
-	border-bottom-width: thin;
+	border-top-style: solid;
+	border-top-width: thin;
 	text-align: center;
 	white-space: nowrap;
+}
+
+td.by-reference {
+	font-family: "Courier New", Courier, mono;
 }
 
 span.formula {

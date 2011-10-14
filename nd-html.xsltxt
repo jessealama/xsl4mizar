@@ -80,6 +80,7 @@ tpl [Derivation[child::Rule[@name = "by"]]] {
       @class = "modus-ponens";
       for-each [Derivation[@name]] {
         <td {
+          @class = "by-reference";
           `@name`;
         }
       }
