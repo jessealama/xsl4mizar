@@ -24,7 +24,8 @@ tpl [/] {
 tpl [tstp] {
   <html {
     @"xmlns" = "http://www.w3.org/1999/xhtml";
-    @xml:lang="en";
+    @xml:lang = "en";
+    @"lang" = "en";
     <head {
       <title {
         "hey there";
