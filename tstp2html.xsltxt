@@ -128,7 +128,7 @@ tpl [formula[@name]] {
       apply [source];
     }
     <td {
-      if [//formula[not(self::* = $context) and @name and descendant::non-logical-data[@name = $n]]] {
+      if [//formula[not(self::* = $context) and @name and descendant::non-logical-data[@name = $n and not(ancestor::useful-info)]]] {
         <ul {
           for-each [//formula[not(self::* = $context) and @name and descendant::non-logical-data[@name = $n and not(ancestor::useful-info)]]] {
             $formula-name = `@name`;
