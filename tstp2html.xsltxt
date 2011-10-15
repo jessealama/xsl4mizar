@@ -18,6 +18,9 @@ $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
 
 tpl [/] {
+  if [not(tstp)] {
+    die (#message = "The required tstp element is missing!");
+  }
   apply [tstp];
 }
 
