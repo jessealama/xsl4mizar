@@ -18,6 +18,9 @@ $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
 
 tpl [/] {
+  if [not(Derivation)] {
+    die (#message = "A Derivation root element is missing!");
+  }
   <html {
     @"xmlns" = "http://www.w3.org/1999/xhtml";
     @xml:lang = "en";
