@@ -125,6 +125,10 @@ tpl [formula[@name]] {
     }
     <td {
       @class = "source";
+      // If we are introducing a new constant, anchor this table cell
+      if [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "definition"] and child::non-logical-data[child::non-logical-data[@name = "new_symbol"]]]]] {
+        @"id" = `source/non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "new_symbol"]/non-logical-data[position() = last()]/@name`;
+      }
       apply [source];
     }
     <td {
@@ -390,8 +394,37 @@ tpl [*] mode="open-assumptions" {
 }
 
 tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "assumption"] and child::non-logical-data[child::non-logical-data[@name = "file"]]]]] {
+  $formula-name = `ancestor::formula/@name`;
   "Assumption about ";
-  apply [non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "file"]/non-logical-data[position() = last()]] mode="link";
+  $first-char-as-string = `substring ($formula-name, 1, 1)`;
+  choose {
+    when [$first-char-as-string = "d"] {
+      apply [non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "file"]/non-logical-data[position() = last()]] mode="link";
+    }
+    when [$first-char-as-string = "e"] {
+      $after-first-char = `substring-after ($formula-name, $first-char-as-string)`;
+      $c-instead-of-e = `concat ("c", $after-first-char)`;
+      $constant = `substring-before ($c-instead-of-e, "__")`;
+      $article = `substring-after ($c-instead-of-e, "__")`;
+      <a {
+        @href = `concat ("#", $c-instead-of-e)`;
+        <span {
+          @class = "constructor";
+          `$constant`;
+        }
+        <sub {
+          <span {
+            @class = "article";
+            $article;
+          }
+        }
+      }
+    }
+    otherwise {
+      $message = `concat ("We assume that the first character of the name of an introduced assumption formula is either 'd' or 'e', but the first char of the current formula name '", $formula-name, "' is '", $first-char-as-string, "'")`;
+      die (#message = $message);
+    }
+  }
 }
 
 tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "definition"] and child::non-logical-data[child::non-logical-data[@name = "new_symbol"]]]]] {
@@ -569,7 +602,22 @@ tpl [non-logical-data[@name]] mode="link" {
   $n = `@name`;
   <a {
     @href = `concat ("#", $n)`;
-    `$n`;
+    if [starts-with ($n, "c") and contains ($n, "__")] { // constant
+      $constant = `substring-before ($n, "__")`;
+      $article = `substring-after ($n, "__")`;
+      <span {
+        @class = "constructor";
+        `$constant`;
+      }
+      <sub {
+        <span {
+          @class = "article";
+          `$article`;
+        }
+      }
+    } else {
+      `$n`;
+    }
   }
 }
 
