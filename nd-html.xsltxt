@@ -74,20 +74,22 @@ tpl [Derivation[child::Rule[@name = "definition"]]] {
 }
 
 tpl [Derivation[child::Rule[@name = "by"]]] {
-  $num-premises = `count (Derivation)`;
   <table {
     <tr {
       @class = "modus-ponens";
-      for-each [Derivation[@name]] {
-        <td {
-          @class = "by-reference";
-          `@name`;
+      if [Derivation[@name]] {
+        <ul {
+          for-each [Derivation[@name]] {
+            <li {
+              @class = "by-reference";
+              `@name`;
+            }
+          }
         }
       }
     }
     <tr {
       <td {
-        @colspan = $num-premises;
         @class = "rule-conclusion";
         apply [*[1]];
       }
