@@ -17,17 +17,66 @@ $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
 tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
 
-// Sanity checks as templates
+//////////////////////////////////////////////////////////////////////
+/// Sanity checks as templates
+//////////////////////////////////////////////////////////////////////
 
-tpl [Rule[not(@name)]] mode="rules-have-names" {
+// Deriviation sanity checks
+
+tpl [Deriviation[not(child::Rule)]] mode="sanity-check" {
+  die (#message = "We require that a Derivatiion element have a Rule child!");
+}
+
+tpl [Deriviation[child::Rule[2]]] mode="sanity-check" {
+  die (#message = "We require that a Deriviation element have at most one Rule child!");
+}
+
+tpl [Deriviation[child::Rule
+                 and not(child::Rule[@name = "implication-elimination"])
+                 and not(child::Rule[@name = "axiom"])
+                 and not(child::Rule[@name = "definition"])
+                 and not(child::Rule[@name = "by"])]] mode="sanity-check" {
+  $n = `Rule/@name`;
+  $message = `concat ("We require that a Deriviation have a Rule child whose name is either\n\n* implication-elimination\n* axiom\n* definition\n* by\n\nbut we encountered a Deriviation whose Rule child has the name\n\n  '", $n, "'\n")`;
+  die (#message = $message);
+}
+
+// Rule sanity checks
+
+tpl [Rule[not(@name)]] mode="sanity-check" {
   die (#message = "We require that all Rule elements have a name attribute!");
 }
 
-tpl [/] {
+// Formula and term sanity checks
+
+tpl [defined-predicate[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a defined-predicate element have a name attribute!");
+}
+
+tpl [defined-predicate[@name and not(@name = "true")]] mode="sanity-check" {
+  $n = `@name`;
+  $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $n, "'")`;
+  die (#message = $message);
+}
+
+tpl [variable[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that variables have a name attribute!");
+}
+
+// Apply the sanity checks
+
+tpl [/] mode="sanity-check" {
   if [not(Derivation)] {
     die (#message = "A Derivation root element is missing!");
   }
-  apply [descendant::Rule] mode="rules-have-names";
+  apply [descendant::Deriviation] mode="sanity-check";
+  apply [descendant::Rule] mode="sanity-check";
+  apply [descendant::defined-predicate] mode="sanity-check";
+  apply [descendant::variable] mode="sanity-check";
+}
+
+tpl [/] {
+  apply [.] mode="sanity-check"; // don't proceed unless the sanity checks pass
   <html {
     @"xmlns" = "http://www.w3.org/1999/xhtml";
     @xml:lang = "en";
@@ -109,25 +158,11 @@ tpl [Derivation[child::Rule[@name = "by"]]] {
 
 // Rendering formulas
 
-tpl [defined-predicate[not(@name)]] {
-  die (#message = "We require that a defined-predicate element have a name attribute!");
-}
-
 tpl [defined-predicate[@name = "true"]] {
   "&#8868;";
 }
 
-tpl [defined-predicate[@name and not(@name = "true")]] {
-  $n = `@name`;
-  $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $n, "'")`;
-  die (#message = $message);
-}
-
 // variables
-
-tpl [variable[not(@name)]] {
-  die (#message = "We require that variables have a name attribute!");
-}
 
 tpl [variable[@name]] {
   <span {
