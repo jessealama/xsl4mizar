@@ -27,6 +27,9 @@ tpl [*] {
 }
 
 tpl [/] {
+  if [not(tstp)] {
+    die (#message = "The required tstp element is missing!");
+  }
   apply [tstp];
 }
 
