@@ -17,10 +17,17 @@ $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
 tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
 
+// Sanity checks as templates
+
+tpl [Rule[not(@name)]] mode="rules-have-names" {
+  die (#message = "We require that all Rule elements have a name attribute!");
+}
+
 tpl [/] {
   if [not(Derivation)] {
     die (#message = "A Derivation root element is missing!");
   }
+  apply [descendant::Rule] mode="rules-have-names";
   <html {
     @"xmlns" = "http://www.w3.org/1999/xhtml";
     @xml:lang = "en";
