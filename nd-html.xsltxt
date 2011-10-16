@@ -12,7 +12,6 @@ include utils/tokens.xsl;
 /// Parameters
 //////////////////////////////////////////////////////////////////////
 
-
 // The style of the proof output.
 #style = { "gentzen"; }
 
