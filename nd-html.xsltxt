@@ -79,7 +79,7 @@ tpl [Derivation[child::Rule
                  and not(child::Rule[@name = "definition"])
                  and not(child::Rule[@name = "by"])]] mode="sanity-check" {
   $n = `Rule/@name`;
-  $message = `concat ("We require that a Derivation have a Rule child whose name is either&#xa;&#xa;* implication-elimination&#xa;* axiom&#xa;* definition&#xa;* by&#xa;&#xa;but we encountered a Derivation whose Rule child has the name&#xa;&#xa;  ", $n, "&#xa;&#xa;We don't know how to proceed.")`;
+  $message = `concat ("We require that a Derivation have a Rule child whose name is either&#xa;&#xa;  * implication-elimination&#xa;  * axiom&#xa;  * definition&#xa;  * by&#xa;&#xa;but we encountered a Derivation whose Rule child has the name&#xa;&#xa;  ", $n, "&#xa;&#xa;We don't know how to proceed.")`;
   die (#message = $message);
 }
 
