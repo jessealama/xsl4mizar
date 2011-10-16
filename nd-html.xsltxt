@@ -192,8 +192,16 @@ tpl [/] {
 
 // Rendering Derivation elements
 
-tpl [Derivation[child::Rule[@name = "implication-elimination"]]] mode="gentzen" {
+tpl [Derivation[@name and child::Rule[@name = "implication-elimination"]]] mode="gentzen" {
   <table {
+    @class = "derivation";
+    @summary = `@name`;
+    @title = `@name`;
+    @"id" = `@name`;
+    <caption {
+      @class = "derivation-caption";
+      `@name`;
+    }
     <tr {
       @class = "modus-ponens";
       for-each [Rule] {
@@ -219,23 +227,43 @@ tpl [Derivation[child::Rule[@name = "implication-elimination"]]] mode="gentzen" 
       <td {
         @colspan = `count (Rule/following-sibling::*)`;
         @class = "rule-conclusion";
-        apply [*[1]];
+        <span {
+          @class = "derivation-label";
+          `@name`;
+        }
+        " : "; apply [*[1]];
       }
       <td; // empty cell for the rule name, just above
     }
   }
 }
 
-tpl [Derivation[child::Rule[@name = "axiom"]]] mode="gentzen" {
-  apply [*[1]]; // just the formula
+tpl [Derivation[@name and child::Rule[@name = "axiom"]]] mode="gentzen" {
+  <span {
+    @class = "derivation-label";
+    `@name`;
+  }
+  " : "; apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[child::Rule[@name = "definition"]]] mode="gentzen" {
-  apply [*[1]]; // just the formula
+tpl [Derivation[@name and child::Rule[@name = "definition"]]] mode="gentzen" {
+  <span {
+    @class = "derivation-label";
+    `@name`;
+  }
+  " : "; apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[child::Rule[@name = "by"]]] mode="gentzen" {
+tpl [Derivation[@name and child::Rule[@name = "by"]]] mode="gentzen" {
   <table {
+    @class = "derivation";
+    @summary = `@name`;
+    @title = `@name`;
+    @"id" = `@name`;
+    <caption {
+      @class = "derivation-caption";
+      `@name`;
+    }
     <tr {
       <td {
         @class = "modus-ponens";
@@ -266,7 +294,11 @@ tpl [Derivation[child::Rule[@name = "by"]]] mode="gentzen" {
       <td {
         @class = "rule-conclusion";
         @colspan = `count (Derivation[@name])`;
-        apply [*[1]];
+        <span {
+          @class = "derivation-label";
+          `@name`;
+        }
+        " : "; apply [*[1]];
       }
       <td; // empty cell for the rule name, just above
 
