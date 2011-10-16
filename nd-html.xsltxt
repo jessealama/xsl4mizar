@@ -428,35 +428,3 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
     "["; apply [*[position() = last()]]; "]";
   }
 }
-
-// Formula sources
-
-tpl [*] mode="inference-references" {
-  "References:";
-  if [child::non-logical-data[@name = "inference"]/non-logical-data[position() = last()]/*] {
-    <ul {
-      for-each [non-logical-data[@name = "inference"]/non-logical-data[position() = last()]/*] {
-        <li {
-          apply [.] mode="link";
-        }
-      }
-    }
-  } else {
-    <em { " (none)"; }
-  }
-}
-
-tpl [*] mode="open-assumptions" {
-  "Open assumptions:";
-  if [descendant::non-logical-data[@name = "assumptions"]/non-logical-data/*] {
-    <ul {
-      for-each [descendant::non-logical-data[@name = "assumptions"]/non-logical-data/*] {
-        <li {
-          apply [.] mode="link";
-        }
-      }
-    }
-  } else {
-    <em { " (none)"; }
-  }
-}
