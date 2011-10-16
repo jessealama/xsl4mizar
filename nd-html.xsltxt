@@ -6,6 +6,7 @@ output doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd";
 output omit-xml-declaration="no";
 
 include utils/strings.xsl;
+include utils/tokens.xsl;
 
 //////////////////////////////////////////////////////////////////////
 /// Parameters
