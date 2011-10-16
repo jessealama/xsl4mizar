@@ -7,6 +7,10 @@ output omit-xml-declaration="no";
 
 include utils/die.xsl;
 
+//////////////////////////////////////////////////////////////////////
+/// Utilities
+//////////////////////////////////////////////////////////////////////
+
 tpl list (#separ, #elems) {
  for-each [$elems] {
   apply[.]; if [not(position()=last())] { copy-of $separ; } }
@@ -141,8 +145,6 @@ tpl [number[not(@name)]] mode="sanity-check" {
   die (#message = "We require that numbe elements have a name attribute!");
 }
 
-// Apply the sanity checks
-
 tpl [/] mode="sanity-check" {
   if [not(Derivation)] {
     die (#message = "A Derivation root element is missing!");
@@ -156,6 +158,10 @@ tpl [/] mode="sanity-check" {
   apply [descendant::quantifier] mode="sanity-check";
   apply [descendant::number] mode="sanity-check";
 }
+
+//////////////////////////////////////////////////////////////////////
+/// The meat
+//////////////////////////////////////////////////////////////////////
 
 tpl [/] {
   apply [.] mode="sanity-check"; // don't proceed unless the sanity checks pass
