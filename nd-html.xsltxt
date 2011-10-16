@@ -63,6 +63,42 @@ tpl [variable[not(@name)]] mode="sanity-check" {
   die (#message = "We require that variables have a name attribute!");
 }
 
+tpl [predicate[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a variable have a name attribute!");
+}
+
+tpl [predicate[@name = "=" and not(child::*[2])]] mode="sanity-check" {
+  die (#message = "We require that an equality predicate element have at least two children!");
+}
+
+tpl [predicate[@name = "=" and child::*[3]]] mode="sanity-check" {
+  die (#message = "We require that an equality predicate element have fewer than three children!");
+}
+
+tpl [function[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a function have a name attribute!");
+}
+
+tpl [quantifier[not(@type)]] mode="sanity-check" {
+  die (#message = "Quantifiers must have a type attribute, but we found one that lacks this attribute!");
+}
+
+tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] mode="sanity-check" {
+  die (#message = "We assume that quantifiers are either universal or existential!");
+}
+
+tpl [quantifer[not(child::variable)]] mode="sanity-check" {
+  die (#message = "We require that quantifiers have at least one variable child!");
+}
+
+tpl [quantifier[not(child::*[2])]] mode="sanity-check" {
+  die (#message = "We require that quantifiers have at least two child elements!");
+}
+
+tpl [number[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that numbe elements have a name attribute!");
+}
+
 // Apply the sanity checks
 
 tpl [/] mode="sanity-check" {
@@ -73,6 +109,10 @@ tpl [/] mode="sanity-check" {
   apply [descendant::Rule] mode="sanity-check";
   apply [descendant::defined-predicate] mode="sanity-check";
   apply [descendant::variable] mode="sanity-check";
+  apply [descendant::predicate] mode="sanity-check";
+  apply [descendant::function] mode="sanity-check";
+  apply [descendant::quantifier] mode="sanity-check";
+  apply [descendant::number] mode="sanity-check";
 }
 
 tpl [/] {
@@ -173,18 +213,6 @@ tpl [variable[@name]] {
 
 // formula shapes
 
-tpl [predicate[not(@name)]] {
-  die (#message = "We require that a variable have a name attribute!");
-}
-
-tpl [predicate[@name = "=" and not(child::*[2])]] {
-  die (#message = "We require that an equality predicate element have at least two children!");
-}
-
-tpl [predicate[@name = "=" and child::*[3]]] {
-  die (#message = "We require that an equality predicate element have fewer than three children!");
-}
-
 tpl [predicate[@name = "="]] {
   "(";
   apply [*[1]];
@@ -216,10 +244,6 @@ tpl [predicate[@name and not(@name = "=")]] {
   "(";
   list (#separ = ", ", #elems = `*`);
   ")";
-}
-
-tpl [function[not(@name)]] {
-  die (#message = "We require that a function have a name attribute!");
 }
 
 tpl [function[@name]] {
@@ -315,22 +339,6 @@ tpl [negation] {
 }
 
 // quantifiers
-
-tpl [quantifier[not(@type)]] {
-  die (#message = "Quantifiers must have a type attribute, but we found one that lacks this attribute!");
-}
-
-tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] {
-  die (#message = "We assume that quantifiers are either universal or existential!");
-}
-
-tpl [quantifer[not(child::variable)]] {
-  die (#message = "We require that quantifiers have at least one variable child!");
-}
-
-tpl [quantifier[not(child::*[2])]] {
-  die (#message = "We require that quantifiers have at least two child elements!");
-}
 
 tpl [quantifier[@type = "universal" or @type = "existential"]] {
   $type = `@type`;
@@ -567,10 +575,6 @@ tpl [useful-info] {
     @class = "useful-info";
     apply [*];
   }
-}
-
-tpl [number[not(@name)]] {
-  die (#message = "We require that numbe elements have a name attribute!");
 }
 
 tpl [number[@name]] {
