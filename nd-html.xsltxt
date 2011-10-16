@@ -193,6 +193,8 @@ tpl [/] {
   }
 }
 
+// Rendering Deriviation elements
+
 tpl [Derivation[child::Rule[@name = "implication-elimination"]]] {
   <table {
     <tr {
@@ -253,7 +255,7 @@ tpl [defined-predicate[@name = "true"]] {
   "&#8868;";
 }
 
-// variables
+// Rendering variables
 
 tpl [variable[@name]] {
   <span {
@@ -262,7 +264,7 @@ tpl [variable[@name]] {
   }
 }
 
-// formula shapes
+// Atomic formulas
 
 tpl [predicate[@name = "="]] {
   "(";
@@ -329,6 +331,8 @@ tpl [function[@name]] {
   }
 }
 
+// Complex formulas: binary connectives
+
 tpl [*[not(child::*[2])]] mode="binary-connective" {
   $shape = `local-name (.)`;
   $message = `concat ("Elements of type '", $shape, "' are intended to represent binary connectives, but we have found such an element that lacks two children")`;
@@ -364,7 +368,7 @@ tpl [conjunction] {
   apply [.] (#connective = "&#8743;") mode="binary-connective";
 }
 
-// unary connectives
+// Complex formulas: unary connectives
 
 tpl [*[not(child::*)]] mode="unary-connective" {
   $shape = `local-name (.)`;
@@ -389,7 +393,7 @@ tpl [negation] {
   apply [.] (#connective = "&#172;") mode="unary-connective";
 }
 
-// quantifiers
+// Rendering quantifiers
 
 tpl [quantifier[@type = "universal" or @type = "existential"]] {
   $type = `@type`;
@@ -405,7 +409,7 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
   }
 }
 
-// sources
+// Formula sources
 
 tpl [*] mode="inference-references" {
   "References:";
