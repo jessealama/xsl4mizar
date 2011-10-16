@@ -40,8 +40,8 @@ tpl [Derivation[child::Rule[2]]] mode="sanity-check" {
   die (#message = "We require that a Derivation element have at most one Rule child!");
 }
 
-tpl [Deriviation[child::Rule[not(@name)]]] mode="sanity-check" {
-  die (#message = "We require that the Rule child elements of Deriviations have a name attribute!");
+tpl [Derivation[child::Rule[not(@name)]]] mode="sanity-check" {
+  die (#message = "We require that the Rule child elements of Derivations have a name attribute!");
 }
 
 tpl [Derivation[child::Rule
