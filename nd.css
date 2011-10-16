@@ -68,6 +68,13 @@ td.rule-conclusion {
 	text-align: center;	
 }
 
+caption.derivation-caption {
+	caption-side: bottom;
+	border-top-style: solid;
+	border-top-width: thin;
+	display: none;
+}
+
 td.by-reference {
 	font-family: "Courier New", Courier, mono;
 }
@@ -84,4 +91,18 @@ tr.modus-ponens td {
 	vertical-align: bottom;
 	text-align: center;
 	white-space: nowrap;
+}
+
+table.derivation {
+	border-style: solid;
+	border-width: thin;
+}
+
+td.rule-name {
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+span.derivation-label {
+	font-family: "Courier New", Courier, mono;
 }
