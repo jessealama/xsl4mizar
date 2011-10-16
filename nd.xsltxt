@@ -1,14 +1,14 @@
 // nd.xsltxt : Transform mizar proofs into Gentzen-style natural deductions
 
+// This stylesheet works on the XML emitted by the mizar analyzer.
+// The input is thus the XMLization of a whole mizar article.  We will
+// process only toplevel theorems.
+
 stylesheet "1.0";
 
 output method="xml" encoding="utf-8" indent="yes";
 
 include utils/die.xsl;
-
-// This stylesheet works on the XML emitted by the mizar analyzer.
-// The input is thus the XMLization of a whole mizar article.  We will
-// process only toplevel theorems.
 
 tpl list (#separ, #elems) {
  for-each [$elems] {
