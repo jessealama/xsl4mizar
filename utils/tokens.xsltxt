@@ -183,3 +183,42 @@ tpl cons-token-string-at-end (#item, #token-string) {
   append-token-strings (#token-string-b = `concat (",", $item, ",")`,
                         #token-string-a = $token-string);
 }
+
+tpl item-in-token-list (#token-list, #item) {
+  $token = `concat (",", $item, ",")`;
+  if [contains ($token-list, $token)] {
+    "1";
+  } else {
+    "0";
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+/// Printing token strings
+//////////////////////////////////////////////////////////////////////
+
+tpl render-token-string-helper (#token-string, #before-item, #after-item, #val) {
+  if [$token-string = ""] {
+    `$val`;
+  } else {
+    $item = first-item (#token-string = $token-string);
+    $tail = token-string-tail (#token-string = $token-string);
+    render-token-string-helper (#token-string = $tail,
+                                #before-item = $before-item,
+                                #after-item = $after-item,
+                                #val = `concat ($val, $before-item, $item, $after-item)`);
+  }
+}
+
+tpl render-token-string (#token-string, #before-item, #after-item) {
+  $ok = ensure-token-string (#string = $token-string);
+  if [$ok = "1"] {
+    render-token-string-helper (#token-string = $token-string,
+                                #before-item = $before-item,
+                                #after-item = $after-item,
+                                #val = "");
+  } else {
+    $message = `concat ("We cannot redner the token string&#xa;&#xa;  ", $token-string, "&#xa;&#xa;because it is not actually a token string!")`;
+    die (#message = $message);
+  }
+}
