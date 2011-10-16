@@ -99,6 +99,16 @@ tpl [formula[@name and @status = "definition"]] {
   }
 }
 
+tpl [formula[@name and @status = "axiom"]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    <Rule {
+      @"name" = "axiom";
+    }
+  }
+}
+
 // The weird xpath predicate is designed to rule out applying this
 // template to the final formula of the TSTP problem whose status is
 // 'theorem'.  The final formula whose status is 'theorem' is not to
