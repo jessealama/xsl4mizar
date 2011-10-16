@@ -198,17 +198,16 @@ tpl [Derivation[child::Rule[@name = "implication-elimination"]]] {
     <tr {
       @class = "modus-ponens";
       for-each [Rule] {
-        <td {
-          apply [following-sibling::*[1]];
-        }
-        <td {
-          apply [following-sibling::*[2]];
+        for-each [following-sibling::*] {
+          <td {
+            apply [.];
+          }
         }
       }
     }
     <tr {
       <td {
-        @colspan = "2";
+        @colspan = `count (Rule/following-sibling::*)`;
         @class = "rule-conclusion";
         apply [*[1]];
       }
