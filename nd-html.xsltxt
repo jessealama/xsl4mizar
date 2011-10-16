@@ -141,9 +141,13 @@ tpl [quantifier[not(child::*[2])]] mode="sanity-check" {
   die (#message = "We require that quantifiers have at least two child elements!");
 }
 
+// Numerals
+
 tpl [number[not(@name)]] mode="sanity-check" {
   die (#message = "We require that numbe elements have a name attribute!");
 }
+
+// Toplevel sanity check
 
 tpl [/] mode="sanity-check" {
   if [not(Derivation)] {
