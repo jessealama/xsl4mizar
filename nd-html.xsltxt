@@ -207,7 +207,7 @@ tpl [Derivation[child::Rule[@name = "implication-elimination"]]] mode="gentzen" 
       }
       <td {
         @class = "rule-name";
-        "&#8594;-I";
+        "&#8594;-E";
       }
     }
     <tr {
