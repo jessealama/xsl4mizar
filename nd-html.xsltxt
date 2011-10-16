@@ -174,7 +174,7 @@ tpl [/] {
     <body {
       choose {
         when [$style = "gentzen"] {
-          apply [Derivation];
+          apply [Derivation] mode="gentzen";
         }
         otherwise {
           $message = `concat ("The value supplied for the 'style' parameter,&#xa;&#xa;  ", $style, "&#xa;&#xa;is not acceptable.  The only acceptable values for the stylesheet parameter 'style' are:&#xa;&#xa;", $styles-string, "&#xa")`;
@@ -187,14 +187,14 @@ tpl [/] {
 
 // Rendering Deriviation elements
 
-tpl [Derivation[child::Rule[@name = "implication-elimination"]]] {
+tpl [Derivation[child::Rule[@name = "implication-elimination"]]] mode="gentzen" {
   <table {
     <tr {
       @class = "modus-ponens";
       for-each [Rule] {
         for-each [following-sibling::*] {
           <td {
-            apply [.];
+            apply [.] mode="gentzen";
           }
         }
       }
@@ -209,15 +209,15 @@ tpl [Derivation[child::Rule[@name = "implication-elimination"]]] {
   }
 }
 
-tpl [Derivation[child::Rule[@name = "axiom"]]] {
+tpl [Derivation[child::Rule[@name = "axiom"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[child::Rule[@name = "definition"]]] {
+tpl [Derivation[child::Rule[@name = "definition"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[child::Rule[@name = "by"]]] {
+tpl [Derivation[child::Rule[@name = "by"]]] mode="gentzen" {
   <table {
     <tr {
       @class = "modus-ponens";
