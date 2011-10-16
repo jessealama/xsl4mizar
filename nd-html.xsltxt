@@ -185,7 +185,7 @@ tpl [/] {
   }
 }
 
-// Rendering Deriviation elements
+// Rendering Derivation elements
 
 tpl [Derivation[child::Rule[@name = "implication-elimination"]]] mode="gentzen" {
   <table {
