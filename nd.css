@@ -65,10 +65,7 @@ td.status {
 }
 
 td.rule-conclusion {
-	border-top-style: solid;
-	border-top-width: thin;
-	text-align: center;
-	white-space: nowrap;
+	text-align: center;	
 }
 
 td.by-reference {
