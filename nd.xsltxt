@@ -63,10 +63,16 @@ tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name 
       @"name" = "by";
     }
     for-each [source/non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
-      <Derivation {
-        @"name" = `@name`;
-        <Rule {
-          @"name" = "axiom";
+      $premise-name = `@name`;
+      $premise = `key ("formulas", $premise-name)`;
+      if [$premise] {
+        apply [$premise];
+      } else {
+        <Deriviation {
+          @"name" = $premise-name;
+          <Rule {
+            @"name" = "axiom";
+          }
         }
       }
     }
