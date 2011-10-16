@@ -230,7 +230,7 @@ tpl [Derivation[@name and child::Rule[@name = "implication-elimination"]]] mode=
           @class = "derivation-label";
           `@name`;
         }
-        " : "; apply [*[1]];
+        apply [*[1]];
       }
       <td; // empty cell for the rule name, just above
     }
@@ -242,7 +242,7 @@ tpl [Derivation[@name and child::Rule[@name = "axiom"]]] mode="gentzen" {
     @class = "derivation-label";
     `@name`;
   }
-  " : "; apply [*[1]]; // just the formula
+  apply [*[1]]; // just the formula
 }
 
 tpl [Derivation[@name and child::Rule[@name = "definition"]]] mode="gentzen" {
@@ -250,7 +250,7 @@ tpl [Derivation[@name and child::Rule[@name = "definition"]]] mode="gentzen" {
     @class = "derivation-label";
     `@name`;
   }
-  " : "; apply [*[1]]; // just the formula
+  apply [*[1]]; // just the formula
 }
 
 tpl [Derivation[@name and child::Rule[@name = "by"]]] mode="gentzen" {
@@ -297,7 +297,7 @@ tpl [Derivation[@name and child::Rule[@name = "by"]]] mode="gentzen" {
           @class = "derivation-label";
           `@name`;
         }
-        " : "; apply [*[1]];
+        apply [*[1]];
       }
       <td; // empty cell for the rule name, just above
 
