@@ -264,17 +264,9 @@ tpl [Derivation[@name and child::Rule[@name = "by"]]] mode="gentzen" {
       `@name`;
     }
     <tr {
-      <td {
-        @class = "modus-ponens";
-        if [Derivation[@name]] {
-          <ul {
-            for-each [Derivation[@name]] {
-              <li {
-                @class = "by-reference";
-                `@name`;
-              }
-            }
-          }
+      for-each [Derivation[@name]] {
+        <td {
+          apply [.] mode="gentzen";
         }
       }
       <td; // empty cell for the rule name, coming up
