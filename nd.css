@@ -105,4 +105,5 @@ td.rule-name {
 
 span.derivation-label {
 	font-family: "Courier New", Courier, mono;
+	display: none;
 }
