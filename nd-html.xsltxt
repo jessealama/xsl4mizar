@@ -63,23 +63,23 @@ tpl first-numeral (#string) {
 /// Sanity checks as templates
 //////////////////////////////////////////////////////////////////////
 
-// Deriviation sanity checks
+// Derivation sanity checks
 
-tpl [Deriviation[not(child::Rule)]] mode="sanity-check" {
+tpl [Derivation[not(child::Rule)]] mode="sanity-check" {
   die (#message = "We require that a Derivatiion element have a Rule child!");
 }
 
-tpl [Deriviation[child::Rule[2]]] mode="sanity-check" {
-  die (#message = "We require that a Deriviation element have at most one Rule child!");
+tpl [Derivation[child::Rule[2]]] mode="sanity-check" {
+  die (#message = "We require that a Derivation element have at most one Rule child!");
 }
 
-tpl [Deriviation[child::Rule
+tpl [Derivation[child::Rule
                  and not(child::Rule[@name = "implication-elimination"])
                  and not(child::Rule[@name = "axiom"])
                  and not(child::Rule[@name = "definition"])
                  and not(child::Rule[@name = "by"])]] mode="sanity-check" {
   $n = `Rule/@name`;
-  $message = `concat ("We require that a Deriviation have a Rule child whose name is either\n\n* implication-elimination\n* axiom\n* definition\n* by\n\nbut we encountered a Deriviation whose Rule child has the name\n\n  '", $n, "'\n")`;
+  $message = `concat ("We require that a Derivation have a Rule child whose name is either&#xa;&#xa;* implication-elimination&#xa;* axiom&#xa;* definition&#xa;* by&#xa;&#xa;but we encountered a Derivation whose Rule child has the name&#xa;&#xa;  ", $n, "&#xa;&#xa;We don't know how to proceed.")`;
   die (#message = $message);
 }
 
@@ -147,7 +147,7 @@ tpl [/] mode="sanity-check" {
   if [not(Derivation)] {
     die (#message = "A Derivation root element is missing!");
   }
-  apply [descendant::Deriviation] mode="sanity-check";
+  apply [descendant::Derivation] mode="sanity-check";
   apply [descendant::Rule] mode="sanity-check";
   apply [descendant::defined-predicate] mode="sanity-check";
   apply [descendant::variable] mode="sanity-check";
