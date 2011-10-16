@@ -123,7 +123,7 @@ tpl [formula[@name and @status = "theorem" and following-sibling::formula[@statu
   }
 }
 
-tpl [formula[@name and @status = "theorem"]] {
+tpl [formula[@name and @status = "theorem" and not(following-sibling::formula[@status = "theorem"])]] {
   <Derivation {
     @"name" = `@name`;
     apply [*[1]]; // the actual formula
