@@ -13,7 +13,8 @@ include utils/strings.xsl;
 
 tpl list (#separ, #elems) {
  for-each [$elems] {
-  apply[.]; if [not(position()=last())] { copy-of $separ; } }
+  apply[.];
+  if [not(position()=last())] { copy-of $separ; } }
 }
 
 //////////////////////////////////////////////////////////////////////
