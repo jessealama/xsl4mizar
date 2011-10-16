@@ -213,11 +213,11 @@ tpl [Derivation[child::Rule[@name = "implication-elimination"]]] {
 }
 
 tpl [Derivation[child::Rule[@name = "axiom"]]] {
-  apply [*[1]];
+  apply [*[1]]; // just the formula
 }
 
 tpl [Derivation[child::Rule[@name = "definition"]]] {
-  apply [*[1]];
+  apply [*[1]]; // just the formula
 }
 
 tpl [Derivation[child::Rule[@name = "by"]]] {
