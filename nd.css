@@ -86,4 +86,5 @@ tr.modus-ponens {
 tr.modus-ponens td {
 	vertical-align: bottom;
 	text-align: center;
+	white-space: nowrap;
 }
