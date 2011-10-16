@@ -8,6 +8,14 @@ output omit-xml-declaration="no";
 include utils/strings.xsl;
 
 //////////////////////////////////////////////////////////////////////
+/// Parameters
+//////////////////////////////////////////////////////////////////////
+
+
+// The style of the proof output.
+#style = { "gentzen"; }
+
+//////////////////////////////////////////////////////////////////////
 /// Utilities
 //////////////////////////////////////////////////////////////////////
 
@@ -107,6 +115,12 @@ tpl [/] mode="sanity-check" {
   if [not(Derivation)] {
     die (#message = "A Derivation root element is missing!");
   }
+
+  // paramter sanity check
+  if [not($style = "gentzen")] {
+    die (#message = "The only acceptable value for the stylesheet parameter 'style' is 'gentzen'.");
+  }
+
   apply [descendant::Derivation] mode="sanity-check";
   apply [descendant::Rule] mode="sanity-check";
   apply [descendant::defined-predicate] mode="sanity-check";
