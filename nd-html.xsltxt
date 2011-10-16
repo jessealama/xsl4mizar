@@ -17,6 +17,48 @@ $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
 tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
 
+tpl first-numeral-helper (#string) {
+  if [$string = ""] {
+    die (#message = "We cannot determine the first numeral of the empty string!");
+  } else {
+    $first-char-as-string = `substring ($string, 1, 1)`;
+    if [$first-char-as-string = "0"
+        or $first-char-as-string = "1"
+        or $first-char-as-string = "2"
+        or $first-char-as-string = "3"
+        or $first-char-as-string = "4"
+        or $first-char-as-string = "5"
+        or $first-char-as-string = "6"
+        or $first-char-as-string = "7"
+        or $first-char-as-string = "8"
+        or $first-char-as-string = "9"] {
+      $first-char-as-string;
+    } else {
+      first-numeral-helper (#string = `substring-after ($string, $first-char-as-string)`);
+    }
+  }
+}
+
+// the position of the first numeral in a string
+tpl first-numeral (#string) {
+  // sanity check: $string does contain a numeral
+  if [contains ($string, "0")
+      or contains ($string, "1")
+      or contains ($string, "2")
+      or contains ($string, "3")
+      or contains ($string, "4")
+      or contains ($string, "5")
+      or contains ($string, "6")
+      or contains ($string, "7")
+      or contains ($string, "8")
+      or contains ($string, "9")] {
+    first-numeral-helper (#string = $string);
+  } else {
+    $message = `concat ("We cannot determine the first numeral of the string '", $string, "', because it contains no numerals")`;
+    die (#message = $message);
+  }
+}
+
 //////////////////////////////////////////////////////////////////////
 /// Sanity checks as templates
 //////////////////////////////////////////////////////////////////////
@@ -435,48 +477,6 @@ tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-
 
 tpl [source[child::non-logical-data[@name = "file" and not(child::non-logical-data[2])]]] {
   die (#message = "We require that non-logical-data elements whose name is 'file' have at least two non-logical-data child elements!");
-}
-
-tpl first-numeral-helper (#string) {
-  if [$string = ""] {
-    die (#message = "We cannot determine the first numeral of the empty string!");
-  } else {
-    $first-char-as-string = `substring ($string, 1, 1)`;
-    if [$first-char-as-string = "0"
-        or $first-char-as-string = "1"
-        or $first-char-as-string = "2"
-        or $first-char-as-string = "3"
-        or $first-char-as-string = "4"
-        or $first-char-as-string = "5"
-        or $first-char-as-string = "6"
-        or $first-char-as-string = "7"
-        or $first-char-as-string = "8"
-        or $first-char-as-string = "9"] {
-      $first-char-as-string;
-    } else {
-      first-numeral-helper (#string = `substring-after ($string, $first-char-as-string)`);
-    }
-  }
-}
-
-// the position of the first numeral in a string
-tpl first-numeral (#string) {
-  // sanity check: $string does contain a numeral
-  if [contains ($string, "0")
-      or contains ($string, "1")
-      or contains ($string, "2")
-      or contains ($string, "3")
-      or contains ($string, "4")
-      or contains ($string, "5")
-      or contains ($string, "6")
-      or contains ($string, "7")
-      or contains ($string, "8")
-      or contains ($string, "9")] {
-    first-numeral-helper (#string = $string);
-  } else {
-    $message = `concat ("We cannot determine the first numeral of the string '", $string, "', because it contains no numerals")`;
-    die (#message = $message);
-  }
 }
 
 // extract the "K" and "CC" from strings like "K4" and "CC10"
