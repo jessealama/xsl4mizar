@@ -5,26 +5,123 @@ output doctype-public="-//W3C//DTD XHTML 1.1//EN";
 output doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd";
 output omit-xml-declaration="no";
 
-include utils/die.xsl;
+include utils/strings.xsl;
+
+//////////////////////////////////////////////////////////////////////
+/// Utilities
+//////////////////////////////////////////////////////////////////////
 
 tpl list (#separ, #elems) {
  for-each [$elems] {
   apply[.]; if [not(position()=last())] { copy-of $separ; } }
 }
 
-$lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
-$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+//////////////////////////////////////////////////////////////////////
+/// Sanity checks as templates
+//////////////////////////////////////////////////////////////////////
 
-tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
+// Derivation sanity checks
 
-tpl [/] {
-  if [not(tstp)] {
-    die (#message = "The required tstp element is missing!");
-  }
-  apply [tstp];
+tpl [Derivation[not(child::Rule)]] mode="sanity-check" {
+  die (#message = "We require that a Derivatiion element have a Rule child!");
 }
 
-tpl [tstp] {
+tpl [Derivation[child::Rule[2]]] mode="sanity-check" {
+  die (#message = "We require that a Derivation element have at most one Rule child!");
+}
+
+tpl [Derivation[child::Rule
+                and not(child::Rule[@name = "implication-elimination"])
+                and not(child::Rule[@name = "axiom"])
+                and not(child::Rule[@name = "definition"])
+                and not(child::Rule[@name = "by"])]] mode="sanity-check" {
+  $n = `Rule/@name`;
+  $message = `concat ("We require that a Derivation have a Rule child whose name is either&#xa;&#xa;  * implication-elimination&#xa;  * axiom&#xa;  * definition&#xa;  * by&#xa;&#xa;but we encountered a Derivation whose Rule child has the name&#xa;&#xa;  ", $n, "&#xa;&#xa;We don't know how to proceed.")`;
+  die (#message = $message);
+}
+
+// Rule sanity checks
+
+tpl [Rule[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that all Rule elements have a name attribute!");
+}
+
+// Formula and term sanity checks
+
+tpl [defined-predicate[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a defined-predicate element have a name attribute!");
+}
+
+tpl [defined-predicate[@name and not(@name = "true")]] mode="sanity-check" {
+  $n = `@name`;
+  $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $n, "'")`;
+  die (#message = $message);
+}
+
+tpl [variable[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that variables have a name attribute!");
+}
+
+tpl [predicate[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a variable have a name attribute!");
+}
+
+tpl [predicate[@name = "=" and not(child::*[2])]] mode="sanity-check" {
+  die (#message = "We require that an equality predicate element have at least two children!");
+}
+
+tpl [predicate[@name = "=" and child::*[3]]] mode="sanity-check" {
+  die (#message = "We require that an equality predicate element have fewer than three children!");
+}
+
+tpl [function[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a function have a name attribute!");
+}
+
+tpl [quantifier[not(@type)]] mode="sanity-check" {
+  die (#message = "Quantifiers must have a type attribute, but we found one that lacks this attribute!");
+}
+
+tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] mode="sanity-check" {
+  die (#message = "We assume that quantifiers are either universal or existential!");
+}
+
+tpl [quantifer[not(child::variable)]] mode="sanity-check" {
+  die (#message = "We require that quantifiers have at least one variable child!");
+}
+
+tpl [quantifier[not(child::*[2])]] mode="sanity-check" {
+  die (#message = "We require that quantifiers have at least two child elements!");
+}
+
+// Numerals
+
+tpl [number[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that numbe elements have a name attribute!");
+}
+
+// Toplevel sanity check
+
+tpl [/] mode="sanity-check" {
+  if [not(Derivation)] {
+    die (#message = "A Derivation root element is missing!");
+  }
+  apply [descendant::Derivation] mode="sanity-check";
+  apply [descendant::Rule] mode="sanity-check";
+  apply [descendant::defined-predicate] mode="sanity-check";
+  apply [descendant::variable] mode="sanity-check";
+  apply [descendant::predicate] mode="sanity-check";
+  apply [descendant::function] mode="sanity-check";
+  apply [descendant::quantifier] mode="sanity-check";
+  apply [descendant::number] mode="sanity-check";
+}
+
+//////////////////////////////////////////////////////////////////////
+/// The meat
+//////////////////////////////////////////////////////////////////////
+
+tpl [/] {
+  apply [.] mode="sanity-check"; // don't proceed unless the sanity checks pass
   <html {
     @"xmlns" = "http://www.w3.org/1999/xhtml";
     @xml:lang = "en";
@@ -40,125 +137,78 @@ tpl [tstp] {
       <link {
         @rel = "stylesheet";
         @type = "text/css";
-        @href = "tstp.css";
+        @href = "nd.css";
       }
     }
     <body {
-      <table {
-        @class = "tstp-problem";
-        @rules = "all";
-        if [comment] {
-          @summary = `comment[1]/text()`;
-          <caption {
-            @class = "tstp-problem-caption";
-            apply [comment[1]];
+      apply [Derivation];
+    }
+  }
+}
+
+// Rendering Deriviation elements
+
+tpl [Derivation[child::Rule[@name = "implication-elimination"]]] {
+  <table {
+    <tr {
+      @class = "modus-ponens";
+      for-each [Rule] {
+        for-each [following-sibling::*] {
+          <td {
+            apply [.];
           }
         }
-        <colgroup {
-          <col;
-          <col;
-          <col;
-          <col;
-        }
-        <thead {
-          <tr {
-            <th { "Name"; }
-            <th { "Status"; }
-            <th { "Formula"; }
-            <th { "Source"; }
-	    <th { "Users"; }
-          }
-        }
-        <tbody {
-          apply [formula[child::source/non-logical-data[@name = "file"]]];
-        }
-        <tbody {
-          apply [formula[not(child::source/non-logical-data[@name = "file"])]];
-        }
+      }
+    }
+    <tr {
+      <td {
+        @colspan = `count (Rule/following-sibling::*)`;
+        @class = "rule-conclusion";
+        apply [*[1]];
       }
     }
   }
 }
 
-tpl [comment] {
-  `.`;
+tpl [Derivation[child::Rule[@name = "axiom"]]] {
+  apply [*[1]]; // just the formula
 }
 
-key "formulas" [/tstp/formula[@name]] `@name`;
-key "symbols" [/tstp/formula/source[descendant::non-logical-data[@name = "new_symbol"]]] `descendant::non-logical-data[@name = "new_symbol"]/non-logical-data/@name`;
-
-tpl [formula[not(@name)]] {
-  die (#message = "We require that a formula element have a name attribute!");
+tpl [Derivation[child::Rule[@name = "definition"]]] {
+  apply [*[1]]; // just the formula
 }
 
-tpl [formula[not(@status)]] {
-  die (#message = "We require that a formula element have a status attribute!");
+tpl [Derivation[child::Rule[@name = "by"]]] {
+  <table {
+    <tr {
+      @class = "modus-ponens";
+      if [Derivation[@name]] {
+        <ul {
+          for-each [Derivation[@name]] {
+            <li {
+              @class = "by-reference";
+              `@name`;
+            }
+          }
+        }
+      }
+    }
+    <tr {
+      <td {
+        @class = "rule-conclusion";
+        apply [*[1]];
+      }
+    }
+  }
 }
 
-tpl [defined-predicate[not(@name)]] {
-  die (#message = "We require that a defined-predicate element have a name attribute!");
-}
+// Rendering formulas
 
 tpl [defined-predicate[@name = "true"]] {
   "&#8868;";
 }
 
-tpl [defined-predicate[@name and not(@name = "true")]] {
-  $n = `@name`;
-  $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $n, "'")`;
-  die (#message = $message);
-}
-
-tpl [formula[@name]] {
-  $n = `@name`;
-  $context = `.`;
-  <tr {
-    <td {
-      @"id" = `@name`;
-      @class = "formula-name";
-      `$n`;
-     }
-     <td {
-       @class = "status";
-       `@status`;
-     }
-     <td {
-      @class = "formula";
-      apply [*[1]];
-    }
-    <td {
-      @class = "source";
-      // If we are introducing a new constant, anchor this table cell
-      if [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "definition"] and child::non-logical-data[child::non-logical-data[@name = "new_symbol"]]]]] {
-        @"id" = `source/non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "new_symbol"]/non-logical-data[position() = last()]/@name`;
-      }
-      apply [source];
-    }
-    <td {
-      if [//formula[not(self::* = $context) and @name and descendant::non-logical-data[@name = $n and not(ancestor::useful-info)]]] {
-        <ul {
-          for-each [//formula[not(self::* = $context) and @name and descendant::non-logical-data[@name = $n and not(ancestor::useful-info)]]] {
-            $formula-name = `@name`;
-            <li {
-              <a {
-                @href = `concat ("#", $formula-name)`;
-                `$formula-name`;
-              }
-            }
-          }
-        }
-      } else {
-        <em { "(none)"; }
-      }
-    }
-  }
-}
-
-// variables
-
-tpl [variable[not(@name)]] {
-  die (#message = "We require that variables have a name attribute!");
-}
+// Rendering variables
 
 tpl [variable[@name]] {
   <span {
@@ -167,19 +217,7 @@ tpl [variable[@name]] {
   }
 }
 
-// formula shapes
-
-tpl [predicate[not(@name)]] {
-  die (#message = "We require that a variable have a name attribute!");
-}
-
-tpl [predicate[@name = "=" and not(child::*[2])]] {
-  die (#message = "We require that an equality predicate element have at least two children!");
-}
-
-tpl [predicate[@name = "=" and child::*[3]]] {
-  die (#message = "We require that an equality predicate element have fewer than three children!");
-}
+// Atomic formulas
 
 tpl [predicate[@name = "="]] {
   "(";
@@ -214,10 +252,6 @@ tpl [predicate[@name and not(@name = "=")]] {
   ")";
 }
 
-tpl [function[not(@name)]] {
-  die (#message = "We require that a function have a name attribute!");
-}
-
 tpl [function[@name]] {
   $n = `@name`;
   $constructor = { if [contains ($n, "__")] {
@@ -250,6 +284,8 @@ tpl [function[@name]] {
   }
 }
 
+// Complex formulas: binary connectives
+
 tpl [*[not(child::*[2])]] mode="binary-connective" {
   $shape = `local-name (.)`;
   $message = `concat ("Elements of type '", $shape, "' are intended to represent binary connectives, but we have found such an element that lacks two children")`;
@@ -263,13 +299,9 @@ tpl [*[child::*[3]]] mode="binary-connective" {
 }
 
 tpl [*] (#connective) mode="binary-connective" {
-  <table {
-    @class = "binary-connective";
-    <tbody {
-      <tr { <td { apply [*[1]]; } }
-      <tr { <td { `$connective`; } }
-      <tr { <td { apply [*[2]]; } }
-    }
+  <span {
+    @class = "formula";
+    apply [*[1]]; " "; `$connective`; " "; apply [*[2]];
   }
 }
 
@@ -289,7 +321,7 @@ tpl [conjunction] {
   apply [.] (#connective = "&#8743;") mode="binary-connective";
 }
 
-// unary connectives
+// Complex formulas: unary connectives
 
 tpl [*[not(child::*)]] mode="unary-connective" {
   $shape = `local-name (.)`;
@@ -304,15 +336,9 @@ tpl [*[child::*[3]]] mode="unary-connective" {
 }
 
 tpl [*] (#connective) mode="unary-connective" {
-  <table {
-    @class = "unary-connective";
-    <tr {
-      <td { `$connective`; }
-      <td {
-        @class = "formula";
-        apply [*[1]];
-      }
-    }
+  <span {
+    @class = "formula";
+    `$connective`; apply [*[1]];
   }
 }
 
@@ -320,51 +346,23 @@ tpl [negation] {
   apply [.] (#connective = "&#172;") mode="unary-connective";
 }
 
-// quantifiers
-
-tpl [quantifier[not(@type)]] {
-  die (#message = "Quantifiers must have a type attribute, but we found one that lacks this attribute!");
-}
-
-tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] {
-  die (#message = "We assume that quantifiers are either universal or existential!");
-}
-
-tpl [quantifer[not(child::variable)]] {
-  die (#message = "We require that quantifiers have at least one variable child!");
-}
-
-tpl [quantifier[not(child::*[2])]] {
-  die (#message = "We require that quantifiers have at least two child elements!");
-}
+// Rendering quantifiers
 
 tpl [quantifier[@type = "universal" or @type = "existential"]] {
   $type = `@type`;
-  <table {
+  <span {
     @class = "formula";
-    <tbody {
-      <tr {
-        <td {
-          if [$type = "universal"] {
-            "&#8704;";
-          } else {
-            "&#8707;";
-          }
-        }
-        <td {
-          @class = "variable-list";
-          list (#elems = `variable`, #separ = ", ");
-        }
-        <td {
-          @class = "quantifier-matrix";
-          apply [*[position() = last()]];
-        }
-      }
+    if [$type = "universal"] {
+      "&#8704;";
+    } else {
+      "&#8707;";
     }
+    list (#elems = `variable`, #separ = ", ");
+    "["; apply [*[position() = last()]]; "]";
   }
 }
 
-// sources
+// Formula sources
 
 tpl [*] mode="inference-references" {
   "References:";
@@ -397,37 +395,8 @@ tpl [*] mode="open-assumptions" {
 }
 
 tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "assumption"] and child::non-logical-data[child::non-logical-data[@name = "file"]]]]] {
-  $formula-name = `ancestor::formula/@name`;
   "Assumption about ";
-  $first-char-as-string = `substring ($formula-name, 1, 1)`;
-  choose {
-    when [$first-char-as-string = "d"] {
-      apply [non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "file"]/non-logical-data[position() = last()]] mode="link";
-    }
-    when [$first-char-as-string = "e"] {
-      $after-first-char = `substring-after ($formula-name, $first-char-as-string)`;
-      $c-instead-of-e = `concat ("c", $after-first-char)`;
-      $constant = `substring-before ($c-instead-of-e, "__")`;
-      $article = `substring-after ($c-instead-of-e, "__")`;
-      <a {
-        @href = `concat ("#", $c-instead-of-e)`;
-        <span {
-          @class = "constructor";
-          `$constant`;
-        }
-        <sub {
-          <span {
-            @class = "article";
-            $article;
-          }
-        }
-      }
-    }
-    otherwise {
-      $message = `concat ("We assume that the first character of the name of an introduced assumption formula is either 'd' or 'e', but the first char of the current formula name '", $formula-name, "' is '", $first-char-as-string, "'")`;
-      die (#message = $message);
-    }
-  }
+  apply [non-logical-data[@name = "introduced"]/non-logical-data[position() = last()]/non-logical-data[@name = "file"]/non-logical-data[position() = last()]] mode="link";
 }
 
 tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "definition"] and child::non-logical-data[child::non-logical-data[@name = "new_symbol"]]]]] {
@@ -474,48 +443,6 @@ tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-
 
 tpl [source[child::non-logical-data[@name = "file" and not(child::non-logical-data[2])]]] {
   die (#message = "We require that non-logical-data elements whose name is 'file' have at least two non-logical-data child elements!");
-}
-
-tpl first-numeral-helper (#string) {
-  if [$string = ""] {
-    die (#message = "We cannot determine the first numeral of the empty string!");
-  } else {
-    $first-char-as-string = `substring ($string, 1, 1)`;
-    if [$first-char-as-string = "0"
-        or $first-char-as-string = "1"
-        or $first-char-as-string = "2"
-        or $first-char-as-string = "3"
-        or $first-char-as-string = "4"
-        or $first-char-as-string = "5"
-        or $first-char-as-string = "6"
-        or $first-char-as-string = "7"
-        or $first-char-as-string = "8"
-        or $first-char-as-string = "9"] {
-      $first-char-as-string;
-    } else {
-      first-numeral-helper (#string = `substring-after ($string, $first-char-as-string)`);
-    }
-  }
-}
-
-// the position of the first numeral in a string
-tpl first-numeral (#string) {
-  // sanity check: $string does contain a numeral
-  if [contains ($string, "0")
-      or contains ($string, "1")
-      or contains ($string, "2")
-      or contains ($string, "3")
-      or contains ($string, "4")
-      or contains ($string, "5")
-      or contains ($string, "6")
-      or contains ($string, "7")
-      or contains ($string, "8")
-      or contains ($string, "9")] {
-    first-numeral-helper (#string = $string);
-  } else {
-    $message = `concat ("We cannot determine the first numeral of the string '", $string, "', because it contains no numerals")`;
-    die (#message = $message);
-  }
 }
 
 // extract the "K" and "CC" from strings like "K4" and "CC10"
@@ -605,22 +532,7 @@ tpl [non-logical-data[@name]] mode="link" {
   $n = `@name`;
   <a {
     @href = `concat ("#", $n)`;
-    if [starts-with ($n, "c") and contains ($n, "__")] { // constant
-      $constant = `substring-before ($n, "__")`;
-      $article = `substring-after ($n, "__")`;
-      <span {
-        @class = "constructor";
-        `$constant`;
-      }
-      <sub {
-        <span {
-          @class = "article";
-          `$article`;
-        }
-      }
-    } else {
-      `$n`;
-    }
+    `$n`;
   }
 }
 
@@ -629,10 +541,6 @@ tpl [useful-info] {
     @class = "useful-info";
     apply [*];
   }
-}
-
-tpl [number[not(@name)]] {
-  die (#message = "We require that numbe elements have a name attribute!");
 }
 
 tpl [number[@name]] {
