@@ -41,18 +41,23 @@ tpl [Derivation[child::Rule[2]]] mode="sanity-check" {
 }
 
 tpl [Derivation[child::Rule
-                and not(child::Rule[@kind = "implication-elimination"])
-                and not(child::Rule[@kind = "axiom"])
-                and not(child::Rule[@kind = "definition"])
-                and not(child::Rule[@kind = "by"])]] mode="sanity-check" {
-  $kind = `Rule/@kind`;
-  $message = `concat ("We require that a Derivation have a Rule child whose kind is either&#xa;&#xa;  * implication-elimination&#xa;  * axiom&#xa;  * definition&#xa;  * by&#xa;&#xa;but we encountered a Derivation whose Rule child has the kind&#xa;&#xa;  ", $kind, "&#xa;&#xa;We don't know how to proceed.")`;
-  die (#message = $message);
+                and not(child::Rule[@name = "implication-elimination"])
+                and not(child::Rule[@name = "axiom"])
+                and not(child::Rule[@name = "definition"])
+                and not(child::Rule[@name = "by"])]] mode="sanity-check" {
+  if [Rule/@name] {
+    $n = `Rule/@name`;
+    $message = `concat ("We require that a Derivation have a Rule child whose name is either&#xa;&#xa;  * implication-elimination&#xa;  * axiom&#xa;  * definition&#xa;  * by&#xa;&#xa;but we encountered a Derivation whose Rule child has the name&#xa;&#xa;  ", $n, "&#xa;&#xa;We don't know how to proceed.")`;
+    die (#message = $message);
+  } else {
+    $message = `concat ("We require that a Derivation have a Rule child whose name is either&#xa;&#xa;  * implication-elimination&#xa;  * axiom&#xa;  * definition&#xa;  * by&#xa;&#xa;but we encountered a Derivation whose Rule child has no name at all.  We don't know how to proceed.")`;
+    die (#message = $message);
+  }
 }
 
 // Rule sanity checks
 
-tpl [Rule[not(@kind)]] mode="sanity-check" {
+tpl [Rule[not(@name)]] mode="sanity-check" {
   die (#message = "We require that all Rule elements have a name attribute!");
 }
 
@@ -187,7 +192,7 @@ tpl [/] {
 
 // Rendering Derivation elements
 
-tpl [Derivation[child::Rule[@kind = "implication-elimination"]]] mode="gentzen" {
+tpl [Derivation[child::Rule[@name = "implication-elimination"]]] mode="gentzen" {
   <table {
     <tr {
       @class = "modus-ponens";
@@ -221,25 +226,25 @@ tpl [Derivation[child::Rule[@kind = "implication-elimination"]]] mode="gentzen" 
   }
 }
 
-tpl [Derivation[child::Rule[@kind = "axiom"]]] mode="gentzen" {
+tpl [Derivation[child::Rule[@name = "axiom"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[child::Rule[@kind = "definition"]]] mode="gentzen" {
+tpl [Derivation[child::Rule[@name = "definition"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[child::Rule[@kind = "by"]]] mode="gentzen" {
+tpl [Derivation[child::Rule[@name = "by"]]] mode="gentzen" {
   <table {
     <tr {
       <td {
         @class = "modus-ponens";
-        if [Derivation[@kind]] {
+        if [Derivation[@name]] {
           <ul {
-            for-each [Derivation[@kind]] {
+            for-each [Derivation[@name]] {
               <li {
                 @class = "by-reference";
-                `@kind`;
+                `@name`;
               }
             }
           }
@@ -249,7 +254,7 @@ tpl [Derivation[child::Rule[@kind = "by"]]] mode="gentzen" {
     }
     <tr {
       <td {
-        @colspan = `count (Derivation[@kind])`;
+        @colspan = `count (Derivation[@name])`;
         <hr;
       }
       <td {
@@ -260,7 +265,7 @@ tpl [Derivation[child::Rule[@kind = "by"]]] mode="gentzen" {
     <tr {
       <td {
         @class = "rule-conclusion";
-        @colspan = `count (Derivation[@kind])`;
+        @colspan = `count (Derivation[@name])`;
         apply [*[1]];
       }
       <td; // empty cell for the rule name, just above
