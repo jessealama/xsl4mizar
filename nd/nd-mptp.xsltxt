@@ -92,7 +92,7 @@ tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name 
     @"name" = `$n`;
     apply [*[1]]; // the actual formula
     <Rule {
-      @"name" = "by";
+      @"name" = "by/RAA";
     }
     // apply [source] mode="recurse";
     $nd-path = `concat ($n, ".nd")`;
