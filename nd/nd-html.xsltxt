@@ -242,7 +242,7 @@ tpl [Derivation[@name and child::Rule[@name = "definition"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[@name and child::Rule[@name = "by"]]] mode="gentzen" {
+tpl [Derivation[@name and child::Rule[@name and not(@name = "axiom") and not(@name = "definition")]]] mode="gentzen" {
   <table {
     @class = "derivation";
     @summary = `@name`;
@@ -267,7 +267,7 @@ tpl [Derivation[@name and child::Rule[@name = "by"]]] mode="gentzen" {
       }
       <td {
         @class = "rule-name";
-        "by";
+        `Rule/@name`;
       }
     }
     <tr {
