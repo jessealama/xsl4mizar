@@ -63,14 +63,26 @@ tpl [tstp] {
   apply [formula[position() = last()]];
 }
 
-tpl [formula[@name and @status = "plain" and not(descendant::non-logical-data[@name = "mizar_by"])]] {
+tpl [formula[@name and source/non-logical-data[@name = "file"]]] {
   <Derivation {
     @"name" = `@name`;
     apply [*[1]]; // the actual formula
     <Rule {
-      @"name" = "implication-elimination";
+      @"name" = "axiom";
     }
-    apply [source];
+  }
+}
+
+tpl [formula[@name and @status = "plain"]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    if [source/non-logical-data[@name = "file"]] {
+      <Rule { @"name" = "axiom"; }
+    } else {
+      <Rule { @"name" = "implication-elimination"; }
+      apply [source] mode="recurse";
+    }
   }
 }
 
@@ -81,20 +93,7 @@ tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name 
     <Rule {
       @"name" = "by";
     }
-    for-each [source/non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
-      $premise-name = `@name`;
-      $premise = `key ("formulas", $premise-name)`;
-      if [$premise] {
-        apply [$premise];
-      } else {
-        <Deriviation {
-          @"name" = $premise-name;
-          <Rule {
-            @"name" = "axiom";
-          }
-        }
-      }
-    }
+    apply [source] mode="recurse";
   }
 }
 
@@ -128,83 +127,32 @@ tpl [formula[@name and @status = "axiom"]] {
   }
 }
 
-// The weird xpath predicate is designed to rule out applying this
-// template to the final formula of the TSTP problem whose status is
-// 'theorem'.  The final formula whose status is 'theorem' is not to
-// be treated as an axiom.
-tpl [formula[@name and @status = "theorem" and following-sibling::formula[@status = "theorem"]]] {
+tpl [formula[@name and @status = "theorem"]] {
   <Derivation {
     @"name" = `@name`;
     apply [*[1]]; // the actual formula
-    <Rule {
-      @"name" = "axiom";
+    if [following-sibling::formula[@status = "theorem"]] {
+      <Rule { @"name" = "axiom"; }
+    } else {
+      <Rule { @"name" = "implication-elimination"; }
+      apply [source] mode="recurse";
     }
   }
 }
 
-tpl [formula[@name and @status = "theorem" and not(following-sibling::formula[@status = "theorem"])]] {
-  <Derivation {
-    @"name" = `@name`;
-    apply [*[1]]; // the actual formula
-    <Rule {
-      if [following-sibling::formula[@status = "theorem"]] {
-        @"name" = "axiom";
-      } else {
-        @"name" = "implication-elimination";
+tpl [source] mode="recurse" {
+  for-each [non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
+    $premise-name = `@name`;
+    $premise = `key ("formulas", $premise-name)`;
+    if [$premise] {
+      apply [$premise];
+    } else {
+      <Deriviation {
+        @"name" = $premise-name;
+        <Rule {
+          @"name" = "axiom";
+        }
       }
     }
-    apply [source];
   }
-}
-
-tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "let"]]]] {
-  for-each [non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
-    $premise-name = `@name`;
-    $premise = `key ("formulas", $premise-name)`;
-    if [not($premise)] {
-      $message = `concat ("We failed to look up the formula whose name is '", $premise-name, "'")`;
-      die (#message = $message);
-    }
-    apply [$premise];
-  }
-}
-
-tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "conclusion"]]]] {
-  for-each [non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
-    $premise-name = `@name`;
-    $premise = `key ("formulas", $premise-name)`;
-    if [not($premise)] {
-      $message = `concat ("We failed to look up the formula whose name is '", $premise-name, "'")`;
-      die (#message = $message);
-    }
-    apply [$premise];
-  }
-}
-
-tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "discharge_asm"]]]] {
-  for-each [non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
-    $premise-name = `@name`;
-    $premise = `key ("formulas", $premise-name)`;
-    if [not($premise)] {
-      $message = `concat ("We failed to look up the formula whose name is '", $premise-name, "'")`;
-      die (#message = $message);
-    }
-    apply [$premise];
-  }
-}
-
-tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "mizar_by"]]]] {
-  for-each [non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
-    $premise-name = `@name`;
-    $premise = `key ("formulas", $premise-name)`;
-    if [not($premise)] {
-      $message = `concat ("We failed to look up the formula whose name is '", $premise-name, "'")`;
-      die (#message = $message);
-    }
-    apply [$premise];
-  }
-}
-
-tpl [source[child::non-logical-data[@name = "introduced" and child::non-logical-data[@name = "tautology"]]]] {
-  // do nothing
 }
