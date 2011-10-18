@@ -185,7 +185,6 @@ tpl [Derivation[@name and child::Rule[@name = "implication-elimination"]]] mode=
     @class = "derivation";
     @summary = `@name`;
     @title = `@name`;
-    @"id" = `@name`;
     <caption {
       @class = "derivation-caption";
       `@name`;
@@ -247,7 +246,6 @@ tpl [Derivation[@name and child::Rule[@name and not(@name = "axiom") and not(@na
     @class = "derivation";
     @summary = `@name`;
     @title = `@name`;
-    @"id" = `@name`;
     <caption {
       @class = "derivation-caption";
       `@name`;
