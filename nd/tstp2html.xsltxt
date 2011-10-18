@@ -5,7 +5,7 @@ output doctype-public="-//W3C//DTD XHTML 1.1//EN";
 output doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd";
 output omit-xml-declaration="no";
 
-include utils/die.xsl;
+include ../utils/die.xsl;
 
 tpl list (#separ, #elems) {
  for-each [$elems] {

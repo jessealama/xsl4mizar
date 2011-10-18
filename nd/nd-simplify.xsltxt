@@ -9,7 +9,7 @@ stylesheet "1.0";
 
 output method="xml" encoding="utf-8" indent="yes";
 
-include utils/die.xsl;
+include ../utils/die.xsl;
 
 tpl [*] {
   $element = `local-name ()`;
