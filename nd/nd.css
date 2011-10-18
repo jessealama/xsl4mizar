@@ -107,3 +107,12 @@ span.derivation-label {
 	font-family: "Courier New", Courier, mono;
 	display: none;
 }
+
+span.defined-predicate {
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+td {
+	text-align: center;
+}
