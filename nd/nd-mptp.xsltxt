@@ -49,11 +49,11 @@ tpl [/] mode="sanity-check" {
 }
 
 tpl [/] {
-  if [not(tstp)] {
-    die (#message = "The required tstp element is missing!");
-  }
+  // if [not(tstp)] {
+  //   die (#message = "The required tstp element is missing!");
+  // }
   apply [.] mode="sanity-check";
-  apply [tstp];
+  apply [*];
 }
 
 tpl [tstp] {
@@ -87,13 +87,18 @@ tpl [formula[@name and @status = "plain"]] {
 }
 
 tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name = "mizar_by"]]] {
+  $n = `@name`;
   <Derivation {
-    @"name" = `@name`;
+    @"name" = `$n`;
     apply [*[1]]; // the actual formula
     <Rule {
       @"name" = "by";
     }
-    apply [source] mode="recurse";
+    // apply [source] mode="recurse";
+    $nd-path = `concat ($n, ".nd")`;
+    for-each [document ($nd-path, /Derivation)] {
+      apply [.];
+    }
   }
 }
 
