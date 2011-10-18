@@ -29,6 +29,10 @@ tpl list (#separ, #elems) {
 /// Sanity checks as templates
 //////////////////////////////////////////////////////////////////////
 
+tpl [*] mode="sanity-check" {
+  // do nothing
+}
+
 // Derivation sanity checks
 
 tpl [Derivation[not(child::Rule)]] mode="sanity-check" {
