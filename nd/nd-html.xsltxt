@@ -35,15 +35,15 @@ tpl [*] mode="sanity-check" {
 
 // Derivation sanity checks
 
-tpl [Derivation[not(child::Rule)]] mode="sanity-check" {
+tpl [Derivation[not(Rule)]] mode="sanity-check" {
   die (#message = "We require that a Derivatiion element have a Rule child!");
 }
 
-tpl [Derivation[child::Rule[2]]] mode="sanity-check" {
+tpl [Derivation[Rule[2]]] mode="sanity-check" {
   die (#message = "We require that a Derivation element have at most one Rule child!");
 }
 
-tpl [Derivation[child::Rule[not(@name)]]] mode="sanity-check" {
+tpl [Derivation[Rule[not(@name)]]] mode="sanity-check" {
   die (#message = "We require that the Rule child elements of Derivations have a name attribute!");
 }
 
@@ -87,7 +87,7 @@ tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] mo
   die (#message = "We assume that quantifiers are either universal or existential!");
 }
 
-tpl [quantifer[not(child::variable)]] mode="sanity-check" {
+tpl [quantifer[not(variable)]] mode="sanity-check" {
   die (#message = "We require that quantifiers have at least one variable child!");
 }
 
@@ -178,52 +178,7 @@ tpl [/] {
 
 // Rendering Derivation elements
 
-tpl [Derivation[@name and child::Rule[@name = "implication-elimination"]]] mode="gentzen" {
-  <table {
-    @class = "derivation";
-    @summary = `@name`;
-    @title = `@name`;
-    <caption {
-      @class = "derivation-caption";
-      `@name`;
-    }
-    <tr {
-      @class = "modus-ponens";
-      for-each [Rule] {
-        for-each [following-sibling::*] {
-          <td {
-            apply [.] mode="gentzen";
-          }
-        }
-      }
-      <td; // empty cell for the rule name, coming up
-    }
-    <tr {
-      <td {
-        @colspan = `count (Rule/following-sibling::*)`;
-        <hr;
-      }
-      <td {
-        @class = "rule-name";
-        "&#8594;-E";
-      }
-    }
-    <tr {
-      <td {
-        @colspan = `count (Rule/following-sibling::*)`;
-        @class = "rule-conclusion";
-        <span {
-          @class = "derivation-label";
-          `@name`;
-        }
-        apply [*[1]];
-      }
-      <td; // empty cell for the rule name, just above
-    }
-  }
-}
-
-tpl [Derivation[@name and child::Rule[@name = "axiom"]]] mode="gentzen" {
+tpl [Derivation[@name and Rule[@name = "axiom"]]] mode="gentzen" {
   <span {
     @class = "derivation-label";
     `@name`;
@@ -231,7 +186,7 @@ tpl [Derivation[@name and child::Rule[@name = "axiom"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[@name and child::Rule[@name = "definition"]]] mode="gentzen" {
+tpl [Derivation[@name and Rule[@name = "definition"]]] mode="gentzen" {
   <span {
     @class = "derivation-label";
     `@name`;
@@ -239,7 +194,7 @@ tpl [Derivation[@name and child::Rule[@name = "definition"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[@name and child::Rule[@name and not(@name = "axiom") and not(@name = "definition")]]] mode="gentzen" {
+tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "definition")]]] mode="gentzen" {
   <table {
     @class = "derivation";
     @summary = `@name`;
