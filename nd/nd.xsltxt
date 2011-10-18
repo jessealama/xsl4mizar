@@ -22,10 +22,37 @@ tpl [*] {
   }
 }
 
+//////////////////////////////////////////////////////////////////////
+// Sanity checks as templates
+//////////////////////////////////////////////////////////////////////
+
+tpl [formula[not(@name)]] mode="sanity-check" {
+  die (#message = "We requre that formula elements have names");
+}
+
+tpl [formula[not(@status)]] mode="sanity-check" {
+  die (#message = "We requre that formula elements have a status!");
+}
+
+tpl [formula[@status and not(@status = "plain"
+                             or @status = "assumption"
+                             or @status = "definition"
+                             or @status = "axiom"
+                             or @status = "theorem")]] mode="sanity-check" {
+  $status = `@status`;
+  $message = `concat ("We know how to deal only with the with formula elements whose status is one of these kinds: plain, assumption, definition, axiom, theorem.  The status of the current formula element is '", $status, "'")`;
+  die (#message = $message);
+}
+
+tpl [/] mode="sanity-check" {
+  apply [descendant::formula] mode="sanity-check";
+}
+
 tpl [/] {
   if [not(tstp)] {
     die (#message = "The required tstp element is missing!");
   }
+  apply [.] mode="sanity-check";
   apply [tstp];
 }
 
@@ -34,10 +61,6 @@ tpl [tstp] {
     die (#message = "We require that a tstp element have at least one formula child element!");
   }
   apply [formula[position() = last()]];
-}
-
-tpl [formula[not(@name)]] {
-  die (#message = "We requre that formula elements have names");
 }
 
 tpl [formula[@name and @status = "plain" and not(descendant::non-logical-data[@name = "mizar_by"])]] {
