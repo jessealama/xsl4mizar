@@ -289,11 +289,24 @@ tpl [Derivation[@name and child::Rule[@name and not(@name = "axiom") and not(@na
 // Rendering formulas
 
 tpl [defined-predicate[@name = "true"]] {
-  "&#8868;";
+  <span {
+    @class = "defined-predicate";
+    "&#8868;";
+  }
 }
 
 tpl [defined-predicate[@name = "false"]] {
-  "&#8869;";
+  <span {
+    @class = "defined-predicate";
+    "&#8869;";
+  }
+}
+
+tpl [defined-predicate[@name and not(@name = "true") and not(@name = "false")]] {
+  <span {
+    @class = "defined-predicate";
+    `@name`;
+  }
 }
 
 // Rendering variables
