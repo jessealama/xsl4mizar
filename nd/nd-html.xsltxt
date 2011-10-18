@@ -55,7 +55,7 @@ tpl [defined-predicate[not(@name)]] mode="sanity-check" {
   die (#message = "We require that a defined-predicate element have a name attribute!");
 }
 
-tpl [defined-predicate[@name and not(@name = "true")]] mode="sanity-check" {
+tpl [defined-predicate[@name and not(@name = "true") and not(@name = "false")]] mode="sanity-check" {
   $n = `@name`;
   $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $n, "'")`;
   die (#message = $message);
@@ -290,6 +290,10 @@ tpl [Derivation[@name and child::Rule[@name = "by"]]] mode="gentzen" {
 
 tpl [defined-predicate[@name = "true"]] {
   "&#8868;";
+}
+
+tpl [defined-predicate[@name = "false"]] {
+  "&#8869;";
 }
 
 // Rendering variables
