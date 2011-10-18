@@ -35,6 +35,10 @@ tpl [*] mode="sanity-check" {
 
 // Derivation sanity checks
 
+tpl [Derivation[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a Derivatiion element have a name attribute!");
+}
+
 tpl [Derivation[not(Rule)]] mode="sanity-check" {
   die (#message = "We require that a Derivatiion element have a Rule child!");
 }
