@@ -276,14 +276,17 @@ tpl [variable[@name]] {
 // Atomic formulas
 
 tpl [predicate[@name = "="]] {
-  "(";
-  apply [*[1]];
   <span {
-    @class = "predicate";
-    " = ";
+    @class = "formula";
+    "(";
+    apply [*[1]];
+    <span {
+      @class = "predicate";
+      " = ";
+    }
+    apply [*[2]];
+    ")";
   }
-  apply [*[2]];
-  ")";
 }
 
 tpl [predicate[@name and not(@name = "=")]] {
@@ -291,21 +294,24 @@ tpl [predicate[@name and not(@name = "=")]] {
   $constructor = `substring-before ($n, "_")`;
   $article = `substring-after ($n, "_")`;
   <span {
-    @class = "predicate";
+    @class = "formula";
     <span {
-      @class = "constructor";
-      `$constructor`;
-    }
-    <sub {
+      @class = "predicate";
       <span {
-        @class = "article";
-        `$article`;
+        @class = "constructor";
+        `$constructor`;
+      }
+      <sub {
+        <span {
+          @class = "article";
+          `$article`;
+        }
       }
     }
+    "(";
+    list (#separ = ", ", #elems = `*`);
+    ")";
   }
-  "(";
-  list (#separ = ", ", #elems = `*`);
-  ")";
 }
 
 tpl [function[@name]] {
