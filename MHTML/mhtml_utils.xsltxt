@@ -1,6 +1,6 @@
 stylesheet 1.0;
 
-output method=html;
+output method=xml;
 
 include mhtml_print_simple.xsl;
 
@@ -299,7 +299,15 @@ tpl andlist(#elems) {
 
 tpl dlist(#separ,#elems) { 
  for-each [$elems] {
+<<<<<<< HEAD
+<<<<<<< HEAD
   <div { apply[.]; if [not(position()=last())] { copy-of $separ; } } }
+=======
+  <div { @class="mhtml"; apply[.]; if [not(position()=last())] { $separ; } } }
+>>>>>>> refs/remotes/origin/jesse-hunchentoot-site
+=======
+  <div { apply[.]; if [not(position()=last())] { copy-of $separ; } } }
+>>>>>>> refs/remotes/origin/jesse-hunchentoot-site
 }
 
 
@@ -477,6 +485,7 @@ tpl patt_info(#k, #nr, #pid)
 		     or (key($pkey,$nr)[$pid=@relnr])]  { ""; } else { $patts; }
              }
 
+      if [$doc] {
       for-each [document($doc,/)] 
       {
 	   if [$typ and key('EXP',$pid)] 
@@ -503,10 +512,13 @@ tpl patt_info(#k, #nr, #pid)
 	      }
            }
        }
+     }
    }
    else 
    { 
       $doc = { if [key($pkey,$nr)] { ""; } else { $patts; } }
+
+      if [$doc] {
 
       for-each [document($doc,/)] 
       {
@@ -515,6 +527,7 @@ tpl patt_info(#k, #nr, #pid)
 	    encode_std_pattern(#k = $k);
 	 }
       }
+    }
    }
 }
 
@@ -543,10 +556,26 @@ tpl get_parent_level(#pl, #ls, #n)
 
 
 
-tpl add_hs_attrs { @class="txt"; @onclick="hs(this)"; @href="javascript:()"; }
+tpl add_hs_attrs {
+  @class="mhtml txt";
+  @onclick="hs(this)";
+  @href="javascript:void(0)";
+}
 
-tpl add_hs2_attrs { @class="txt"; @onclick="hs2(this)"; @href="javascript:()"; }
+tpl add_hs2_attrs {
+  @class="mhtml txt";
+  @onclick="hs2(this)";
+  @href="javascript:void(0)";
+}
 
-tpl add_hsNdiv_attrs { @class="txt"; @onclick="hsNdiv(this)"; @href="javascript:()"; }
+tpl add_hsNdiv_attrs {
+  @class="mhtml txt";
+  @onclick="hsNdiv(this)";
+  @href="javascript:void(0)";
+}
 
-tpl add_ajax_attrs(#u) { @class="txt"; @onclick=`concat("makeRequest(this,'",$u,"')")`; @href="javascript:()"; }
+tpl add_ajax_attrs(#u) {
+  @class="mhtml txt";
+  @onclick=`concat("makeRequest(this,'",$u,"')")`;
+  @href="javascript:void(0)";
+}

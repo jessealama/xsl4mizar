@@ -17,8 +17,8 @@ output method=text;
 // XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking 
 // Mizar XML terms, formulas and types to Prolog TSTP-like format.
 
-// To produce standard XSLT from this do e.g.: 
-// java -jar xsltxt.jar toXSL mizpl.xsltxt >mizpl.xsl
+// To produce standard XSLT from this call make, or do e.g.: 
+// java -jar xsltxt.jar toXSL mizpl.xsltxt | sed -e 's/<!\-\- *\(<\/*xsl:document.*\) *\-\->/\1/g' >mizpl.xsl
 
 // ##NOTE: TPTP types 'theorem' and 'definition' are wider
 //   than in Mizar. Mizar 'property' is also exported as
@@ -1185,13 +1185,17 @@ tpl [Let|Given|TakeAsVar|Consider|Set]
 // That should be OK for problem creation using mizar_by - the type
 // statement will be deleted from the axioms, and the rest of BG are just 
 // general theorems, nothing specific about the constant.
+// The proposition is generated before the types and equalities, otherwise in MizAR
+// the article_position is wrong, resulting in bad .allowed_local info
 tpl [Reconsider] 
 { 
+
   $cnr     = `@constnr`; 
   $pl      = `@plevel`; 
+  apply[Proposition](#pl=$pl);
   $prop_nm = plname(#n=`Proposition/@propnr`, #pl=`Proposition/@plevel`);
   for-each [Var|LocusVar|Const|InfConst|Num|Func|PrivFunc|Fraenkel|
-	      QuaTrm|It|ErrorTrm] 
+	      QuaTrm|It|Choice|ErrorTrm] 
   {
       $nr   = `$cnr + position() - 1`; 
       $nm   =  { "c"; $nr; addp(#pl=$pl); }
@@ -1945,7 +1949,7 @@ tpl mjoin(#el,#s) {
 // this asssumes Let | Given | TakeAsVar | Consider | Set | Reconsider
 tpl getcnr(#el) { for-each [$el] {
     if [(name() = "Reconsider")] { `count(Var|LocusVar|Const|InfConst|
-		  Num|Func|PrivFunc|Fraenkel|QuaTrm|It|ErrorTrm)`; }
+		  Num|Func|PrivFunc|Fraenkel|QuaTrm|It|Choice|ErrorTrm)`; }
     else { `count(Typ)`; } }}
 
 
@@ -2086,7 +2090,7 @@ tpl [ByExplanations](#i,#pl) { for-each [Typ] { if[position() = 2] { "non"; } "z
  ").\n"; }}
 
 
-tpl [/] { if [$mml="0"] { apply[//Constructor|//Proposition|//Now|//IterEquality|
+tpl [/] { if [$mml="0"] { apply[//Constructor|//Proposition[not(name(..)="Reconsider")]|//Now|//IterEquality|
 	     //Let|//Given|//TakeAsVar|//Consider|//Set|
 	     //Reconsider|//SchemeFuncDecl|//SchemeBlock|
 	     //CCluster|//FCluster|//RCluster|//IdentifyWithExp|//Identify|//Thesis|//PerCasesReasoning|/ByExplanations]; 

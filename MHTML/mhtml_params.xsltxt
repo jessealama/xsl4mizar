@@ -1,6 +1,6 @@
 stylesheet 1.0;
 
-output method=html;
+output method=xml;
 
 // $Revision: 1.24 $
 //
@@ -71,6 +71,8 @@ $print_identifiers = { "1"; }
 // it should be turned off for item generating
 $print_lab_identifiers = { "1"; }
 
+// print "for" in registrations - newly in version 1132
+#regs_use_for = { "1"; }
 
 // tells whether relative or absolute names are shown
 #relnames= { "1"; }
@@ -173,6 +175,21 @@ $lbydlicgipref= { `concat($lbydlicgi,"?url=",$lbydliurl)`; }
 // ##TODO: 2 is implement incorrectly and should not be used now,
 //         it should be done like privname (via the C key, not like now)
 #const_links = { "0"; }
+
+// Generate links suitable for the mizar-items namespace
+#mizar_items = { "0"; }
+
+// in the presence of ajax proofs, generate links to proofs coming
+// from a "base article" that generates many articles.
+//
+// If different from the empty string, AJAX URIs will have the form
+//
+// proofs/$source_article/<article>
+//
+// rather than the default
+//
+// proofs/<article>
+#source_article = { "undefined"; }
 
 // tells if proofs are fetched through AJAX; default is off
 // value 2 tells to produce the proofs, but not to insert the ajax calls,

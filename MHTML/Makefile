@@ -4,6 +4,8 @@ JAVA = java
 XSLTXT = ../xsltxt.jar
 CAT = cat
 
+USE_XSL_DOCUMENT = 1
+
 MIZDEPS = mhtml_params mhtml_keys mhtml_print_simple mhtml_utils mhtml_frmtrm mhtml_print_complex mhtml_reasoning mhtml_block_top
 MIZXSLDEPS = $(addsuffix .xsl, $(MIZDEPS))
 MIZXSLTXTDEPS = $(addsuffix .xsltxt, $(MIZDEPS))
@@ -22,7 +24,11 @@ miz.xsltxt: $(MIZXSLDEPS) mhtml_main.xsl
 
 
 %.xsl: %.xsltxt
-	$(JAVA) -jar $(XSLTXT) toXSL $*.xsltxt | sed -e 's/<!\-\- *\(<\/*xsl:document.*\) *\-\->/\1/g' -e 's/NAME/name/g' > $*.xsl
+	if [ "$(USE_XSL_DOCUMENT)" = "1" ]; then \
+	  $(JAVA) -jar $(XSLTXT) toXSL $*.xsltxt | sed -e 's/<!\-\- *\(<\/*xsl:document.*\) *\-\->/\1/g' -e 's/NAME/name/g' > $*.xsl; \
+	else \
+	  $(JAVA) -jar $(XSLTXT) toXSL $*.xsltxt | sed -e 's/NAME/name/g' > $*.xsl; \
+	fi
 
 TAGS: $(MIZXSLTXTDEPS)
 	etags   --language=none  --regex='/^tpl *\[? *\([^]({\n]+\) *\]?.*/\1/' $(MIZXSLTXTDEPS)

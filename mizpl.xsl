@@ -12,8 +12,8 @@
   <!-- License: GPL (GNU GENERAL PUBLIC LICENSE) -->
   <!-- XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking -->
   <!-- Mizar XML terms, formulas and types to Prolog TSTP-like format. -->
-  <!-- To produce standard XSLT from this do e.g.: -->
-  <!-- java -jar xsltxt.jar toXSL mizpl.xsltxt >mizpl.xsl -->
+  <!-- To produce standard XSLT from this call make, or do e.g.: -->
+  <!-- java -jar xsltxt.jar toXSL mizpl.xsltxt | sed -e 's/<!\-\- *\(<\/*xsl:document.*\) *\-\->/\1/g' >mizpl.xsl -->
   <!-- ##NOTE: TPTP types 'theorem' and 'definition' are wider -->
   <!-- than in Mizar. Mizar 'property' is also exported as -->
   <!-- TPTP 'theorem', and there are various Mizar items -->
@@ -2812,9 +2812,14 @@
   <!-- That should be OK for problem creation using mizar_by - the type -->
   <!-- statement will be deleted from the axioms, and the rest of BG are just -->
   <!-- general theorems, nothing specific about the constant. -->
+  <!-- The proposition is generated before the types and equalities, otherwise in MizAR -->
+  <!-- the article_position is wrong, resulting in bad .allowed_local info -->
   <xsl:template match="Reconsider">
     <xsl:variable name="cnr" select="@constnr"/>
     <xsl:variable name="pl" select="@plevel"/>
+    <xsl:apply-templates select="Proposition">
+      <xsl:with-param name="pl" select="$pl"/>
+    </xsl:apply-templates>
     <xsl:variable name="prop_nm">
       <xsl:call-template name="plname">
         <xsl:with-param name="n" select="Proposition/@propnr"/>
@@ -2822,7 +2827,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:for-each select="Var|LocusVar|Const|InfConst|Num|Func|PrivFunc|Fraenkel|
-	      QuaTrm|It|ErrorTrm">
+	      QuaTrm|It|Choice|ErrorTrm">
       <xsl:variable name="nr" select="$cnr + position() - 1"/>
       <xsl:variable name="nm">
         <xsl:text>c</xsl:text>
@@ -4830,7 +4835,7 @@
       <xsl:choose>
         <xsl:when test="(name() = &quot;Reconsider&quot;)">
           <xsl:value-of select="count(Var|LocusVar|Const|InfConst|
-		  Num|Func|PrivFunc|Fraenkel|QuaTrm|It|ErrorTrm)"/>
+		  Num|Func|PrivFunc|Fraenkel|QuaTrm|It|Choice|ErrorTrm)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="count(Typ)"/>
@@ -5183,7 +5188,7 @@
   <xsl:template match="/">
     <xsl:choose>
       <xsl:when test="$mml=&quot;0&quot;">
-        <xsl:apply-templates select="//Constructor|//Proposition|//Now|//IterEquality|
+        <xsl:apply-templates select="//Constructor|//Proposition[not(name(..)=&quot;Reconsider&quot;)]|//Now|//IterEquality|
 	     //Let|//Given|//TakeAsVar|//Consider|//Set|
 	     //Reconsider|//SchemeFuncDecl|//SchemeBlock|
 	     //CCluster|//FCluster|//RCluster|//IdentifyWithExp|//Identify|//Thesis|//PerCasesReasoning|/ByExplanations"/>

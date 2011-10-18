@@ -1,5 +1,5 @@
 JAVA = java
-XSLTXT = /home/urban/xsltxt/xsltxt.jar
+XSLTXT = xsltxt.jar
 CAT = cat
 
 

@@ -12,7 +12,7 @@
   <!-- XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking -->
   <!-- TSTP XML solutions to MML Query DLI syntax -->
   <!-- To produce standard XSLT from this do e.g.: -->
-  <!-- java -jar xsltxt.jar toXSL tstp2dli.xsltxt >tstp2dli.xsl -->
+  <!-- java -jar xsltxt.jar toXSL tptp2miz.xsltxt >tptp2miz.xsl -->
   <xsl:strip-space elements="*"/>
   <xsl:variable name="lcletters">
     <xsl:text>abcdefghijklmnopqrstuvwxyz</xsl:text>
@@ -55,46 +55,28 @@
   </xsl:template>
 
   <xsl:template match="formula">
-    <xsl:text>:: </xsl:text>
-    <xsl:text>&lt;a name=&quot;</xsl:text>
     <xsl:value-of select="@name"/>
-    <xsl:text>&quot;/&gt; </xsl:text>
-    <xsl:choose>
-      <xsl:when test="source/non-logical-data[@name=&apos;file&apos;]">
-        <xsl:value-of select="@status"/>
-        <xsl:text>: </xsl:text>
-        <xsl:for-each select="source/non-logical-data[@name=&apos;file&apos;]/*[2]">
-          <xsl:call-template name="get_mizar_url">
-            <xsl:with-param name="nm" select="@name"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="source/non-logical-data[@name=&apos;inference&apos;]">
-          <xsl:text>inference: </xsl:text>
-          <xsl:apply-templates select="."/>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:value-of select="@name"/>
-    <xsl:text>&lt;br/&gt;
-</xsl:text>
-    <xsl:text>Z:</xsl:text>
-    <xsl:value-of select="@name"/>
-    <xsl:text> 0=</xsl:text>
+    <xsl:text>: </xsl:text>
     <xsl:apply-templates select="*[1]"/>
-    <xsl:text>
+    <xsl:text>;
 </xsl:text>
   </xsl:template>
 
-  <xsl:template match="quantifier/variable">
-    <xsl:text>$for(</xsl:text>
-    <xsl:call-template name="pvar">
-      <xsl:with-param name="nm" select="@name"/>
-    </xsl:call-template>
-    <xsl:text>,$type(HIDDEN:mode 1),</xsl:text>
-  </xsl:template>
-
+  <!-- tpl [formula] { -->
+  <!-- ":: "; "<a name=\""; `@name`; "\"/> "; -->
+  <!-- if [source/non-logical-data[@name='file']] { -->
+  <!-- `@status`; ": "; -->
+  <!-- for-each [source/non-logical-data[@name='file']/*[2]] { get_mizar_url(#nm=`@name`); } -->
+  <!-- } -->
+  <!-- else { -->
+  <!-- for-each [source/non-logical-data[@name='inference']] { -->
+  <!-- "inference: "; apply[.]; -->
+  <!-- } -->
+  <!-- } -->
+  <!-- "<br/>\n"; -->
+  <!-- "A:step "; `@name`; "="; apply[*[1]]; "\n"; -->
+  <!-- } -->
+  <!-- tpl [quantifier/variable] { "for "; pvar(#nm=`@name`); " being set holds "; } -->
   <xsl:template match="variable">
     <xsl:call-template name="pvar">
       <xsl:with-param name="nm" select="@name"/>
@@ -104,25 +86,36 @@
   <xsl:template match="quantifier">
     <xsl:choose>
       <xsl:when test="@type=&apos;existential&apos;">
-        <xsl:text>$not(</xsl:text>
-        <xsl:apply-templates select="variable"/>
-        <xsl:text>$not(</xsl:text>
+        <xsl:text>ex </xsl:text>
+        <xsl:call-template name="ilist">
+          <xsl:with-param name="separ">
+            <xsl:text>,</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="elems" select="variable"/>
+        </xsl:call-template>
+        <xsl:text> being set st </xsl:text>
         <xsl:apply-templates select="*[position() = last()]"/>
-        <xsl:text>))</xsl:text>
+        <xsl:text/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates/>
+        <xsl:text>for </xsl:text>
+        <xsl:call-template name="ilist">
+          <xsl:with-param name="separ">
+            <xsl:text>,</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="elems" select="variable"/>
+        </xsl:call-template>
+        <xsl:text> being set holds </xsl:text>
+        <xsl:apply-templates select="*[position() = last()]"/>
+        <xsl:text/>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:for-each select="variable">
-      <xsl:text>)</xsl:text>
-    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="negation|">
-    <xsl:text>$not(</xsl:text>
+    <xsl:text> not </xsl:text>
     <xsl:apply-templates/>
-    <xsl:text>)</xsl:text>
+    <xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="function|predicate">
@@ -130,26 +123,15 @@
       <xsl:text>(</xsl:text>
     </xsl:if>
     <xsl:variable name="tc">
-      <xsl:choose>
-        <xsl:when test="@name=&apos;=&apos;">
-          <xsl:call-template name="transl_constr">
-            <xsl:with-param name="nm">
-              <xsl:text>r1_hidden</xsl:text>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="transl_constr">
-            <xsl:with-param name="nm" select="@name"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="transl_constr">
+        <xsl:with-param name="nm" select="@name"/>
+      </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="contains($tc, &quot;:attr&quot;) or contains($tc, &quot;:mode&quot;)  or contains($tc, &quot;:struct&quot;)">
-        <xsl:text>$is(</xsl:text>
+        <xsl:text> is </xsl:text>
         <xsl:apply-templates select="*[1]"/>
-        <xsl:text>,</xsl:text>
+        <xsl:text> </xsl:text>
         <xsl:value-of select="$tc"/>
         <xsl:text>(</xsl:text>
         <xsl:call-template name="ilist">
@@ -163,14 +145,16 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$tc"/>
-        <xsl:text>(</xsl:text>
-        <xsl:call-template name="ilist">
-          <xsl:with-param name="separ">
-            <xsl:text>,</xsl:text>
-          </xsl:with-param>
-          <xsl:with-param name="elems" select="*"/>
-        </xsl:call-template>
-        <xsl:text>)</xsl:text>
+        <xsl:if test="count(*)&gt;0">
+          <xsl:text>(</xsl:text>
+          <xsl:call-template name="ilist">
+            <xsl:with-param name="separ">
+              <xsl:text>,</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="elems" select="*"/>
+          </xsl:call-template>
+          <xsl:text>)</xsl:text>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:if test="name(..)=&quot;quantifier&quot;">
@@ -179,82 +163,72 @@
   </xsl:template>
 
   <xsl:template match="conjunction">
-    <xsl:text>$and(</xsl:text>
+    <xsl:text> </xsl:text>
     <xsl:call-template name="ilist">
       <xsl:with-param name="separ">
-        <xsl:text>,</xsl:text>
+        <xsl:text> &amp; </xsl:text>
       </xsl:with-param>
       <xsl:with-param name="elems" select="*"/>
     </xsl:call-template>
-    <xsl:text>)</xsl:text>
+    <xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="disjunction">
-    <xsl:text>$not($and(</xsl:text>
-    <xsl:call-template name="notlist">
+    <xsl:text> </xsl:text>
+    <xsl:call-template name="ilist">
       <xsl:with-param name="separ">
-        <xsl:text>,</xsl:text>
+        <xsl:text> or </xsl:text>
       </xsl:with-param>
       <xsl:with-param name="elems" select="*"/>
     </xsl:call-template>
-    <xsl:text>))</xsl:text>
+    <xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="implication">
-    <xsl:text>$not($and(</xsl:text>
+    <xsl:text> </xsl:text>
     <xsl:apply-templates select="*[1]"/>
-    <xsl:text>,</xsl:text>
-    <xsl:text>$not(</xsl:text>
+    <xsl:text> implies </xsl:text>
+    <xsl:text/>
     <xsl:apply-templates select="*[2]"/>
-    <xsl:text>)))</xsl:text>
+    <xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="equivalence">
-    <xsl:text>$and(</xsl:text>
-    <xsl:text>$not($and(</xsl:text>
+    <xsl:text> </xsl:text>
     <xsl:apply-templates select="*[1]"/>
-    <xsl:text>,</xsl:text>
-    <xsl:text>$not(</xsl:text>
+    <xsl:text> iff </xsl:text>
+    <xsl:text/>
     <xsl:apply-templates select="*[2]"/>
-    <xsl:text>)))</xsl:text>
-    <xsl:text>,</xsl:text>
-    <xsl:text>$not($and(</xsl:text>
-    <xsl:apply-templates select="*[2]"/>
-    <xsl:text>,</xsl:text>
-    <xsl:text>$not(</xsl:text>
-    <xsl:apply-templates select="*[1]"/>
-    <xsl:text>)))</xsl:text>
-    <xsl:text>)</xsl:text>
+    <xsl:text> </xsl:text>
   </xsl:template>
 
+  <!-- "$and("; -->
+  <!-- "$not($and("; apply[*[1]]; ","; "$not("; apply[*[2]]; ")))"; ","; -->
+  <!-- "$not($and("; apply[*[2]]; ","; "$not("; apply[*[1]]; ")))"; -->
+  <!-- ")"; -->
+  <!-- } -->
   <xsl:template match="defined-predicate[@name=&apos;equal&apos;]">
     <xsl:if test="name(..)=&quot;quantifier&quot;">
       <xsl:text>(</xsl:text>
     </xsl:if>
-    <xsl:call-template name="transl_constr">
-      <xsl:with-param name="nm">
-        <xsl:text>r1_hidden</xsl:text>
-      </xsl:with-param>
-    </xsl:call-template>
-    <xsl:text>(</xsl:text>
-    <xsl:call-template name="ilist">
-      <xsl:with-param name="separ">
-        <xsl:text>,</xsl:text>
-      </xsl:with-param>
-      <xsl:with-param name="elems" select="*"/>
-    </xsl:call-template>
-    <xsl:text>)</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="*[1]"/>
+    <xsl:text> = </xsl:text>
+    <xsl:text/>
+    <xsl:apply-templates select="*[2]"/>
+    <xsl:text> </xsl:text>
+    <!-- transl_constr(#nm="r1_hidden"); "("; ilist(#separ=",", #elems=`*`); ")"; -->
     <xsl:if test="name(..)=&quot;quantifier&quot;">
       <xsl:text>)</xsl:text>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="defined-predicate[@name=&apos;false&apos;]">
-    <xsl:text>$not($verum)</xsl:text>
+    <xsl:text> contradiction </xsl:text>
   </xsl:template>
 
   <xsl:template match="defined-predicate[@name=&apos;true&apos;]">
-    <xsl:text>$verum</xsl:text>
+    <xsl:text> not contradiction </xsl:text>
   </xsl:template>
 
   <xsl:template match="non-logical-data">
@@ -284,6 +258,11 @@
   </xsl:template>
 
   <xsl:template name="transl_constr">
+    <xsl:param name="nm"/>
+    <xsl:value-of select="$nm"/>
+  </xsl:template>
+
+  <xsl:template name="transl_constr_old">
     <xsl:param name="nm"/>
     <xsl:variable name="pref" select="substring-before($nm,&quot;_&quot;)"/>
     <xsl:choose>
@@ -437,10 +416,7 @@
         <xsl:value-of select="$nr"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>$</xsl:text>
         <xsl:value-of select="$nm"/>
-        <xsl:text> </xsl:text>
-        <xsl:text>0</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

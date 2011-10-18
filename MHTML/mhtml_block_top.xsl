@@ -40,7 +40,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;RC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -59,6 +59,9 @@
             <xsl:text>1</xsl:text>
           </xsl:with-param>
         </xsl:apply-templates>
+        <xsl:if test="$regs_use_for=1">
+          <xsl:text> for</xsl:text>
+        </xsl:if>
         <xsl:text> </xsl:text>
         <xsl:apply-templates select="*[2]"/>
       </xsl:otherwise>
@@ -98,7 +101,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;CC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -123,6 +126,9 @@
           </xsl:with-param>
         </xsl:call-template>
         <xsl:apply-templates select="*[4]"/>
+        <xsl:if test="$regs_use_for=1">
+          <xsl:text> for</xsl:text>
+        </xsl:if>
         <xsl:text> </xsl:text>
         <xsl:apply-templates select="*[3]"/>
       </xsl:otherwise>
@@ -162,7 +168,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;FC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -183,7 +189,12 @@
           </xsl:with-param>
         </xsl:call-template>
         <xsl:apply-templates select="*[3]"/>
-        <xsl:apply-templates select="Typ"/>
+        <xsl:if test="Typ">
+          <xsl:if test="$regs_use_for=1">
+            <xsl:text> for</xsl:text>
+          </xsl:if>
+          <xsl:apply-templates select="Typ"/>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:text>;</xsl:text>
@@ -220,7 +231,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;IY&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -442,7 +453,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;T&quot;, $nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pcomment0">
@@ -592,7 +603,7 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
         <xsl:element name="PARAM">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:text>URL</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="VALUE">
@@ -738,6 +749,10 @@
     <xsl:param name="line1"/>
     <xsl:param name="line2"/>
     <xsl:variable name="section" select="concat($k,$nr,&quot;_&quot;,$line1,&quot;_&quot;,$line2)"/>
+    <!-- // <xsl:document href="{$anamelc}__{$k}{$nr}.itm"> -->
+    <!-- $bogus=`1`; -->
+    <!-- $section; -->
+    <!-- // </xsl:document> -->
     <xsl:element name="a">
       <xsl:attribute name="href">
         <xsl:value-of select="concat($lmwikicgi,&quot;?p=&quot;,$lgitproject,&quot;;a=edit;f=mml/&quot;,$anamelc,&quot;.miz;s=&quot;,$section)"/>
@@ -795,7 +810,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:text> </xsl:text>
-    <!-- <a { @name=`concat("D",$nr1)`; -->
+    <!-- <a { @NAME=`concat("D",$nr1)`; -->
     <xsl:if test="@constrkind">
       <xsl:text>  defines </xsl:text>
       <xsl:call-template name="abs">
@@ -998,7 +1013,7 @@
   <xsl:template name="sd">
     <xsl:element name="div">
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:value-of select="concat(&quot;S&quot;,@schemenr)"/>
         </xsl:attribute>
         <xsl:call-template name="pkeyword">
@@ -1088,7 +1103,7 @@
         </xsl:variable>
         <xsl:for-each select="Pattern">
           <xsl:element name="a">
-            <xsl:attribute name="name">
+            <xsl:attribute name="NAME">
               <xsl:value-of select="concat(&quot;NM&quot;, @nr)"/>
             </xsl:attribute>
             <xsl:call-template name="pkeyword">
@@ -1288,7 +1303,7 @@
           <xsl:text>: </xsl:text>
         </xsl:if>
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(&quot;D&quot;, @defnr)"/>
           </xsl:attribute>
           <xsl:call-template name="pcomment">
@@ -1709,7 +1724,7 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
         <xsl:element name="PARAM">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:text>URL</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="VALUE">
@@ -1886,7 +1901,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(@kind,@nr)"/>
           </xsl:attribute>
           <xsl:call-template name="pkeyword">
@@ -2014,7 +2029,7 @@
     </xsl:variable>
     <xsl:variable name="argtypes" select="../Let/Typ"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;N&quot;,@kind,@nr)"/>
       </xsl:attribute>
       <xsl:choose>

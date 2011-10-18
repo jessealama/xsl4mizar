@@ -5,9 +5,9 @@ xmlns dc "http://purl.org/dc/elements/1.1/";
 xmlns "http://www.w3.org/1999/xhtml";
 
 output method=xml;
-output doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN";
-output doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
-output omit-xml-declaration="no";
+//output doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN";
+//output doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+output omit-xml-declaration="yes";
 
 // $Revision: 1.8 $
 //
@@ -193,15 +193,6 @@ return tstp_dump;
 // End -->
 ";
 }}
-<base { @target=$default_target; }
-// if [$linking = "s"] { @target="_self"; } else { @target="mmlquery";} } 
-// <!-- 
-// var browse_url = \"http://merak.pb.bialystok.pl/mmlquery/fillin.php?entry=\"
-// function l1(c) { location = browse_url + c }
-// // End -->
-// "; }
-}
-        <body {  
 
 	if[$wiki_links=1]
 	{

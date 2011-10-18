@@ -5,11 +5,8 @@
 <!-- So any changes should be done to the MHTML files, running 'make miz.xsl' afterwards. -->
 <!-- The main stylesheet mhtml_main.xsl can be used instead miz.xsl, -->
 <!-- provided the included .xsl files are available in the same directory -->
-<xsl:stylesheet version="1.0" extension-element-prefixes="dc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="xml"/>
-  <xsl:output doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"/>
-  <xsl:output doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>
-  <xsl:output omit-xml-declaration="no"/>
+<xsl:stylesheet version="1.0" extension-element-prefixes="dc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:output method="html"/>
   <!-- $Revision: 1.8 $ -->
   <!--  -->
   <!-- File: mhtml_main.xsltxt - html-ization of Mizar XML, main file -->
@@ -126,6 +123,10 @@
   <xsl:variable name="print_lab_identifiers">
     <xsl:text>1</xsl:text>
   </xsl:variable>
+  <!-- print "for" in registrations - newly in version 1132 -->
+  <xsl:param name="regs_use_for">
+    <xsl:text>1</xsl:text>
+  </xsl:param>
   <!-- tells whether relative or absolute names are shown -->
   <xsl:param name="relnames">
     <xsl:text>1</xsl:text>
@@ -1907,7 +1908,7 @@
       <xsl:variable name="nr1" select="$j+position()"/>
       <xsl:if test="$const_links&gt;0">
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(&quot;c&quot;,$nr1,$addpl)"/>
           </xsl:attribute>
         </xsl:element>
@@ -4977,7 +4978,7 @@
   <xsl:template match="Proposition">
     <xsl:if test="$proof_links&gt;0">
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:call-template name="propname">
             <xsl:with-param name="n" select="@propnr"/>
             <xsl:with-param name="pl" select="@plevel"/>
@@ -5612,7 +5613,7 @@
                 </xsl:call-template>
               </xsl:variable>
               <xsl:element name="a">
-                <xsl:attribute name="name">
+                <xsl:attribute name="NAME">
                   <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
                 </xsl:attribute>
               </xsl:element>
@@ -5659,7 +5660,7 @@
                     </xsl:call-template>
                   </xsl:variable>
                   <xsl:element name="a">
-                    <xsl:attribute name="name">
+                    <xsl:attribute name="NAME">
                       <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
                     </xsl:attribute>
                   </xsl:element>
@@ -5777,7 +5778,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
         </xsl:attribute>
       </xsl:element>
@@ -5950,7 +5951,7 @@
       <xsl:variable name="nr1" select="$j + $p1 - 1"/>
       <xsl:if test="$const_links&gt;0">
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(&quot;c&quot;,$nr1,$addpl)"/>
           </xsl:attribute>
         </xsl:element>
@@ -5987,7 +5988,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:value-of select="concat(&quot;c&quot;,@nr,$addpl)"/>
         </xsl:attribute>
       </xsl:element>
@@ -6256,7 +6257,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;RC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -6275,6 +6276,9 @@
             <xsl:text>1</xsl:text>
           </xsl:with-param>
         </xsl:apply-templates>
+        <xsl:if test="$regs_use_for=1">
+          <xsl:text> for</xsl:text>
+        </xsl:if>
         <xsl:text> </xsl:text>
         <xsl:apply-templates select="*[2]"/>
       </xsl:otherwise>
@@ -6314,7 +6318,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;CC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -6339,6 +6343,9 @@
           </xsl:with-param>
         </xsl:call-template>
         <xsl:apply-templates select="*[4]"/>
+        <xsl:if test="$regs_use_for=1">
+          <xsl:text> for</xsl:text>
+        </xsl:if>
         <xsl:text> </xsl:text>
         <xsl:apply-templates select="*[3]"/>
       </xsl:otherwise>
@@ -6378,7 +6385,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;FC&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -6399,7 +6406,12 @@
           </xsl:with-param>
         </xsl:call-template>
         <xsl:apply-templates select="*[3]"/>
-        <xsl:apply-templates select="Typ"/>
+        <xsl:if test="Typ">
+          <xsl:if test="$regs_use_for=1">
+            <xsl:text> for</xsl:text>
+          </xsl:if>
+          <xsl:apply-templates select="Typ"/>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:text>;</xsl:text>
@@ -6436,7 +6448,7 @@
     </xsl:if>
     <xsl:variable name="nr1" select="@nr"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;IY&quot;,$nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pkeyword">
@@ -6658,7 +6670,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;T&quot;, $nr1)"/>
       </xsl:attribute>
       <xsl:call-template name="pcomment0">
@@ -6808,7 +6820,7 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
         <xsl:element name="PARAM">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:text>URL</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="VALUE">
@@ -6954,6 +6966,10 @@
     <xsl:param name="line1"/>
     <xsl:param name="line2"/>
     <xsl:variable name="section" select="concat($k,$nr,&quot;_&quot;,$line1,&quot;_&quot;,$line2)"/>
+    <!-- // <xsl:document href="{$anamelc}__{$k}{$nr}.itm"> -->
+    <!-- $bogus=`1`; -->
+    <!-- $section; -->
+    <!-- // </xsl:document> -->
     <xsl:element name="a">
       <xsl:attribute name="href">
         <xsl:value-of select="concat($lmwikicgi,&quot;?p=&quot;,$lgitproject,&quot;;a=edit;f=mml/&quot;,$anamelc,&quot;.miz;s=&quot;,$section)"/>
@@ -7011,7 +7027,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:text> </xsl:text>
-    <!-- <a { @name=`concat("D",$nr1)`; -->
+    <!-- <a { @NAME=`concat("D",$nr1)`; -->
     <xsl:if test="@constrkind">
       <xsl:text>  defines </xsl:text>
       <xsl:call-template name="abs">
@@ -7214,7 +7230,7 @@
   <xsl:template name="sd">
     <xsl:element name="div">
       <xsl:element name="a">
-        <xsl:attribute name="name">
+        <xsl:attribute name="NAME">
           <xsl:value-of select="concat(&quot;S&quot;,@schemenr)"/>
         </xsl:attribute>
         <xsl:call-template name="pkeyword">
@@ -7304,7 +7320,7 @@
         </xsl:variable>
         <xsl:for-each select="Pattern">
           <xsl:element name="a">
-            <xsl:attribute name="name">
+            <xsl:attribute name="NAME">
               <xsl:value-of select="concat(&quot;NM&quot;, @nr)"/>
             </xsl:attribute>
             <xsl:call-template name="pkeyword">
@@ -7504,7 +7520,7 @@
           <xsl:text>: </xsl:text>
         </xsl:if>
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(&quot;D&quot;, @defnr)"/>
           </xsl:attribute>
           <xsl:call-template name="pcomment">
@@ -7925,7 +7941,7 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
         <xsl:element name="PARAM">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:text>URL</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="VALUE">
@@ -8102,7 +8118,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:element name="a">
-          <xsl:attribute name="name">
+          <xsl:attribute name="NAME">
             <xsl:value-of select="concat(@kind,@nr)"/>
           </xsl:attribute>
           <xsl:call-template name="pkeyword">
@@ -8230,7 +8246,7 @@
     </xsl:variable>
     <xsl:variable name="argtypes" select="../Let/Typ"/>
     <xsl:element name="a">
-      <xsl:attribute name="name">
+      <xsl:attribute name="NAME">
         <xsl:value-of select="concat(&quot;N&quot;,@kind,@nr)"/>
       </xsl:attribute>
       <xsl:choose>
@@ -8387,13 +8403,12 @@
         <xsl:choose>
           <xsl:when test="$body_only = &quot;0&quot;">
             <xsl:element name="html">
-              <xsl:element name="head">
-                <!-- output the css defaults for div and p (for indenting) -->
-                <xsl:element name="style">
-                  <xsl:attribute name="type">
-                    <xsl:text>text/css</xsl:text>
-                  </xsl:attribute>
-                  <xsl:text>
+              <!-- output the css defaults for div and p (for indenting) -->
+              <xsl:element name="style">
+                <xsl:attribute name="type">
+                  <xsl:text>text/css</xsl:text>
+                </xsl:attribute>
+                <xsl:text>
 div { padding: 0 0 0 0; margin: 0 0 0 0; } 
 div.add { padding-left: 3mm; padding-bottom: 0mm;  margin: 0 0 0 0; } 
 div.box { border-width:thin; border-color:blue; border-style:solid; }
@@ -8422,7 +8437,8 @@ span.p0:hover { color : inherit; background-color : #FFBAFF; }
 .default:hover { background-color: white; color: black; }
 :target { background: #5D9BF7; border: solid 1px #aaa;}
 </xsl:text>
-                </xsl:element>
+              </xsl:element>
+              <xsl:element name="head">
                 <xsl:element name="title">
                   <xsl:choose>
                     <xsl:when test="$mk_header &gt; 0">
