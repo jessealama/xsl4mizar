@@ -65,25 +65,14 @@ tpl [tstp] {
   apply [formula[position() = last()]];
 }
 
-tpl [formula[@name and @status = "plain" and not(descendant::non-logical-data[@name = "mizar_by"])]] {
+tpl [formula[@name and source/non-logical-data[@name = "inference"]/non-logical-data[@name]]] {
   <Derivation {
     @"name" = `@name`;
     apply [*[1]]; // the actual formula
     <Rule {
-      @"name" = "implication-elimination";
+      @"name" = `source/non-logical-data[@name = "inference"]/non-logical-data/@name`;
     }
-    apply [source];
-  }
-}
-
-tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name = "mizar_by"]]] {
-  <Derivation {
-    @"name" = `@name`;
-    apply [*[1]]; // the actual formula
-    <Rule {
-      @"name" = "by";
-    }
-    for-each [source/non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
+    for-each [source/non-logical-data[@name = "inference"]/non-logical-data[position() = last()]/number[@name]] {
       $premise-name = `@name`;
       $premise = `key ("formulas", $premise-name)`;
       if [$premise] {
@@ -97,120 +86,39 @@ tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name 
         }
       }
     }
-    // no need to look at the source
   }
 }
 
-tpl [formula[@name and @status = "assumption"]] {
+tpl [formula[@name and source/number[@name]]] {
   <Derivation {
     @"name" = `@name`;
     apply [*[1]]; // the actual formula
     <Rule {
-      @"name" = "axiom";
+      @"name" = "proof";
     }
-  }
-}
-
-tpl [formula[@name and @status = "definition"]] {
-  <Derivation {
-    @"name" = `@name`;
-    apply [*[1]]; // the actual formula
-    <Rule {
-      @"name" = "definition";
-    }
-  }
-}
-
-tpl [formula[@name and @status = "axiom"]] {
-  <Derivation {
-    @"name" = `@name`;
-    apply [*[1]]; // the actual formula
-    <Rule {
-      @"name" = "axiom";
-    }
-  }
-}
-
-tpl [formula[@name and @status = "conjecture"]] {
-  <Derivation {
-    @"name" = `@name`;
-    apply [*[1]]; // the actual formula
-    <Rule {
-      @"name" = "axiom";
-    }
-    // no need to consult the source of conjecture formulas
-  }
-}
-
-tpl [formula[@name and @status = "negated_conjecture"]] {
-  <Derivation {
-    @"name" = `@name`;
-    apply [*[1]]; // the actual formula
-    <Rule {
-      @"name" = "RAA";
-    }
-    apply [source];
-  }
-}
-
-// The weird xpath predicate is designed to rule out applying this
-// template to the final formula of the TSTP problem whose status is
-// 'theorem'.  The final formula whose status is 'theorem' is not to
-// be treated as an axiom.
-tpl [formula[@name and @status = "theorem" and following-sibling::formula[@status = "theorem"]]] {
-  <Derivation {
-    @"name" = `@name`;
-    apply [*[1]]; // the actual formula
-    <Rule {
-      @"name" = "axiom";
-    }
-    apply [source];
-  }
-}
-
-tpl [formula[@name and @status = "theorem" and not(following-sibling::formula[@status = "theorem"])]] {
-  <Derivation {
-    @"name" = `@name`;
-    apply [*[1]]; // the actual formula
-    <Rule {
-      if [following-sibling::formula[@status = "theorem"]] {
-        @"name" = "axiom";
+    for-each [source/number[@name]] {
+      $premise-name = `@name`;
+      $premise = `key ("formulas", $premise-name)`;
+      if [$premise] {
+        apply [$premise];
       } else {
-        @"name" = "implication-elimination";
+        <Deriviation {
+          @"name" = $premise-name;
+          <Rule {
+            @"name" = "axiom";
+          }
+        }
       }
     }
-    apply [source];
   }
 }
 
-tpl [source[non-logical-data[@name = "inference"]]] {
-  for-each [non-logical-data/non-logical-data[position() = last()]/number[@name]] {
-    $premise-name = `@name`;
-    $premise = `key ("formulas", $premise-name)`;
-    if [not($premise)] {
-      $message = `concat ("We failed to look up the formula whose name is '", $premise-name, "'")`;
-      die (#message = $message);
+tpl [formula[@name and source/non-logical-data[@name = "file"]]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    <Rule {
+      @"name" = "axiom";
     }
-    apply [$premise];
-  }
-}
-
-tpl [source[non-logical-data[@name = "introduced" and non-logical-data[@name = "tautology"]]]] {
-  // do nothing
-}
-
-tpl [source[non-logical-data[@name = "introduced" and non-logical-data[@name = "tautology"]]]] {
-  // do nothing
-}
-
-tpl [source[number[@name]]] {
-  for-each [number[@name]] {
-    $premise-name = `@name`;
-    $premise = `key ("formulas", $premise-name)`;
-    if [not($premise)] {
-      $message = `concat ("We failed to look up the formula whose name is '", $premise-name, "'")`;
-      die (#message = $message);
-    }
-    apply [$premise];
   }
 }
