@@ -69,11 +69,15 @@ tpl [tstp] {
 	    <th { "Users"; }
           }
         }
-        <tbody {
-          apply [formula[child::source/non-logical-data[@name = "file"]]];
+        if [formula[source/non-logical-data[@name = "file"]]] {
+          <tbody {
+            apply [formula[source/non-logical-data[@name = "file"]]];
+          }
         }
-        <tbody {
-          apply [formula[not(child::source/non-logical-data[@name = "file"])]];
+        if [formula[not(source/non-logical-data[@name = "file"])]] {
+          <tbody {
+            apply [formula[not(source/non-logical-data[@name = "file"])]];
+          }
         }
       }
     }
