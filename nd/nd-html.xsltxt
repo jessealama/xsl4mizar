@@ -222,7 +222,7 @@ tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "d
       }
       <td {
         @class = "rule-name";
-        `Rule/@name`;
+        apply [Rule];
       }
     }
     <tr {
@@ -422,4 +422,29 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
     list (#elems = `variable`, #separ = ", ");
     "["; apply [*[position() = last()]]; "]";
   }
+}
+
+// Rules
+
+// Special instantiation rule
+
+tpl [Rule[@name = "instantiate"]] {
+  msg terminate="no" "we be doing it";
+  `@name`;
+  $num-variables = `count (variable)`;
+  if [not(Substitution)] {
+    die (#message = "We found an application of the instantiation rule that has no Substitution children!");
+  }
+  "[";
+  for-each [Substitution] {
+    apply [*[1]]; " := "; apply [*[2]];
+    if [not(position() = last())] {
+      ", ";
+    }
+  }
+  "]";
+}
+
+tpl [Rule[@name and not(@name = "instantiate")]] {
+  `@name`;
 }
