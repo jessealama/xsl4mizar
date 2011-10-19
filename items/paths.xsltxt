@@ -166,6 +166,27 @@ tpl some-private-predicate-definition-clobbers (#item, #items) {
   }
 }
 
+// $item is assumed to be a private functor definition
+tpl some-private-functor-definition-clobbers (#item, #items) {
+  $idnr = `$item/Variable/@idnr`;
+  if [$items = ""] {
+    "0";
+  } else {
+    $first-toplevel-item-number-token = first-token (#token-string = $items);
+    $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
+    $first-item = `key ("binder", $first-toplevel-item-number)`;
+    $remaining-items = token-string-tail (#token-string = $items);
+    for-each [$first-item] {
+      if [self::Item[@kind = "Private-Functor-Definition"]/Variable[@idnr = $idnr]] {
+        "1";
+      } else {
+        some-private-functor-definition-clobbers (#item = $item,
+                                                  #items = $remaining-items);
+      }
+    }
+  }
+}
+
 // $reservations is a list of reservation numbers
 tpl item-bound-by-some-toplevel-item (#item, #items) {
   if [$items = ""] {
@@ -184,6 +205,10 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
         when [self::Item[@kind = "Private-Predicate-Definition"]] {
           some-private-predicate-definition-clobbers (#item = $item,
                                                       #items = $items);
+        }
+        when [self::Item[@kind = "Private-Functor-Definition"]] {
+          some-private-functor-definition-clobbers (#item = $item,
+                                                    #items = $items);
         }
         when [$item/@idnr] {
           $idnr = `$item/@idnr`;
