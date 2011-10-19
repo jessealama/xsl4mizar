@@ -152,7 +152,7 @@ tpl [source] mode="recurse" {
     if [$premise] {
       apply [$premise];
     } else {
-      <Deriviation {
+      <Derivation {
         @"name" = $premise-name;
         <Rule {
           @"name" = "axiom";
