@@ -225,6 +225,9 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
                 item-bound-by-some-toplevel-item (#item = $item,
                                                   #items = $remaining-items);
               }
+              when [self::Item[@kind = "Private-Functor-Definition"]] {
+                "0";  // blah
+              }
               when [@idnr = $idnr] {
                 "1";
               }
@@ -441,50 +444,61 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
     }
   } else {
     $bound-later = item-bound-by-some-toplevel-item (#item = $item, #items = $all-later-toplevel-items);
-    if [$bound-later = "1"] {
-      "0";
-    } else {
-      $token = `concat (",", $idnr, ",")`;
-      $free-variables-of-context = `$context/@free-variables`;
-      if [contains ($free-variables-of-context, $token)] {
-        "1";
-      } else {
-        if [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+    $token = `concat (",", $idnr, ",")`;
+    $free-variables-of-context = `$context/@free-variables`;
+    choose {
+      when [$kind = "Private-Predicate-Definition"] {
+        if [$context//Private-Predicate-Formula[@idnr = $idnr]] {
           "1";
         } else {
-          if [$kind = "Loci-Declaration"] {
-            choose {
-              when [$context//Locus[@nr = $idnr]] {
-                "1";
-              }
-              when [$context//Simple-Term[@idnr = $idnr]] {
-                "1";
-              }
-              otherwise {
-                // since we are dealing with a loci declaration, the
-                // only additional candidates are other loci
-                // declarations.  (I think.)  So it is OK to simply
-                // take all later toplevel items; we don't need to
-                // select a sublist of $all-later-toplevel-items
-                // corresponding to loci declarations
-                $later-needed = needed-items-sublist (#context = $context,
-                                                      #list = $all-later-toplevel-items);
-                $later-users = exists-loci-declaration-using-loci-declaration (#loci-declaration = $item,
-                                                                               #loci-declarations = $later-needed);
-                $later-users;
-              }
-            }
-          } else {
-            if [$kind = "Private-Predicate-Definition" and $context//Private-Predicate-Formula[@idnr = $idnr]] {
+          "0";
+        }
+      }
+      when [$kind = "Private-Functor-Definition"] {
+        if [$context//Private-Functor-Term[@idnr = $idnr]] {
+          "1";
+        } else {
+          "0";
+        }
+      }
+      when [$bound-later = "1"] {
+        "0";
+      }
+      when [contains ($free-variables-of-context, $token)] {
+        "1";
+      }
+      when [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+        "1";
+      }
+      otherwise {
+        if [$kind = "Loci-Declaration"] {
+          choose {
+            when [$context//Locus[@nr = $idnr]] {
               "1";
-            } else {
-              $later-users = toplevel-items-in-which-item-occurs (#item = $item,
-                                                                  #items = $all-later-toplevel-items);
-              exists-path-from-some-toplevel-item-to-context (#items = $later-users,
-                                                              #context = $context,
-                                                              #later-items = $all-later-toplevel-items);
+            }
+            when [$context//Simple-Term[@idnr = $idnr]] {
+              "1";
+            }
+            otherwise {
+              // since we are dealing with a loci declaration, the
+              // only additional candidates are other loci
+              // declarations.  (I think.)  So it is OK to simply
+              // take all later toplevel items; we don't need to
+              // select a sublist of $all-later-toplevel-items
+              // corresponding to loci declarations
+              $later-needed = needed-items-sublist (#context = $context,
+                                                    #list = $all-later-toplevel-items);
+              $later-users = exists-loci-declaration-using-loci-declaration (#loci-declaration = $item,
+                                                                             #loci-declarations = $later-needed);
+              $later-users;
             }
           }
+        } else {
+          $later-users = toplevel-items-in-which-item-occurs (#item = $item,
+                                                              #items = $all-later-toplevel-items);
+          exists-path-from-some-toplevel-item-to-context (#items = $later-users,
+                                                          #context = $context,
+                                                          #later-items = $all-later-toplevel-items);
         }
       }
     }
