@@ -183,3 +183,46 @@
     (format output-xml (ivy-nd ivy-input)))
   t)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Transformations on IVY proofs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Expand multi-instantiations into singleton instantiations
+
+(defun fresh-label (ivy-proof)
+  "A label that doesn't occur already as a label for any step in IVY-PROOF."
+  (loop
+     with labels = (mapcar #'first ivy-proof)
+     for new-label = 1
+     do
+       (if (member new-label labels)
+	   (incf new-label)
+	   (return new-label))))
+
+(defun first-multi-instantiate-step (ivy-proof)
+  (loop
+     for step in ivy-proof
+     do
+       (destructuring-bind (label (rule-name . rule-data) . rest)
+	   step
+	 (declare (ignore label rest))
+	 (when (and (string= (downcase rule-name)
+			"instantiate")
+	       (> (length (cadr rule-data)) 1))
+	   (return step)))
+     finally
+       (return nil)))
+
+(defun formula-of-step-having-label (ivy-proof step-label)
+  "The formula occuring in IVY-PROOF in the step whose label is STEP-LABEL."
+  (let ((step-label-str (downcase step-label)))
+    (loop
+       for step in ivy-proof
+       do
+	 (destructuring-bind (label rule formula junk)
+	     step
+	   (declare (ignore rule junk))
+	   (when (string= (downcase label) step-label-str)
+	     (return formula)))
+       finally
+	 (return nil))))
