@@ -429,7 +429,6 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
 // Special instantiation rule
 
 tpl [Rule[@name = "instantiate"]] {
-  msg terminate="no" "we be doing it";
   `@name`;
   $num-variables = `count (variable)`;
   if [not(Substitution)] {
