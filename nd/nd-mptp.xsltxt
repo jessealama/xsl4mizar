@@ -174,20 +174,6 @@ tpl [*] mode="ivy" {
   }
 }
 
-tpl [*] (#substitutions, #treated) mode="generalize" {
-  if [$substitutions] {
-    <quantifier {
-      @type = "universal";
-      for-each [$substitutions] {
-        apply [*[position() = 1]]; // the variable of the substitution
-      }
-      apply [.];
-    }
-  } else {
-    apply [.];
-  }
-}
-
 tpl [*] (#variables) mode="generalize-with-variables" {
   if [$variables] {
     <quantifier {
@@ -202,29 +188,29 @@ tpl [*] (#variables) mode="generalize-with-variables" {
   }
 }
 
-tpl [*] mode="generalize" {
+tpl [*] (#derivation-name) mode="generalize" {
   $n = `local-name (.)`;
   $message = `concat ("Don't know how to generalize ", $n, " elements")`;
   die (#message = $message);
 }
 
-tpl [defined-predicate] mode="generalize" {
+tpl [defined-predicate] (#derivation-name) mode="generalize" {
   // nothing to do
   apply [.];
 }
 
-tpl [predicate[@name]] mode="generalize" {
+tpl [predicate[@name]] (#derivation-name, #derivation-id) mode="generalize" {
   $context = `.`;
-  $n = `@name`;
-  apply [.] (#variables = `descendant::variable[@name and not(@name = preceding::variable[@name and ancestor::predicate[@name = $n] = $context]/@name)]`) mode="generalize-with-variables";
+  $variables = `descendant::variable[@name and not(@name = (preceding::variable[@name and ancestor::Derivation[@name = $derivation-name and @id = $derivation-id]] | preceding-sibling::variable[@name and ancestor::Derivation[@name = $derivation-name and @id = $derivation-id]])/@name)]`;
+  apply [.] (#variables = $variables) mode="generalize-with-variables";
 }
 
-tpl [negation] mode="generalize" {
+tpl [negation] (#derivation-name, #derivation-id) mode="generalize" {
   $context = `.`;
   apply [.] (#variables = `descendant::variable[@name and not(@name = preceding::variable[@name and ancestor::negation = $context]/@name)]`) mode="generalize-with-variables";
 }
 
-tpl [disjunction] mode="generalize" {
+tpl [disjunction] (#derivation-name, #derivation-id) mode="generalize" {
   $context = `.`;
   apply [.] (#variables = `descendant::variable[@name and not(@name = preceding::variable[@name and ancestor::disjunction = $context]/@name)]`) mode="generalize-with-variables";
 }
@@ -266,12 +252,15 @@ tpl [disjunction] mode="generalize" {
 
 // universally generalize any formula appearing coming from an IVY
 // derivation
-tpl [Derivation] mode="ivy" {
+tpl [Derivation[@name and @id]] mode="ivy" {
   $formula = `*[1]`;
   <Derivation {
     for-each [@*] { copy-of `.`; }
-    apply [$formula] mode="generalize";
+    apply [$formula] (#derivation-name = `@name`,
+                      #derivation-id = `@id`) mode="generalize";
     apply [Rule];
-    apply [Derivation] mode="ivy";
+    for-each [Derivation] {
+      apply [.] mode="ivy";
+    }
   }
 }
