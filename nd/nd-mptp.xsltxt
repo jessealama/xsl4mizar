@@ -6,6 +6,13 @@ output method="xml" encoding="utf-8" indent="yes";
 
 include ../utils/die.xsl;
 
+//////////////////////////////////////////////////////////////////////
+/// Parameters
+//////////////////////////////////////////////////////////////////////
+
+// The directory relative to which we will look for .nd files
+#basedir = { ""; }
+
 tpl list (#separ, #elems) {
  for-each [$elems] {
   apply[.]; if [not(position()=last())] { copy-of $separ; } }
@@ -95,7 +102,7 @@ tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name 
       @"name" = "by/RAA";
     }
     // apply [source] mode="recurse";
-    $nd-path = `concat ($n, ".nd")`;
+    $nd-path = `concat ($basedir, $n, ".nd")`;
     for-each [document ($nd-path, /Derivation)] {
       apply [.] mode="ivy";
     }
