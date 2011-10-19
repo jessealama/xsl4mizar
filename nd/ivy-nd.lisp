@@ -1,3 +1,4 @@
+
 (in-package :cl-user)
 
 (eval-when (:compile-toplevel)
@@ -8,6 +9,13 @@
   (:use :cl :alexandria :com.gigamonkeys.pathnames))
 
 (in-package :ivy-nd)
+
+(defun first-n (lst n)
+  (loop
+     for i from 1 upto n
+     for elt in lst
+     collecting elt into items
+     finally (return items)))
 
 (defun downcase (string)
   (format nil "~(~a~)" string))
