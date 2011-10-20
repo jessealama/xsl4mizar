@@ -166,6 +166,27 @@ tpl some-private-predicate-definition-clobbers (#item, #items) {
   }
 }
 
+// $item is assumed to be a private functor definition
+tpl some-private-functor-definition-clobbers (#item, #items) {
+  $idnr = `$item/Variable/@idnr`;
+  if [$items = ""] {
+    "0";
+  } else {
+    $first-toplevel-item-number-token = first-token (#token-string = $items);
+    $first-toplevel-item-number = value-of-token (#token = $first-toplevel-item-number-token);
+    $first-item = `key ("binder", $first-toplevel-item-number)`;
+    $remaining-items = token-string-tail (#token-string = $items);
+    for-each [$first-item] {
+      if [self::Item[@kind = "Private-Functor-Definition"]/Variable[@idnr = $idnr]] {
+        "1";
+      } else {
+        some-private-functor-definition-clobbers (#item = $item,
+                                                  #items = $remaining-items);
+      }
+    }
+  }
+}
+
 // $reservations is a list of reservation numbers
 tpl item-bound-by-some-toplevel-item (#item, #items) {
   if [$items = ""] {
@@ -185,6 +206,10 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
           some-private-predicate-definition-clobbers (#item = $item,
                                                       #items = $items);
         }
+        when [self::Item[@kind = "Private-Functor-Definition"]] {
+          some-private-functor-definition-clobbers (#item = $item,
+                                                    #items = $items);
+        }
         when [$item/@idnr] {
           $idnr = `$item/@idnr`;
           $first-toplevel-item-number-token = first-token (#token-string = $items);
@@ -199,6 +224,9 @@ tpl item-bound-by-some-toplevel-item (#item, #items) {
               when [self::Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
                 item-bound-by-some-toplevel-item (#item = $item,
                                                   #items = $remaining-items);
+              }
+              when [self::Item[@kind = "Private-Functor-Definition"]] {
+                "0";  // blah
               }
               when [@idnr = $idnr] {
                 "1";
@@ -437,6 +465,55 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
       choose {
         when [$context//Locus[@nr = $idnr]] {
           "1";
+        } else {
+          "0";
+        }
+      }
+      when [$kind = "Private-Functor-Definition"] {
+        if [$context//Private-Functor-Term[@idnr = $idnr]] {
+          "1";
+        } else {
+          "0";
+        }
+      }
+      when [$bound-later = "1"] {
+        "0";
+      }
+      when [contains ($free-variables-of-context, $token)] {
+        "1";
+      }
+      when [$context//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
+        "1";
+      }
+      otherwise {
+        if [$kind = "Loci-Declaration"] {
+          choose {
+            when [$context//Locus[@nr = $idnr]] {
+              "1";
+            }
+            when [$context//Simple-Term[@idnr = $idnr]] {
+              "1";
+            }
+            otherwise {
+              // since we are dealing with a loci declaration, the
+              // only additional candidates are other loci
+              // declarations.  (I think.)  So it is OK to simply
+              // take all later toplevel items; we don't need to
+              // select a sublist of $all-later-toplevel-items
+              // corresponding to loci declarations
+              $later-needed = needed-items-sublist (#context = $context,
+                                                    #list = $all-later-toplevel-items);
+              $later-users = exists-loci-declaration-using-loci-declaration (#loci-declaration = $item,
+                                                                             #loci-declarations = $later-needed);
+              $later-users;
+            }
+          }
+        } else {
+          $later-users = toplevel-items-in-which-item-occurs (#item = $item,
+                                                              #items = $all-later-toplevel-items);
+          exists-path-from-some-toplevel-item-to-context (#items = $later-users,
+                                                          #context = $context,
+                                                          #later-items = $all-later-toplevel-items);
         }
         when [$context//Simple-Term[@idnr = $idnr]] {
           "1";

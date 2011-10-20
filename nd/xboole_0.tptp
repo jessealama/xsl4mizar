@@ -1,0 +1,48 @@
+fof(e1_7__mtest1,conjecture,
+    ( r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1))
+  <=> ( r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1))
+      | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) ) )).
+fof(commutativity_k2_mtest1,axiom,(
+    ! [A,B] : k2_mtest1(A,B) = k2_mtest1(B,A) )).
+fof(idempotence_k2_mtest1,axiom,(
+    ! [A,B] : k2_mtest1(A,A) = A )).
+fof(commutativity_k2_mtest1_001,axiom,(
+    ! [A,B] : k2_mtest1(A,B) = k2_mtest1(B,A) )).
+fof(idempotence_k2_mtest1_002,axiom,(
+    ! [A,B] : k2_mtest1(A,A) = A )).
+fof(commutativity_k5_mtest1,axiom,(
+    ! [A,B] : k5_mtest1(A,B) = k5_mtest1(B,A) )).
+fof(commutativity_k5_mtest1_003,axiom,(
+    ! [A,B] : k5_mtest1(A,B) = k5_mtest1(B,A) )).
+fof(antisymmetry_r2_hidden,axiom,(
+    ! [A,B] :
+      ( r2_hidden(A,B)
+     => ~ r2_hidden(B,A) ) )).
+fof(dt_k2_mtest1,axiom,(
+    $true )).
+fof(dt_k2_mtest1_004,axiom,(
+    $true )).
+fof(dt_k4_mtest1,axiom,(
+    $true )).
+fof(dt_k4_mtest1_005,axiom,(
+    $true )).
+fof(dt_k5_mtest1,axiom,(
+    $true )).
+fof(dt_k5_mtest1_006,axiom,(
+    $true )).
+fof(dt_c1_7__mtest1,axiom,(
+    $true )).
+fof(dt_c2_7__mtest1,axiom,(
+    $true )).
+fof(dt_c3_7__mtest1,axiom,(
+    $true )).
+fof(d6_mtest1,axiom,(
+    ! [A,B] : k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A)) )).
+fof(d3_mtest1,axiom,(
+    ! [A,B,C] :
+      ( C = k2_mtest1(A,B)
+    <=> ! [D] :
+          ( r2_hidden(D,C)
+        <=> ( r2_hidden(D,A)
+            | r2_hidden(D,B) ) ) ) )).
+

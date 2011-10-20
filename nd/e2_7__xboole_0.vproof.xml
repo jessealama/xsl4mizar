@@ -1,0 +1,3303 @@
+<tstp>
+  <formula name='f153_2' syntax='formula' status='plain'>
+    <defined-predicate name='false'/>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='merge'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f71_1'/>
+          <non-logical-data name='f74_1'/>
+          <non-logical-data name='f81_1'/>
+          <non-logical-data name='f91_1'/>
+          <non-logical-data name='f96_1'/>
+          <non-logical-data name='f116_1'/>
+          <non-logical-data name='f125_1'/>
+          <non-logical-data name='f136_1'/>
+          <non-logical-data name='f145_1'/>
+          <non-logical-data name='f144_1'/>
+          <non-logical-data name='f153_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f153_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd2'/>
+              <defined-predicate name='true'/>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+              <negation>
+                <defined-predicate name='bdd1'/>
+              </negation>
+            </implication>
+          </conjunction>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f149_1'/>
+          <non-logical-data name='f62_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f62_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </predicate>
+      </negation>
+      <defined-predicate name='bdd2'/>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f62_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f62_D' syntax='formula' status='plain'>
+    <equivalence>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </predicate>
+      </negation>
+      <negation>
+        <defined-predicate name='bdd2'/>
+      </negation>
+    </equivalence>
+    <source>
+      <non-logical-data name='introduced'>
+        <non-logical-data name='splitting_component_introduction'/>
+        <non-logical-data/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f149_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c3_7__mtest1'/>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <negation>
+            <defined-predicate name='bdd1'/>
+          </negation>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f121_1'/>
+          <non-logical-data name='f63_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f63_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c2_7__mtest1'/>
+      </predicate>
+      <negation>
+        <defined-predicate name='bdd1'/>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f63_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f63_D' syntax='formula' status='plain'>
+    <equivalence>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c2_7__mtest1'/>
+      </predicate>
+      <defined-predicate name='bdd1'/>
+    </equivalence>
+    <source>
+      <non-logical-data name='introduced'>
+        <non-logical-data name='splitting_component_introduction'/>
+        <non-logical-data/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f121_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+      </negation>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </predicate>
+        <defined-predicate name='bdd3'/>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f95'/>
+          <non-logical-data name='f68_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f68_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+      </negation>
+      <defined-predicate name='bdd3'/>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='splitting'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f59'/>
+          <non-logical-data name='f66_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f66_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </function>
+      </predicate>
+      <negation>
+        <defined-predicate name='bdd3'/>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f66_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f66_D' syntax='formula' status='plain'>
+    <equivalence>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </function>
+      </predicate>
+      <defined-predicate name='bdd3'/>
+    </equivalence>
+    <source>
+      <non-logical-data name='introduced'>
+        <non-logical-data name='splitting_component_introduction'/>
+        <non-logical-data/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f59' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </function>
+      </predicate>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='definition_unfolding'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f44'/>
+          <non-logical-data name='f42'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f42' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <predicate name='='>
+        <function name='k5_mtest1'>
+          <variable name='X0'/>
+          <variable name='X1'/>
+        </function>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <variable name='X0'/>
+            <variable name='X1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <variable name='X1'/>
+            <variable name='X0'/>
+          </function>
+        </function>
+      </predicate>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f18'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f18' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <predicate name='='>
+        <function name='k5_mtest1'>
+          <variable name='X0'/>
+          <variable name='X1'/>
+        </function>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <variable name='X0'/>
+            <variable name='X1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <variable name='X1'/>
+            <variable name='X0'/>
+          </function>
+        </function>
+      </predicate>
+    </quantifier>
+    <source>
+      <non-logical-data name='file'>
+        <non-logical-data name='e2_7__xboole_0.tptp'/>
+        <non-logical-data name='unknown'/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f44' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k5_mtest1'>
+          <function name='c2_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </function>
+      </predicate>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f26'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f26' syntax='formula' status='plain'>
+    <conjunction>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k5_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+          </predicate>
+        </negation>
+        <disjunction>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k4_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+          </predicate>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k4_mtest1'>
+              <function name='c3_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </function>
+          </predicate>
+        </disjunction>
+      </disjunction>
+      <disjunction>
+        <conjunction>
+          <negation>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='k4_mtest1'>
+                <function name='c2_7__mtest1'/>
+                <function name='c3_7__mtest1'/>
+              </function>
+            </predicate>
+          </negation>
+          <negation>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='k4_mtest1'>
+                <function name='c3_7__mtest1'/>
+                <function name='c2_7__mtest1'/>
+              </function>
+            </predicate>
+          </negation>
+        </conjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k5_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+      </disjunction>
+    </conjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='flattening'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f25'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f25' syntax='formula' status='plain'>
+    <conjunction>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k5_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+          </predicate>
+        </negation>
+        <disjunction>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k4_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+          </predicate>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k4_mtest1'>
+              <function name='c3_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </function>
+          </predicate>
+        </disjunction>
+      </disjunction>
+      <disjunction>
+        <conjunction>
+          <negation>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='k4_mtest1'>
+                <function name='c2_7__mtest1'/>
+                <function name='c3_7__mtest1'/>
+              </function>
+            </predicate>
+          </negation>
+          <negation>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='k4_mtest1'>
+                <function name='c3_7__mtest1'/>
+                <function name='c2_7__mtest1'/>
+              </function>
+            </predicate>
+          </negation>
+        </conjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k5_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+      </disjunction>
+    </conjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='nnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f19'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f19' syntax='formula' status='axiom'>
+    <equivalence>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k5_mtest1'>
+          <function name='c2_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </function>
+      </predicate>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </predicate>
+      </disjunction>
+    </equivalence>
+    <source>
+      <non-logical-data name='file'>
+        <non-logical-data name='e2_7__xboole_0.tptp'/>
+        <non-logical-data name='unknown'/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f95' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <variable name='X0'/>
+          <function name='k4_mtest1'>
+            <variable name='X2'/>
+            <variable name='X1'/>
+          </function>
+        </predicate>
+        <disjunction>
+          <predicate name='r2_hidden'>
+            <variable name='X0'/>
+            <variable name='X1'/>
+          </predicate>
+          <negation>
+            <predicate name='r2_hidden'>
+              <variable name='X0'/>
+              <variable name='X2'/>
+            </predicate>
+          </negation>
+        </disjunction>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='forward_demodulation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f93'/>
+          <non-logical-data name='f36'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f36' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <predicate name='='>
+        <function name='k2_mtest1'>
+          <variable name='X0'/>
+          <variable name='X0'/>
+        </function>
+        <variable name='X0'/>
+      </predicate>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f3'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f3' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <predicate name='='>
+        <function name='k2_mtest1'>
+          <variable name='X0'/>
+          <variable name='X0'/>
+        </function>
+        <variable name='X0'/>
+      </predicate>
+    </quantifier>
+    <source>
+      <non-logical-data name='file'>
+        <non-logical-data name='e2_7__xboole_0.tptp'/>
+        <non-logical-data name='unknown'/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f93' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <variable name='X0'/>
+          <variable name='X1'/>
+        </predicate>
+        <disjunction>
+          <negation>
+            <predicate name='r2_hidden'>
+              <variable name='X0'/>
+              <variable name='X2'/>
+            </predicate>
+          </negation>
+          <predicate name='r2_hidden'>
+            <variable name='X0'/>
+            <function name='k2_mtest1'>
+              <function name='k4_mtest1'>
+                <variable name='X2'/>
+                <variable name='X1'/>
+              </function>
+              <function name='k4_mtest1'>
+                <variable name='X2'/>
+                <variable name='X1'/>
+              </function>
+            </function>
+          </predicate>
+        </disjunction>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f48'/>
+          <non-logical-data name='f36'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f48' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X3'/>
+      <variable name='X1'/>
+      <disjunction>
+        <negation>
+          <predicate name='='>
+            <function name='k4_mtest1'>
+              <variable name='X0'/>
+              <variable name='X1'/>
+            </function>
+            <variable name='X2'/>
+          </predicate>
+        </negation>
+        <disjunction>
+          <predicate name='r2_hidden'>
+            <variable name='X3'/>
+            <variable name='X1'/>
+          </predicate>
+          <disjunction>
+            <negation>
+              <predicate name='r2_hidden'>
+                <variable name='X3'/>
+                <variable name='X0'/>
+              </predicate>
+            </negation>
+            <predicate name='r2_hidden'>
+              <variable name='X3'/>
+              <variable name='X2'/>
+            </predicate>
+          </disjunction>
+        </disjunction>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f30'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f30' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <variable name='X2'/>
+      <conjunction>
+        <disjunction>
+          <negation>
+            <predicate name='='>
+              <function name='k4_mtest1'>
+                <variable name='X0'/>
+                <variable name='X1'/>
+              </function>
+              <variable name='X2'/>
+            </predicate>
+          </negation>
+          <quantifier type='universal'>
+            <variable name='X3'/>
+            <conjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </negation>
+                <conjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X1'/>
+                    </predicate>
+                  </negation>
+                </conjunction>
+              </disjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                </negation>
+                <disjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X1'/>
+                  </predicate>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </disjunction>
+              </disjunction>
+            </conjunction>
+          </quantifier>
+        </disjunction>
+        <disjunction>
+          <conjunction>
+            <disjunction>
+              <predicate name='r2_hidden'>
+                <function name='sK0'>
+                  <variable name='X2'/>
+                  <variable name='X1'/>
+                  <variable name='X0'/>
+                </function>
+                <variable name='X2'/>
+              </predicate>
+              <conjunction>
+                <predicate name='r2_hidden'>
+                  <function name='sK0'>
+                    <variable name='X2'/>
+                    <variable name='X1'/>
+                    <variable name='X0'/>
+                  </function>
+                  <variable name='X0'/>
+                </predicate>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <function name='sK0'>
+                      <variable name='X2'/>
+                      <variable name='X1'/>
+                      <variable name='X0'/>
+                    </function>
+                    <variable name='X1'/>
+                  </predicate>
+                </negation>
+              </conjunction>
+            </disjunction>
+            <disjunction>
+              <negation>
+                <predicate name='r2_hidden'>
+                  <function name='sK0'>
+                    <variable name='X2'/>
+                    <variable name='X1'/>
+                    <variable name='X0'/>
+                  </function>
+                  <variable name='X2'/>
+                </predicate>
+              </negation>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <function name='sK0'>
+                      <variable name='X2'/>
+                      <variable name='X1'/>
+                      <variable name='X0'/>
+                    </function>
+                    <variable name='X0'/>
+                  </predicate>
+                </negation>
+                <predicate name='r2_hidden'>
+                  <function name='sK0'>
+                    <variable name='X2'/>
+                    <variable name='X1'/>
+                    <variable name='X0'/>
+                  </function>
+                  <variable name='X1'/>
+                </predicate>
+              </disjunction>
+            </disjunction>
+          </conjunction>
+          <predicate name='='>
+            <function name='k4_mtest1'>
+              <variable name='X0'/>
+              <variable name='X1'/>
+            </function>
+            <variable name='X2'/>
+          </predicate>
+        </disjunction>
+      </conjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='skolemisation'/>
+        <non-logical-data>
+          <non-logical-data name='status'>
+            <non-logical-data name='esa'/>
+          </non-logical-data>
+        </non-logical-data>
+        <non-logical-data>
+          <non-logical-data name='f29'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f29' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <variable name='X2'/>
+      <conjunction>
+        <disjunction>
+          <negation>
+            <predicate name='='>
+              <function name='k4_mtest1'>
+                <variable name='X0'/>
+                <variable name='X1'/>
+              </function>
+              <variable name='X2'/>
+            </predicate>
+          </negation>
+          <quantifier type='universal'>
+            <variable name='X3'/>
+            <conjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </negation>
+                <conjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X1'/>
+                    </predicate>
+                  </negation>
+                </conjunction>
+              </disjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                </negation>
+                <disjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X1'/>
+                  </predicate>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </disjunction>
+              </disjunction>
+            </conjunction>
+          </quantifier>
+        </disjunction>
+        <disjunction>
+          <quantifier type='existential'>
+            <variable name='X4'/>
+            <conjunction>
+              <disjunction>
+                <predicate name='r2_hidden'>
+                  <variable name='X4'/>
+                  <variable name='X2'/>
+                </predicate>
+                <conjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X4'/>
+                    <variable name='X0'/>
+                  </predicate>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X4'/>
+                      <variable name='X1'/>
+                    </predicate>
+                  </negation>
+                </conjunction>
+              </disjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X4'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </negation>
+                <disjunction>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X4'/>
+                      <variable name='X0'/>
+                    </predicate>
+                  </negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X4'/>
+                    <variable name='X1'/>
+                  </predicate>
+                </disjunction>
+              </disjunction>
+            </conjunction>
+          </quantifier>
+          <predicate name='='>
+            <function name='k4_mtest1'>
+              <variable name='X0'/>
+              <variable name='X1'/>
+            </function>
+            <variable name='X2'/>
+          </predicate>
+        </disjunction>
+      </conjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='rectify'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f28'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f28' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <variable name='X2'/>
+      <conjunction>
+        <disjunction>
+          <negation>
+            <predicate name='='>
+              <function name='k4_mtest1'>
+                <variable name='X0'/>
+                <variable name='X1'/>
+              </function>
+              <variable name='X2'/>
+            </predicate>
+          </negation>
+          <quantifier type='universal'>
+            <variable name='X3'/>
+            <conjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </negation>
+                <conjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X1'/>
+                    </predicate>
+                  </negation>
+                </conjunction>
+              </disjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                </negation>
+                <disjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X1'/>
+                  </predicate>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </disjunction>
+              </disjunction>
+            </conjunction>
+          </quantifier>
+        </disjunction>
+        <disjunction>
+          <quantifier type='existential'>
+            <variable name='X3'/>
+            <conjunction>
+              <disjunction>
+                <predicate name='r2_hidden'>
+                  <variable name='X3'/>
+                  <variable name='X2'/>
+                </predicate>
+                <conjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X1'/>
+                    </predicate>
+                  </negation>
+                </conjunction>
+              </disjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </negation>
+                <disjunction>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X0'/>
+                    </predicate>
+                  </negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X1'/>
+                  </predicate>
+                </disjunction>
+              </disjunction>
+            </conjunction>
+          </quantifier>
+          <predicate name='='>
+            <function name='k4_mtest1'>
+              <variable name='X0'/>
+              <variable name='X1'/>
+            </function>
+            <variable name='X2'/>
+          </predicate>
+        </disjunction>
+      </conjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='flattening'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f27'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f27' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <variable name='X2'/>
+      <conjunction>
+        <disjunction>
+          <negation>
+            <predicate name='='>
+              <function name='k4_mtest1'>
+                <variable name='X0'/>
+                <variable name='X1'/>
+              </function>
+              <variable name='X2'/>
+            </predicate>
+          </negation>
+          <quantifier type='universal'>
+            <variable name='X3'/>
+            <conjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </negation>
+                <conjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X1'/>
+                    </predicate>
+                  </negation>
+                </conjunction>
+              </disjunction>
+              <disjunction>
+                <disjunction>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X0'/>
+                    </predicate>
+                  </negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X1'/>
+                  </predicate>
+                </disjunction>
+                <predicate name='r2_hidden'>
+                  <variable name='X3'/>
+                  <variable name='X2'/>
+                </predicate>
+              </disjunction>
+            </conjunction>
+          </quantifier>
+        </disjunction>
+        <disjunction>
+          <quantifier type='existential'>
+            <variable name='X3'/>
+            <conjunction>
+              <disjunction>
+                <predicate name='r2_hidden'>
+                  <variable name='X3'/>
+                  <variable name='X2'/>
+                </predicate>
+                <conjunction>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X0'/>
+                  </predicate>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X1'/>
+                    </predicate>
+                  </negation>
+                </conjunction>
+              </disjunction>
+              <disjunction>
+                <negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X2'/>
+                  </predicate>
+                </negation>
+                <disjunction>
+                  <negation>
+                    <predicate name='r2_hidden'>
+                      <variable name='X3'/>
+                      <variable name='X0'/>
+                    </predicate>
+                  </negation>
+                  <predicate name='r2_hidden'>
+                    <variable name='X3'/>
+                    <variable name='X1'/>
+                  </predicate>
+                </disjunction>
+              </disjunction>
+            </conjunction>
+          </quantifier>
+          <predicate name='='>
+            <function name='k4_mtest1'>
+              <variable name='X0'/>
+              <variable name='X1'/>
+            </function>
+            <variable name='X2'/>
+          </predicate>
+        </disjunction>
+      </conjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='nnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f23'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f23' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <variable name='X2'/>
+      <equivalence>
+        <predicate name='='>
+          <function name='k4_mtest1'>
+            <variable name='X0'/>
+            <variable name='X1'/>
+          </function>
+          <variable name='X2'/>
+        </predicate>
+        <quantifier type='universal'>
+          <variable name='X3'/>
+          <equivalence>
+            <predicate name='r2_hidden'>
+              <variable name='X3'/>
+              <variable name='X2'/>
+            </predicate>
+            <conjunction>
+              <predicate name='r2_hidden'>
+                <variable name='X3'/>
+                <variable name='X0'/>
+              </predicate>
+              <negation>
+                <predicate name='r2_hidden'>
+                  <variable name='X3'/>
+                  <variable name='X1'/>
+                </predicate>
+              </negation>
+            </conjunction>
+          </equivalence>
+        </quantifier>
+      </equivalence>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='ennf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f20'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f20' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <variable name='X2'/>
+      <equivalence>
+        <predicate name='='>
+          <function name='k4_mtest1'>
+            <variable name='X0'/>
+            <variable name='X1'/>
+          </function>
+          <variable name='X2'/>
+        </predicate>
+        <quantifier type='universal'>
+          <variable name='X3'/>
+          <equivalence>
+            <predicate name='r2_hidden'>
+              <variable name='X3'/>
+              <variable name='X2'/>
+            </predicate>
+            <conjunction>
+              <predicate name='r2_hidden'>
+                <variable name='X3'/>
+                <variable name='X0'/>
+              </predicate>
+              <negation>
+                <predicate name='r2_hidden'>
+                  <variable name='X3'/>
+                  <variable name='X1'/>
+                </predicate>
+              </negation>
+            </conjunction>
+          </equivalence>
+        </quantifier>
+      </equivalence>
+    </quantifier>
+    <source>
+      <non-logical-data name='file'>
+        <non-logical-data name='e2_7__xboole_0.tptp'/>
+        <non-logical-data name='unknown'/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f144_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd3'/>
+              <defined-predicate name='true'/>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd3'/>
+              </negation>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+            </implication>
+          </conjunction>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f135_1'/>
+          <non-logical-data name='f112_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f112_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+      </negation>
+      <negation>
+        <defined-predicate name='bdd4'/>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f90'/>
+          <non-logical-data name='f70_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f70_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k4_mtest1'>
+          <function name='c3_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </function>
+      </predicate>
+      <negation>
+        <defined-predicate name='bdd4'/>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f70_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f70_D' syntax='formula' status='plain'>
+    <equivalence>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k4_mtest1'>
+          <function name='c3_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </function>
+      </predicate>
+      <defined-predicate name='bdd4'/>
+    </equivalence>
+    <source>
+      <non-logical-data name='introduced'>
+        <non-logical-data name='splitting_component_introduction'/>
+        <non-logical-data/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f90' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <variable name='X0'/>
+            <function name='k4_mtest1'>
+              <variable name='X1'/>
+              <variable name='X2'/>
+            </function>
+          </predicate>
+        </negation>
+        <negation>
+          <predicate name='r2_hidden'>
+            <variable name='X0'/>
+            <variable name='X2'/>
+          </predicate>
+        </negation>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='forward_demodulation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f88'/>
+          <non-logical-data name='f36'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f88' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <variable name='X0'/>
+            <function name='k2_mtest1'>
+              <function name='k4_mtest1'>
+                <variable name='X1'/>
+                <variable name='X2'/>
+              </function>
+              <function name='k4_mtest1'>
+                <variable name='X1'/>
+                <variable name='X2'/>
+              </function>
+            </function>
+          </predicate>
+        </negation>
+        <negation>
+          <predicate name='r2_hidden'>
+            <variable name='X0'/>
+            <variable name='X2'/>
+          </predicate>
+        </negation>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f47'/>
+          <non-logical-data name='f36'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f47' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X3'/>
+      <variable name='X1'/>
+      <disjunction>
+        <negation>
+          <predicate name='='>
+            <function name='k4_mtest1'>
+              <variable name='X0'/>
+              <variable name='X1'/>
+            </function>
+            <variable name='X2'/>
+          </predicate>
+        </negation>
+        <disjunction>
+          <negation>
+            <predicate name='r2_hidden'>
+              <variable name='X3'/>
+              <variable name='X2'/>
+            </predicate>
+          </negation>
+          <negation>
+            <predicate name='r2_hidden'>
+              <variable name='X3'/>
+              <variable name='X1'/>
+            </predicate>
+          </negation>
+        </disjunction>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f30'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f135_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c2_7__mtest1'/>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <negation>
+            <defined-predicate name='bdd2'/>
+          </negation>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f120_1'/>
+          <non-logical-data name='f65_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f65_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c3_7__mtest1'/>
+      </predicate>
+      <negation>
+        <defined-predicate name='bdd2'/>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f65_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f65_D' syntax='formula' status='plain'>
+    <equivalence>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c3_7__mtest1'/>
+      </predicate>
+      <defined-predicate name='bdd2'/>
+    </equivalence>
+    <source>
+      <non-logical-data name='introduced'>
+        <non-logical-data name='splitting_component_introduction'/>
+        <non-logical-data/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f120_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </predicate>
+      </negation>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+        <defined-predicate name='bdd3'/>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f95'/>
+          <non-logical-data name='f67_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f67_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </predicate>
+      </negation>
+      <defined-predicate name='bdd3'/>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='splitting'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f58'/>
+          <non-logical-data name='f66_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f58' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </function>
+      </predicate>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </predicate>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='definition_unfolding'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f45'/>
+          <non-logical-data name='f42'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f45' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k5_mtest1'>
+          <function name='c2_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </function>
+      </predicate>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </predicate>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f26'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f145_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd2'/>
+              <defined-predicate name='bdd1'/>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+              <defined-predicate name='true'/>
+            </implication>
+          </conjunction>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f135_1'/>
+          <non-logical-data name='f64_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f64_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+      </negation>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd2'/>
+              <defined-predicate name='bdd1'/>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+              <defined-predicate name='false'/>
+            </implication>
+          </conjunction>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <defined-predicate name='bdd1'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='merge'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f64_2'/>
+          <non-logical-data name='f64_3'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f64_3' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+      </negation>
+      <defined-predicate name='bdd1'/>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f64_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f64_D' syntax='formula' status='plain'>
+    <equivalence>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+      </negation>
+      <negation>
+        <defined-predicate name='bdd1'/>
+      </negation>
+    </equivalence>
+    <source>
+      <non-logical-data name='introduced'>
+        <non-logical-data name='splitting_component_introduction'/>
+        <non-logical-data/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f64_2' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+      </negation>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <defined-predicate name='bdd2'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='splitting'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f53'/>
+          <non-logical-data name='f61_D'/>
+          <non-logical-data name='f65_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f61_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k2_mtest1'>
+            <function name='k4_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+            <function name='k4_mtest1'>
+              <function name='c3_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </function>
+          </function>
+        </predicate>
+      </negation>
+      <defined-predicate name='bdd3'/>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f61_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f61_D' syntax='formula' status='plain'>
+    <equivalence>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k2_mtest1'>
+            <function name='k4_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+            <function name='k4_mtest1'>
+              <function name='c3_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </function>
+          </function>
+        </predicate>
+      </negation>
+      <negation>
+        <defined-predicate name='bdd3'/>
+      </negation>
+    </equivalence>
+    <source>
+      <non-logical-data name='introduced'>
+        <non-logical-data name='splitting_component_introduction'/>
+        <non-logical-data/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f53' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c3_7__mtest1'/>
+      </predicate>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </predicate>
+        </negation>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k2_mtest1'>
+              <function name='k4_mtest1'>
+                <function name='c2_7__mtest1'/>
+                <function name='c3_7__mtest1'/>
+              </function>
+              <function name='k4_mtest1'>
+                <function name='c3_7__mtest1'/>
+                <function name='c2_7__mtest1'/>
+              </function>
+            </function>
+          </predicate>
+        </negation>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='definition_unfolding'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f33'/>
+          <non-logical-data name='f42'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f33' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c3_7__mtest1'/>
+      </predicate>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </predicate>
+        </negation>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k5_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+          </predicate>
+        </negation>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f24'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f24' syntax='formula' status='plain'>
+    <conjunction>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k5_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+        <conjunction>
+          <disjunction>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </predicate>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </predicate>
+          </disjunction>
+          <disjunction>
+            <negation>
+              <predicate name='r2_hidden'>
+                <function name='c1_7__mtest1'/>
+                <function name='c2_7__mtest1'/>
+              </predicate>
+            </negation>
+            <negation>
+              <predicate name='r2_hidden'>
+                <function name='c1_7__mtest1'/>
+                <function name='c3_7__mtest1'/>
+              </predicate>
+            </negation>
+          </disjunction>
+        </conjunction>
+      </disjunction>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k5_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+          </predicate>
+        </negation>
+        <conjunction>
+          <disjunction>
+            <negation>
+              <predicate name='r2_hidden'>
+                <function name='c1_7__mtest1'/>
+                <function name='c2_7__mtest1'/>
+              </predicate>
+            </negation>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </predicate>
+          </disjunction>
+          <disjunction>
+            <negation>
+              <predicate name='r2_hidden'>
+                <function name='c1_7__mtest1'/>
+                <function name='c3_7__mtest1'/>
+              </predicate>
+            </negation>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </predicate>
+          </disjunction>
+        </conjunction>
+      </disjunction>
+    </conjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='nnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f21'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f21' syntax='formula' status='plain'>
+    <nonequivalence>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k5_mtest1'>
+          <function name='c2_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </function>
+      </predicate>
+      <nonequivalence>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </predicate>
+      </nonequivalence>
+    </nonequivalence>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='ennf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f1' syntax='formula' status='negated_conjecture'>
+    <negation>
+      <equivalence>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k5_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+        <negation>
+          <equivalence>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </predicate>
+            <predicate name='r2_hidden'>
+              <function name='c1_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </predicate>
+          </equivalence>
+        </negation>
+      </equivalence>
+    </negation>
+    <source>
+      <non-logical-data name='file'>
+        <non-logical-data name='e2_7__xboole_0.tptp'/>
+        <non-logical-data name='unknown'/>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f136_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='bdd3'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='subsumption_resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f134_1'/>
+          <non-logical-data name='f112_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f134_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c2_7__mtest1'/>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='bdd3'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f120_1'/>
+          <non-logical-data name='f87_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f87_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c3_7__mtest1'/>
+      </predicate>
+      <negation>
+        <defined-predicate name='bdd4'/>
+      </negation>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f85'/>
+          <non-logical-data name='f70_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f85' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <variable name='X0'/>
+            <function name='k4_mtest1'>
+              <variable name='X1'/>
+              <variable name='X2'/>
+            </function>
+          </predicate>
+        </negation>
+        <predicate name='r2_hidden'>
+          <variable name='X0'/>
+          <variable name='X1'/>
+        </predicate>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='forward_demodulation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f83'/>
+          <non-logical-data name='f36'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f83' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X1'/>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <variable name='X0'/>
+            <function name='k2_mtest1'>
+              <function name='k4_mtest1'>
+                <variable name='X1'/>
+                <variable name='X2'/>
+              </function>
+              <function name='k4_mtest1'>
+                <variable name='X1'/>
+                <variable name='X2'/>
+              </function>
+            </function>
+          </predicate>
+        </negation>
+        <predicate name='r2_hidden'>
+          <variable name='X0'/>
+          <variable name='X1'/>
+        </predicate>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f46'/>
+          <non-logical-data name='f36'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f46' syntax='formula' status='plain'>
+    <quantifier type='universal'>
+      <variable name='X2'/>
+      <variable name='X0'/>
+      <variable name='X3'/>
+      <variable name='X1'/>
+      <disjunction>
+        <negation>
+          <predicate name='='>
+            <function name='k4_mtest1'>
+              <variable name='X0'/>
+              <variable name='X1'/>
+            </function>
+            <variable name='X2'/>
+          </predicate>
+        </negation>
+        <disjunction>
+          <negation>
+            <predicate name='r2_hidden'>
+              <variable name='X3'/>
+              <variable name='X2'/>
+            </predicate>
+          </negation>
+          <predicate name='r2_hidden'>
+            <variable name='X3'/>
+            <variable name='X0'/>
+          </predicate>
+        </disjunction>
+      </disjunction>
+    </quantifier>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f30'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f125_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <negation>
+            <defined-predicate name='bdd1'/>
+          </negation>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f112_1'/>
+          <non-logical-data name='f63_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f116_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd3'/>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd3'/>
+              </negation>
+              <defined-predicate name='true'/>
+            </implication>
+          </conjunction>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f111_1'/>
+          <non-logical-data name='f65_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f111_1' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </predicate>
+      </negation>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f90'/>
+          <non-logical-data name='f69_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f69_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k4_mtest1'>
+          <function name='c2_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </function>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='splitting'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f60'/>
+          <non-logical-data name='f70_D'/>
+          <non-logical-data name='f61_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f60' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k4_mtest1'>
+          <function name='c3_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </function>
+      </predicate>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k2_mtest1'>
+              <function name='k4_mtest1'>
+                <function name='c2_7__mtest1'/>
+                <function name='c3_7__mtest1'/>
+              </function>
+              <function name='k4_mtest1'>
+                <function name='c3_7__mtest1'/>
+                <function name='c2_7__mtest1'/>
+              </function>
+            </function>
+          </predicate>
+        </negation>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='definition_unfolding'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f43'/>
+          <non-logical-data name='f42'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f43' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k4_mtest1'>
+          <function name='c3_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </function>
+      </predicate>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k5_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+          </predicate>
+        </negation>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f26'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f96_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='bdd2'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f87_1'/>
+          <non-logical-data name='f62_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f91_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd3'/>
+              <conjunction>
+                <implication>
+                  <defined-predicate name='bdd2'/>
+                  <defined-predicate name='bdd1'/>
+                </implication>
+                <implication>
+                  <negation>
+                    <defined-predicate name='bdd2'/>
+                  </negation>
+                  <defined-predicate name='false'/>
+                </implication>
+              </conjunction>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd3'/>
+              </negation>
+              <defined-predicate name='true'/>
+            </implication>
+          </conjunction>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f86_1'/>
+          <non-logical-data name='f64_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f86_1' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c2_7__mtest1'/>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f85'/>
+          <non-logical-data name='f69_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f81_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd2'/>
+              <defined-predicate name='bdd1'/>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+              <defined-predicate name='true'/>
+            </implication>
+          </conjunction>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd2'/>
+              <negation>
+                <defined-predicate name='bdd1'/>
+              </negation>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+              <defined-predicate name='bdd1'/>
+            </implication>
+          </conjunction>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f66_2'/>
+          <non-logical-data name='f61_2'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f61_2' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k2_mtest1'>
+            <function name='k4_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+            <function name='k4_mtest1'>
+              <function name='c3_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </function>
+          </function>
+        </predicate>
+      </negation>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd2'/>
+              <defined-predicate name='bdd1'/>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+              <defined-predicate name='true'/>
+            </implication>
+          </conjunction>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <defined-predicate name='false'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='merge'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f61_3'/>
+          <non-logical-data name='f61_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f61_3' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k2_mtest1'>
+            <function name='k4_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+            <function name='k4_mtest1'>
+              <function name='c3_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </function>
+          </function>
+        </predicate>
+      </negation>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd2'/>
+          <defined-predicate name='bdd1'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd2'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='splitting'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f52'/>
+          <non-logical-data name='f62_D'/>
+          <non-logical-data name='f63_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f52' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c2_7__mtest1'/>
+      </predicate>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </predicate>
+        </negation>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k2_mtest1'>
+              <function name='k4_mtest1'>
+                <function name='c2_7__mtest1'/>
+                <function name='c3_7__mtest1'/>
+              </function>
+              <function name='k4_mtest1'>
+                <function name='c3_7__mtest1'/>
+                <function name='c2_7__mtest1'/>
+              </function>
+            </function>
+          </predicate>
+        </negation>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='definition_unfolding'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f34'/>
+          <non-logical-data name='f42'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f34' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c2_7__mtest1'/>
+      </predicate>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </predicate>
+        </negation>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='k5_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+          </predicate>
+        </negation>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f24'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f66_2' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </function>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <defined-predicate name='false'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd2'/>
+              <negation>
+                <defined-predicate name='bdd1'/>
+              </negation>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+              <defined-predicate name='bdd1'/>
+            </implication>
+          </conjunction>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='merge'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f66_3'/>
+          <non-logical-data name='f66_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f66_3' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </function>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd2'/>
+          <negation>
+            <defined-predicate name='bdd1'/>
+          </negation>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd2'/>
+          </negation>
+          <defined-predicate name='bdd1'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='merge'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f66_4'/>
+          <non-logical-data name='f66_5'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f66_5' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </function>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd2'/>
+          <defined-predicate name='true'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd2'/>
+          </negation>
+          <defined-predicate name='bdd1'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='splitting'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f55'/>
+          <non-logical-data name='f65_D'/>
+          <non-logical-data name='f63_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f55' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c3_7__mtest1'/>
+      </predicate>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k2_mtest1'>
+            <function name='k4_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+            <function name='k4_mtest1'>
+              <function name='c3_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </function>
+          </function>
+        </predicate>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='definition_unfolding'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f31'/>
+          <non-logical-data name='f42'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f31' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='c3_7__mtest1'/>
+      </predicate>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c2_7__mtest1'/>
+        </predicate>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k5_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f24'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f66_4' syntax='formula' status='plain'>
+    <disjunction>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </function>
+      </predicate>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd2'/>
+          <negation>
+            <defined-predicate name='bdd1'/>
+          </negation>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd2'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='splitting'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f54'/>
+          <non-logical-data name='f64_D'/>
+          <non-logical-data name='f62_D'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f54' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </predicate>
+      </negation>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </predicate>
+        </negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k2_mtest1'>
+            <function name='k4_mtest1'>
+              <function name='c2_7__mtest1'/>
+              <function name='c3_7__mtest1'/>
+            </function>
+            <function name='k4_mtest1'>
+              <function name='c3_7__mtest1'/>
+              <function name='c2_7__mtest1'/>
+            </function>
+          </function>
+        </predicate>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='definition_unfolding'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f32'/>
+          <non-logical-data name='f42'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f32' syntax='formula' status='plain'>
+    <disjunction>
+      <negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </predicate>
+      </negation>
+      <disjunction>
+        <negation>
+          <predicate name='r2_hidden'>
+            <function name='c1_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </predicate>
+        </negation>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k5_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+      </disjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='cnf_transformation'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f24'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f74_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd4'/>
+          <defined-predicate name='bdd3'/>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd4'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f70_1'/>
+          <non-logical-data name='f67_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+  <formula name='f71_1' syntax='formula' status='plain'>
+    <disjunction>
+      <defined-predicate name='false'/>
+      <conjunction>
+        <implication>
+          <defined-predicate name='bdd3'/>
+          <conjunction>
+            <implication>
+              <defined-predicate name='bdd2'/>
+              <defined-predicate name='true'/>
+            </implication>
+            <implication>
+              <negation>
+                <defined-predicate name='bdd2'/>
+              </negation>
+              <negation>
+                <defined-predicate name='bdd1'/>
+              </negation>
+            </implication>
+          </conjunction>
+        </implication>
+        <implication>
+          <negation>
+            <defined-predicate name='bdd3'/>
+          </negation>
+          <defined-predicate name='true'/>
+        </implication>
+      </conjunction>
+    </disjunction>
+    <source>
+      <non-logical-data name='inference'>
+        <non-logical-data name='resolution'/>
+        <non-logical-data/>
+        <non-logical-data>
+          <non-logical-data name='f64_1'/>
+          <non-logical-data name='f63_1'/>
+        </non-logical-data>
+      </non-logical-data>
+    </source>
+  </formula>
+</tstp>

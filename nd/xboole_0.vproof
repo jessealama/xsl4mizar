@@ -1,0 +1,147 @@
+fof(f156_2,plain,(
+  $false),
+  inference(merge,[],[f56_1,f62_1,f87_1,f106_1,f156_1])).
+fof(f156_1,plain,(
+  $false | ( ( $bdd3 => $true) & ( ~$bdd3 => ( ( $bdd2 => $bdd1) & ( ~$bdd2 => $true ) ) ) )),
+  inference(resolution,[],[f154_1,f52_1])).
+fof(f52_1,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | ~$bdd2),
+  inference(splitting,[],[f46,f50_D])).
+fof(f50_1,plain,(
+  ~r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | $bdd2),
+  inference(cnf_transformation,[],[f50_D])).
+fof(f50_D,plain,(
+  ~r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) <=> ~$bdd2),
+  introduced(splitting_component_introduction,[])).
+fof(f46,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | ~r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1)))),
+  inference(definition_unfolding,[],[f29,f38])).
+fof(f38,plain,(
+  ( ! [X0,X1] : (k5_mtest1(X0,X1) = k2_mtest1(k4_mtest1(X0,X1),k4_mtest1(X1,X0))) )),
+  inference(cnf_transformation,[],[f18])).
+fof(f18,axiom,(
+  ! [X0,X1] : k5_mtest1(X0,X1) = k2_mtest1(k4_mtest1(X0,X1),k4_mtest1(X1,X0))),
+  file('xboole_0.p',unknown)).
+fof(f29,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | ~r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1))),
+  inference(cnf_transformation,[],[f23])).
+fof(f23,plain,(
+  (r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1))) & (~r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | (~r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) & ~r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1))))),
+  inference(flattening,[],[f22])).
+fof(f22,plain,(
+  (r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | (r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)))) & (~r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | (~r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) & ~r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1))))),
+  inference(nnf_transformation,[],[f20])).
+fof(f20,plain,(
+  r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) <~> (r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)))),
+  inference(ennf_transformation,[],[f1])).
+fof(f1,negated_conjecture,(
+  ~(r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) <=> (r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1))))),
+  file('xboole_0.p',unknown)).
+fof(f154_1,plain,(
+  r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | ( ( $bdd3 => $true) & ( ~$bdd3 => $bdd1 ) )),
+  inference(subsumption_resolution,[],[f144_1,f51_1])).
+fof(f51_1,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | $bdd1),
+  inference(cnf_transformation,[],[f51_D])).
+fof(f51_D,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) <=> ~$bdd1),
+  introduced(splitting_component_introduction,[])).
+fof(f144_1,plain,(
+  r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | ( ( $bdd3 => $true) & ( ~$bdd3 => $bdd1 ) )),
+  inference(resolution,[],[f89,f53_1])).
+fof(f53_1,plain,(
+  r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | ( ( $bdd3 => $true) & ( ~$bdd3 => $bdd1 ) )),
+  inference(splitting,[],[f47,f54_D,f55_D])).
+fof(f55_1,plain,(
+  r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | ~$bdd1),
+  inference(cnf_transformation,[],[f55_D])).
+fof(f55_D,plain,(
+  r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) <=> $bdd1),
+  introduced(splitting_component_introduction,[])).
+fof(f54_1,plain,(
+  r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | ~$bdd3),
+  inference(cnf_transformation,[],[f54_D])).
+fof(f54_D,plain,(
+  r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) <=> $bdd3),
+  introduced(splitting_component_introduction,[])).
+fof(f47,plain,(
+  r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1)))),
+  inference(definition_unfolding,[],[f28,f38])).
+fof(f28,plain,(
+  r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1))),
+  inference(cnf_transformation,[],[f23])).
+fof(f89,plain,(
+  ( ! [X4,X2,X3] : (~r2_hidden(X2,k2_mtest1(X4,X3)) | r2_hidden(X2,X3) | r2_hidden(X2,X4)) )),
+  inference(resolution,[],[f39,f31])).
+fof(f31,plain,(
+  ( ! [X0,X1] : (k2_mtest1(X0,X1) = k2_mtest1(X1,X0)) )),
+  inference(cnf_transformation,[],[f2])).
+fof(f2,axiom,(
+  ! [X0,X1] : k2_mtest1(X0,X1) = k2_mtest1(X1,X0)),
+  file('xboole_0.p',unknown)).
+fof(f39,plain,(
+  ( ! [X2,X0,X3,X1] : (k2_mtest1(X0,X1) != X2 | r2_hidden(X3,X0) | ~r2_hidden(X3,X2) | r2_hidden(X3,X1)) )),
+  inference(cnf_transformation,[],[f27])).
+fof(f27,plain,(
+  ! [X0,X1,X2] : ((k2_mtest1(X0,X1) != X2 | ! [X3] : ((~r2_hidden(X3,X2) | r2_hidden(X3,X0) | r2_hidden(X3,X1)) & ((~r2_hidden(X3,X0) & ~r2_hidden(X3,X1)) | r2_hidden(X3,X2)))) & (((r2_hidden(sK0(X2,X1,X0),X2) | r2_hidden(sK0(X2,X1,X0),X0) | r2_hidden(sK0(X2,X1,X0),X1)) & (~r2_hidden(sK0(X2,X1,X0),X2) | (~r2_hidden(sK0(X2,X1,X0),X0) & ~r2_hidden(sK0(X2,X1,X0),X1)))) | k2_mtest1(X0,X1) = X2))),
+  inference(skolemisation,[status(esa)],[f26])).
+fof(f26,plain,(
+  ! [X0,X1,X2] : ((k2_mtest1(X0,X1) != X2 | ! [X3] : ((~r2_hidden(X3,X2) | r2_hidden(X3,X0) | r2_hidden(X3,X1)) & ((~r2_hidden(X3,X0) & ~r2_hidden(X3,X1)) | r2_hidden(X3,X2)))) & (? [X4] : ((r2_hidden(X4,X2) | r2_hidden(X4,X0) | r2_hidden(X4,X1)) & (~r2_hidden(X4,X2) | (~r2_hidden(X4,X0) & ~r2_hidden(X4,X1)))) | k2_mtest1(X0,X1) = X2))),
+  inference(rectify,[],[f25])).
+fof(f25,plain,(
+  ! [X0,X1,X2] : ((k2_mtest1(X0,X1) != X2 | ! [X3] : ((~r2_hidden(X3,X2) | r2_hidden(X3,X0) | r2_hidden(X3,X1)) & ((~r2_hidden(X3,X0) & ~r2_hidden(X3,X1)) | r2_hidden(X3,X2)))) & (? [X3] : ((r2_hidden(X3,X2) | r2_hidden(X3,X0) | r2_hidden(X3,X1)) & (~r2_hidden(X3,X2) | (~r2_hidden(X3,X0) & ~r2_hidden(X3,X1)))) | k2_mtest1(X0,X1) = X2))),
+  inference(flattening,[],[f24])).
+fof(f24,plain,(
+  ! [X0,X1,X2] : ((k2_mtest1(X0,X1) != X2 | ! [X3] : ((~r2_hidden(X3,X2) | (r2_hidden(X3,X0) | r2_hidden(X3,X1))) & ((~r2_hidden(X3,X0) & ~r2_hidden(X3,X1)) | r2_hidden(X3,X2)))) & (? [X3] : ((r2_hidden(X3,X2) | (r2_hidden(X3,X0) | r2_hidden(X3,X1))) & (~r2_hidden(X3,X2) | (~r2_hidden(X3,X0) & ~r2_hidden(X3,X1)))) | k2_mtest1(X0,X1) = X2))),
+  inference(nnf_transformation,[],[f19])).
+fof(f19,axiom,(
+  ! [X0,X1,X2] : (k2_mtest1(X0,X1) = X2 <=> ! [X3] : (r2_hidden(X3,X2) <=> (r2_hidden(X3,X0) | r2_hidden(X3,X1))))),
+  file('xboole_0.p',unknown)).
+fof(f106_1,plain,(
+  $false | ( ( $bdd3 => ( ( $bdd2 => ~$bdd1) & ( ~$bdd2 => $false ) )) & ( ~$bdd3 => $true ) )),
+  inference(resolution,[],[f99_1,f54_1])).
+fof(f99_1,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | ( ( $bdd2 => ~$bdd1) & ( ~$bdd2 => $false ) )),
+  inference(resolution,[],[f72,f50_2])).
+fof(f50_2,plain,(
+  ~r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | ( ( $bdd2 => ~$bdd1) & ( ~$bdd2 => $false ) )),
+  inference(merge,[],[f50_3,f50_1])).
+fof(f50_3,plain,(
+  ~r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | ~$bdd1),
+  inference(splitting,[],[f45,f51_D])).
+fof(f45,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | ~r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1)))),
+  inference(definition_unfolding,[],[f30,f38])).
+fof(f30,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | ~r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1))),
+  inference(cnf_transformation,[],[f23])).
+fof(f72,plain,(
+  ( ! [X4,X5,X3] : (r2_hidden(X3,k2_mtest1(X4,X5)) | ~r2_hidden(X3,X4)) )),
+  inference(forward_demodulation,[],[f67,f32])).
+fof(f32,plain,(
+  ( ! [X0] : (k2_mtest1(X0,X0) = X0) )),
+  inference(cnf_transformation,[],[f3])).
+fof(f3,axiom,(
+  ! [X0,X1] : k2_mtest1(X0,X0) = X0),
+  file('xboole_0.p',unknown)).
+fof(f67,plain,(
+  ( ! [X4,X5,X3] : (~r2_hidden(X3,X4) | r2_hidden(X3,k2_mtest1(k2_mtest1(X4,X5),k2_mtest1(X4,X5)))) )),
+  inference(resolution,[],[f40,f32])).
+fof(f40,plain,(
+  ( ! [X2,X0,X3,X1] : (k2_mtest1(X0,X1) != X2 | ~r2_hidden(X3,X0) | r2_hidden(X3,X2)) )),
+  inference(cnf_transformation,[],[f27])).
+fof(f87_1,plain,(
+  $false | ~$bdd1),
+  inference(resolution,[],[f73_1,f55_1])).
+fof(f73_1,plain,(
+  ~r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | ( ( $bdd2 => ~$bdd1) & ( ~$bdd2 => $false ) )),
+  inference(resolution,[],[f65,f50_2])).
+fof(f65,plain,(
+  ( ! [X4,X2,X3] : (r2_hidden(X2,k2_mtest1(X4,X3)) | ~r2_hidden(X2,X3)) )),
+  inference(resolution,[],[f40,f31])).
+fof(f62_1,plain,(
+  $false | ( ( $bdd3 => $true) & ( ~$bdd3 => ( ( $bdd2 => $true) & ( ~$bdd2 => $bdd1 ) ) ) )),
+  inference(resolution,[],[f53_1,f50_2])).
+fof(f56_1,plain,(
+  $false | ( ( $bdd3 => ~$bdd2) & ( ~$bdd3 => $true ) )),
+  inference(resolution,[],[f54_1,f52_1])).

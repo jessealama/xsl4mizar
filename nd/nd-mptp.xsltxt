@@ -1,0 +1,273 @@
+// nd.xsltxt : Transform mizar proofs into Gentzen-style natural deductions
+
+stylesheet "1.0";
+
+output method="xml" encoding="utf-8" indent="yes";
+
+include ../utils/die.xsl;
+
+//////////////////////////////////////////////////////////////////////
+/// Parameters
+//////////////////////////////////////////////////////////////////////
+
+// The directory relative to which we will look for .nd files
+#basedir = { ""; }
+
+tpl list (#separ, #elems) {
+ for-each [$elems] {
+  apply[.]; if [not(position()=last())] { copy-of $separ; } }
+}
+
+key "formulas" [/tstp/formula[@name]] `@name`;
+key "symbols" [/tstp/formula/source[descendant::non-logical-data[@name = "new_symbol"]]] `descendant::non-logical-data[@name = "new_symbol"]/non-logical-data/@name`;
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+// Sanity checks as templates
+//////////////////////////////////////////////////////////////////////
+
+tpl [formula[not(@name)]] mode="sanity-check" {
+  die (#message = "We requre that formula elements have names");
+}
+
+tpl [formula[not(@status)]] mode="sanity-check" {
+  die (#message = "We requre that formula elements have a status!");
+}
+
+tpl [formula[@status and not(@status = "plain"
+                             or @status = "assumption"
+                             or @status = "definition"
+                             or @status = "axiom"
+                             or @status = "theorem")]] mode="sanity-check" {
+  $status = `@status`;
+  $message = `concat ("We know how to deal only with the with formula elements whose status is one of these kinds: plain, assumption, definition, axiom, theorem.  The status of the current formula element is '", $status, "'")`;
+  die (#message = $message);
+}
+
+tpl [/] mode="sanity-check" {
+  apply [descendant::formula] mode="sanity-check";
+}
+
+tpl [/] {
+  // if [not(tstp)] {
+  //   die (#message = "The required tstp element is missing!");
+  // }
+  apply [.] mode="sanity-check";
+  apply [*];
+}
+
+tpl [tstp] {
+  if [not(formula)] {
+    die (#message = "We require that a tstp element have at least one formula child element!");
+  }
+  apply [formula[position() = last()]];
+}
+
+tpl [formula[@name and source/non-logical-data[@name = "file"]]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    <Rule {
+      @"name" = "axiom";
+    }
+  }
+}
+
+tpl [formula[@name and @status = "plain"]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    if [source/non-logical-data[@name = "file"]] {
+      <Rule { @"name" = "axiom"; }
+    } else {
+      <Rule { @"name" = "implication-elimination"; }
+      apply [source] mode="recurse";
+    }
+  }
+}
+
+tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name = "mizar_by"]]] {
+  $n = `@name`;
+  <Derivation {
+    @"name" = `$n`;
+    apply [*[1]]; // the actual formula
+    <Rule {
+      @"name" = "by/RAA";
+    }
+    // apply [source] mode="recurse";
+    $nd-path = `concat ($basedir, $n, ".nd")`;
+    for-each [document ($nd-path, /Derivation)] {
+      apply [.] mode="ivy";
+    }
+  }
+}
+
+tpl [formula[@name and @status = "assumption"]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    <Rule {
+      @"name" = "axiom";
+    }
+  }
+}
+
+tpl [formula[@name and @status = "definition"]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    <Rule {
+      @"name" = "definition";
+    }
+  }
+}
+
+tpl [formula[@name and @status = "axiom"]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    <Rule {
+      @"name" = "axiom";
+    }
+  }
+}
+
+tpl [formula[@name and @status = "theorem"]] {
+  <Derivation {
+    @"name" = `@name`;
+    apply [*[1]]; // the actual formula
+    if [following-sibling::formula[@status = "theorem"]] {
+      <Rule { @"name" = "axiom"; }
+    } else {
+      <Rule { @"name" = "implication-elimination"; }
+      apply [source] mode="recurse";
+    }
+  }
+}
+
+tpl [source] mode="recurse" {
+  for-each [non-logical-data/non-logical-data[position() = last()]/non-logical-data[@name]] {
+    $premise-name = `@name`;
+    $premise = `key ("formulas", $premise-name)`;
+    if [$premise] {
+      apply [$premise];
+    } else {
+      <Derivation {
+        @"name" = $premise-name;
+        <Rule {
+          @"name" = "axiom";
+        }
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+/// Dealing with derivations derived from IVY proofs
+//////////////////////////////////////////////////////////////////////
+
+tpl [*] mode="ivy" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] mode="ivy";
+  }
+}
+
+tpl [*] (#variables) mode="generalize-with-variables" {
+  if [$variables] {
+    <quantifier {
+      @type = "universal";
+      for-each [$variables] {
+        apply [.];
+      }
+      apply [.];
+    }
+  } else {
+    apply [.];
+  }
+}
+
+tpl [*] (#derivation-name) mode="generalize" {
+  $n = `local-name (.)`;
+  $message = `concat ("Don't know how to generalize ", $n, " elements")`;
+  die (#message = $message);
+}
+
+tpl [defined-predicate] (#derivation-name) mode="generalize" {
+  // nothing to do
+  apply [.];
+}
+
+tpl [predicate[@name]] (#derivation-name, #derivation-id) mode="generalize" {
+  $context = `.`;
+  $variables = `descendant::variable[@name and not(@name = (preceding::variable[@name and ancestor::Derivation[@name = $derivation-name and @id = $derivation-id]] | preceding-sibling::variable[@name and ancestor::Derivation[@name = $derivation-name and @id = $derivation-id]])/@name)]`;
+  apply [.] (#variables = $variables) mode="generalize-with-variables";
+}
+
+tpl [negation] (#derivation-name, #derivation-id) mode="generalize" {
+  $context = `.`;
+  apply [.] (#variables = `descendant::variable[@name and not(@name = preceding::variable[@name and ancestor::negation = $context]/@name)]`) mode="generalize-with-variables";
+}
+
+tpl [disjunction] (#derivation-name, #derivation-id) mode="generalize" {
+  $context = `.`;
+  apply [.] (#variables = `descendant::variable[@name and not(@name = preceding::variable[@name and ancestor::disjunction = $context]/@name)]`) mode="generalize-with-variables";
+}
+
+// An approach that recurses over variables, recording which ones have
+// been treated.
+
+// tpl [*] (#variables, #treated) mode="generalize-with-variables" {
+//   if [$variables] {
+//     $variable = `$variables[1]`;
+//     $variable-name = `$variable/@name`;
+//     $token = `concat (",", $variable-name)`;
+//     if [contains ($treated, $token)] {
+//       apply [.] (#treated = $treated,
+//                  #variables = `$variables[position() > 1]`)
+//         mode="generalize-with-variables";
+//     } else {
+//       <quantifier {
+//         @type = "universal";
+//         apply [$variable];
+//         apply [.] (#treated = `concat ($token, $treated)`,
+//                    #variables = `$variables[position() > 1]`)
+//           mode="generalize-with-variables";
+//       }
+//     }
+//   } else {
+//     apply [.];
+//   }
+// }
+
+// tpl [*] mode="generalize" {
+//   if [descendant::variable] {
+//     apply [.] (#variables = `descendant::variable`,
+//                #treated = "") mode="generalize-with-variables";
+//   } else {
+//     apply [.];
+//   }
+// }
+
+// universally generalize any formula appearing coming from an IVY
+// derivation
+tpl [Derivation[@name and @id]] mode="ivy" {
+  $formula = `*[1]`;
+  <Derivation {
+    for-each [@*] { copy-of `.`; }
+    apply [$formula] (#derivation-name = `@name`,
+                      #derivation-id = `@id`) mode="generalize";
+    apply [Rule];
+    for-each [Derivation] {
+      apply [.] mode="ivy";
+    }
+  }
+}
