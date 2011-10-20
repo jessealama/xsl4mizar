@@ -283,7 +283,7 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
     @kind = "Definition-Item";
     <Block {
       @kind = "Definitional-Block";
-      for-each [preceding-sibling::Item[@kind = "Loci-Declaration" or @kind = "Assumption" or @kind = "Existential-Assumption" or @kind = "Constant-Definition" or @kind = "Regular-Statement"]] {
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration" or @kind = "Assumption" or @kind = "Existential-Assumption" or @kind = "Constant-Definition" or @kind = "Regular-Statement" or @kind = "Choice-Statement"]] {
         apply [.];
       }
       <Item {
