@@ -21,7 +21,8 @@ tpl count-preceding-toplevel-items {
                                                        or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
                                                                                                           and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
                                                        or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
-                                                                                                          and @kind = "Type-Changing-Statement"]/Variable/@idnr])))])`;
+                                                                                                          and @kind = "Type-Changing-Statement"]/Variable/@idnr]
+                                                       or descendant::Private-Predicate-Formula)))])`;
 }
 
 // Sanity checks
@@ -100,7 +101,8 @@ tpl [Text-Proper] {
                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
                                                                                          and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
-                                                                                         and @kind = "Type-Changing-Statement"]/Variable/@idnr])
+                                                                                         and @kind = "Type-Changing-Statement"]/Variable/@idnr
+                                      or descendant::Private-Predicate-Formula])
                   or @kind = "Type-Changing-Statement")]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
@@ -124,8 +126,20 @@ tpl needed-toplevel-items (#candidates, #context) {
   }
 }
 
-// tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and @shape = "Diffuse-Statement") and not(@kind = "Regular-Statement" and @shape = "Iterative-Equality")and not(@kind = "Private-Predicate-Definition") and not(@kind = "Private-Functor-Definition") and not(@kind = "Constant-Definition") and not(@kind = "Regular-Statement" and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) and not(@kind = "Choice-Statement") and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
-tpl [Text-Proper/Item] (#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation")
+                      and not(@kind = "Regular-Statement" and @shape = "Diffuse-Statement")
+                      and not(@kind = "Regular-Statement" and @shape = "Iterative-Equality")
+                      and not(@kind = "Private-Predicate-Definition")
+                      and not(@kind = "Private-Functor-Definition")
+                      and not(@kind = "Constant-Definition")
+                      and not(@kind = "Regular-Statement"
+                              and @shape = "Compact-Statement"
+                              and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr
+                                              or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
+                                              or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr
+                                              or descendant::Private-Predicate-Formula])
+                      and not(@kind = "Choice-Statement")
+                      and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
   <Item-Bundle {
 
    @bundlenr = $bundlenr;
@@ -152,7 +166,8 @@ tpl [Text-Proper/Item] (#bundlenr, #articleid) {
                                         and @shape = "Compact-Statement"
                                         and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr
                                                         or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
-                                                        or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])
+                                                        or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr
+                                                        or descendant::Private-Predicate-Formula])
                                     or @kind = "Type-Changing-Statement"]`,
                              #context = $context);
       copy {
