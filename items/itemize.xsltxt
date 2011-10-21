@@ -16,9 +16,12 @@ tpl count-preceding-toplevel-items {
                                or @kind = "Identify"
                                or (@kind = "Regular-Statement"
                                    and @shape = "Compact-Statement"
-                                   and not(Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr
-                                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
-                                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])))])`;
+                                   and not(Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                       and @kind = "Constant-Definition"]/Variable/@idnr
+                                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                          and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
+                                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                          and @kind = "Type-Changing-Statement"]/Variable/@idnr])))])`;
 }
 
 // Sanity checks
