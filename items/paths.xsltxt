@@ -94,6 +94,13 @@ tpl toplevel-items-in-which-item-occurs (#item, #items, #val) {
                                                    #items = $remaining-items,
                                                    #val = $new-val);
             }
+            when [$item[self::Item[@kind = "Private-Functor-Definition"] and $first-toplevel-item//Private-Functor-Term[@idnr = $idnr]]] {
+              // $message = `concat ("The private functor definition with idnr ", $idnr, " is used by a toplevel item")`;
+              // msg $message;
+              toplevel-items-in-which-item-occurs (#item = $item,
+                                                   #items = $remaining-items,
+                                                   #val = $new-val);
+            }
             when [$first-toplevel-item//Implicitly-Qualified-Segment/Variable[@idnr = $idnr]] {
               toplevel-items-in-which-item-occurs (#item = $item,
                                                    #items = $remaining-items,
@@ -456,17 +463,46 @@ tpl exists-path-from-toplevel-item-to-context (#item, #context, #later-toplevel-
       "1";
     }
     when [$kind = "Private-Functor-Definition"] {
-      if [$context//Private-Functor-Term[@idnr = $idnr]] {
-        "1";
-      } else {
-        "0";
+
+      $later-needed = needed-items-sublist (#context = $context,
+                                            #list = $all-later-toplevel-items);
+      $later-users = toplevel-items-in-which-item-occurs (#item = $item,
+                                                          #items = $all-later-toplevel-items);
+      $path = exists-path-from-some-toplevel-item-to-context (#items = $later-users,
+                                                              #context = $context,
+                                                              #later-items = $all-later-toplevel-items);
+      choose {
+        when [$path = "1"] {
+          "1";
+        }
+        when [$context//Private-Functor-Term[@idnr = $idnr]] {
+          "1";
+        }
+        otherwise {
+          // $message = `concat ("The private functor definition with idnr ", $idnr, " is not used by a later needed item, and doesn't occur directly in the context item")`;
+          // msg $message;
+          "0";
+        }
       }
     }
     when [$kind = "Private-Predicate-Definition"] {
-      if [$context//Private-Predicate-Formula[@idnr = $idnr]] {
-        "1";
-      } else {
-        "0";
+      $later-needed = needed-items-sublist (#context = $context,
+                                            #list = $all-later-toplevel-items);
+      $later-users = toplevel-items-in-which-item-occurs (#item = $item,
+                                                          #items = $all-later-toplevel-items);
+      $path = exists-path-from-some-toplevel-item-to-context (#items = $later-users,
+                                                              #context = $context,
+                                                              #later-items = $all-later-toplevel-items);
+      choose {
+        when [$path = "1"] {
+          "1";
+        }
+        when [$context//Private-Predicate-Formula[@idnr = $idnr]] {
+          "1";
+        }
+        otherwise {
+          "0";
+        }
       }
     }
     when [contains ($free-variables-of-context, $token)] {
