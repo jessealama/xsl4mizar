@@ -114,6 +114,7 @@ function run_prover_with_timeout() {
 
     timeout $prover_timeout $prover_script $theory > $proof;
 
+    # Mac OS X timeout is weird
     if [ $? -eq "124" ]; then
 	echo; # because the previous call to echo used -n
 	echo "Unable to find an initial proof in less than $prover_timeout; unable to proceed.";
