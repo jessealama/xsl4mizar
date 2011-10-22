@@ -92,6 +92,22 @@ function ensure_file_exists_and_is_readable() {
 }
 
 function run_prover_with_timeout() {
+
+    if [ -z $1 ]; then
+	echo "Error: a proof script is needed, but none was supplied";
+	return 1;
+    fi
+
+    if [ -z $2 ]; then
+	echo "Error: a theory file is needed, but none was supplied";
+	return 1;
+    fi
+
+    if [ -z $3 ]; then
+	echo "Error: a target proof file must be supplied";
+	return 1;
+    fi
+
     local prover_script=$1;
     local theory=$2;
     local proof=$3;
