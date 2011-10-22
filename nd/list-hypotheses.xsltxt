@@ -1,0 +1,276 @@
+// list-hypotheses.xsl : Extract the hypotheses of a "by" step
+
+stylesheet "1.0";
+
+output method="text" encoding="utf-8" indent="yes";
+
+include ../utils/die.xsl;
+
+//////////////////////////////////////////////////////////////////////
+/// Parameters
+//////////////////////////////////////////////////////////////////////
+
+// The formula whose assumptions we should extract
+#formula = { ""; }
+
+//////////////////////////////////////////////////////////////////////
+/// Keys
+//////////////////////////////////////////////////////////////////////
+
+key "formulas" [/tstp/formula[@name]] `@name`;
+
+//////////////////////////////////////////////////////////////////////
+/// Utilities
+//////////////////////////////////////////////////////////////////////
+
+tpl list (#separ, #elems) {
+ for-each [$elems] {
+  apply[.]; if [not(position()=last())] { copy-of $separ; } }
+}
+
+// Do nothing by default
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl [*] mode="sanity-check" {
+  // nothing
+}
+
+tpl [formula] mode="sanity-check" {
+  // nothing
+}
+
+tpl [formula[not(@status)]] mode="sanity-check" {
+  die (#message = "We require that formula elements have a status!");
+}
+
+tpl [formula[not(@syntax)]] mode="sanity-check" {
+  die (#message = "We require that every formula have a syntax attribute!");
+}
+
+tpl [formula[@syntax and not(@syntax = "formula")]] mode="sanity-check" {
+  $syntax = `@syntax`;
+  $message = `concat ("We are unable to deal with formulas whose syntax attribute is '", $syntax, "'")`;
+  die (#message = $message);
+}
+
+tpl [variable] mode="sanity-check" {
+  // nothing
+}
+
+tpl [variable[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that variables have a name attribute!");
+}
+
+tpl [defined-predicate] mode="sanity-check" {
+  // nothing
+}
+
+tpl [defined-predicate[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a defined-predicate element have a name attribute!");
+}
+
+tpl [defined-predicate[@name and not(@name = "true") and not(@name = "false")]] mode="sanity-check" {
+  $n = `@name`;
+  $message = `concat ("We don't know how to deal with a defined predicate whose name is not 'true' (the name is '", $n, "'")`;
+  die (#message = $message);
+}
+
+tpl [predicate] mode="sanity-check" {
+  // nothing
+}
+
+tpl [predicate[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a variable have a name attribute!");
+}
+
+tpl [function] mode="sanity-check" {
+  // nothing
+}
+
+tpl [function[not(@name)]] mode="sanity-check" {
+  die (#message = "We require that a function have a name attribute!");
+}
+
+tpl [quantifier] mode="sanity-check" {
+  // nothing
+}
+
+tpl [quantifier[not(@type)]] mode="sanity-check" {
+  die (#message = "Quantifiers must have a type attribute, but we found one that lacks this attribute!");
+}
+
+tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] mode="sanity-check" {
+  die (#message = "We assume that quantifiers are either universal or existential!");
+}
+
+tpl [quantifer[not(child::variable)]] mode="sanity-check" {
+  die (#message = "We require that quantifiers have at least one variable child!");
+}
+
+tpl [quantifier[not(child::*[2])]] mode="sanity-check" {
+  die (#message = "We require that quantifiers have at least two child elements!");
+}
+
+tpl [/] mode="sanity-check" {
+  apply [descendant::formula] mode="sanity-check";
+  apply [descendant::variable] mode="sanity-check";
+  apply [descendant::predicate] mode="sanity-check";
+  apply [descendant::defined-predicate] mode="sanity-check";
+}
+
+tpl [/] {
+  if [not(tstp)] {
+    die (#message = "The required tstp element is missing!");
+  }
+  apply [.] mode="sanity-check";
+  apply [*];
+}
+
+tpl [tstp] {
+  if [not(formula)] {
+    die (#message = "We require that a tstp element have at least one formula child element!");
+  }
+  if [$formula = ""] {
+    die (#message = "Error: the formula paramter (the key into the TPTP problem that we will use to make the ATP problem) is missing.");
+  }
+  if [not(formula/@name = $formula)] {
+    $message = `concat ("There are no formulas in the supplied TPTP problem whose name is '", $formula, "'")`;
+    die (#message = $message);
+  }
+  apply [formula[@name = $formula]] mode="conjecturize";
+}
+
+tpl [formula[@name]] mode="conjecturize" {
+  "fof("; `@name`; ","; "conjecture"; ","; apply [*[1]]; ")"; "."; "\n";
+  for-each [source/non-logical-data[@name = "inference" and non-logical-data[@name = "mizar_by" or @name = "mizar_from"]]/non-logical-data[position() = last()]/non-logical-data[@name and not(@name = following-sibling::non-logical-data/@name)]] {
+    $n = `@name`;
+    $assumption-formula = `key ("formulas", $n)`;
+    if [not($assumption-formula)] {
+      $message = `concat ("In the current TPTP problem we were unable to look up the formula whose name is '", $n, "'")`;
+      die (#message = $message);
+    }
+    apply [$assumption-formula]; "\n";
+  }
+}
+
+tpl [formula[@name and @status and @syntax = "formula"]] {
+  // We will emit only the name, status, and content of the formula.
+  // Source and useful-info fields, if present, will be ignored.
+  "fof("; `@name`; ","; `@status`; ","; apply [*[1]]; ").";
+}
+
+// variables
+
+tpl [variable[@name]] {
+  `@name`;
+}
+
+// formula shapes
+
+tpl [predicate[@name = "=" and not(child::*[2])]] {
+  die (#message = "We require that an equality predicate element have at least two children!");
+}
+
+tpl [predicate[@name = "=" and child::*[3]]] {
+  die (#message = "We require that an equality predicate element have fewer than three children!");
+}
+
+tpl [predicate[@name = "="]] {
+  "("; apply [*[1]]; " = "; apply [*[2]]; ")";
+}
+
+tpl [predicate[@name and not(@name = "=") and not(*)]] {
+  `@name`;
+}
+
+tpl [predicate[@name and not(@name = "=") and *]] {
+  `@name`; "("; list (#separ = ", ", #elems = `*`); ")";
+}
+
+tpl [function[@name and not(*)]] {
+  `@name`;
+}
+
+tpl [function[@name and *]] {
+  `@name`; "("; list (#separ = ", ", #elems = `*`); ")";
+}
+
+tpl [*[not(child::*[2])]] mode="binary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent binary connectives, but we have found such an element that lacks two children")`;
+  die (#message = $message);
+}
+
+tpl [*[child::*[3]]] mode="binary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent binary connectives, but we have found such an element that has more than two children")`;
+  die (#message = $message);
+}
+
+tpl [*] (#connective) mode="binary-connective" {
+  "("; apply [*[1]]; " "; `$connective`; " "; apply [*[2]]; ")";
+}
+
+tpl [implication] {
+  apply [.] (#connective = "=>") mode="binary-connective";
+}
+
+tpl [equivalence] {
+  apply [.] (#connective = "<=>") mode="binary-connective";
+}
+
+tpl [disjunction] {
+  apply [.] (#connective = "|") mode="binary-connective";
+}
+
+tpl [conjunction] {
+  apply [.] (#connective = "&") mode="binary-connective";
+}
+
+// unary connectives
+
+tpl [*[not(child::*)]] mode="unary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent unary connectives, but we have found such an element that lacks a child!")`;
+  die (#message = $message);
+}
+
+tpl [*[child::*[3]]] mode="unary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent unary connectives, but we have found such an element that has more than one child")`;
+  die (#message = $message);
+}
+
+tpl [*] (#connective) mode="unary-connective" {
+  `$connective`; " "; apply [*[1]];
+}
+
+tpl [negation] {
+  apply [.] (#connective = "~") mode="unary-connective";
+}
+
+// quantifiers
+
+tpl [quantifier[@type = "universal"]] {
+ "( ! ["; list (#separ = ",", #elems = `variable`); "] : "; apply [*[position() = last()]]; ")";
+}
+
+tpl [quantifier[@type = "existential"]] {
+ "( ? ["; list (#separ = ",", #elems = `variable`); "] : "; apply [*[position() = last()]]; ")";
+}
+
+// defined predicates
+
+tpl [defined-predicate[@name = "true"]] {
+  "$true";
+}
+
+tpl [defined-predicate[@name = "false"]] {
+  "$false";
+}
