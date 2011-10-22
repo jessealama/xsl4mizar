@@ -86,12 +86,12 @@ tpl [formula[@name and @status = "plain"]] {
   }
 }
 
-tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name = "mizar_by"]]] {
+tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name = "mizar_by" or @name = "mizar_from"]]] {
   <Derivation {
     @"name" = `@name`;
     apply [*[1]]; // the actual formula
     <Rule {
-      @"name" = "by";
+      @"name" = "by/from";
     }
     apply [source] mode="recurse";
   }
