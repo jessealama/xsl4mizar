@@ -132,6 +132,108 @@ function run_prover_with_timeout() {
 #
 # $4: the name of the subdirectory of $work_directory where we will
 #     save our output
+function keep_proving() {
+
+    local prover_script=$1;
+    local used_principles_script=$2;
+    local unused_principles_script=$3;
+    local prover_name=$4;
+
+    local prover_directory=$work_directory/$prover_name;
+    mkdir -p $prover_directory;
+
+    local theory_basename=`basename $theory`;
+    local theory=$theory;
+
+    local proof_attempt=1;
+
+    local proof="$prover_directory/$theory_basename.1.proof";
+    local used_principles="$prover_directory/$theory_basename.1.proof.used-principles";
+    local unused_principles="$prover_directory/$theory_basename.1.proof.unused-principles";
+    local trimmed_theory="$prover_directory/$theory_basename.1.trimmed";
+
+    # do the initial proof
+    run_prover_with_timeout $prover_script $theory $proof;
+
+    # if this didn't work, then don't go any further
+    if [ $? -ne "0" ]; then
+	echo "Error: the initial run of the proof script";
+	echo;
+	echo "  $prover_script";
+	echo;
+	echo "did not exit cleanly when applied to";
+	echo;
+	echo "  $theory";
+	echo;
+	echo "so we cannot continue.";
+	return 1;
+    fi
+
+    # compute used and unused principles, and trim the theory
+    $used_principles_script $proof $theory > $used_principles;
+    $unused_principles_script $proof $theory > $unused_principles;
+
+    for principle in `cat $used_principles`; do
+	tptp4X -umachine $theory | grep "fof($principle," >> $trimmed_theory;
+    done
+
+    ## Sanity check: the theory that we just emitted is a sensible TPTP theory
+    ensure_sensible_tptp_theory $trimmed_theory;
+
+    while [ -s $unused_principles -a $proof_attempt -lt "5" ]; do
+
+	theory=$trimmed_theory;
+	proof_attempt=`expr $proof_attempt + 1`;
+	proof="$prover_directory/$theory_basename.$proof_attempt.proof";
+
+	run_prover_with_timeout $prover_script $theory $proof;
+
+        # if this didn't work, then don't go any further
+	if [ $? -ne "0" ]; then
+	    echo "Error: run number $proof_attempt of the proof script";
+	    echo;
+	    echo "  $prover_script";
+	    echo;
+	    echo "did not exit cleanly when applied to";
+	    echo;
+	    echo "  $theory";
+	    echo;
+	    echo "so we cannot continue.";
+	    return 1;
+	fi
+
+	used_principles="$prover_directory/$theory_basename.$proof_attempt.proof.used-principles";
+	unused_principles="$prover_directory/$theory_basename.$proof_attempt.proof.unused-principles";
+
+	$used_principles_script $proof $trimmed_theory > $used_principles;
+	$unused_principles_script $proof $trimmed_theory > $unused_principles;
+
+	trimmed_theory="$prover_directory/$theory_basename.$proof_attempt.trimmed";
+
+	for principle in `cat $used_principles`; do
+	    tptp4X -umachine $theory | grep "fof($principle," >> $trimmed_theory;
+	done
+
+        ## Sanity check: the theory that we just emitted is a sensible TPTP theory
+	ensure_sensible_tptp_theory $trimmed_theory;
+
+    done
+
+    echo "We needed $proof_attempt iteration(s) before finding the minimal set of principles";
+
+    return;
+}
+
+# $1: the script to be executed (under a timeout)
+#
+# $2: the script that will tell us what principles were used in the
+#     proof
+#
+# $3: the script that will tell us what principles were *not* used in
+# the proof
+#
+# $4: the name of the subdirectory of $work_directory where we will
+#     save our output
 function reprove() {
 
     local prover_script=$1;
@@ -223,8 +325,8 @@ fi
 mkdir -p $work_directory;
 cp $theory $work_directory;
 
-reprove $run_eprover_script $eprover_used_principles_script $eprover_unused_principles_script "eprover";
-reprove $run_vampire_script $vampire_used_principles_script $vampire_unused_principles_script "vampire";
-reprove $run_prover9_script $prover9_used_principles_script $prover9_unused_principles_script "prover9";
+keep_proving $run_eprover_script $eprover_used_principles_script $eprover_unused_principles_script "eprover";
+keep_proving $run_vampire_script $vampire_used_principles_script $vampire_unused_principles_script "vampire";
+keep_proving $run_prover9_script $prover9_used_principles_script $prover9_unused_principles_script "prover9";
 
 exit 0;
