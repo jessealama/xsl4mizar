@@ -461,10 +461,10 @@ tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-d
   apply [.] mode="open-assumptions";
 }
 
-tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "mizar_by"]]]] {
+tpl [source[child::non-logical-data[@name = "inference" and child::non-logical-data[@name = "mizar_by" or @name = "mizar_from"]]]] {
   <span {
     @class = "keyword";
-    "by";
+    "by/from";
   }
   <br;
   <br;
