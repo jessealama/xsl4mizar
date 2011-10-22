@@ -8,7 +8,21 @@ include paths.xsl;
 include resolve-references.xsl;
 
 tpl count-preceding-toplevel-items {
-  `count (preceding::Item[parent::Text-Proper and  (@kind = "Canceled-Pragma" or @kind = "Theorem-Item" or @kind = "Definition-Item" or @kind = "Scheme-Block-Item" or @kind = "Identify" or (@kind = "Regular-Statement" and not(@shape = "Diffuse-Statement") and not(child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])))])`;
+  `count (preceding::Item[parent::Text-Proper
+                          and (@kind = "Canceled-Pragma"
+                               or @kind = "Theorem-Item"
+                               or @kind = "Definition-Item"
+                               or @kind = "Scheme-Block-Item"
+                               or @kind = "Identify"
+                               or (@kind = "Regular-Statement"
+                                   and @shape = "Compact-Statement"
+                                   and not(Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                       and @kind = "Constant-Definition"]/Variable/@idnr
+                                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                          and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
+                                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                          and @kind = "Type-Changing-Statement"]/Variable/@idnr]
+                                                       or descendant::Private-Predicate-Formula)))])`;
 }
 
 // Sanity checks
@@ -68,7 +82,28 @@ tpl [Item[@kind = "Pragma"]] {
 
 tpl [Text-Proper] {
   <Items {
-    enumerate-items (#candidates = `Item[not(@kind = "Section-Pragma" or @kind = "Pragma" or @kind = "Reservation" or @kind = "Choice-Statement" or @kind = "Private-Predicate-Definition" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement")]`,
+    enumerate-items (#candidates
+      = `Item[not(@kind = "Section-Pragma"
+                  or @kind = "Pragma"
+                  or @kind = "Reservation"
+                  or @kind = "Choice-Statement"
+                  or @kind = "Private-Predicate-Definition"
+                  or @kind = "Private-Functor-Definition"
+                  or (@kind = "Regular-Statement"
+                      and @shape = "Diffuse-Statement")
+                  or (@kind = "Regular-Statement"
+                      and @shape = "Iterative-Equality")
+                  or @kind = "Constant-Definition"
+                  or (@kind = "Regular-Statement"
+                      and @shape = "Compact-Statement"
+                      and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                      and @kind = "Constant-Definition"]/Variable/@idnr
+                                      or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                         and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
+                                      or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                         and @kind = "Type-Changing-Statement"]/Variable/@idnr
+                                      or descendant::Private-Predicate-Formula])
+                  or @kind = "Type-Changing-Statement")]`,
                      #bundlenr = "1",
                      #articleid = `@articleid`);
   }
@@ -91,7 +126,20 @@ tpl needed-toplevel-items (#candidates, #context) {
   }
 }
 
-tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statement" and @shape = "Diffuse-Statement") and not(@kind = "Private-Predicate-Definition") and not(@kind = "Constant-Definition") and not(@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) and not(@kind = "Choice-Statement") and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
+tpl [Text-Proper/Item[not(@kind = "Reservation")
+                      and not(@kind = "Regular-Statement" and @shape = "Diffuse-Statement")
+                      and not(@kind = "Regular-Statement" and @shape = "Iterative-Equality")
+                      and not(@kind = "Private-Predicate-Definition")
+                      and not(@kind = "Private-Functor-Definition")
+                      and not(@kind = "Constant-Definition")
+                      and not(@kind = "Regular-Statement"
+                              and @shape = "Compact-Statement"
+                              and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr
+                                              or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
+                                              or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr
+                                              or descendant::Private-Predicate-Formula])
+                      and not(@kind = "Choice-Statement")
+                      and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
   <Item-Bundle {
 
    @bundlenr = $bundlenr;
@@ -104,11 +152,28 @@ tpl [Text-Proper/Item[not(@kind = "Reservation") and not(@kind = "Regular-Statem
 
     <Text-Proper {
       <Item { @kind = "Section-Pragma"; }
-      needed-toplevel-items (#candidates = `preceding-sibling::Item[(@kind="Reservation" and not(child::Variables/Variable/@idnr = $context/Block[@kind = "Definitional-Block"]/Item[@kind = "Loci-Declaration"]/Explicitly-Qualified-Segment/Variables/Variable/@idnr)) or @kind = "Private-Predicate-Definition" or @kind = "Choice-Statement" or (@kind = "Regular-Statement" and @shape = "Diffuse-Statement") or @kind = "Constant-Definition" or (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr]) or @kind = "Type-Changing-Statement"]`, #context = $context);
+      needed-toplevel-items (#candidates
+        = `preceding-sibling::Item[(@kind="Reservation" and not(Variables/Variable/@idnr = $context/Block[@kind = "Definitional-Block"]/Item[@kind = "Loci-Declaration"]/Explicitly-Qualified-Segment/Variables/Variable/@idnr))
+                                    or @kind = "Private-Predicate-Definition"
+                                    or @kind = "Private-Functor-Definition"
+                                    or @kind = "Choice-Statement"
+                                    or (@kind = "Regular-Statement"
+                                        and @shape = "Diffuse-Statement")
+                                    or (@kind = "Regular-Statement"
+                                        and @shape = "Iterative-Equality")
+                                    or @kind = "Constant-Definition"
+                                    or (@kind = "Regular-Statement"
+                                        and @shape = "Compact-Statement"
+                                        and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr
+                                                        or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
+                                                        or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr
+                                                        or descendant::Private-Predicate-Formula])
+                                    or @kind = "Type-Changing-Statement"]`,
+                             #context = $context);
       copy {
         for-each [@*] { copy-of `.`; }
         // possibly promote toplevel Regular-Statement items to theorems
-        if [@kind = "Regular-Statement" and @shape = "Compact-Statement"] {
+        if [@kind = "Regular-Statement" and not(@shape = "Diffuse-Statement") and not(@shape = "Iterative-Equality")] {
           @kind = "Theorem-Item";
         } else {
           @kind = `@kind`;
@@ -133,14 +198,28 @@ tpl [Text-Proper/*/Straightforward-Justification/Link] {
 tpl [Block[@kind = "Definitional-Block"]] {
   <Block {
     for-each [@*] { copy-of `.`; }
-    apply [Item[@kind = "Functor-Definition" or @kind = "Predicate-Definition" or @kind = "Attribute-Definition" or @kind = "Mode-Definition" or @kind = "Structure-Definition"]];
-    apply [Item[@kind = "Correctness" or @kind = "Correctness-Condition" or @kind = "Property"]];
+    apply [Item[@kind = "Functor-Definition"
+                or @kind = "Predicate-Definition"
+                or @kind = "Attribute-Definition"
+                or @kind = "Mode-Definition"
+                or @kind = "Structure-Definition"]];
+    apply [Item[@kind = "Correctness"
+                or @kind = "Correctness-Condition"
+                or @kind = "Property"]];
   }
 }
 
-tpl [Item[@kind = "Functor-Definition" or @kind = "Predicate-Definition" or @kind = "Attribute-Definition" or @kind = "Mode-Definition" or @kind = "Structure-Definition"]] {
+tpl [Item[@kind = "Functor-Definition"
+          or @kind = "Predicate-Definition"
+          or @kind = "Attribute-Definition"
+          or @kind = "Mode-Definition"
+          or @kind = "Structure-Definition"]] {
   needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`, #context = `*`);
-  apply [preceding-sibling::Item[@kind = "Assumption" or @kind = "Existential-Assumption" or @kind = "Regular-Statement" or @kind = "Constant-Definition"]];
+  apply [preceding-sibling::Item[@kind = "Assumption"
+                                 or @kind = "Existential-Assumption"
+                                 or @kind = "Regular-Statement"
+                                 or @kind = "Constant-Definition"
+                                 or @kind = "Choice-Statement"]];
   <Item {
     for-each [@*] { copy-of `.`; }
     apply [*];
@@ -158,12 +237,14 @@ tpl [Block[@kind = "Registration-Block"]] {
         apply [Item[@kind = "Identify"]];
       }
     }
-    apply [Item[@kind = "Correctness" or @kind = "Correctness-Condition"]];
+    apply [Item[@kind = "Correctness"
+                or @kind = "Correctness-Condition"]];
   }
 }
 
 tpl [Item[@kind = "Cluster"]] {
-  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`, #context = `.`);
+  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`,
+                         #context = `.`);
   <Item {
     for-each [@*] { copy-of `.`; }
     apply [*];
@@ -171,7 +252,8 @@ tpl [Item[@kind = "Cluster"]] {
 }
 
 tpl [Item[@kind = "Identify"]] {
-  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`, #context = `.`);
+  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`,
+                         #context = `.`);
   <Item {
     for-each [@*] { copy-of `.`; }
     apply [*];

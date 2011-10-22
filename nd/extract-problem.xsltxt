@@ -1,0 +1,69 @@
+// extract-problem.xsltxt : Extract a specified TSTP problem from a problems file
+
+stylesheet "1.0";
+
+output method="xml" encoding="utf-8" indent="yes";
+
+//////////////////////////////////////////////////////////////////////
+/// Parameters
+//////////////////////////////////////////////////////////////////////
+
+#problem = { ""; }
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+// Sanity checks as templates
+//////////////////////////////////////////////////////////////////////
+
+tpl [formula[not(@name)]] mode="sanity-check" {
+  msg terminate="yes" "We requre that formula elements have names";
+}
+
+tpl [formula[not(@status)]] mode="sanity-check" {
+  msg terminate="yes" "We requre that formula elements have a status!";
+}
+
+tpl [formula[@status and not(@status = "plain"
+                             or @status = "assumption"
+                             or @status = "definition"
+                             or @status = "axiom"
+                             or @status = "theorem")]] mode="sanity-check" {
+  $status = `@status`;
+  $message = `concat ("We know how to deal only with the with formula elements whose status is one of these kinds: plain, assumption, definition, axiom, theorem.  The status of the current formula element is '", $status, "'")`;
+  msg terminate="yes" $message;
+}
+
+tpl [/] mode="sanity-check" {
+  apply [descendant::formula] mode="sanity-check";
+}
+
+tpl [/] {
+  if [not(Problems)] {
+    msg terminate="yes" "The required Problems element is missing!";
+  }
+  apply [Problems];
+}
+
+tpl [Problems] {
+  if [not(tstp)] {
+    msg terminate="yes" "We require that a Problems element have at least one tstp child element!";
+  }
+  if [$problem = ""] {
+    msg terminate="yes" "Error: a non-empty value for the problem parameter must be supplied";
+  }
+  $num-problems = `count (tstp)`;
+  if [1 <= $problem and $problem <= $num-problems] {
+    apply [tstp[position() = $problem]];
+  } else {
+    $message = `concat ("There is/are ", $num-problems, " problem(s) in the supplied Problems document; we cannot access problem number ", $problem)`;
+    msg terminate="yes" $message;
+  }
+
+}

@@ -1,0 +1,23 @@
+// deriviation-id.xsltxt : Generate unique ids for deriviations
+
+stylesheet "1.0";
+
+output method="xml" encoding="utf-8" indent="yes";
+
+include ../utils/die.xsl;
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl [Derivation] {
+  <Derivation {
+    for-each [@*] { copy-of `.`; }
+    @"id" = `count (ancestor::Derivation | preceding-sibling::Derivation | preceding::Derivation)`;
+    apply [*];
+  }
+}

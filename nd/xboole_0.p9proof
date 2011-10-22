@@ -1,0 +1,417 @@
+============================== Prover9 ===============================
+Prover9 (64) version 2009-11A, November 2009.
+Process 21233 was started by alama on n138138.science.ru.nl,
+Tue Oct 18 14:37:59 2011
+The command was "prover9".
+============================== end of head ===========================
+
+============================== INPUT =================================
+set(prolog_style_variables).
+
+formulas(assumptions).
+(all A all B k2_mtest1(A,B) = k2_mtest1(B,A)) # label(commutativity_k2_mtest1) # label(axiom).
+(all A all B k2_mtest1(A,A) = A) # label(idempotence_k2_mtest1) # label(axiom).
+(all A all B k2_mtest1(A,B) = k2_mtest1(B,A)) # label(commutativity_k2_mtest1_001) # label(axiom).
+(all A all B k2_mtest1(A,A) = A) # label(idempotence_k2_mtest1_002) # label(axiom).
+(all A all B k5_mtest1(A,B) = k5_mtest1(B,A)) # label(commutativity_k5_mtest1) # label(axiom).
+(all A all B k5_mtest1(A,B) = k5_mtest1(B,A)) # label(commutativity_k5_mtest1_003) # label(axiom).
+(all A all B (r2_hidden(A,B) -> -r2_hidden(B,A))) # label(antisymmetry_r2_hidden) # label(axiom).
+$T # label(dt_k2_mtest1) # label(axiom).
+$T # label(dt_k2_mtest1_004) # label(axiom).
+$T # label(dt_k4_mtest1) # label(axiom).
+$T # label(dt_k4_mtest1_005) # label(axiom).
+$T # label(dt_k5_mtest1) # label(axiom).
+$T # label(dt_k5_mtest1_006) # label(axiom).
+$T # label(dt_c1_7__mtest1) # label(axiom).
+$T # label(dt_c2_7__mtest1) # label(axiom).
+$T # label(dt_c3_7__mtest1) # label(axiom).
+(all A all B k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A))) # label(d6_mtest1) # label(axiom).
+(all A all B all C (C = k2_mtest1(A,B) <-> (all D (r2_hidden(D,C) <-> r2_hidden(D,A) | r2_hidden(D,B))))) # label(d3_mtest1) # label(axiom).
+end_of_list.
+
+formulas(goals).
+r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) <-> r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).
+end_of_list.
+
+============================== end of input ==========================
+
+============================== PROCESS NON-CLAUSAL FORMULAS ==========
+
+% Formulas that are not ordinary clauses:
+1 (all A all B k2_mtest1(A,B) = k2_mtest1(B,A)) # label(commutativity_k2_mtest1) # label(axiom) # label(non_clause).  [assumption].
+2 (all A all B k2_mtest1(A,A) = A) # label(idempotence_k2_mtest1) # label(axiom) # label(non_clause).  [assumption].
+3 (all A all B k2_mtest1(A,B) = k2_mtest1(B,A)) # label(commutativity_k2_mtest1_001) # label(axiom) # label(non_clause).  [assumption].
+4 (all A all B k2_mtest1(A,A) = A) # label(idempotence_k2_mtest1_002) # label(axiom) # label(non_clause).  [assumption].
+5 (all A all B k5_mtest1(A,B) = k5_mtest1(B,A)) # label(commutativity_k5_mtest1) # label(axiom) # label(non_clause).  [assumption].
+6 (all A all B k5_mtest1(A,B) = k5_mtest1(B,A)) # label(commutativity_k5_mtest1_003) # label(axiom) # label(non_clause).  [assumption].
+7 (all A all B (r2_hidden(A,B) -> -r2_hidden(B,A))) # label(antisymmetry_r2_hidden) # label(axiom) # label(non_clause).  [assumption].
+8 $T # label(dt_k2_mtest1) # label(axiom) # label(non_clause).  [assumption].
+9 $T # label(dt_k2_mtest1_004) # label(axiom) # label(non_clause).  [assumption].
+10 $T # label(dt_k4_mtest1) # label(axiom) # label(non_clause).  [assumption].
+11 $T # label(dt_k4_mtest1_005) # label(axiom) # label(non_clause).  [assumption].
+12 $T # label(dt_k5_mtest1) # label(axiom) # label(non_clause).  [assumption].
+13 $T # label(dt_k5_mtest1_006) # label(axiom) # label(non_clause).  [assumption].
+14 $T # label(dt_c1_7__mtest1) # label(axiom) # label(non_clause).  [assumption].
+15 $T # label(dt_c2_7__mtest1) # label(axiom) # label(non_clause).  [assumption].
+16 $T # label(dt_c3_7__mtest1) # label(axiom) # label(non_clause).  [assumption].
+17 (all A all B k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A))) # label(d6_mtest1) # label(axiom) # label(non_clause).  [assumption].
+18 (all A all B all C (C = k2_mtest1(A,B) <-> (all D (r2_hidden(D,C) <-> r2_hidden(D,A) | r2_hidden(D,B))))) # label(d3_mtest1) # label(axiom) # label(non_clause).  [assumption].
+19 r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) <-> r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture) # label(non_clause) # label(goal).  [goal].
+
+============================== end of process non-clausal formulas ===
+
+============================== PROCESS INITIAL CLAUSES ===============
+
+% Clauses before input processing:
+
+formulas(usable).
+end_of_list.
+
+formulas(sos).
+k2_mtest1(A,B) = k2_mtest1(B,A) # label(commutativity_k2_mtest1) # label(axiom).  [clausify(1)].
+k2_mtest1(A,A) = A # label(idempotence_k2_mtest1) # label(axiom).  [clausify(2)].
+k2_mtest1(A,B) = k2_mtest1(B,A) # label(commutativity_k2_mtest1_001) # label(axiom).  [clausify(3)].
+k2_mtest1(A,A) = A # label(idempotence_k2_mtest1_002) # label(axiom).  [clausify(4)].
+k5_mtest1(A,B) = k5_mtest1(B,A) # label(commutativity_k5_mtest1) # label(axiom).  [clausify(5)].
+k5_mtest1(A,B) = k5_mtest1(B,A) # label(commutativity_k5_mtest1_003) # label(axiom).  [clausify(6)].
+-r2_hidden(A,B) | -r2_hidden(B,A) # label(antisymmetry_r2_hidden) # label(axiom).  [clausify(7)].
+k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A)) # label(d6_mtest1) # label(axiom).  [clausify(17)].
+k2_mtest1(A,B) != C | -r2_hidden(D,C) | r2_hidden(D,A) | r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,A) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),C) | r2_hidden(f1(A,B,C),A) | r2_hidden(f1(A,B,C),B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+k2_mtest1(A,B) = C | -r2_hidden(f1(A,B,C),C) | -r2_hidden(f1(A,B,C),A) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+k2_mtest1(A,B) = C | -r2_hidden(f1(A,B,C),C) | -r2_hidden(f1(A,B,C),B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+-r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+-r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+end_of_list.
+
+formulas(demodulators).
+end_of_list.
+
+============================== PREDICATE ELIMINATION =================
+
+No predicates eliminated.
+
+============================== end predicate elimination =============
+
+Auto_denials:  (non-Horn, no changes).
+
+Term ordering decisions:
+Predicate symbol precedence:  predicate_order([ =, r2_hidden ]).
+Function symbol precedence:  function_order([ c1_7__mtest1, c2_7__mtest1, c3_7__mtest1, k2_mtest1, k5_mtest1, k4_mtest1, f1 ]).
+After inverse_order:  (no changes).
+Unfolding symbols: k5_mtest1/2.
+
+Auto_inference settings:
+  % set(paramodulation).  % (positive equality literals)
+  % set(binary_resolution).  % (non-Horn)
+  % set(neg_ur_resolution).  % (non-Horn, less than 100 clauses)
+
+Auto_process settings:
+  % set(factor).  % (non-Horn)
+  % set(unit_deletion).  % (non-Horn)
+
+
+% Operation k2_mtest1 is commutative; C redundancy checks enabled.
+kept:      20 k2_mtest1(A,B) = k2_mtest1(B,A) # label(commutativity_k2_mtest1) # label(axiom).  [clausify(1)].
+kept:      21 k2_mtest1(A,A) = A # label(idempotence_k2_mtest1) # label(axiom).  [clausify(2)].
+           22 k2_mtest1(A,A) = A # label(idempotence_k2_mtest1_002) # label(axiom).  [clausify(4)].
+
+% Operation k5_mtest1 is commutative; C redundancy checks enabled.
+kept:      23 k5_mtest1(A,B) = k5_mtest1(B,A) # label(commutativity_k5_mtest1) # label(axiom).  [clausify(5)].
+kept:      24 -r2_hidden(A,B) | -r2_hidden(B,A) # label(antisymmetry_r2_hidden) # label(axiom).  [clausify(7)].
+kept:      25 k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A)) # label(d6_mtest1) # label(axiom).  [clausify(17)].
+kept:      26 k2_mtest1(A,B) != C | -r2_hidden(D,C) | r2_hidden(D,A) | r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+kept:      27 k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,A) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+kept:      28 k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+kept:      29 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),C) | r2_hidden(f1(A,B,C),A) | r2_hidden(f1(A,B,C),B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+kept:      30 k2_mtest1(A,B) = C | -r2_hidden(f1(A,B,C),C) | -r2_hidden(f1(A,B,C),A) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+kept:      31 k2_mtest1(A,B) = C | -r2_hidden(f1(A,B,C),C) | -r2_hidden(f1(A,B,C),B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+           32 r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+kept:      33 r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [copy(32),rewrite([25(4)])].
+           34 -r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+kept:      35 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | -r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)).  [copy(34),rewrite([25(4)])].
+           36 -r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+kept:      37 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [copy(36),rewrite([25(4)])].
+kept:      38 -r2_hidden(A,A).  [factor(24,a,b)].
+kept:      39 A != B | -r2_hidden(C,B) | r2_hidden(C,A).  [factor(26,c,d),rewrite([21(1)])].
+kept:      40 k2_mtest1(A,B) = A | r2_hidden(f1(A,B,A),A) | r2_hidden(f1(A,B,A),B).  [factor(29,b,c)].
+kept:      41 k2_mtest1(A,B) = B | r2_hidden(f1(A,B,B),B) | r2_hidden(f1(A,B,B),A).  [factor(29,b,d)].
+kept:      42 A = B | r2_hidden(f1(A,A,B),B) | r2_hidden(f1(A,A,B),A).  [factor(29,c,d),rewrite([21(1)])].
+kept:      43 k2_mtest1(A,B) = A | -r2_hidden(f1(A,B,A),A).  [factor(30,b,c)].
+kept:      44 k2_mtest1(A,B) = B | -r2_hidden(f1(A,B,B),B).  [factor(31,b,c)].
+
+============================== end of process initial clauses ========
+
+============================== CLAUSES FOR SEARCH ====================
+
+% Clauses after input processing:
+
+formulas(usable).
+end_of_list.
+
+formulas(sos).
+20 k2_mtest1(A,B) = k2_mtest1(B,A) # label(commutativity_k2_mtest1) # label(axiom).  [clausify(1)].
+21 k2_mtest1(A,A) = A # label(idempotence_k2_mtest1) # label(axiom).  [clausify(2)].
+24 -r2_hidden(A,B) | -r2_hidden(B,A) # label(antisymmetry_r2_hidden) # label(axiom).  [clausify(7)].
+25 k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A)) # label(d6_mtest1) # label(axiom).  [clausify(17)].
+26 k2_mtest1(A,B) != C | -r2_hidden(D,C) | r2_hidden(D,A) | r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+27 k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,A) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+28 k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+29 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),C) | r2_hidden(f1(A,B,C),A) | r2_hidden(f1(A,B,C),B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+30 k2_mtest1(A,B) = C | -r2_hidden(f1(A,B,C),C) | -r2_hidden(f1(A,B,C),A) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+31 k2_mtest1(A,B) = C | -r2_hidden(f1(A,B,C),C) | -r2_hidden(f1(A,B,C),B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+33 r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [copy(32),rewrite([25(4)])].
+35 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | -r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)).  [copy(34),rewrite([25(4)])].
+37 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [copy(36),rewrite([25(4)])].
+38 -r2_hidden(A,A).  [factor(24,a,b)].
+39 A != B | -r2_hidden(C,B) | r2_hidden(C,A).  [factor(26,c,d),rewrite([21(1)])].
+40 k2_mtest1(A,B) = A | r2_hidden(f1(A,B,A),A) | r2_hidden(f1(A,B,A),B).  [factor(29,b,c)].
+41 k2_mtest1(A,B) = B | r2_hidden(f1(A,B,B),B) | r2_hidden(f1(A,B,B),A).  [factor(29,b,d)].
+42 A = B | r2_hidden(f1(A,A,B),B) | r2_hidden(f1(A,A,B),A).  [factor(29,c,d),rewrite([21(1)])].
+43 k2_mtest1(A,B) = A | -r2_hidden(f1(A,B,A),A).  [factor(30,b,c)].
+44 k2_mtest1(A,B) = B | -r2_hidden(f1(A,B,B),B).  [factor(31,b,c)].
+end_of_list.
+
+formulas(demodulators).
+20 k2_mtest1(A,B) = k2_mtest1(B,A) # label(commutativity_k2_mtest1) # label(axiom).  [clausify(1)].
+        % (lex-dep)
+21 k2_mtest1(A,A) = A # label(idempotence_k2_mtest1) # label(axiom).  [clausify(2)].
+25 k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A)) # label(d6_mtest1) # label(axiom).  [clausify(17)].
+end_of_list.
+
+============================== end of clauses for search =============
+
+============================== SEARCH ================================
+
+% Starting search at 0.01 seconds.
+
+given #1 (I,wt=7): 20 k2_mtest1(A,B) = k2_mtest1(B,A) # label(commutativity_k2_mtest1) # label(axiom).  [clausify(1)].
+
+given #2 (I,wt=5): 21 k2_mtest1(A,A) = A # label(idempotence_k2_mtest1) # label(axiom).  [clausify(2)].
+
+given #3 (I,wt=6): 24 -r2_hidden(A,B) | -r2_hidden(B,A) # label(antisymmetry_r2_hidden) # label(axiom).  [clausify(7)].
+
+given #4 (I,wt=11): 25 k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A)) # label(d6_mtest1) # label(axiom).  [clausify(17)].
+
+given #5 (I,wt=14): 26 k2_mtest1(A,B) != C | -r2_hidden(D,C) | r2_hidden(D,A) | r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+
+given #6 (I,wt=11): 27 k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,A) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+
+given #7 (I,wt=11): 28 k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+
+given #8 (I,wt=23): 29 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),C) | r2_hidden(f1(A,B,C),A) | r2_hidden(f1(A,B,C),B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+
+given #9 (I,wt=17): 30 k2_mtest1(A,B) = C | -r2_hidden(f1(A,B,C),C) | -r2_hidden(f1(A,B,C),A) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+
+given #10 (I,wt=17): 31 k2_mtest1(A,B) = C | -r2_hidden(f1(A,B,C),C) | -r2_hidden(f1(A,B,C),B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+
+given #11 (I,wt=19): 33 r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [copy(32),rewrite([25(4)])].
+
+given #12 (I,wt=14): 35 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | -r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)).  [copy(34),rewrite([25(4)])].
+
+given #13 (I,wt=14): 37 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [copy(36),rewrite([25(4)])].
+
+given #14 (I,wt=3): 38 -r2_hidden(A,A).  [factor(24,a,b)].
+
+given #15 (I,wt=9): 39 A != B | -r2_hidden(C,B) | r2_hidden(C,A).  [factor(26,c,d),rewrite([21(1)])].
+
+given #16 (I,wt=17): 40 k2_mtest1(A,B) = A | r2_hidden(f1(A,B,A),A) | r2_hidden(f1(A,B,A),B).  [factor(29,b,c)].
+
+given #17 (I,wt=17): 41 k2_mtest1(A,B) = B | r2_hidden(f1(A,B,B),B) | r2_hidden(f1(A,B,B),A).  [factor(29,b,d)].
+
+given #18 (I,wt=15): 42 A = B | r2_hidden(f1(A,A,B),B) | r2_hidden(f1(A,A,B),A).  [factor(29,c,d),rewrite([21(1)])].
+
+given #19 (I,wt=11): 43 k2_mtest1(A,B) = A | -r2_hidden(f1(A,B,A),A).  [factor(30,b,c)].
+
+given #20 (I,wt=11): 44 k2_mtest1(A,B) = B | -r2_hidden(f1(A,B,B),B).  [factor(31,b,c)].
+
+given #21 (A,wt=28): 45 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),A) | r2_hidden(f1(A,B,C),B) | k2_mtest1(D,C) != E | r2_hidden(f1(A,B,C),E).  [resolve(29,b,28,c)].
+
+given #22 (F,wt=5): 139 -r2_hidden(k2_mtest1(A,B),A).  [ur(28,a,20,a,b,38,a)].
+
+given #23 (F,wt=5): 141 -r2_hidden(k2_mtest1(A,B),B).  [ur(28,a,21,a(flip),b,38,a),rewrite([21(3)])].
+
+given #24 (F,wt=7): 142 -r2_hidden(k2_mtest1(A,B),k2_mtest1(B,A)).  [ur(39,a,20,a,c,38,a)].
+
+given #25 (F,wt=7): 196 -r2_hidden(k2_mtest1(k2_mtest1(A,B),C),A).  [ur(28,a,20,a,b,139,a)].
+
+given #26 (T,wt=10): 138 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [factor(132,b,d),xx(c)].
+
+given #27 (T,wt=10): 223 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(k4_mtest1(c3_7__mtest1,c2_7__mtest1),c1_7__mtest1).  [resolve(138,b,24,b)].
+
+given #28 (T,wt=11): 173 k2_mtest1(A,B) = A | r2_hidden(f1(A,B,A),B).  [resolve(43,b,40,b),merge(b)].
+
+given #29 (T,wt=11): 174 k2_mtest1(A,B) = B | r2_hidden(f1(A,B,B),A).  [resolve(44,b,41,b),merge(b)].
+
+given #30 (A,wt=28): 46 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),A) | r2_hidden(f1(A,B,C),B) | k2_mtest1(C,D) != E | r2_hidden(f1(A,B,C),E).  [resolve(29,b,27,c)].
+
+given #31 (F,wt=7): 198 -r2_hidden(k2_mtest1(k2_mtest1(A,B),C),B).  [ur(28,a,21,a(flip),b,139,a),rewrite([21(3)])].
+
+given #32 (F,wt=7): 201 -r2_hidden(k2_mtest1(A,k2_mtest1(B,C)),B).  [ur(28,a,20,a,b,141,a)].
+
+given #33 (F,wt=7): 203 -r2_hidden(k2_mtest1(A,k2_mtest1(B,C)),C).  [ur(28,a,21,a(flip),b,141,a),rewrite([21(3)])].
+
+given #34 (F,wt=9): 195 -r2_hidden(k2_mtest1(k2_mtest1(A,B),C),k2_mtest1(B,A)).  [ur(39,a,20,a,c,139,a)].
+
+given #35 (T,wt=11): 233 k2_mtest1(A,B) = A | -r2_hidden(B,f1(A,B,A)).  [resolve(173,b,24,b)].
+
+given #36 (T,wt=11): 238 k2_mtest1(A,B) = B | -r2_hidden(A,f1(A,B,B)).  [resolve(174,b,24,b)].
+
+given #37 (T,wt=12): 168 A = B | r2_hidden(f1(A,A,B),B) | B != A.  [factor(163,b,d)].
+
+given #38 (T,wt=12): 194 A = B | r2_hidden(f1(A,A,B),A) | B != A.  [factor(188,b,d)].
+
+given #39 (A,wt=34): 47 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),A) | r2_hidden(f1(A,B,C),B) | k2_mtest1(D,E) != C | r2_hidden(f1(A,B,C),D) | r2_hidden(f1(A,B,C),E).  [resolve(29,b,26,b)].
+
+given #40 (F,wt=9): 199 -r2_hidden(k2_mtest1(A,B),k2_mtest1(A,k2_mtest1(A,B))).  [ur(26,a,20,a,c,38,a,d,139,a)].
+
+given #41 (F,wt=9): 200 -r2_hidden(k2_mtest1(A,k2_mtest1(B,C)),k2_mtest1(C,B)).  [ur(39,a,20,a,c,141,a)].
+
+given #42 (F,wt=9): 204 -r2_hidden(k2_mtest1(A,B),k2_mtest1(B,k2_mtest1(A,B))).  [ur(26,a,20,a,c,38,a,d,141,a)].
+
+given #43 (F,wt=9): 205 -r2_hidden(k2_mtest1(A,B),k2_mtest1(B,k2_mtest1(B,A))).  [ur(26,a,20,a,c,141,a,d,142,a),rewrite([20(3)])].
+
+given #44 (T,wt=12): 224 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | k4_mtest1(c3_7__mtest1,c2_7__mtest1) != k4_mtest1(c2_7__mtest1,c3_7__mtest1).  [factor(219,a,c)].
+
+given #45 (T,wt=13): 219 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | k4_mtest1(c3_7__mtest1,c2_7__mtest1) != A | r2_hidden(c1_7__mtest1,A).  [resolve(138,b,39,b),flip(b)].
+
+given #46 (T,wt=14): 96 A = B | r2_hidden(f1(A,A,B),A) | k2_mtest1(C,B) != A.  [factor(57,b,d)].
+
+given #47 (T,wt=14): 97 A = B | r2_hidden(f1(A,A,B),A) | k2_mtest1(B,C) != A.  [factor(60,b,d)].
+
+given #48 (A,wt=23): 48 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),A) | r2_hidden(f1(A,B,C),B) | -r2_hidden(C,f1(A,B,C)).  [resolve(29,b,24,b)].
+
+given #49 (F,wt=9): 206 -r2_hidden(k2_mtest1(A,B),k2_mtest1(A,k2_mtest1(B,A))).  [ur(26,a,20,a,c,139,a,d,142,a),rewrite([20(3)])].
+
+given #50 (F,wt=9): 210 -r2_hidden(k2_mtest1(k2_mtest1(k2_mtest1(A,B),C),D),A).  [ur(28,a,20,a,b,196,a)].
+
+given #51 (F,wt=9): 212 -r2_hidden(k2_mtest1(k2_mtest1(k2_mtest1(A,B),C),D),B).  [ur(28,a,21,a(flip),b,196,a),rewrite([21(3)])].
+
+given #52 (F,wt=9): 214 -r2_hidden(k2_mtest1(k2_mtest1(A,B),C),k2_mtest1(A,C)).  [ur(26,a,20,a,c,141,a,d,196,a)].
+
+given #53 (T,wt=14): 169 A = B | r2_hidden(f1(A,A,B),B) | k2_mtest1(C,A) != B.  [factor(164,b,d)].
+
+given #54 (T,wt=14): 170 A = B | r2_hidden(f1(A,A,B),B) | k2_mtest1(A,C) != B.  [factor(165,b,d)].
+
+given #55 (T,wt=14): 225 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | k2_mtest1(A,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) != k4_mtest1(c2_7__mtest1,c3_7__mtest1).  [factor(220,a,c)].
+
+given #56 (T,wt=14): 226 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | k2_mtest1(k4_mtest1(c3_7__mtest1,c2_7__mtest1),A) != k4_mtest1(c2_7__mtest1,c3_7__mtest1).  [factor(221,a,c)].
+
+given #57 (A,wt=28): 49 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),C) | r2_hidden(f1(A,B,C),B) | k2_mtest1(D,A) != E | r2_hidden(f1(A,B,C),E).  [resolve(29,c,28,c)].
+
+given #58 (F,wt=9): 218 -r2_hidden(k2_mtest1(k2_mtest1(A,B),C),k2_mtest1(C,A)).  [ur(26,a,21,a(flip),c,141,a,d,196,a),rewrite([21(5)])].
+
+given #59 (F,wt=9): 242 -r2_hidden(k2_mtest1(k2_mtest1(A,k2_mtest1(B,C)),D),B).  [ur(28,a,20,a,b,198,a)].
+
+given #60 (F,wt=9): 244 -r2_hidden(k2_mtest1(k2_mtest1(A,k2_mtest1(B,C)),D),C).  [ur(28,a,21,a(flip),b,198,a),rewrite([21(3)])].
+
+given #61 (F,wt=9): 246 -r2_hidden(k2_mtest1(k2_mtest1(A,B),C),k2_mtest1(B,C)).  [ur(26,a,20,a,c,141,a,d,198,a)].
+
+given #62 (T,wt=14): 229 k2_mtest1(A,B) = A | C != B | r2_hidden(f1(A,B,A),C).  [resolve(173,b,39,b)].
+
+given #63 (T,wt=14): 234 k2_mtest1(A,B) = B | C != A | r2_hidden(f1(A,B,B),C).  [resolve(174,b,39,b)].
+
+given #64 (T,wt=14): 479 k2_mtest1(A,B) = B | r2_hidden(f1(A,B,B),B) | A != B.  [factor(473,b,d)].
+
+given #65 (T,wt=15): 69 A = B | r2_hidden(f1(A,A,B),A) | -r2_hidden(B,f1(A,A,B)).  [factor(48,b,c),rewrite([21(1)])].
+
+given #66 (A,wt=28): 50 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),C) | r2_hidden(f1(A,B,C),B) | k2_mtest1(A,D) != E | r2_hidden(f1(A,B,C),E).  [resolve(29,c,27,c)].
+
+given #67 (F,wt=9): 250 -r2_hidden(k2_mtest1(k2_mtest1(A,B),C),k2_mtest1(C,B)).  [ur(26,a,21,a(flip),c,141,a,d,198,a),rewrite([21(5)])].
+
+given #68 (F,wt=9): 252 -r2_hidden(k2_mtest1(A,k2_mtest1(k2_mtest1(B,C),D)),B).  [ur(28,a,20,a,b,201,a)].
+
+given #69 (F,wt=9): 254 -r2_hidden(k2_mtest1(A,k2_mtest1(k2_mtest1(B,C),D)),C).  [ur(28,a,21,a(flip),b,201,a),rewrite([21(3)])].
+
+given #70 (F,wt=9): 259 -r2_hidden(k2_mtest1(A,k2_mtest1(B,C)),k2_mtest1(B,A)).  [ur(26,a,20,a,c,139,a,d,201,a)].
+
+given #71 (T,wt=15): 167 A = B | r2_hidden(f1(A,A,B),B) | -r2_hidden(A,f1(A,A,B)).  [resolve(42,c,24,b)].
+
+given #72 (T,wt=15): 220 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | k2_mtest1(A,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) != B | r2_hidden(c1_7__mtest1,B).  [resolve(138,b,28,c)].
+
+given #73 (T,wt=12): 760 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c3_7__mtest1,c2_7__mtest1),A)).  [resolve(220,b,20,a)].
+
+given #74 (T,wt=12): 762 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k2_mtest1(A,k4_mtest1(c3_7__mtest1,c2_7__mtest1))).  [resolve(220,b,21,a(flip)),rewrite([21(15)])].
+
+given #75 (A,wt=34): 51 k2_mtest1(A,B) = C | r2_hidden(f1(A,B,C),C) | r2_hidden(f1(A,B,C),B) | k2_mtest1(D,E) != A | r2_hidden(f1(A,B,C),D) | r2_hidden(f1(A,B,C),E).  [resolve(29,c,26,b)].
+
+given #76 (F,wt=9): 266 -r2_hidden(k2_mtest1(A,k2_mtest1(B,C)),k2_mtest1(A,B)).  [ur(26,a,21,a(flip),c,139,a,d,201,a),rewrite([21(5)])].
+
+given #77 (F,wt=9): 268 -r2_hidden(k2_mtest1(A,k2_mtest1(B,k2_mtest1(C,D))),C).  [ur(28,a,20,a,b,203,a)].
+
+given #78 (F,wt=9): 270 -r2_hidden(k2_mtest1(A,k2_mtest1(B,k2_mtest1(C,D))),D).  [ur(28,a,21,a(flip),b,203,a),rewrite([21(3)])].
+
+given #79 (F,wt=9): 275 -r2_hidden(k2_mtest1(A,k2_mtest1(B,C)),k2_mtest1(C,A)).  [ur(26,a,20,a,c,139,a,d,203,a)].
+
+given #80 (T,wt=10): 771 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [resolve(762,b,37,a)].
+
+given #81 (T,wt=5): 973 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)).  [resolve(771,b,138,b),merge(b)].
+
+given #82 (T,wt=8): 975 k4_mtest1(c2_7__mtest1,c3_7__mtest1) != A | r2_hidden(c1_7__mtest1,A).  [resolve(973,a,39,b),flip(a)].
+
+given #83 (T,wt=10): 976 k2_mtest1(A,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) != B | r2_hidden(c1_7__mtest1,B).  [resolve(973,a,28,c)].
+
+============================== PROOF =================================
+
+% Proof 1 at 0.08 (+ 0.01) seconds.
+% Length of proof is 27.
+% Level of proof is 12.
+% Maximum clause weight is 27.000.
+% Given clauses 83.
+
+1 (all A all B k2_mtest1(A,B) = k2_mtest1(B,A)) # label(commutativity_k2_mtest1) # label(axiom) # label(non_clause).  [assumption].
+2 (all A all B k2_mtest1(A,A) = A) # label(idempotence_k2_mtest1) # label(axiom) # label(non_clause).  [assumption].
+17 (all A all B k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A))) # label(d6_mtest1) # label(axiom) # label(non_clause).  [assumption].
+18 (all A all B all C (C = k2_mtest1(A,B) <-> (all D (r2_hidden(D,C) <-> r2_hidden(D,A) | r2_hidden(D,B))))) # label(d3_mtest1) # label(axiom) # label(non_clause).  [assumption].
+19 r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) <-> r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture) # label(non_clause) # label(goal).  [goal].
+20 k2_mtest1(A,B) = k2_mtest1(B,A) # label(commutativity_k2_mtest1) # label(axiom).  [clausify(1)].
+21 k2_mtest1(A,A) = A # label(idempotence_k2_mtest1) # label(axiom).  [clausify(2)].
+25 k5_mtest1(A,B) = k2_mtest1(k4_mtest1(A,B),k4_mtest1(B,A)) # label(d6_mtest1) # label(axiom).  [clausify(17)].
+26 k2_mtest1(A,B) != C | -r2_hidden(D,C) | r2_hidden(D,A) | r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+28 k2_mtest1(A,B) != C | r2_hidden(D,C) | -r2_hidden(D,B) # label(d3_mtest1) # label(axiom).  [clausify(18)].
+32 r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+33 r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [copy(32),rewrite([25(4)])].
+34 -r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+35 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | -r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)).  [copy(34),rewrite([25(4)])].
+36 -r2_hidden(c1_7__mtest1,k5_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) # label(e1_7__mtest1) # label(conjecture).  [deny(19)].
+37 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [copy(36),rewrite([25(4)])].
+126 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1)) != k2_mtest1(A,B) | r2_hidden(c1_7__mtest1,A) | r2_hidden(c1_7__mtest1,B).  [resolve(33,a,26,b),flip(c)].
+132 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) | k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1)) != k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),A) | r2_hidden(c1_7__mtest1,A).  [factor(126,a,d)].
+138 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [factor(132,b,d),xx(c)].
+220 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | k2_mtest1(A,k4_mtest1(c3_7__mtest1,c2_7__mtest1)) != B | r2_hidden(c1_7__mtest1,B).  [resolve(138,b,28,c)].
+762 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | r2_hidden(c1_7__mtest1,k2_mtest1(A,k4_mtest1(c3_7__mtest1,c2_7__mtest1))).  [resolve(220,b,21,a(flip)),rewrite([21(15)])].
+771 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) | -r2_hidden(c1_7__mtest1,k4_mtest1(c3_7__mtest1,c2_7__mtest1)).  [resolve(762,b,37,a)].
+973 r2_hidden(c1_7__mtest1,k4_mtest1(c2_7__mtest1,c3_7__mtest1)).  [resolve(771,b,138,b),merge(b)].
+974 -r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),k4_mtest1(c3_7__mtest1,c2_7__mtest1))).  [back_unit_del(35),unit_del(b,973)].
+976 k2_mtest1(A,k4_mtest1(c2_7__mtest1,c3_7__mtest1)) != B | r2_hidden(c1_7__mtest1,B).  [resolve(973,a,28,c)].
+983 r2_hidden(c1_7__mtest1,k2_mtest1(k4_mtest1(c2_7__mtest1,c3_7__mtest1),A)).  [resolve(976,a,20,a)].
+984 $F.  [resolve(983,a,974,a)].
+
+============================== end of proof ==========================
+
+============================== STATISTICS ============================
+
+Given=83. Generated=5304. Kept=960. proofs=1.
+Usable=68. Sos=713. Demods=3. Limbo=0, Disabled=195. Hints=0.
+Kept_by_rule=0, Deleted_by_rule=0.
+Forward_subsumed=4344. Back_subsumed=176.
+Sos_limit_deleted=0. Sos_displaced=0. Sos_removed=0.
+New_demodulators=4 (2 lex), Back_demodulated=1. Back_unit_deleted=1.
+Demod_attempts=41739. Demod_rewrites=3350.
+Res_instance_prunes=0. Para_instance_prunes=0. Basic_paramod_prunes=0.
+Nonunit_fsub_feature_tests=5667. Nonunit_bsub_feature_tests=6871.
+Megabytes=1.22.
+User_CPU=0.08, System_CPU=0.01, Wall_clock=1.
+
+============================== end of statistics =====================
+
+============================== end of search =========================
+
+THEOREM PROVED
+
+Exiting with 1 proof.
+
+Process 21233 exit (max_proofs) Tue Oct 18 14:38:00 2011

@@ -1,0 +1,222 @@
+<tstp>
+  <formula name='e1_7__mtest1' syntax='formula' status='conjecture'>
+    <equivalence>
+      <predicate name='r2_hidden'>
+        <function name='c1_7__mtest1'/>
+        <function name='k5_mtest1'>
+          <function name='c2_7__mtest1'/>
+          <function name='c3_7__mtest1'/>
+        </function>
+      </predicate>
+      <disjunction>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c2_7__mtest1'/>
+            <function name='c3_7__mtest1'/>
+          </function>
+        </predicate>
+        <predicate name='r2_hidden'>
+          <function name='c1_7__mtest1'/>
+          <function name='k4_mtest1'>
+            <function name='c3_7__mtest1'/>
+            <function name='c2_7__mtest1'/>
+          </function>
+        </predicate>
+      </disjunction>
+    </equivalence>
+  </formula>
+  <formula name='commutativity_k2_mtest1' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <predicate name='='>
+        <function name='k2_mtest1'>
+          <variable name='A'/>
+          <variable name='B'/>
+        </function>
+        <function name='k2_mtest1'>
+          <variable name='B'/>
+          <variable name='A'/>
+        </function>
+      </predicate>
+    </quantifier>
+  </formula>
+  <formula name='idempotence_k2_mtest1' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <predicate name='='>
+        <function name='k2_mtest1'>
+          <variable name='A'/>
+          <variable name='A'/>
+        </function>
+        <variable name='A'/>
+      </predicate>
+    </quantifier>
+  </formula>
+  <formula name='commutativity_k2_mtest1_001' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <predicate name='='>
+        <function name='k2_mtest1'>
+          <variable name='A'/>
+          <variable name='B'/>
+        </function>
+        <function name='k2_mtest1'>
+          <variable name='B'/>
+          <variable name='A'/>
+        </function>
+      </predicate>
+    </quantifier>
+  </formula>
+  <formula name='idempotence_k2_mtest1_002' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <predicate name='='>
+        <function name='k2_mtest1'>
+          <variable name='A'/>
+          <variable name='A'/>
+        </function>
+        <variable name='A'/>
+      </predicate>
+    </quantifier>
+  </formula>
+  <formula name='commutativity_k5_mtest1' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <predicate name='='>
+        <function name='k5_mtest1'>
+          <variable name='A'/>
+          <variable name='B'/>
+        </function>
+        <function name='k5_mtest1'>
+          <variable name='B'/>
+          <variable name='A'/>
+        </function>
+      </predicate>
+    </quantifier>
+  </formula>
+  <formula name='commutativity_k5_mtest1_003' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <predicate name='='>
+        <function name='k5_mtest1'>
+          <variable name='A'/>
+          <variable name='B'/>
+        </function>
+        <function name='k5_mtest1'>
+          <variable name='B'/>
+          <variable name='A'/>
+        </function>
+      </predicate>
+    </quantifier>
+  </formula>
+  <formula name='antisymmetry_r2_hidden' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <implication>
+        <predicate name='r2_hidden'>
+          <variable name='A'/>
+          <variable name='B'/>
+        </predicate>
+        <negation>
+          <predicate name='r2_hidden'>
+            <variable name='B'/>
+            <variable name='A'/>
+          </predicate>
+        </negation>
+      </implication>
+    </quantifier>
+  </formula>
+  <formula name='dt_k2_mtest1' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='dt_k2_mtest1_004' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='dt_k4_mtest1' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='dt_k4_mtest1_005' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='dt_k5_mtest1' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='dt_k5_mtest1_006' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='dt_c1_7__mtest1' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='dt_c2_7__mtest1' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='dt_c3_7__mtest1' syntax='formula' status='axiom'>
+    <defined-predicate name='true'/>
+  </formula>
+  <formula name='d6_mtest1' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <predicate name='='>
+        <function name='k5_mtest1'>
+          <variable name='A'/>
+          <variable name='B'/>
+        </function>
+        <function name='k2_mtest1'>
+          <function name='k4_mtest1'>
+            <variable name='A'/>
+            <variable name='B'/>
+          </function>
+          <function name='k4_mtest1'>
+            <variable name='B'/>
+            <variable name='A'/>
+          </function>
+        </function>
+      </predicate>
+    </quantifier>
+  </formula>
+  <formula name='d3_mtest1' syntax='formula' status='axiom'>
+    <quantifier type='universal'>
+      <variable name='A'/>
+      <variable name='B'/>
+      <variable name='C'/>
+      <equivalence>
+        <predicate name='='>
+          <variable name='C'/>
+          <function name='k2_mtest1'>
+            <variable name='A'/>
+            <variable name='B'/>
+          </function>
+        </predicate>
+        <quantifier type='universal'>
+          <variable name='D'/>
+          <equivalence>
+            <predicate name='r2_hidden'>
+              <variable name='D'/>
+              <variable name='C'/>
+            </predicate>
+            <disjunction>
+              <predicate name='r2_hidden'>
+                <variable name='D'/>
+                <variable name='A'/>
+              </predicate>
+              <predicate name='r2_hidden'>
+                <variable name='D'/>
+                <variable name='B'/>
+              </predicate>
+            </disjunction>
+          </equivalence>
+        </quantifier>
+      </equivalence>
+    </quantifier>
+  </formula>
+
+</tstp>

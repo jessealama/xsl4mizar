@@ -1,0 +1,60 @@
+// nd-simplify.xsltxt : Simplify natural deductions
+
+// This stylesheet works on the XML emitted by the nd.xsl stylesheet.
+// The aim is to eliminate spurious tautologies that are introduced
+// into proofs to make them adhere more closely to the structure of a
+// mizar proof, but which have no interesting logical content.
+
+stylesheet "1.0";
+
+output method="xml" encoding="utf-8" indent="yes";
+
+include ../utils/die.xsl;
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl [/] {
+  if [not(Derivation)] {
+    die (#message = "We require that there be a Derivation root element, but there is no such element");
+  }
+  apply [Derivation];
+}
+
+tpl [Derivation[Rule[@name = "implication-elimination"]
+                and Derivation[not(defined-predicate[@name = "true"])]
+                and Derivation[defined-predicate[@name = "true"]]]]	 {
+  msg terminate="no" "implication-elimination simplification encountered";
+  apply [Derivation[not(defined-predicate[@name = "true"])]];
+}
+
+tpl [Derivation[Rule[@name = "by"]
+                and Derivation[not(defined-predicate[@name = "true"])]
+                and Derivation[defined-predicate[@name = "true"]]]] {
+  msg terminate="no" "by simplification encountered";
+  if [Derivation[2] and not(Derivation[3])] {
+    <Derivation {
+      for-each [@*] { copy-of `.`; }
+      apply [*[1]];
+      <Rule {
+        @"name" = "axiom";
+      }
+      apply [Derivation[not(defined-predicate[@name = "true"])]];
+    }
+  } else {
+    <Derivation {
+      for-each [@*] { copy-of `.`; }
+      apply [*[1]];
+      apply [Rule];
+      for-each [Derivation[not(defined-predicate[@name = "true"])]] {
+        apply [.];
+      }
+    }
+  }
+
+}

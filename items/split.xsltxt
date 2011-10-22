@@ -13,7 +13,7 @@ tpl [*] {
 }
 
 tpl count-preceding-eliminable-toplevel-items {
-  `count (preceding::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or @kind = "Regular-Statement" or @kind = "Loci-Declaration"])`;
+  `count (preceding::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Regular-Statement" or @kind = "Loci-Declaration"])`;
 }
 
 tpl [Text-Proper/Item[@kind = "Reservation" and not(child::Variables)]] {
@@ -283,7 +283,7 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
     @kind = "Definition-Item";
     <Block {
       @kind = "Definitional-Block";
-      for-each [preceding-sibling::Item[@kind = "Loci-Declaration" or @kind = "Assumption" or @kind = "Existential-Assumption" or @kind = "Constant-Definition" or @kind = "Regular-Statement"]] {
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration" or @kind = "Assumption" or @kind = "Existential-Assumption" or @kind = "Constant-Definition" or @kind = "Regular-Statement" or @kind = "Choice-Statement"]] {
         apply [.];
       }
       <Item {

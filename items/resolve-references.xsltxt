@@ -43,12 +43,28 @@ tpl [Local-Reference] {
   copy-of `.`;
 }
 
-// (@kind = "Regular-Statement" and child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])
-
 // look for a previous unexported-but-exportable toplevel theorem (lemma)
-tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper and @kind = "Regular-Statement" and not(child::Diffuse-Statement) and not(child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])]/Proposition/Label/@idnr]] {
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+                                             and @kind = "Regular-Statement"
+                                             and @shape = "Compact-Statement"
+                                             and not(Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                                 and @kind = "Constant-Definition"]/Variable/@idnr
+                                                     or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                        and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
+                                                     or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                        and @kind = "Type-Changing-Statement"]/Variable/@idnr
+                                                     or descendant::Private-Predicate-Formula])]/Proposition/Label/@idnr]] {
   $idnr = `@idnr`;
-  for-each [preceding::Item[parent::Text-Proper and @kind = "Regular-Statement" and not(child::Diffuse-Statement) and not(child::Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr])]/Proposition/Label[@idnr = $idnr]] {
+  for-each [preceding::Item[parent::Text-Proper
+                            and @kind = "Regular-Statement"
+                            and @shape = "Compact-Statement"
+                            and not(Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                and @kind = "Constant-Definition"]/Variable/@idnr
+                                                or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                   and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
+                                                or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
+                                                                                                   and @kind = "Type-Changing-Statement"]/Variable/@idnr
+                                                or descendant::Private-Predicate-Formula])]/Proposition/Label[@idnr = $idnr]] {
     $num-previous = count-preceding-toplevel-items ();
     $position = `$num-previous + 1`;
     $new_spelling = `concat ("CKB", $position)`;

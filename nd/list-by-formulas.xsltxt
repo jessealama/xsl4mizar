@@ -1,0 +1,20 @@
+// list-hypotheses.xsl : Extract the hypotheses of a "by" step
+
+stylesheet "1.0";
+
+output method="text" encoding="utf-8" indent="yes";
+
+include ../utils/die.xsl;
+
+tpl [/] {
+  if [not(tstp)] {
+    die (#message = "The required tstp element is missing!");
+  }
+  apply [tstp];
+}
+
+tpl [tstp] {
+  for-each [formula[@name and source/non-logical-data[@name = "inference"]/non-logical-data[@name = "mizar_by" or @name = "mizar_from"]]] {
+    `@name`; "\n";
+  }
+}
