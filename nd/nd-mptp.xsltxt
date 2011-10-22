@@ -93,7 +93,7 @@ tpl [formula[@name and @status = "plain"]] {
   }
 }
 
-tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name = "mizar_by"]]] {
+tpl [formula[@name and @status = "plain" and descendant::non-logical-data[@name = "mizar_by" or @name = "mizar_from"]]] {
   $n = `@name`;
   <Derivation {
     @"name" = `$n`;
