@@ -3,7 +3,10 @@
 stylesheet 1.0;
 output method="text";
 
-// The number of the theorem to consult (starting from 1)
+// The number of the theorem to consult (starting from 1).  If this is
+// empty, we will count the number of propositions in all theorems in
+// the article.  Otherwise, only the supplied theorem will be
+// consulted.
 #theorem = { ""; }
 
 tpl [/] {
@@ -11,20 +14,27 @@ tpl [/] {
 }
 
 tpl [Article] {
-  if [$theorem = ""] {
-    msg terminate="yes" "Error: the theorem parameter has an empty value";
-  }
   $num-theorems = `count (JustifiedTheorem)`;
-  if [0 < $theorem and $theorem <= $num-theorems] {
-    apply [JustifiedTheorem[position() = $theorem]];
-  } else {
-    $message = `concat ("Error: for the supplied mizar xml file, the theorem parameter should be greater than 0 and at most ", $num-theorems, ", but the value '", $theorem, "' was given")`;
-    msg terminate="yes" $message;
+  choose {
+    when [$theorem = ""] {
+      for-each [JustifiedTheorem] {
+        "Theorem "; `position()`; ": ";
+        apply [.]; "\n";
+      }
+    }
+    when [0 < $theorem and $theorem <= $num-theorems] {
+      "Theorem "; `$theorem`; ": ";
+      apply [JustifiedTheorem[position() = $theorem]]; "\n";
+    }
+    otherwise {
+      $message = `concat ("Error: for the supplied mizar xml file, the theorem parameter, if it is non-empty, should be greater than 0 and at most ", $num-theorems, ", but the value '", $theorem, "' was given")`;
+      msg terminate="yes" $message;
+    }
   }
 }
 
 tpl [JustifiedTheorem[Proof]] {
-  apply [Proof]; "\n";
+  apply [Proof];
 }
 
 tpl [JustifiedTheorem[not(Proof)]] {
