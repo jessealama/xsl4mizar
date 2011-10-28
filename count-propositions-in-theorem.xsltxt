@@ -18,13 +18,11 @@ tpl [Article] {
   choose {
     when [$theorem = ""] {
       for-each [JustifiedTheorem] {
-        "Theorem "; `position()`; ": ";
-        apply [.]; "\n";
+        `position()`; ":"; apply [.]; "\n";
       }
     }
     when [0 < $theorem and $theorem <= $num-theorems] {
-      "Theorem "; `$theorem`; ": ";
-      apply [JustifiedTheorem[position() = $theorem]]; "\n";
+      `$theorem`; ":"; apply [JustifiedTheorem[position() = $theorem]]; "\n";
     }
     otherwise {
       $message = `concat ("Error: for the supplied mizar xml file, the theorem parameter, if it is non-empty, should be greater than 0 and at most ", $num-theorems, ", but the value '", $theorem, "' was given")`;
