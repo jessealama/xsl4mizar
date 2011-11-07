@@ -75,11 +75,17 @@ tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] {
 }
 
 tpl [quantifier[@type = "existential"]] {
-  "ex "; ilist(#separ=",", #elems=`variable`); " st ";  apply[*[position() = last()]]; "";
+  "ex ";
+  ilist(#separ=",", #elems=`variable`);
+  " st ";
+  apply[*[position() = last()]];
 }
 
 tpl [quantifier[@type = "universal"]] {
-  "for "; ilist(#separ=",", #elems=`variable`); " holds ";  apply[*[position() = last()]]; "";
+  "for ";
+  ilist(#separ=",", #elems=`variable`);
+  " holds ";
+  apply[*[position() = last()]];
 }
 
 tpl [negation|] { "not "; apply; }
