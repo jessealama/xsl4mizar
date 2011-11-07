@@ -111,9 +111,8 @@
   </xsl:template>
 
   <xsl:template match="negation|">
-    <xsl:text> not </xsl:text>
+    <xsl:text>not </xsl:text>
     <xsl:apply-templates/>
-    <xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="function|predicate">
@@ -237,31 +236,7 @@
     <xsl:text> not contradiction </xsl:text>
   </xsl:template>
 
-  <xsl:template match="non-logical-data">
-    <!-- there can be embedded inferences -->
-    <xsl:choose>
-      <xsl:when test="@name=&apos;inference&apos;">
-        <xsl:for-each select="*[1]">
-          <xsl:value-of select="@name"/>
-        </xsl:for-each>
-        <xsl:text>(</xsl:text>
-        <xsl:call-template name="ilist">
-          <xsl:with-param name="separ">
-            <xsl:text>,</xsl:text>
-          </xsl:with-param>
-          <xsl:with-param name="elems" select="*[3]/*[not(@name=&apos;theory&apos;)]"/>
-        </xsl:call-template>
-        <xsl:text>)</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text>&lt;a href=&quot;#</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>&quot;&gt;</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>&lt;/a&gt;</xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
+  <xsl:template match="non-logical-data"/>
 
   <xsl:template name="transl_constr">
     <xsl:param name="nm"/>

@@ -113,12 +113,8 @@ tpl [defined-predicate[@name='false']]  { " contradiction "; }
 tpl [defined-predicate[@name='true']]  { " not contradiction "; }
 
 tpl [non-logical-data] {
-    // there can be embedded inferences
-    if [@name='inference'] {
-       for-each [*[1]] { `@name`; }
-       "("; ilist(#separ=",", #elems=`*[3]/*[not(@name='theory')]`); ")";
-    }
-    else { "<a href=\"#"; `@name`; "\">"; `@name`; "</a>"; } }
+  // no-op, for now
+}
 
 tpl transl_constr(#nm) { $nm; }
 
