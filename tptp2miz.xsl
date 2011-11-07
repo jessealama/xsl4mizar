@@ -3,6 +3,65 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="text"/>
   <xsl:strip-space elements="*"/>
+  <!-- //////////////////////////////////////////////////////////////////// -->
+  <!-- Stylesheet parameters -->
+  <!-- //////////////////////////////////////////////////////////////////// -->
+  <xsl:param name="article">
+    <xsl:text/>
+  </xsl:param>
+  <!-- //////////////////////////////////////////////////////////////////// -->
+  <!-- Utilities -->
+  <!-- //////////////////////////////////////////////////////////////////// -->
+  <xsl:variable name="lcletters">
+    <xsl:text>abcdefghijklmnopqrstuvwxyz</xsl:text>
+  </xsl:variable>
+  <xsl:variable name="ucletters">
+    <xsl:text>ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:text>
+  </xsl:variable>
+
+  <xsl:template name="lc">
+    <xsl:param name="s"/>
+    <xsl:value-of select="translate($s, $ucletters, $lcletters)"/>
+  </xsl:template>
+
+  <xsl:template name="uc">
+    <xsl:param name="s"/>
+    <xsl:value-of select="translate($s, $lcletters, $ucletters)"/>
+  </xsl:template>
+
+  <xsl:template name="capitalize-after-understore">
+    <xsl:param name="string"/>
+    <xsl:choose>
+      <xsl:when test="contains ($string, &quot;_&quot;)">
+        <xsl:variable name="before" select="substring-before ($string, &quot;_&quot;)"/>
+        <xsl:variable name="after" select="substring-after ($string, &quot;_&quot;)"/>
+        <xsl:choose>
+          <xsl:when test="$after = &quot;&quot;">
+            <xsl:value-of select="$before"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="after-length" select="string-length ($after)"/>
+            <xsl:variable name="first-char-as-string" select="substring ($after, 1, 1)"/>
+            <xsl:variable name="after-first-char" select="substring ($after, 2, $after-length)"/>
+            <xsl:variable name="first-char-as-string-uc">
+              <xsl:call-template name="uc">
+                <xsl:with-param name="s" select="$first-char-as-string"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="transformed-tail">
+              <xsl:call-template name="capitalize-after-understore">
+                <xsl:with-param name="string" select="$after-first-char"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat ($before, $first-char-as-string-uc, $transformed-tail)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$string"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
   <xsl:template match="/">
     <xsl:choose>
@@ -26,6 +85,30 @@
     <xsl:text>environ</xsl:text>
     <xsl:text>
 </xsl:text>
+    <xsl:if test="not($article = &quot;&quot;)">
+      <xsl:variable name="article-uc">
+        <xsl:call-template name="uc">
+          <xsl:with-param name="s" select="$article"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:text>
+</xsl:text>
+      <xsl:text>vocabularies </xsl:text>
+      <xsl:value-of select="$article-uc"/>
+      <xsl:text>;</xsl:text>
+      <xsl:text>
+</xsl:text>
+      <xsl:text>notations </xsl:text>
+      <xsl:value-of select="$article-uc"/>
+      <xsl:text>;</xsl:text>
+      <xsl:text>
+</xsl:text>
+      <xsl:text>constructors </xsl:text>
+      <xsl:value-of select="$article-uc"/>
+      <xsl:text>;</xsl:text>
+      <xsl:text>
+</xsl:text>
+    </xsl:if>
     <xsl:text>
 </xsl:text>
     <xsl:text>begin</xsl:text>
@@ -60,7 +143,12 @@
   </xsl:template>
 
   <xsl:template match="formula[@name]">
-    <xsl:value-of select="@name"/>
+    <xsl:variable name="safe-name">
+      <xsl:call-template name="capitalize-after-understore">
+        <xsl:with-param name="string" select="@name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$safe-name"/>
     <xsl:text>:</xsl:text>
     <xsl:text>
 </xsl:text>
@@ -167,15 +255,14 @@
       <xsl:text>(</xsl:text>
     </xsl:if>
     <xsl:value-of select="@name"/>
-    <xsl:if test="count(*)&gt;0">
-      <xsl:text>(</xsl:text>
+    <xsl:if test="count(*) &gt; 0">
+      <xsl:text> </xsl:text>
       <xsl:call-template name="ilist">
         <xsl:with-param name="separ">
           <xsl:text>,</xsl:text>
         </xsl:with-param>
         <xsl:with-param name="elems" select="*"/>
       </xsl:call-template>
-      <xsl:text>)</xsl:text>
     </xsl:if>
     <xsl:if test="parent::quantifier">
       <xsl:text>)</xsl:text>

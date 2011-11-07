@@ -19,9 +19,23 @@ $ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 tpl lc (#s) { `translate($s, $ucletters, $lcletters)`; }
 tpl uc (#s) { `translate($s, $lcletters, $ucletters)`; }
 
-// rough, but quick
-tpl delete-underscores (#string) {
-  `translate ($string, "_", "")`;
+tpl capitalize-after-understore (#string) {
+  if [contains ($string, "_")] {
+    $before = `substring-before ($string, "_")`;
+    $after = `substring-after ($string, "_")`;
+    if [$after = ""] {
+      `$before`;
+    } else {
+      $after-length = `string-length ($after)`;
+      $first-char-as-string = `substring ($after, 1, 1)`;
+      $after-first-char = `substring ($after, 2, $after-length)`;
+      $first-char-as-string-uc = uc (#s = $first-char-as-string);
+      $transformed-tail = capitalize-after-understore (#string = $after-first-char);
+      `concat ($before, $first-char-as-string-uc, $transformed-tail)`;
+    }
+  } else {
+    `$string`;
+  }
 }
 
 tpl [/] {
@@ -81,7 +95,7 @@ tpl [formula[not(@name)]] {
 }
 
 tpl [formula[@name]] {
-  $safe-name = delete-underscores (#string = `@name`);
+  $safe-name = capitalize-after-understore (#string = `@name`);
   `$safe-name`; ":"; "\n";
   apply[*[1]]; ";"; "\n";
 }
