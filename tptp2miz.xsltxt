@@ -139,8 +139,22 @@ tpl [predicate[@name = "="]] {
     if [parent::quantifier] { ")"; }
 }
 
-tpl [defined-predicate[@name='false']]  { " contradiction "; }
-tpl [defined-predicate[@name='true']]  { " not contradiction "; }
+//////////////////////////////////////////////////////////////////////
+// Defined predicates
+//////////////////////////////////////////////////////////////////////
+
+tpl [defined-predicate[not(@name)]] {
+  msg terminate="yes" "Error: unable to render a defined-predicate element that lacks a name attribute.";
+}
+
+tpl [defined-predicate[@name and not(@name = "true" or @name = "false")]] {
+  $n = `@name`;
+  $message = `concat ("Error: we are unable to handle a defined-predicate element whose name is '", $n, "'; we are able to handle only defined-predicates whose name is either 'true' or 'false'.")`;
+  msg terminate="yes" `$message`;
+}
+
+tpl [defined-predicate[@name = "false"]]  { "contradiction"; }
+tpl [defined-predicate[@name = "true"]]  { "not contradiction"; }
 
 tpl [non-logical-data] {
   // no-op, for now

@@ -23,6 +23,12 @@
   </xsl:template>
 
   <xsl:template match="tstp">
+    <xsl:text>environ</xsl:text>
+    <xsl:text>
+</xsl:text>
+    <xsl:text>begin</xsl:text>
+    <xsl:text>
+</xsl:text>
     <!-- give the type 'set' to all variables appearing in the problem -->
     <xsl:for-each select="descendant::variable[@name
                                  and not(@name = preceding::variable[@name]/@name)]">
@@ -94,7 +100,6 @@
     </xsl:call-template>
     <xsl:text> st </xsl:text>
     <xsl:apply-templates select="*[position() = last()]"/>
-    <xsl:text/>
   </xsl:template>
 
   <xsl:template match="quantifier[@type = &quot;universal&quot;]">
@@ -107,7 +112,6 @@
     </xsl:call-template>
     <xsl:text> holds </xsl:text>
     <xsl:apply-templates select="*[position() = last()]"/>
-    <xsl:text/>
   </xsl:template>
 
   <xsl:template match="negation|">
@@ -212,7 +216,6 @@
     <xsl:text> </xsl:text>
     <xsl:apply-templates select="*[1]"/>
     <xsl:text> = </xsl:text>
-    <xsl:text/>
     <xsl:apply-templates select="*[2]"/>
     <xsl:text> </xsl:text>
     <xsl:if test="parent::quantifier">
@@ -226,11 +229,27 @@
     </xsl:if>
     <xsl:apply-templates select="*[1]"/>
     <xsl:text> = </xsl:text>
-    <xsl:text/>
     <xsl:apply-templates select="*[2]"/>
     <xsl:if test="parent::quantifier">
       <xsl:text>)</xsl:text>
     </xsl:if>
+  </xsl:template>
+
+  <!-- //////////////////////////////////////////////////////////////////// -->
+  <!-- Defined predicates -->
+  <!-- //////////////////////////////////////////////////////////////////// -->
+  <xsl:template match="defined-predicate[not(@name)]">
+    <xsl:message terminate="yes">
+      <xsl:text>Error: unable to render a defined-predicate element that lacks a name attribute.</xsl:text>
+    </xsl:message>
+  </xsl:template>
+
+  <xsl:template match="defined-predicate[@name and not(@name = &quot;true&quot; or @name = &quot;false&quot;)]">
+    <xsl:variable name="n" select="@name"/>
+    <xsl:variable name="message" select="concat (&quot;Error: we are unable to handle a defined-predicate element whose name is &apos;&quot;, $n, &quot;&apos;; we are able to handle only defined-predicates whose name is either &apos;true&apos; or &apos;false&apos;.&quot;)"/>
+    <xsl:message terminate="yes">
+      <xsl:value-of select="$message"/>
+    </xsl:message>
   </xsl:template>
 
   <xsl:template match="defined-predicate[@name=&apos;false&apos;]">
