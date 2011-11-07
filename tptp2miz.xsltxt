@@ -19,6 +19,10 @@ tpl [/] {
 
 tpl [tstp] {
 
+  "environ"; "\n";
+
+  "begin"; "\n";
+
   // give the type 'set' to all variables appearing in the problem
   for-each [descendant::variable[@name
                                  and not(@name = preceding::variable[@name]/@name)]] {
