@@ -42,6 +42,14 @@ tpl [tstp] {
 
   "environ"; "\n";
 
+  if [not($article = "")] {
+    $article-uc = uc (#s = `$article`);
+    "\n";
+    "vocabularies "; `$article-uc`; ";"; "\n";
+    "notations "; `$article-uc`; ";"; "\n";
+    "constructors "; `$article-uc`; ";"; "\n";
+  }
+
   "\n";
 
   "begin"; "\n";
