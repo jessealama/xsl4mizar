@@ -47,15 +47,42 @@ tpl [/] {
   }
 }
 
-tpl [tstp] { apply; }
+tpl [tstp] {
 
-tpl [formula] {
+  // give the type 'set' to all variables appearing in the problem
+  for-each [descendant::variable[@name
+                                 and not(@name = preceding::variable[@name]/@name)]] {
+    apply [.] mode="set";
+  }
+
+  apply;
+}
+
+tpl [comment] {
+  // don't know how to properly deal with this yet
+
+  // ":: "; `text()`;
+}
+
+tpl [formula[not(@name)]] {
+  msg terminate="yes" "We encountered a formula element that lacks a name attribute.";
+}
+
+tpl [formula[@name]] {
     `@name`; ": ";
     apply[*[1]]; ";\n";
 }
 
-
 tpl [variable] { pvar(#nm=`@name`); }
+
+tpl [variable[not(@name)]] mode="set" {
+  msg terminate="yes" "Error: unable to assign the type 'set' to a variable that lacks a name";
+}
+
+tpl [variable[@name]] mode="set" {
+  "reserve "; `@name`; " for set;\n";
+}
+
 tpl [quantifier] {
     if [@type='existential'] { "ex "; ilist(#separ=",", #elems=`variable`); " being set st ";  apply[*[position() = last()]]; ""; }
     else { "for "; ilist(#separ=",", #elems=`variable`); " being set holds ";  apply[*[position() = last()]]; ""; }
