@@ -83,10 +83,24 @@ tpl [variable[@name]] mode="set" {
   "reserve "; `@name`; " for set;\n";
 }
 
-tpl [quantifier] {
-    if [@type='existential'] { "ex "; ilist(#separ=",", #elems=`variable`); " st ";  apply[*[position() = last()]]; ""; }
-    else { "for "; ilist(#separ=",", #elems=`variable`); " holds ";  apply[*[position() = last()]]; ""; }
+tpl [quantifier[not(@type)]] {
+  msg terminate="yes" "Error: we encountered a quantifier element that lacks a type attribute.";
 }
+
+tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] {
+  $type = `@type`;
+  $message = `concat ("Error: we encountered a quantifier element whose type, '", $type, "' is neither 'universal' nor 'existential', which are the only two types we handle.")`;
+  msg terminate="yes" `$message`;
+}
+
+tpl [quantifier[@type = "existential"]] {
+  "ex "; ilist(#separ=",", #elems=`variable`); " st ";  apply[*[position() = last()]]; "";
+}
+
+tpl [quantifier[@type = "universal"]] {
+  "for "; ilist(#separ=",", #elems=`variable`); " holds ";  apply[*[position() = last()]]; "";
+}
+
 tpl [negation|] { " not "; apply; " "; }
 tpl [function|predicate] {
     if [name(..)="quantifier"] { "("; }
@@ -102,15 +116,9 @@ tpl [conjunction] { " "; ilist(#separ=" & ", #elems=`*`); " "; }
 tpl [disjunction] { " "; ilist(#separ=" or ", #elems=`*`); " "; }
 tpl [implication] { " "; apply[*[1]]; " implies "; ""; apply[*[2]]; " "; }
 tpl [equivalence] {  " "; apply[*[1]]; " iff "; ""; apply[*[2]]; " "; }
-//     "$and(";
-//     "$not($and("; apply[*[1]]; ","; "$not("; apply[*[2]]; ")))"; ",";
-//     "$not($and("; apply[*[2]]; ","; "$not("; apply[*[1]]; ")))";
-//     ")";
-// }
 tpl [defined-predicate[@name='equal']]  {
     if [name(..)="quantifier"] { "("; }
      " "; apply[*[1]]; " = "; ""; apply[*[2]]; " ";
-//    transl_constr(#nm="r1_hidden"); "("; ilist(#separ=",", #elems=`*`); ")";
     if [name(..)="quantifier"] { ")"; }
  }
 tpl [defined-predicate[@name='false']]  { " contradiction "; }
