@@ -81,7 +81,16 @@ tpl [quantifier[@type = "existential"]] {
   apply[*[position() = last()]];
 }
 
-tpl [quantifier[@type = "universal"]] {
+tpl [quantifier[@type = "universal" and implication]] {
+  "for ";
+  ilist(#separ = ",", #elems = `variable`);
+  " st ";
+  apply [implication/*[1]];
+  " holds ";
+  apply [implication/*[2]];
+}
+
+tpl [quantifier[@type = "universal" and not(implication)]] {
   "for ";
   ilist(#separ=",", #elems=`variable`);
   " holds ";
@@ -122,6 +131,16 @@ tpl [*] (#connective) mode="multiple-arity-connective" {
 }
 
 tpl [conjunction] { apply [.] (#connective = "&") mode="multiple-arity-connective"; }
+
+// smart conjunction
+tpl [conjunction] {
+  apply [predicate[1]]; " & "; apply [predicate[2]];
+}
+
+tpl [conjunction[predicate and conjunction]] {
+  apply [predicate]; " & "; apply [conjunction];
+}
+
 tpl [disjunction] { apply [.] (#connective = "or") mode="multiple-arity-connective"; }
 tpl [implication] { apply [.] (#connective = "implies") mode="binary-connective"; }
 tpl [equivalence] { apply [.] (#connective = "iff") mode="binary-connective"; }

@@ -102,7 +102,21 @@
     <xsl:apply-templates select="*[position() = last()]"/>
   </xsl:template>
 
-  <xsl:template match="quantifier[@type = &quot;universal&quot;]">
+  <xsl:template match="quantifier[@type = &quot;universal&quot; and implication]">
+    <xsl:text>for </xsl:text>
+    <xsl:call-template name="ilist">
+      <xsl:with-param name="separ">
+        <xsl:text>,</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="elems" select="variable"/>
+    </xsl:call-template>
+    <xsl:text> st </xsl:text>
+    <xsl:apply-templates select="implication/*[1]"/>
+    <xsl:text> holds </xsl:text>
+    <xsl:apply-templates select="implication/*[2]"/>
+  </xsl:template>
+
+  <xsl:template match="quantifier[@type = &quot;universal&quot; and not(implication)]">
     <xsl:text>for </xsl:text>
     <xsl:call-template name="ilist">
       <xsl:with-param name="separ">
@@ -184,6 +198,19 @@
     </xsl:apply-templates>
   </xsl:template>
 
+  <!-- smart conjunction -->
+  <xsl:template match="conjunction">
+    <xsl:apply-templates select="predicate[1]"/>
+    <xsl:text> &amp; </xsl:text>
+    <xsl:apply-templates select="predicate[2]"/>
+  </xsl:template>
+
+  <xsl:template match="conjunction[predicate and conjunction]">
+    <xsl:apply-templates select="predicate"/>
+    <xsl:text> &amp; </xsl:text>
+    <xsl:apply-templates select="conjunction"/>
+  </xsl:template>
+
   <xsl:template match="disjunction">
     <xsl:apply-templates select="." mode="multiple-arity-connective">
       <xsl:with-param name="connective">
@@ -252,12 +279,12 @@
     </xsl:message>
   </xsl:template>
 
-  <xsl:template match="defined-predicate[@name=&apos;false&apos;]">
-    <xsl:text> contradiction </xsl:text>
+  <xsl:template match="defined-predicate[@name = &quot;false&quot;]">
+    <xsl:text>contradiction</xsl:text>
   </xsl:template>
 
-  <xsl:template match="defined-predicate[@name=&apos;true&apos;]">
-    <xsl:text> not contradiction </xsl:text>
+  <xsl:template match="defined-predicate[@name = &quot;true&quot;]">
+    <xsl:text>not contradiction</xsl:text>
   </xsl:template>
 
   <xsl:template match="non-logical-data"/>
