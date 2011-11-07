@@ -84,8 +84,8 @@ tpl [variable[@name]] mode="set" {
 }
 
 tpl [quantifier] {
-    if [@type='existential'] { "ex "; ilist(#separ=",", #elems=`variable`); " being set st ";  apply[*[position() = last()]]; ""; }
-    else { "for "; ilist(#separ=",", #elems=`variable`); " being set holds ";  apply[*[position() = last()]]; ""; }
+    if [@type='existential'] { "ex "; ilist(#separ=",", #elems=`variable`); " st ";  apply[*[position() = last()]]; ""; }
+    else { "for "; ilist(#separ=",", #elems=`variable`); " holds ";  apply[*[position() = last()]]; ""; }
 }
 tpl [negation|] { " not "; apply; " "; }
 tpl [function|predicate] {
