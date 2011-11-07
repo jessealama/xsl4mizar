@@ -125,14 +125,3 @@ tpl notlist(#separ,#elems) {
  for-each [$elems] {
   "$not("; apply[.]; ")"; if [not(position()=last())] { $separ; } }
 }
-
-tpl mkind(#kind) {
-   choose {
-      when [$kind = 'm'] { "mode";}
-      when [$kind = 'v'] { "attr";}
-      when [$kind = 'r'] { "pred";}
-      when [$kind = 'k'] { "func";}
-      when [$kind = 'g'] { "aggr";}
-      when [$kind = 'l'] { "struct";}
-      when [$kind = 'u'] { "sel";}
- }}
