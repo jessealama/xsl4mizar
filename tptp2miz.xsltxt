@@ -12,10 +12,10 @@ output method=text;
 // License: GPL (GNU GENERAL PUBLIC LICENSE)
 
 
-// XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking 
+// XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking
 // TSTP XML solutions to MML Query DLI syntax
 
-// To produce standard XSLT from this do e.g.: 
+// To produce standard XSLT from this do e.g.:
 // java -jar xsltxt.jar toXSL tptp2miz.xsltxt >tptp2miz.xsl
 
 
