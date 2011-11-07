@@ -120,8 +120,3 @@ tpl ilist(#separ,#elems) {
  for-each [$elems] {
   apply[.]; if [not(position()=last())] { $separ; } }
 }
-
-tpl notlist(#separ,#elems) {
- for-each [$elems] {
-  "$not("; apply[.]; ")"; if [not(position()=last())] { $separ; } }
-}
