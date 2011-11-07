@@ -82,7 +82,7 @@ tpl [negation|] { "not "; apply; }
 
 tpl [function|predicate] {
     if [name(..)="quantifier"] { "("; }
-    $tc = { transl_constr(#nm=`@name`); }
+    $tc = `@name`;
     if [contains($tc, ":attr") or contains($tc, ":mode")  or contains($tc, ":struct")] {
        " is "; apply[*[1]]; " "; $tc;
        "("; ilist(#separ=",", #elems=`*[position()>1]`); ")"; ")";
@@ -115,8 +115,6 @@ tpl [defined-predicate[@name='true']]  { " not contradiction "; }
 tpl [non-logical-data] {
   // no-op, for now
 }
-
-tpl transl_constr(#nm) { $nm; }
 
 tpl ilist(#separ,#elems) {
  for-each [$elems] {
