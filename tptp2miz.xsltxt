@@ -81,14 +81,17 @@ tpl [quantifier[@type = "universal"]] {
 tpl [negation|] { "not "; apply; }
 
 tpl [function|predicate] {
-    if [name(..)="quantifier"] { "("; }
+
+    if [parent::quantifier] { "("; }
+
     $tc = `@name`;
     if [contains($tc, ":attr") or contains($tc, ":mode")  or contains($tc, ":struct")] {
        " is "; apply[*[1]]; " "; $tc;
        "("; ilist(#separ=",", #elems=`*[position()>1]`); ")"; ")";
     }
     else { $tc; if[count(*)>0] {"("; ilist(#separ=",", #elems=`*`); ")"; }}
-    if [name(..)="quantifier"] { ")"; }
+
+    if [parent::quantifier] { ")"; }
 }
 tpl [conjunction] { " "; ilist(#separ=" & ", #elems=`*`); " "; }
 tpl [disjunction] { " "; ilist(#separ=" or ", #elems=`*`); " "; }
