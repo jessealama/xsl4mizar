@@ -26,15 +26,29 @@
     <xsl:text>environ</xsl:text>
     <xsl:text>
 </xsl:text>
+    <xsl:text>
+</xsl:text>
     <xsl:text>begin</xsl:text>
     <xsl:text>
 </xsl:text>
+    <xsl:if test="descendant::variable">
+      <xsl:text>
+</xsl:text>
+    </xsl:if>
     <!-- give the type 'set' to all variables appearing in the problem -->
     <xsl:for-each select="descendant::variable[@name
                                  and not(@name = preceding::variable[@name]/@name)]">
       <xsl:apply-templates select="." mode="set"/>
     </xsl:for-each>
-    <xsl:apply-templates/>
+    <xsl:if test="descendant::variable">
+      <xsl:text>
+</xsl:text>
+    </xsl:if>
+    <xsl:for-each select="formula">
+      <xsl:apply-templates select="."/>
+      <xsl:text>
+</xsl:text>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="comment"/>
@@ -47,9 +61,12 @@
 
   <xsl:template match="formula[@name]">
     <xsl:value-of select="@name"/>
-    <xsl:text>: </xsl:text>
+    <xsl:text>:</xsl:text>
+    <xsl:text>
+</xsl:text>
     <xsl:apply-templates select="*[1]"/>
-    <xsl:text>;
+    <xsl:text>;</xsl:text>
+    <xsl:text>
 </xsl:text>
   </xsl:template>
 
@@ -199,12 +216,6 @@
   </xsl:template>
 
   <!-- smart conjunction -->
-  <xsl:template match="conjunction">
-    <xsl:apply-templates select="predicate[1]"/>
-    <xsl:text> &amp; </xsl:text>
-    <xsl:apply-templates select="predicate[2]"/>
-  </xsl:template>
-
   <xsl:template match="conjunction[predicate and conjunction]">
     <xsl:apply-templates select="predicate"/>
     <xsl:text> &amp; </xsl:text>
@@ -217,6 +228,13 @@
         <xsl:text>or</xsl:text>
       </xsl:with-param>
     </xsl:apply-templates>
+  </xsl:template>
+
+  <!-- smart disjunction -->
+  <xsl:template match="disjunction[predicate and disjunction]">
+    <xsl:apply-templates select="predicate"/>
+    <xsl:text> &amp; </xsl:text>
+    <xsl:apply-templates select="disjunction"/>
   </xsl:template>
 
   <xsl:template match="implication">

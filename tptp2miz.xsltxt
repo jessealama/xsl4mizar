@@ -21,7 +21,11 @@ tpl [tstp] {
 
   "environ"; "\n";
 
+  "\n";
+
   "begin"; "\n";
+
+  if [descendant::variable] { "\n"; }
 
   // give the type 'set' to all variables appearing in the problem
   for-each [descendant::variable[@name
@@ -29,7 +33,11 @@ tpl [tstp] {
     apply [.] mode="set";
   }
 
-  apply;
+  if [descendant::variable] { "\n"; }
+
+  for-each [formula] {
+    apply [.]; "\n";
+  }
 }
 
 tpl [comment] {
@@ -44,8 +52,8 @@ tpl [formula[not(@name)]] {
 }
 
 tpl [formula[@name]] {
-    `@name`; ": ";
-    apply[*[1]]; ";\n";
+  `@name`; ":"; "\n";
+  apply[*[1]]; ";"; "\n";
 }
 
 tpl [variable[not(@name)]] {
@@ -133,15 +141,19 @@ tpl [*] (#connective) mode="multiple-arity-connective" {
 tpl [conjunction] { apply [.] (#connective = "&") mode="multiple-arity-connective"; }
 
 // smart conjunction
-tpl [conjunction] {
-  apply [predicate[1]]; " & "; apply [predicate[2]];
-}
 
 tpl [conjunction[predicate and conjunction]] {
   apply [predicate]; " & "; apply [conjunction];
 }
 
 tpl [disjunction] { apply [.] (#connective = "or") mode="multiple-arity-connective"; }
+
+// smart disjunction
+
+tpl [disjunction[predicate and disjunction]] {
+  apply [predicate]; " & "; apply [disjunction];
+}
+
 tpl [implication] { apply [.] (#connective = "implies") mode="binary-connective"; }
 tpl [equivalence] { apply [.] (#connective = "iff") mode="binary-connective"; }
 
