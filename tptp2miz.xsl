@@ -2,34 +2,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="text"/>
-  <!-- $Revision: 1.6 $ -->
-  <!--  -->
-  <!-- File: mizpl.xsltxt - stylesheet translating TSTP XML solutions to MML Query DLI syntax -->
-  <!--  -->
-  <!-- Author: Josef Urban -->
-  <!--  -->
-  <!-- License: GPL (GNU GENERAL PUBLIC LICENSE) -->
-  <!-- XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking -->
-  <!-- TSTP XML solutions to MML Query DLI syntax -->
-  <!-- To produce standard XSLT from this do e.g.: -->
-  <!-- java -jar xsltxt.jar toXSL tptp2miz.xsltxt >tptp2miz.xsl -->
   <xsl:strip-space elements="*"/>
-  <xsl:variable name="lcletters">
-    <xsl:text>abcdefghijklmnopqrstuvwxyz</xsl:text>
-  </xsl:variable>
-  <xsl:variable name="ucletters">
-    <xsl:text>ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:text>
-  </xsl:variable>
-
-  <xsl:template name="lc">
-    <xsl:param name="s"/>
-    <xsl:value-of select="translate($s, $ucletters, $lcletters)"/>
-  </xsl:template>
-
-  <xsl:template name="uc">
-    <xsl:param name="s"/>
-    <xsl:value-of select="translate($s, $lcletters, $ucletters)"/>
-  </xsl:template>
 
   <!-- MML Query needs numbers for proper display of indeces, -->
   <!-- hence this poor-man's numberization of proof-levels -->
@@ -300,63 +273,6 @@
   <xsl:template name="transl_constr">
     <xsl:param name="nm"/>
     <xsl:value-of select="$nm"/>
-  </xsl:template>
-
-  <xsl:template name="transl_constr_old">
-    <xsl:param name="nm"/>
-    <xsl:variable name="pref" select="substring-before($nm,&quot;_&quot;)"/>
-    <xsl:choose>
-      <xsl:when test="$pref">
-        <xsl:variable name="k" select="substring($pref,1,1)"/>
-        <xsl:variable name="nr" select="substring($pref,2)"/>
-        <xsl:variable name="art" select="substring-after($nm,&quot;_&quot;)"/>
-        <!-- test if $nr is digit -->
-        <xsl:choose>
-          <xsl:when test="$nr &gt;= 0">
-            <xsl:choose>
-              <xsl:when test="$k=&quot;c&quot;">
-                <xsl:variable name="lev" select="substring-before($art,&quot;__&quot;)"/>
-                <xsl:text>$</xsl:text>
-                <xsl:value-of select="$pref"/>
-                <xsl:text> </xsl:text>
-                <xsl:call-template name="usto0">
-                  <xsl:with-param name="s" select="$lev"/>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="uc">
-                  <xsl:with-param name="s" select="$art"/>
-                </xsl:call-template>
-                <xsl:text>:</xsl:text>
-                <xsl:call-template name="mkind">
-                  <xsl:with-param name="kind" select="$k"/>
-                </xsl:call-template>
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="$nr"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <xsl:otherwise>
-            <!-- test for skolem - esk3_4, epred1_2 -->
-            <xsl:variable name="esk" select="substring($pref,1,3)"/>
-            <xsl:choose>
-              <xsl:when test="$esk=&quot;esk&quot; or $esk=&quot;epr&quot;">
-                <xsl:text>$</xsl:text>
-                <xsl:value-of select="$pref"/>
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="$art"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$nm"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$nm"/>
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="ilist">
