@@ -115,88 +115,93 @@
     <xsl:apply-templates/>
   </xsl:template>
 
-  <xsl:template match="function|predicate">
-    <xsl:if test="name(..)=&quot;quantifier&quot;">
+  <xsl:template match="function[not(@name)]">
+    <xsl:message terminate="yes">
+      <xsl:text>Error: we cannot render a function element that lacks a name.</xsl:text>
+    </xsl:message>
+  </xsl:template>
+
+  <xsl:template match="predicate[not(@name)]">
+    <xsl:message terminate="yes">
+      <xsl:text>Error: we cannot render a predicate element that lacks a name.</xsl:text>
+    </xsl:message>
+  </xsl:template>
+
+  <xsl:template match="function[@name]|predicate[@name]">
+    <xsl:if test="parent::quantifier">
       <xsl:text>(</xsl:text>
     </xsl:if>
-    <xsl:variable name="tc">
-      <xsl:call-template name="transl_constr">
-        <xsl:with-param name="nm" select="@name"/>
+    <xsl:value-of select="@name"/>
+    <xsl:if test="count(*)&gt;0">
+      <xsl:text>(</xsl:text>
+      <xsl:call-template name="ilist">
+        <xsl:with-param name="separ">
+          <xsl:text>,</xsl:text>
+        </xsl:with-param>
+        <xsl:with-param name="elems" select="*"/>
       </xsl:call-template>
-    </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="contains($tc, &quot;:attr&quot;) or contains($tc, &quot;:mode&quot;)  or contains($tc, &quot;:struct&quot;)">
-        <xsl:text> is </xsl:text>
-        <xsl:apply-templates select="*[1]"/>
-        <xsl:text> </xsl:text>
-        <xsl:value-of select="$tc"/>
-        <xsl:text>(</xsl:text>
-        <xsl:call-template name="ilist">
-          <xsl:with-param name="separ">
-            <xsl:text>,</xsl:text>
-          </xsl:with-param>
-          <xsl:with-param name="elems" select="*[position()&gt;1]"/>
-        </xsl:call-template>
-        <xsl:text>)</xsl:text>
-        <xsl:text>)</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$tc"/>
-        <xsl:if test="count(*)&gt;0">
-          <xsl:text>(</xsl:text>
-          <xsl:call-template name="ilist">
-            <xsl:with-param name="separ">
-              <xsl:text>,</xsl:text>
-            </xsl:with-param>
-            <xsl:with-param name="elems" select="*"/>
-          </xsl:call-template>
-          <xsl:text>)</xsl:text>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:if test="name(..)=&quot;quantifier&quot;">
+      <xsl:text>)</xsl:text>
+    </xsl:if>
+    <xsl:if test="parent::quantifier">
+      <xsl:text>)</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="*" mode="binary-connective">
+    <xsl:param name="connective"/>
+    <xsl:text>(</xsl:text>
+    <xsl:apply-templates select="*[1]"/>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="$connective"/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="*[2]"/>
+    <xsl:text>)</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="*" mode="multiple-arity-connective">
+    <xsl:param name="connective"/>
+    <xsl:if test="count(*) &gt; 1">
+      <xsl:text>(</xsl:text>
+    </xsl:if>
+    <xsl:call-template name="ilist">
+      <xsl:with-param name="separ" select="concat (&quot; &quot;, $connective, &quot; &quot;)"/>
+      <xsl:with-param name="elems" select="*"/>
+    </xsl:call-template>
+    <xsl:if test="count(*) &gt; 1">
       <xsl:text>)</xsl:text>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="conjunction">
-    <xsl:text> </xsl:text>
-    <xsl:call-template name="ilist">
-      <xsl:with-param name="separ">
-        <xsl:text> &amp; </xsl:text>
+    <xsl:apply-templates select="." mode="multiple-arity-connective">
+      <xsl:with-param name="connective">
+        <xsl:text>&amp;</xsl:text>
       </xsl:with-param>
-      <xsl:with-param name="elems" select="*"/>
-    </xsl:call-template>
-    <xsl:text> </xsl:text>
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="disjunction">
-    <xsl:text> </xsl:text>
-    <xsl:call-template name="ilist">
-      <xsl:with-param name="separ">
-        <xsl:text> or </xsl:text>
+    <xsl:apply-templates select="." mode="multiple-arity-connective">
+      <xsl:with-param name="connective">
+        <xsl:text>or</xsl:text>
       </xsl:with-param>
-      <xsl:with-param name="elems" select="*"/>
-    </xsl:call-template>
-    <xsl:text> </xsl:text>
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="implication">
-    <xsl:text> </xsl:text>
-    <xsl:apply-templates select="*[1]"/>
-    <xsl:text> implies </xsl:text>
-    <xsl:text/>
-    <xsl:apply-templates select="*[2]"/>
-    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="binary-connective">
+      <xsl:with-param name="connective">
+        <xsl:text>implies</xsl:text>
+      </xsl:with-param>
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="equivalence">
-    <xsl:text> </xsl:text>
-    <xsl:apply-templates select="*[1]"/>
-    <xsl:text> iff </xsl:text>
-    <xsl:text/>
-    <xsl:apply-templates select="*[2]"/>
-    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="binary-connective">
+      <xsl:with-param name="connective">
+        <xsl:text>iff</xsl:text>
+      </xsl:with-param>
+    </xsl:apply-templates>
   </xsl:template>
 
   <!-- the name 'equal' as a defined-predicate: from an older version of tptp? -->
@@ -238,11 +243,6 @@
 
   <xsl:template match="non-logical-data"/>
 
-  <xsl:template name="transl_constr">
-    <xsl:param name="nm"/>
-    <xsl:value-of select="$nm"/>
-  </xsl:template>
-
   <xsl:template name="ilist">
     <xsl:param name="separ"/>
     <xsl:param name="elems"/>
@@ -252,45 +252,5 @@
         <xsl:value-of select="$separ"/>
       </xsl:if>
     </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template name="notlist">
-    <xsl:param name="separ"/>
-    <xsl:param name="elems"/>
-    <xsl:for-each select="$elems">
-      <xsl:text>$not(</xsl:text>
-      <xsl:apply-templates select="."/>
-      <xsl:text>)</xsl:text>
-      <xsl:if test="not(position()=last())">
-        <xsl:value-of select="$separ"/>
-      </xsl:if>
-    </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template name="mkind">
-    <xsl:param name="kind"/>
-    <xsl:choose>
-      <xsl:when test="$kind = &apos;m&apos;">
-        <xsl:text>mode</xsl:text>
-      </xsl:when>
-      <xsl:when test="$kind = &apos;v&apos;">
-        <xsl:text>attr</xsl:text>
-      </xsl:when>
-      <xsl:when test="$kind = &apos;r&apos;">
-        <xsl:text>pred</xsl:text>
-      </xsl:when>
-      <xsl:when test="$kind = &apos;k&apos;">
-        <xsl:text>func</xsl:text>
-      </xsl:when>
-      <xsl:when test="$kind = &apos;g&apos;">
-        <xsl:text>aggr</xsl:text>
-      </xsl:when>
-      <xsl:when test="$kind = &apos;l&apos;">
-        <xsl:text>struct</xsl:text>
-      </xsl:when>
-      <xsl:when test="$kind = &apos;u&apos;">
-        <xsl:text>sel</xsl:text>
-      </xsl:when>
-    </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>

@@ -80,24 +80,41 @@ tpl [quantifier[@type = "universal"]] {
 
 tpl [negation|] { "not "; apply; }
 
-tpl [function|predicate] {
-
-    if [parent::quantifier] { "("; }
-
-    $tc = `@name`;
-    if [contains($tc, ":attr") or contains($tc, ":mode")  or contains($tc, ":struct")] {
-       " is "; apply[*[1]]; " "; $tc;
-       "("; ilist(#separ=",", #elems=`*[position()>1]`); ")"; ")";
-    }
-    else { $tc; if[count(*)>0] {"("; ilist(#separ=",", #elems=`*`); ")"; }}
-
-    if [parent::quantifier] { ")"; }
+tpl [function[not(@name)]] {
+  msg terminate="yes" "Error: we cannot render a function element that lacks a name.";
 }
-tpl [conjunction] { " "; ilist(#separ=" & ", #elems=`*`); " "; }
-tpl [disjunction] { " "; ilist(#separ=" or ", #elems=`*`); " "; }
-tpl [implication] { " "; apply[*[1]]; " implies "; ""; apply[*[2]]; " "; }
-tpl [equivalence] {  " "; apply[*[1]]; " iff "; ""; apply[*[2]]; " "; }
 
+tpl [predicate[not(@name)]] {
+  msg terminate="yes" "Error: we cannot render a predicate element that lacks a name.";
+}
+
+tpl [function[@name]|predicate[@name]] {
+  if [parent::quantifier] { "("; }
+
+  `@name`;
+
+  if[count(*)>0] {
+    "("; ilist(#separ=",", #elems=`*`); ")";
+  }
+
+  if [parent::quantifier] { ")"; }
+}
+
+tpl [*] (#connective) mode="binary-connective" {
+  "("; apply[*[1]]; " "; `$connective`; " "; apply[*[2]]; ")";
+}
+
+tpl [*] (#connective) mode="multiple-arity-connective" {
+  if [count(*) > 1] { "("; }
+  ilist(#separ = `concat (" ", $connective, " ")`,
+        #elems = `*`);
+  if [count(*) > 1] { ")"; }
+}
+
+tpl [conjunction] { apply [.] (#connective = "&") mode="multiple-arity-connective"; }
+tpl [disjunction] { apply [.] (#connective = "or") mode="multiple-arity-connective"; }
+tpl [implication] { apply [.] (#connective = "implies") mode="binary-connective"; }
+tpl [equivalence] { apply [.] (#connective = "iff") mode="binary-connective"; }
 
 // the name 'equal' as a defined-predicate: from an older version of tptp?
 tpl [defined-predicate[@name='equal']] {
