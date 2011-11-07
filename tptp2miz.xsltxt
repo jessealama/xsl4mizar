@@ -3,6 +3,27 @@ stylesheet "1.0";
 output method=text;
 strip-space "*";
 
+//////////////////////////////////////////////////////////////////////
+// Stylesheet parameters
+//////////////////////////////////////////////////////////////////////
+
+#article = { ""; }
+
+//////////////////////////////////////////////////////////////////////
+// Utilities
+//////////////////////////////////////////////////////////////////////
+
+$lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
+$ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+
+tpl lc (#s) { `translate($s, $ucletters, $lcletters)`; }
+tpl uc (#s) { `translate($s, $lcletters, $ucletters)`; }
+
+// rough, but quick
+tpl delete-underscores (#string) {
+  `translate ($string, "_", "")`;
+}
+
 tpl [/] {
   choose {
     when [not(tstp)] {
