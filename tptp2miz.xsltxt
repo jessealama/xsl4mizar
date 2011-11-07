@@ -122,11 +122,21 @@ tpl [conjunction] { " "; ilist(#separ=" & ", #elems=`*`); " "; }
 tpl [disjunction] { " "; ilist(#separ=" or ", #elems=`*`); " "; }
 tpl [implication] { " "; apply[*[1]]; " implies "; ""; apply[*[2]]; " "; }
 tpl [equivalence] {  " "; apply[*[1]]; " iff "; ""; apply[*[2]]; " "; }
-tpl [defined-predicate[@name='equal']]  {
-    if [name(..)="quantifier"] { "("; }
+
+
+// the name 'equal' as a defined-predicate: from an older version of tptp?
+tpl [defined-predicate[@name='equal']] {
+    if [parent::quantifier] { "("; }
      " "; apply[*[1]]; " = "; ""; apply[*[2]]; " ";
-    if [name(..)="quantifier"] { ")"; }
- }
+    if [parent::quantifier] { ")"; }
+}
+
+tpl [predicate[@name = "="]] {
+    if [parent::quantifier] { "("; }
+    apply[*[1]]; " = "; ""; apply[*[2]];
+    if [parent::quantifier] { ")"; }
+}
+
 tpl [defined-predicate[@name='false']]  { " contradiction "; }
 tpl [defined-predicate[@name='true']]  { " not contradiction "; }
 

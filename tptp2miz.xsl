@@ -20,16 +20,6 @@
   <xsl:variable name="ucletters">
     <xsl:text>ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:text>
   </xsl:variable>
-  <!-- directory with articles in html; we assume it is one level up -->
-  <!-- #baseurl= { "http://lipa.ms.mff.cuni.cz/~urban/xmlmml/html.930/"; } -->
-  <xsl:param name="baseurl">
-    <xsl:text>../</xsl:text>
-  </xsl:param>
-  <!-- name of article from which this by-explanation comes; -->
-  <!-- needs to be passed as a parameter!! -->
-  <xsl:param name="anamelc">
-    <xsl:text>current_article</xsl:text>
-  </xsl:param>
 
   <xsl:template name="lc">
     <xsl:param name="s"/>
@@ -48,13 +38,42 @@
     <xsl:value-of select="translate($s, &quot;_&quot;, &quot;0&quot;)"/>
   </xsl:template>
 
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="not(tstp)">
+        <xsl:message terminate="yes">
+          <xsl:text>Error: this does not appear to be a TSTP XML document, because it lacks a &apos;tstp&apos; root element.</xsl:text>
+        </xsl:message>
+      </xsl:when>
+      <xsl:when test="tstp[2]">
+        <xsl:message terminate="yes">
+          <xsl:text>Error: this does not appear to be a TSTP XML document, because it has multiple &apos;tstp&apos; root elements.</xsl:text>
+        </xsl:message>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="tstp"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="tstp">
-    <xsl:text>:: &lt;h3&gt;&lt;center&gt;&lt;a href=&quot;http://mmlquery.mizar.org&quot;&gt;MML Query&lt;/a&gt; rendering of ATP proof steps&lt;/center&gt;&lt;/h3&gt;&lt;br/&gt;
-</xsl:text>
+    <!-- give the type 'set' to all variables appearing in the problem -->
+    <xsl:for-each select="descendant::variable[@name
+                                 and not(@name = preceding::variable[@name]/@name)]">
+      <xsl:apply-templates select="." mode="set"/>
+    </xsl:for-each>
     <xsl:apply-templates/>
   </xsl:template>
 
-  <xsl:template match="formula">
+  <xsl:template match="comment"/>
+
+  <xsl:template match="formula[not(@name)]">
+    <xsl:message terminate="yes">
+      <xsl:text>We encountered a formula element that lacks a name attribute.</xsl:text>
+    </xsl:message>
+  </xsl:template>
+
+  <xsl:template match="formula[@name]">
     <xsl:value-of select="@name"/>
     <xsl:text>: </xsl:text>
     <xsl:apply-templates select="*[1]"/>
@@ -62,54 +81,67 @@
 </xsl:text>
   </xsl:template>
 
-  <!-- tpl [formula] { -->
-  <!-- ":: "; "<a name=\""; `@name`; "\"/> "; -->
-  <!-- if [source/non-logical-data[@name='file']] { -->
-  <!-- `@status`; ": "; -->
-  <!-- for-each [source/non-logical-data[@name='file']/*[2]] { get_mizar_url(#nm=`@name`); } -->
-  <!-- } -->
-  <!-- else { -->
-  <!-- for-each [source/non-logical-data[@name='inference']] { -->
-  <!-- "inference: "; apply[.]; -->
-  <!-- } -->
-  <!-- } -->
-  <!-- "<br/>\n"; -->
-  <!-- "A:step "; `@name`; "="; apply[*[1]]; "\n"; -->
-  <!-- } -->
-  <!-- tpl [quantifier/variable] { "for "; pvar(#nm=`@name`); " being set holds "; } -->
-  <xsl:template match="variable">
-    <xsl:call-template name="pvar">
-      <xsl:with-param name="nm" select="@name"/>
-    </xsl:call-template>
+  <xsl:template match="variable[not(@name)]">
+    <xsl:message terminate="yes">
+      <xsl:text>Error: unable to render a variable element that lacks a name attribute.</xsl:text>
+    </xsl:message>
   </xsl:template>
 
-  <xsl:template match="quantifier">
-    <xsl:choose>
-      <xsl:when test="@type=&apos;existential&apos;">
-        <xsl:text>ex </xsl:text>
-        <xsl:call-template name="ilist">
-          <xsl:with-param name="separ">
-            <xsl:text>,</xsl:text>
-          </xsl:with-param>
-          <xsl:with-param name="elems" select="variable"/>
-        </xsl:call-template>
-        <xsl:text> being set st </xsl:text>
-        <xsl:apply-templates select="*[position() = last()]"/>
-        <xsl:text/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text>for </xsl:text>
-        <xsl:call-template name="ilist">
-          <xsl:with-param name="separ">
-            <xsl:text>,</xsl:text>
-          </xsl:with-param>
-          <xsl:with-param name="elems" select="variable"/>
-        </xsl:call-template>
-        <xsl:text> being set holds </xsl:text>
-        <xsl:apply-templates select="*[position() = last()]"/>
-        <xsl:text/>
-      </xsl:otherwise>
-    </xsl:choose>
+  <xsl:template match="variable[@name]">
+    <xsl:value-of select="@name"/>
+  </xsl:template>
+
+  <xsl:template match="variable[not(@name)]" mode="set">
+    <xsl:message terminate="yes">
+      <xsl:text>Error: unable to assign the type &apos;set&apos; to a variable that lacks a name</xsl:text>
+    </xsl:message>
+  </xsl:template>
+
+  <xsl:template match="variable[@name]" mode="set">
+    <xsl:text>reserve </xsl:text>
+    <xsl:value-of select="@name"/>
+    <xsl:text> for set;
+</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="quantifier[not(@type)]">
+    <xsl:message terminate="yes">
+      <xsl:text>Error: we encountered a quantifier element that lacks a type attribute.</xsl:text>
+    </xsl:message>
+  </xsl:template>
+
+  <xsl:template match="quantifier[@type and not(@type = &quot;universal&quot; or @type = &quot;existential&quot;)]">
+    <xsl:variable name="type" select="@type"/>
+    <xsl:variable name="message" select="concat (&quot;Error: we encountered a quantifier element whose type, &apos;&quot;, $type, &quot;&apos; is neither &apos;universal&apos; nor &apos;existential&apos;, which are the only two types we handle.&quot;)"/>
+    <xsl:message terminate="yes">
+      <xsl:value-of select="$message"/>
+    </xsl:message>
+  </xsl:template>
+
+  <xsl:template match="quantifier[@type = &quot;existential&quot;]">
+    <xsl:text>ex </xsl:text>
+    <xsl:call-template name="ilist">
+      <xsl:with-param name="separ">
+        <xsl:text>,</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="elems" select="variable"/>
+    </xsl:call-template>
+    <xsl:text> st </xsl:text>
+    <xsl:apply-templates select="*[position() = last()]"/>
+    <xsl:text/>
+  </xsl:template>
+
+  <xsl:template match="quantifier[@type = &quot;universal&quot;]">
+    <xsl:text>for </xsl:text>
+    <xsl:call-template name="ilist">
+      <xsl:with-param name="separ">
+        <xsl:text>,</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="elems" select="variable"/>
+    </xsl:call-template>
+    <xsl:text> holds </xsl:text>
+    <xsl:apply-templates select="*[position() = last()]"/>
+    <xsl:text/>
   </xsl:template>
 
   <xsl:template match="negation|">
@@ -202,13 +234,9 @@
     <xsl:text> </xsl:text>
   </xsl:template>
 
-  <!-- "$and("; -->
-  <!-- "$not($and("; apply[*[1]]; ","; "$not("; apply[*[2]]; ")))"; ","; -->
-  <!-- "$not($and("; apply[*[2]]; ","; "$not("; apply[*[1]]; ")))"; -->
-  <!-- ")"; -->
-  <!-- } -->
+  <!-- the name 'equal' as a defined-predicate: from an older version of tptp? -->
   <xsl:template match="defined-predicate[@name=&apos;equal&apos;]">
-    <xsl:if test="name(..)=&quot;quantifier&quot;">
+    <xsl:if test="parent::quantifier">
       <xsl:text>(</xsl:text>
     </xsl:if>
     <xsl:text> </xsl:text>
@@ -217,8 +245,20 @@
     <xsl:text/>
     <xsl:apply-templates select="*[2]"/>
     <xsl:text> </xsl:text>
-    <!-- transl_constr(#nm="r1_hidden"); "("; ilist(#separ=",", #elems=`*`); ")"; -->
-    <xsl:if test="name(..)=&quot;quantifier&quot;">
+    <xsl:if test="parent::quantifier">
+      <xsl:text>)</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="predicate[@name = &quot;=&quot;]">
+    <xsl:if test="parent::quantifier">
+      <xsl:text>(</xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="*[1]"/>
+    <xsl:text> = </xsl:text>
+    <xsl:text/>
+    <xsl:apply-templates select="*[2]"/>
+    <xsl:if test="parent::quantifier">
       <xsl:text>)</xsl:text>
     </xsl:if>
   </xsl:template>
@@ -312,108 +352,6 @@
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$nm"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="get_mizar_url">
-    <xsl:param name="nm"/>
-    <xsl:variable name="pref" select="substring-before($nm,&quot;_&quot;)"/>
-    <xsl:choose>
-      <xsl:when test="$pref">
-        <xsl:variable name="k" select="substring($pref,1,1)"/>
-        <xsl:variable name="k2" select="substring($pref,2,1)"/>
-        <xsl:variable name="nr">
-          <xsl:choose>
-            <xsl:when test="$k2&gt;0">
-              <xsl:value-of select="substring($pref,2)"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="substring($pref,3)"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="art" select="substring-after($nm,&quot;_&quot;)"/>
-        <xsl:choose>
-          <xsl:when test="$k=&quot;t&quot;">
-            <xsl:text>&lt;a href=&quot;</xsl:text>
-            <xsl:value-of select="$baseurl"/>
-            <xsl:value-of select="$art"/>
-            <xsl:text>.html#T</xsl:text>
-            <xsl:value-of select="$nr"/>
-            <xsl:text>&quot;&gt;</xsl:text>
-            <xsl:value-of select="$nm"/>
-            <xsl:text>&lt;/a&gt;</xsl:text>
-          </xsl:when>
-          <xsl:when test="$k=&quot;l&quot;">
-            <xsl:text>&lt;a href=&quot;</xsl:text>
-            <xsl:value-of select="$baseurl"/>
-            <xsl:value-of select="$art"/>
-            <xsl:text>.html#E</xsl:text>
-            <xsl:value-of select="$nr"/>
-            <xsl:text>&quot;&gt;</xsl:text>
-            <xsl:value-of select="$nm"/>
-            <xsl:text>&lt;/a&gt;</xsl:text>
-          </xsl:when>
-          <xsl:when test="$k=&quot;e&quot;">
-            <xsl:text>&lt;a href=&quot;</xsl:text>
-            <xsl:value-of select="$baseurl"/>
-            <xsl:value-of select="$anamelc"/>
-            <xsl:text>.html#E</xsl:text>
-            <xsl:value-of select="$nr"/>
-            <xsl:text>:</xsl:text>
-            <xsl:value-of select="$art"/>
-            <xsl:text>&quot;&gt;</xsl:text>
-            <xsl:value-of select="$nm"/>
-            <xsl:text>&lt;/a&gt;</xsl:text>
-          </xsl:when>
-          <xsl:when test="($k=&quot;d&quot;) and ($k2&gt;0)">
-            <xsl:text>&lt;a href=&quot;</xsl:text>
-            <xsl:value-of select="$baseurl"/>
-            <xsl:value-of select="$art"/>
-            <xsl:text>.html#D</xsl:text>
-            <xsl:value-of select="$nr"/>
-            <xsl:text>&quot;&gt;</xsl:text>
-            <xsl:value-of select="$nm"/>
-            <xsl:text>&lt;/a&gt;</xsl:text>
-          </xsl:when>
-          <xsl:when test="($k2=&quot;c&quot;) and (($k=&quot;f&quot;) or ($k=&quot;c&quot;) or ($k=&quot;r&quot;))">
-            <xsl:text>&lt;a href=&quot;</xsl:text>
-            <xsl:value-of select="$baseurl"/>
-            <xsl:value-of select="$art"/>
-            <xsl:text>.html#</xsl:text>
-            <xsl:call-template name="uc">
-              <xsl:with-param name="s" select="$pref"/>
-            </xsl:call-template>
-            <xsl:text>&quot;&gt;</xsl:text>
-            <xsl:value-of select="$nm"/>
-            <xsl:text>&lt;/a&gt;</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$nm"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$nm"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="pvar">
-    <xsl:param name="nm"/>
-    <xsl:variable name="l" select="substring($nm,1,1)"/>
-    <xsl:variable name="nr" select="substring($nm,2)"/>
-    <!-- test if $nr is digit -->
-    <xsl:choose>
-      <xsl:when test="$nr &gt;= 0">
-        <xsl:text>$</xsl:text>
-        <xsl:value-of select="$l"/>
-        <xsl:text> </xsl:text>
-        <xsl:value-of select="$nr"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$nm"/>
