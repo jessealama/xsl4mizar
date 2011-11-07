@@ -29,7 +29,8 @@ tpl [tstp] {
 }
 
 tpl [comment] {
-  // don't know how to properly deal with this yet
+  // don't know how to properly deal with this yet.  We need to
+  // properly handle whitespace.
 
   // ":: "; `text()`;
 }

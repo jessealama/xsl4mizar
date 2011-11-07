@@ -4,13 +4,6 @@
   <xsl:output method="text"/>
   <xsl:strip-space elements="*"/>
 
-  <!-- MML Query needs numbers for proper display of indeces, -->
-  <!-- hence this poor-man's numberization of proof-levels -->
-  <xsl:template name="usto0">
-    <xsl:param name="s"/>
-    <xsl:value-of select="translate($s, &quot;_&quot;, &quot;0&quot;)"/>
-  </xsl:template>
-
   <xsl:template match="/">
     <xsl:choose>
       <xsl:when test="not(tstp)">
