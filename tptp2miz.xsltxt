@@ -73,7 +73,13 @@ tpl [formula[@name]] {
     apply[*[1]]; ";\n";
 }
 
-tpl [variable] { pvar(#nm=`@name`); }
+tpl [variable[not(@name)]] {
+  msg terminate="yes" "Error: unable to render a variable element that lacks a name attribute.";
+}
+
+tpl [variable[@name]] {
+  `@name`;
+}
 
 tpl [variable[not(@name)]] mode="set" {
   msg terminate="yes" "Error: unable to assign the type 'set' to a variable that lacks a name";
@@ -156,14 +162,6 @@ tpl transl_constr_old(#nm) {
 	  else { $nm; }
        }
     }
-    else { $nm; }
-}
-
-tpl pvar(#nm) {
-    $l = `substring($nm,1,1)`;
-    $nr = `substring($nm,2)`;
-    // test if $nr is digit
-    if [$nr >= 0] { "$"; $l; " "; $nr; }
     else { $nm; }
 }
 
