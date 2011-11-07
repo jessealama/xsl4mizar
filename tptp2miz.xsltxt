@@ -78,7 +78,8 @@ tpl [quantifier[@type = "universal"]] {
   "for "; ilist(#separ=",", #elems=`variable`); " holds ";  apply[*[position() = last()]]; "";
 }
 
-tpl [negation|] { " not "; apply; " "; }
+tpl [negation|] { "not "; apply; }
+
 tpl [function|predicate] {
     if [name(..)="quantifier"] { "("; }
     $tc = { transl_constr(#nm=`@name`); }
