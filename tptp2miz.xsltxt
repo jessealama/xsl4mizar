@@ -73,7 +73,8 @@ tpl [formula[not(@name)]] {
 }
 
 tpl [formula[@name]] {
-  `@name`; ":"; "\n";
+  $safe-name = delete-underscores (#string = `@name`);
+  `$safe-name`; ":"; "\n";
   apply[*[1]]; ";"; "\n";
 }
 
