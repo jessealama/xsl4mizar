@@ -129,13 +129,13 @@ tpl [equivalence] { apply [.] (#connective = "iff") mode="binary-connective"; }
 // the name 'equal' as a defined-predicate: from an older version of tptp?
 tpl [defined-predicate[@name='equal']] {
     if [parent::quantifier] { "("; }
-     " "; apply[*[1]]; " = "; ""; apply[*[2]]; " ";
+     " "; apply[*[1]]; " = "; apply[*[2]]; " ";
     if [parent::quantifier] { ")"; }
 }
 
 tpl [predicate[@name = "="]] {
     if [parent::quantifier] { "("; }
-    apply[*[1]]; " = "; ""; apply[*[2]];
+    apply[*[1]]; " = "; apply[*[2]];
     if [parent::quantifier] { ")"; }
 }
 
