@@ -150,8 +150,8 @@ tpl [function[@name]|predicate[@name]] {
 
   `@name`;
 
-  if[count(*)>0] {
-    "("; ilist(#separ=",", #elems=`*`); ")";
+  if[count(*) > 0] {
+    " "; ilist(#separ=",", #elems=`*`);
   }
 
   if [parent::quantifier] { ")"; }
