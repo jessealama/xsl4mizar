@@ -3,11 +3,6 @@ stylesheet "1.0";
 output method=text;
 strip-space "*";
 
-// MML Query needs numbers for proper display of indeces,
-// hence this poor-man's numberization of proof-levels
-tpl usto0(#s) { `translate($s, "_", "0")`; }
-
-
 tpl [/] {
   choose {
     when [not(tstp)] {
