@@ -1,0 +1,160 @@
+<Item kind="Theorem-Item" line="647" col="7">
+  <Proposition>
+   <Conditional-Formula line="649" col="5">
+    <Predicative-Formula nr="4" spelling="c=" line="648" col="6">
+     <Arguments>
+      <Simple-Term idnr="5" spelling="X" line="648" col="3"/>
+     </Arguments>
+     <Arguments>
+      <Infix-Term nr="3" spelling="\/" line="648" col="11">
+       <Arguments>
+        <Simple-Term idnr="7" spelling="Y" line="648" col="8"/>
+       </Arguments>
+       <Arguments>
+        <Simple-Term idnr="9" spelling="Z" line="648" col="13"/>
+       </Arguments>
+      </Infix-Term>
+     </Arguments>
+    </Predicative-Formula>
+    <Predicative-Formula nr="4" spelling="c=" line="648" col="30">
+     <Arguments>
+      <Infix-Term nr="5" spelling="\" line="648" col="25">
+       <Arguments>
+        <Simple-Term idnr="5" spelling="X" line="648" col="23"/>
+       </Arguments>
+       <Arguments>
+        <Simple-Term idnr="7" spelling="Y" line="648" col="27"/>
+       </Arguments>
+      </Infix-Term>
+     </Arguments>
+     <Arguments>
+      <Simple-Term idnr="9" spelling="Z" line="648" col="32"/>
+     </Arguments>
+    </Predicative-Formula>
+   </Conditional-Formula>
+  </Proposition>
+  <Block kind="Proof" line="649" col="5">
+   <Item kind="Assumption" line="650" col="8">
+    <Single-Assumption line="650" col="8">
+     <Proposition>
+      <Label idnr="12" spelling="A1" line="651" col="2"/>
+      <Predicative-Formula nr="4" spelling="c=" line="651" col="8">
+       <Arguments>
+        <Simple-Term idnr="5" spelling="X" line="651" col="5"/>
+       </Arguments>
+       <Arguments>
+        <Infix-Term nr="3" spelling="\/" line="651" col="13">
+         <Arguments>
+          <Simple-Term idnr="7" spelling="Y" line="651" col="10"/>
+         </Arguments>
+         <Arguments>
+          <Simple-Term idnr="9" spelling="Z" line="651" col="15"/>
+         </Arguments>
+        </Infix-Term>
+       </Arguments>
+      </Predicative-Formula>
+     </Proposition>
+    </Single-Assumption>
+   </Item>
+   <Item kind="Generalization" line="652" col="7">
+    <Implicitly-Qualified-Segment line="652" col="7">
+     <Variable idnr="2" spelling="x" line="652" col="7"/>
+    </Implicitly-Qualified-Segment>
+   </Item>
+   <Item kind="Assumption" line="653" col="8">
+    <Single-Assumption line="653" col="8">
+     <Proposition>
+      <Label idnr="13" spelling="A2" line="654" col="2"/>
+      <Predicative-Formula nr="3" spelling="in" line="654" col="8">
+       <Arguments>
+        <Simple-Term idnr="2" spelling="x" line="654" col="5"/>
+       </Arguments>
+       <Arguments>
+        <Infix-Term nr="5" spelling="\" line="654" col="12">
+         <Arguments>
+          <Simple-Term idnr="5" spelling="X" line="654" col="10"/>
+         </Arguments>
+         <Arguments>
+          <Simple-Term idnr="7" spelling="Y" line="654" col="14"/>
+         </Arguments>
+        </Infix-Term>
+       </Arguments>
+      </Predicative-Formula>
+     </Proposition>
+    </Single-Assumption>
+   </Item>
+   <Item kind="Regular-Statement" line="655" col="8">
+    <Compact-Statement/>
+    <Proposition>
+     <Predicative-Formula nr="3" spelling="in" line="655" col="11">
+      <Arguments>
+       <Simple-Term idnr="2" spelling="x" line="655" col="8"/>
+      </Arguments>
+      <Arguments>
+       <Simple-Term idnr="5" spelling="X" line="655" col="13"/>
+      </Arguments>
+     </Predicative-Formula>
+    </Proposition>
+    <Straightforward-Justification line="655" col="16">
+     <Link line="655" col="6"/>
+     <Definition-Reference line="655" col="31" nr="2" spelling="XBOOLE_0" number="5"/>
+    </Straightforward-Justification>
+   </Item>
+   <Item kind="Regular-Statement" line="657" col="2">
+    <Compact-Statement/>
+    <Proposition>
+     <Label idnr="21" spelling="A3" line="657" col="2"/>
+     <Predicative-Formula nr="3" spelling="in" line="657" col="8">
+      <Arguments>
+       <Simple-Term idnr="2" spelling="x" line="657" col="5"/>
+      </Arguments>
+      <Arguments>
+       <Infix-Term nr="3" spelling="\/" line="657" col="13">
+        <Arguments>
+         <Simple-Term idnr="7" spelling="Y" line="657" col="10"/>
+        </Arguments>
+        <Arguments>
+         <Simple-Term idnr="9" spelling="Z" line="657" col="15"/>
+        </Arguments>
+       </Infix-Term>
+      </Arguments>
+     </Predicative-Formula>
+    </Proposition>
+    <Straightforward-Justification line="657" col="18">
+     <Link line="656" col="6"/>
+     <Local-Reference line="657" col="21" idnr="12" spelling="A1"/>
+     <Definition-Reference line="657" col="34" nr="1" spelling="TARSKI" number="3"/>
+    </Straightforward-Justification>
+   </Item>
+   <Item kind="Regular-Statement" line="658" col="5">
+    <Compact-Statement/>
+    <Proposition>
+     <Negated-Formula line="658" col="15">
+      <Predicative-Formula nr="3" spelling="in" line="658" col="10">
+       <Arguments>
+        <Simple-Term idnr="2" spelling="x" line="658" col="7"/>
+       </Arguments>
+       <Arguments>
+        <Simple-Term idnr="7" spelling="Y" line="658" col="12"/>
+       </Arguments>
+      </Predicative-Formula>
+     </Negated-Formula>
+    </Proposition>
+    <Straightforward-Justification line="658" col="15">
+     <Local-Reference line="658" col="18" idnr="13" spelling="A2"/>
+     <Definition-Reference line="658" col="33" nr="2" spelling="XBOOLE_0" number="5"/>
+    </Straightforward-Justification>
+   </Item>
+   <Item kind="Conclusion" line="659" col="14">
+    <Compact-Statement/>
+    <Proposition>
+     <Thesis line="659" col="14"/>
+    </Proposition>
+    <Straightforward-Justification line="659" col="17">
+     <Link line="659" col="7"/>
+     <Local-Reference line="659" col="20" idnr="21" spelling="A3"/>
+     <Definition-Reference line="659" col="35" nr="2" spelling="XBOOLE_0" number="3"/>
+    </Straightforward-Justification>
+   </Item>
+  </Block>
+ </Item>
