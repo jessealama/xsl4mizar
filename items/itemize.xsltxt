@@ -28,19 +28,23 @@ tpl [*] mode="make-item" {
 }
 
 tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and @shape = "Compact-Statement"]] mode="make-item" {
+  $context = `.`;
   // look for a sign that we can't promote this toplevel unexported lemma to a proper theorem
-  $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
-  if [$bad = "1"] {
-    msg "we cannot promote this lemma to a theorem";
-    apply [.];
-  } else {
-    msg "we can promote this lemma to a theorem";
-    <Text-Proper {
-      <Item { @kind = "Section-Pragma"; }
-      <Item {
-        @kind = "Theorem-Item";
-        @promoted-lemma = "yes";
-        for-each [Proposition] {
+  for-each [Proposition] {
+    $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
+    if [$bad = "1"] {
+      msg "we cannot promote this lemma to a theorem";
+      <Text-Proper {
+        <Item { @kind = "Section-Pragma"; }
+        apply [$context];
+      }
+    } else {
+      msg "we can promote this lemma to a theorem";
+      <Text-Proper {
+        <Item { @kind = "Section-Pragma"; }
+        <Item {
+          @kind = "Theorem-Item";
+          @promoted-lemma = "yes";
           apply [.];
           for-each [following-sibling::*] {
             apply [.];
@@ -58,10 +62,21 @@ tpl bad-term-hunting (#candidates) {
       die (#message = "To determine whether there is a bad term in the current item, we require that all terms have a spelling, but we just found a term that lacks one.");
     }
     $n = `$candidate/@spelling`;
-    if [starts-with ($n, "D")] {
-      "1";
-    } else {
-      bad-term-hunting (#candidates = `$candidates[position() > 1]`);
+    choose {
+      when [starts-with ($n, "D")] {
+        "1";
+      }
+      // when [preceding::Item[parent::Text-Proper and @kind = "Choice-Statement"]/*/Variables/Variable[@idnr = $idnr]] {
+      //   msg "choice variable introduced";
+      //   "1";
+      // }
+      when [starts-with ($n, "C")] {
+        msg "choice variable introduced";
+        "1";
+      }
+      otherwise {
+        bad-term-hunting (#candidates = `$candidates[position() > 1]`);
+      }
     }
   } else {
     "0";
@@ -116,9 +131,10 @@ tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
                                              and @kind = "Regular-Statement"
                                              and @shape = "Compact-Statement"]/Proposition/Label[@idnr]/@idnr]] {
   $context = `.`;
+  $idnr = `@idnr`;
   for-each [preceding::Item[parent::Text-Proper
                             and @kind = "Regular-Statement"
-                            and @shape = "Compact-Statement"][1]/Proposition] {
+                            and @shape = "Compact-Statement"]/Proposition[Label[@idnr = $idnr]][1]] {
     $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
     if [$bad = "1"] {
       msg "Unable to rewrite a local lemma reference due to unexportability.";
