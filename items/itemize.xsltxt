@@ -3,51 +3,8 @@ stylesheet 1.0;
 output method=xml indent="yes";
 
 include ../utils/die.xsl;
-include ../utils/tokens.xsl;
-include paths.xsl;
-include resolve-references.xsl;
 
-tpl count-preceding-toplevel-items {
-  `count (preceding::Item[parent::Text-Proper
-                          and (@kind = "Canceled-Pragma"
-                               or @kind = "Theorem-Item"
-                               or @kind = "Definition-Item"
-                               or @kind = "Scheme-Block-Item"
-                               or @kind = "Identify"
-                               or (@kind = "Regular-Statement"
-                                   and @shape = "Compact-Statement"
-                                   and not(Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
-                                                                                                       and @kind = "Constant-Definition"]/Variable/@idnr
-                                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
-                                                                                                          and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
-                                                       or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
-                                                                                                          and @kind = "Type-Changing-Statement"]/Variable/@idnr]
-                                                       or descendant::Private-Predicate-Formula)))])`;
-}
-
-// Sanity checks
-
-tpl [Item[@kind = "Reservation" and not(@toplevel-binder-number)]] {
-  die (#message = "This stylesheet assumes that all reservation items have a toplevel-binder-number attribute, but there is at least one reservation in this document that lacks this attribute.");
-}
-
-tpl [Item[@kind = "Reservation" and not(@idnr)]] {
-  die (#message = "This stylesheet assumes that all reservation items have an idnr-number attribute, but there is at least one reservation in this document that lacks this attribute.");
-}
-
-tpl [Item[@toplevel-binder-number = following::Item/@toplevel-binder-number]] {
-  $num = `@toplevel-binder-number`;
-  $message = `concat ("This stylesheet assumes that each toplevel binder item has a toplevel-binder-number attribute shared by no other toplevel binder item, but this document has has at least two such items sharing the same toplevel-binder-number (", $num, ")")`;
-  die (#message = $message);
-}
-
-tpl [Item[@kind = "Loci-Declaration"]/*/Variable[2]] {
-  die (#message = "This stylesheet assumes that all loci declarations bind exactly one variable, but there is at least one loci delcaration in this document that binds multiple variables.");
-}
-
-tpl [Item[@kind = "Loci-Declaration" and not(@toplevel-binder-number)]] {
-  die (#message = "This stylesheet assumes that all loci declarations items have a toplevel-binder-number attribute, but there is at least one loci declaration in this document that lacks this attribute.");
-}
+// default: copy
 
 tpl [*] {
   $element = `local-name ()`;
@@ -57,205 +14,139 @@ tpl [*] {
   }
 }
 
-tpl enumerate-items (#candidates, #bundlenr, #articleid) {
-  if [$candidates] {
-    $candidate = `$candidates[1]`;
-    apply [$candidate](#bundlenr = $bundlenr, #articleid = $articleid);
-    for-each [$candidate] {
-      if [position() != last()] {
-        "\n";
-      }
-    }
-    enumerate-items (#candidates = `$candidates[position () > 1]`,
-                     #bundlenr = `$bundlenr + 1`,
-                     #articleid = $articleid);
+tpl [/] {
+  if [Text-Proper] {
+    apply [Text-Proper];
+  } else {
+    die (#message = "The required Text-Proper element is missing!");
   }
-}
-
-tpl [Item[@kind = "Section-Pragma"]] {
-  // do nothing
-}
-
-tpl [Item[@kind = "Pragma"]] {
-  // do nothing
 }
 
 tpl [Text-Proper] {
-  <Items {
-    enumerate-items (#candidates
-      = `Item[not(@kind = "Section-Pragma"
-                  or @kind = "Pragma"
-                  or @kind = "Reservation"
-                  or @kind = "Choice-Statement"
-                  or @kind = "Private-Predicate-Definition"
-                  or @kind = "Private-Functor-Definition"
-                  or (@kind = "Regular-Statement"
-                      and @shape = "Diffuse-Statement")
-                  or (@kind = "Regular-Statement"
-                      and @shape = "Iterative-Equality")
-                  or @kind = "Constant-Definition"
-                  or (@kind = "Regular-Statement"
-                      and @shape = "Compact-Statement"
-                      and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
-                                                                                      and @kind = "Constant-Definition"]/Variable/@idnr
-                                      or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
-                                                                                         and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
-                                      or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper
-                                                                                         and @kind = "Type-Changing-Statement"]/Variable/@idnr
-                                      or descendant::Private-Predicate-Formula])
-                  or @kind = "Type-Changing-Statement")]`,
-                     #bundlenr = "1",
-                     #articleid = `@articleid`);
-  }
-}
-
-tpl needed-toplevel-items (#candidates, #context) {
-  if [$candidates] {
-    $index_of_min = index-of-item-with-minimal-number (#items = $candidates);
-    $candidate = `$candidates[position() = $index_of_min]`;
-    $other-candidates = `$candidates[position() != $index_of_min]`;
-    $other-candidates-as-token-string = toplevel-item-node-set-to-token-string (#items = $other-candidates);
-    $exists-path = exists-path-from-toplevel-item-to-context (#item = $candidate,
-                                                              #context = $context,
-                                                              #later-toplevel-items = $other-candidates-as-token-string);
-    if [$exists-path = "1"] {
-      apply [$candidate];
-    }
-    needed-toplevel-items (#candidates = $other-candidates,
-                           #context = $context);
-  }
-}
-
-tpl [Text-Proper/Item[not(@kind = "Reservation")
-                      and not(@kind = "Regular-Statement" and @shape = "Diffuse-Statement")
-                      and not(@kind = "Regular-Statement" and @shape = "Iterative-Equality")
-                      and not(@kind = "Private-Predicate-Definition")
-                      and not(@kind = "Private-Functor-Definition")
-                      and not(@kind = "Constant-Definition")
-                      and not(@kind = "Regular-Statement"
-                              and @shape = "Compact-Statement"
-                              and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr
-                                              or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
-                                              or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr
-                                              or descendant::Private-Predicate-Formula])
-                      and not(@kind = "Choice-Statement")
-                      and not(@kind = "Type-Changing-Statement")]] (#bundlenr, #articleid) {
-  <Item-Bundle {
-
-   @bundlenr = $bundlenr;
-   @articleid = $articleid;
-
-   if [@promoted] { @promoted = `@promoted`; }
-   if [@spelling] { @spelling = `@spelling`; }
-
-    $context = `.`;
-
-    <Text-Proper {
-      <Item { @kind = "Section-Pragma"; }
-      needed-toplevel-items (#candidates
-        = `preceding-sibling::Item[(@kind="Reservation" and not(Variables/Variable/@idnr = $context/Block[@kind = "Definitional-Block"]/Item[@kind = "Loci-Declaration"]/Explicitly-Qualified-Segment/Variables/Variable/@idnr))
-                                    or @kind = "Private-Predicate-Definition"
-                                    or @kind = "Private-Functor-Definition"
-                                    or @kind = "Choice-Statement"
-                                    or (@kind = "Regular-Statement"
-                                        and @shape = "Diffuse-Statement")
-                                    or (@kind = "Regular-Statement"
-                                        and @shape = "Iterative-Equality")
-                                    or @kind = "Constant-Definition"
-                                    or (@kind = "Regular-Statement"
-                                        and @shape = "Compact-Statement"
-                                        and Proposition[descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Constant-Definition"]/Variable/@idnr
-                                                        or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Equality/Variable/@idnr
-                                                        or descendant::Simple-Term/@idnr = preceding::Item[parent::Text-Proper and @kind = "Type-Changing-Statement"]/Variable/@idnr
-                                                        or descendant::Private-Predicate-Formula])
-                                    or @kind = "Type-Changing-Statement"]`,
-                             #context = $context);
-      copy {
-        for-each [@*] { copy-of `.`; }
-        // possibly promote toplevel Regular-Statement items to theorems
-        if [@kind = "Regular-Statement" and not(@shape = "Diffuse-Statement") and not(@shape = "Iterative-Equality")] {
-          @kind = "Theorem-Item";
-        } else {
-          @kind = `@kind`;
-        }
-        apply [*];
-      }
+  <Fragments {
+    for-each [Item] {
+      apply [.] mode="make-item";
     }
   }
 }
 
-tpl [Text-Proper/*/Straightforward-Justification/Link] {
-  for-each [../..] {
-    $num-previous = count-preceding-toplevel-items ();
-    $label = `concat ("CKB", $num-previous)`;
+tpl [*] mode="make-item" {
+  <Text-Proper {
+    <Item { @kind = "Section-Pragma"; }
+    apply [.];
+  }
+}
+
+// Resolving scheme references
+
+tpl [Scheme-Justification[@nr = "0" and not(@idnr)]] {
+  die (#message = "We found an article-local Scheme-Justification that lacks an idnr attribute!");
+}
+
+tpl [Scheme-Justification[@nr = "0"
+                          and not(@idnr = preceding::Item[parent::Text-Proper
+                                                          and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme/@idnr)]] {
+  die (#message = "Unable to resolve a reference to an article-local scheme because we are unable to find a previous scheme under the same name");
+}
+
+tpl [Scheme-Justification[@nr = "0"
+                          and @idnr = preceding::Item[parent::Text-Proper
+                                                      and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr]/@idnr]] {
+  $context = `.`;
+  $idnr = `@idnr`;
+  for-each [preceding::Item[parent::Text-Proper and @kind = "Scheme-Block-Item" and descendant::Scheme[@idnr = $idnr]][1]] {
+    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+    $position = `$num-previous + 1`;
+    $spelling = `concat ("CKB", $position)`;
+    <Scheme-Justification {
+      @spelling = $spelling;
+      @idnr = "1";
+      @nr = "1"; // might not be right
+      @promoted = "promoted";
+      apply [`$context/*`];
+    }
+  }
+}
+
+// Non-scheme references
+
+// By default, we don't know how to resolve; just copy.
+tpl [Local-Reference] {
+  copy-of `.`;
+}
+
+// look for a previous unexported-but-exportable toplevel theorem (lemma)
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+                                             and @kind = "Regular-Statement"
+                                             and @shape = "Compact-Statement"]/Proposition/Label[@idnr]/@idnr]] {
+  $idnr = `@idnr`;
+  for-each [preceding::Item[parent::Text-Proper
+                            and @kind = "Regular-Statement"
+                            and @shape = "Compact-Statement"
+                            and Proposition/Label[@idnr = $idnr]][1]] {
+    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+    $position = `$num-previous + 1`;
+    $new_spelling = `concat ("CKB", $position)`;
     <Theorem-Reference {
-      @spelling = $label;
+      @spelling = $new_spelling;
+      @promoted = "promoted";
       @"number" = "1";
     }
   }
 }
 
-tpl [Block[@kind = "Definitional-Block"]] {
-  <Block {
-    for-each [@*] { copy-of `.`; }
-    apply [Item[@kind = "Functor-Definition"
-                or @kind = "Predicate-Definition"
-                or @kind = "Attribute-Definition"
-                or @kind = "Mode-Definition"
-                or @kind = "Structure-Definition"]];
-    apply [Item[@kind = "Correctness"
-                or @kind = "Correctness-Condition"
-                or @kind = "Property"]];
-  }
-}
-
-tpl [Item[@kind = "Functor-Definition"
-          or @kind = "Predicate-Definition"
-          or @kind = "Attribute-Definition"
-          or @kind = "Mode-Definition"
-          or @kind = "Structure-Definition"]] {
-  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`, #context = `*`);
-  apply [preceding-sibling::Item[@kind = "Assumption"
-                                 or @kind = "Existential-Assumption"
-                                 or @kind = "Regular-Statement"
-                                 or @kind = "Constant-Definition"
-                                 or @kind = "Choice-Statement"]];
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
-  }
-}
-
-tpl [Block[@kind = "Registration-Block"]] {
-  <Block {
-    for-each [@*] { copy-of `.`; }
-    choose {
-      when [Item[@kind = "Cluster"]] {
-        apply [Item[@kind = "Cluster"]];
-      }
-      when [Item[@kind = "Identify"]] {
-        apply [Item[@kind = "Identify"]];
-      }
+// look for a previous exported toplevel theorem
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+                                             and @kind = "Theorem-Item"]/Proposition/Label/@idnr]] {
+  $idnr = `@idnr`;
+  for-each [preceding::Item[parent::Text-Proper and @kind = "Theorem-Item" and Proposition/Label[@idnr = $idnr]]] {
+    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+    $position = `$num-previous + 1`;
+    $new_spelling = `concat ("CKB", $position)`;
+    <Theorem-Reference {
+      @spelling = $new_spelling;
+      @promoted = "promoted";
+      @"number" = "1";
     }
-    apply [Item[@kind = "Correctness"
-                or @kind = "Correctness-Condition"]];
   }
 }
 
-tpl [Item[@kind = "Cluster"]] {
-  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`,
-                         #context = `.`);
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
+// look for a previous non-mode definition
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+                                             and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
+                                                                                                                     or @kind = "Attribute-Definition"
+                                                                                                                     or @kind = "Predicate-Definition"
+                                                                                                                     or @kind = "Structure-Definition"]/Definiens/Label[@idnr]/@idnr]] {
+  $idnr = `@idnr`;
+  for-each [preceding::Item[parent::Text-Proper
+                            and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
+                                                                                                    or @kind = "Attribute-Definition"
+                                                                                                    or @kind = "Predicate-Definition"
+                                                                                                    or @kind = "Structure-Definition"]/Definiens/Label[@idnr = $idnr]] {
+    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+    $position = `$num-previous + 1`;
+    $new_spelling = `concat ("CKB", $position)`;
+    <Definition-Reference {
+      @spelling = $new_spelling;
+      @promoted = "promoted";
+      @"number" = "1";
+    }
   }
 }
 
-tpl [Item[@kind = "Identify"]] {
-  needed-toplevel-items (#candidates = `preceding-sibling::Item[@kind="Loci-Declaration"]`,
-                         #context = `.`);
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
+// look for a previous mode definition
+tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+                                             and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr]/@idnr]] {
+  $idnr = `@idnr`;
+  for-each [preceding::Item[@kind = "Definition-Item"
+                            and Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]]] {
+    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+    $position = `$num-previous + 1`;
+    $new_spelling = `concat ("CKB", $position)`;
+    <Definition-Reference {
+      @spelling = $new_spelling;
+      @promoted = "promoted";
+      @"number" = "1";
+    }
   }
 }

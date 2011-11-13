@@ -15,6 +15,19 @@ tpl list(#separ,#elems) {
 $lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
 $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
+// whether we should try to compute and emit the environment part of
+// the article.  The value 1 (and only the value 1) will disable
+// printing the envionment.  If this value is 1, the environment will
+// not be printed even if a value for the $evl stylesheet parameter is
+// supplied.
+#suppress-environment = { "0"; }
+
+// whether to promote regular statement lemmas (toplevel unexported
+// theorems that are neither pieces of diffuse reasoning nor iterated
+// equalities) to (exported) theorems.  Use the value "1" to turn on
+// this feature.
+#promote-lemmas = { "0"; }
+
 // name of current article (upper case)
 #aname= { `string(/*/@articleid)`; }
 
@@ -45,8 +58,10 @@ tpl [Directive] {
 
 
 tpl [Text-Proper] {
-  for-each [document ($evl, /)] {
-    apply [*];
+  if [not($suppress-environment = "1")] {
+    for-each [document ($evl, /)] {
+      apply [*];
+    }
   }
   for-each [Item] {
     apply [.];
@@ -1543,6 +1558,12 @@ tpl [Item[@kind='Regular-Statement' and @shape = "Diffuse-Statement" and (child:
 }
 
 tpl [Item[@kind='Regular-Statement' and @shape = "Compact-Statement"]] {
+  if [parent::Text-Proper and $promote-lemmas = "1"] {
+    if [Straightforward-Justification/Link] {
+      die (#message = "We cannot promote a linked toplevel lemma to a theorem.");
+    }
+    "theorem ";
+  }
   maybe-link ();
   if [Label] {
     apply [Label[1]];
