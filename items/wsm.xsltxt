@@ -24,6 +24,13 @@ $ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 // .idx file with identifier names
 #evl = { `concat($anamelc, '.evl')`; }
 
+// prefix given to all variables
+#variable-prefix = { ""; }
+
+// suppress printing the environment.  Set this to 1 to skip printing
+// the environment.
+#suppress-environment = { ""; }
+
 tpl lc(#s) { `translate($s, $ucletters, $lcletters)`; }
 tpl uc(#s) { `translate($s, $lcletters, $ucletters)`; }
 
@@ -45,8 +52,10 @@ tpl [Directive] {
 
 
 tpl [Text-Proper] {
-  for-each [document ($evl, /)] {
-    apply [*];
+  if [not($suppress-environment = "1")] {
+    for-each [document ($evl, /)] {
+      apply [*];
+    }
   }
   for-each [Item] {
     apply [.];
@@ -97,7 +106,7 @@ tpl [Variables] {
 
 tpl [Variable] {
   ensure-spelling ();
-  `@spelling`;
+  `$variable-prefix`; `@spelling`;
 }
 
 tpl [Internal-Selector-Term] {
@@ -760,7 +769,7 @@ tpl [Explicitly-Qualified-Segment](#verb) {
 
 tpl [Simple-Term] {
   ensure-spelling ();
-  `@spelling`;
+  `$variable-prefix`; `@spelling`;
 }
 
 tpl [Forgetful-Functor-Term] {
