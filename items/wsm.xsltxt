@@ -1148,10 +1148,23 @@ tpl [Item[@kind='Choice-Statement' and not(child::Conditions)]] {
   die (#message = "We expected to find a Conditions child of a Choice-Statement item, but none was found");
 }
 
-tpl [Item[@kind='Choice-Statement' and child::Conditions]] {
+tpl [Item[@kind = "Choice-Statement" and Conditions and Implicitly-Qualified-Segment]] {
   maybe-link ();
   "consider ";
-  list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
+  list (#separ = ",", #elems = `Implicitly-Qualified-Segment/Variable`);
+  if [Conditions/Proposition] {
+    " such that ";
+    list (#separ = " and ", #elems = `Conditions/Proposition`);
+    apply-justification-if-present ();
+  }
+  ";"; "\n";
+}
+
+tpl [Item[@kind = "Choice-Statement" and Conditions and Explicitly-Qualified-Segment]] {
+  maybe-link ();
+  "consider ";
+  list (#separ = ",", #elems = `Explicitly-Qualified-Segment/Variables/Variable`);
+  " being "; apply [Explicitly-Qualified-Segment/*[position() = last()]];
   if [Conditions/Proposition] {
     " such that ";
     list (#separ = " and ", #elems = `Conditions/Proposition`);
