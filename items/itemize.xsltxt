@@ -69,16 +69,20 @@ tpl bad-term-hunting (#candidates) {
     if [not($candidate/@spelling)] {
       die (#message = "To determine whether there is a bad term in the current item, we require that all terms have a spelling, but we just found a term that lacks one.");
     }
-    $n = `$candidate/@spelling`;
+    $spelling = `$candidate/@spelling`;
+    $n = `local-name ($candidate)`;
     choose {
-      when [starts-with ($n, "D")] {
+      when [$n = "Schematic-Variable"] {
+        "1";
+      }
+      when [starts-with ($spelling, "D")] {
         "1";
       }
       // when [preceding::Item[parent::Text-Proper and @kind = "Choice-Statement"]/*/Variables/Variable[@idnr = $idnr]] {
       //   msg "choice variable introduced";
       //   "1";
       // }
-      when [starts-with ($n, "C")] {
+      when [starts-with ($spelling, "C")] {
         msg "choice variable introduced";
         "1";
       }
@@ -148,14 +152,19 @@ tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
       msg "Unable to rewrite a local lemma reference due to unexportability.";
       copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
     } else {
-      msg "Rewriting a local lemma reference; it is safe because it is exportable";
-      $num-previous = `count (preceding::Item[parent::Text-Proper])`;
-      $position = `$num-previous + 1`;
-      $new_spelling = `concat ("CKB", $position)`;
-      <Theorem-Reference {
-        @spelling = $new_spelling;
-        @promoted = "promoted";
-        @"number" = "1";
+      if [descendant::Private-Predicate-Formula] {
+        msg "Unable to rewrite a local lemma reference due to presence of a private predicate symbol.";
+        copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
+      } else {
+        msg "Rewriting a local lemma reference; it is safe because it is exportable";
+        $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+        $position = `$num-previous + 1`;
+        $new_spelling = `concat ("CKB", $position)`;
+        <Theorem-Reference {
+          @spelling = $new_spelling;
+          @promoted = "promoted";
+          @"number" = "1";
+        }
       }
     }
   }
