@@ -39,15 +39,23 @@ tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and @shape = "Comp
         apply [$context];
       }
     } else {
-      msg "we can promote this lemma to a theorem";
-      <Text-Proper {
-        <Item { @kind = "Section-Pragma"; }
-        <Item {
-          @kind = "Theorem-Item";
-          @promoted-lemma = "yes";
-          apply [.];
-          for-each [following-sibling::*] {
+      if [descendant::Private-Predicate-Formula] {
+        msg "we cannot promote this lemma to a because it contains a private predicate formula";
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          apply [$context];
+        }
+      } else {
+        msg "we can promote this lemma to a theorem";
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          <Item {
+            @kind = "Theorem-Item";
+            @promoted-lemma = "yes";
             apply [.];
+            for-each [following-sibling::*] {
+              apply [.];
+            }
           }
         }
       }
