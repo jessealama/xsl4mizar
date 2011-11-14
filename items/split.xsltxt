@@ -41,92 +41,6 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
   }
 }
 
-tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
-  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    @toplevel-binder-number = `$num-previous-toplevel + 1`;
-    apply [*];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition"]] {
-  if [Variable[2]] {
-    die (#message = "We assume that private predicate/functor definitions bind at most one variable, but we found one that binds at least two!");
-  }
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    $num-previous = count-preceding-eliminable-toplevel-items ();
-    @toplevel-binder-number = `$num-previous + 1`;
-    @idnr = `Variable[1]/@idnr`;
-    apply [*];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Equality]] {
-  $num-children = `count (*)`;
-  $justification = `*[position() = $num-children]`;
-  $num-children-minus-one = `$num-children - 1`;
-  $type = `*[position() = $num-children-minus-one]`;
-  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-  for-each [Equality] {
-    $variable = `Variable`;
-    $variable-idnr = `$variable/@idnr`;
-    $definiens = `*[position() = last()]`;
-    <Item {
-      for-each [@*] { copy-of `.`; }
-      @kind = "Type-Changing-Statement";
-      @toplevel-binder-number = `position() + $num-previous-toplevel`;
-      @idnr = $variable-idnr;
-      <Equality {
-        apply [$variable];
-        apply [$definiens];
-      }
-      apply [$type];
-      apply [$justification];
-    }
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
-  $num-children = `count (*)`;
-  $justification = `*[position() = $num-children]`;
-  $num-children-minus-one = `$num-children - 1`;
-  $type = `*[position() = $num-children-minus-one]`;
-  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-  $variable = `Variable`;
-  $variable-idnr = `$variable/@idnr`;
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    @kind = "Type-Changing-Statement";
-    @toplevel-binder-number = `$num-previous-toplevel + 1`;
-    @idnr = $variable-idnr;
-    apply [$variable];
-    apply [$type];
-    apply [$justification];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    choose {
-      when [Proposition/Label] {
-        @idnr = `Proposition/Label[1]/@idnr`;
-      }
-      when [@shape = "Diffuse-Statement" and Label] {
-        @idnr = `Label[1]/@idnr`;
-      }
-      otherwise {
-        @idnr = "";
-      }
-    }
-    $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-    @toplevel-binder-number = `$num-previous-toplevel + 1`;
-    apply [*];
-  }
-}
-
 tpl [Item[@kind = "Loci-Declaration" and child::Explicitly-Qualified-Segment]] {
   $loci = `.`;
   $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
@@ -247,13 +161,6 @@ tpl [Item[@kind = "Correctness-Condition" or @kind = "Property" or @kind = "Corr
   <Item {
     for-each [@*] { copy-of `.`; }
     apply [*](#definitions = $definitions);
-  }
-}
-
-tpl [Item[@kind = "Theorem-Item"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
   }
 }
 
