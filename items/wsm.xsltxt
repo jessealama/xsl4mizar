@@ -498,10 +498,11 @@ tpl [Consistency] {
   "consistency";
 }
 
-tpl [Item[@kind='Correctness-Condition']] {
-  if [not(@condition)] {
-    die (#message = "Correctness-Condition items must have a condition attribute");
-  }
+tpl [Item[@kind = "Correctness-Condition" and not(@condition)]] {
+  die (#message = "Correctness-Condition items must have a condition attribute");
+}
+
+tpl [Item[@kind = "Correctness-Condition" and @condition]] {
   `@condition`;
   if [Block[@kind='Proof']] {
     "\n";
