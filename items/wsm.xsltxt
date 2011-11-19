@@ -1168,8 +1168,7 @@ tpl [Item[@kind = "Choice-Statement" and Conditions and Implicitly-Qualified-Seg
 tpl [Item[@kind = "Choice-Statement" and Conditions and Explicitly-Qualified-Segment]] {
   maybe-link ();
   "consider ";
-  list (#separ = ",", #elems = `Explicitly-Qualified-Segment/Variables/Variable`);
-  " being "; apply [Explicitly-Qualified-Segment/*[position() = last()]];
+  list (#separ = ",", #elems = `Explicitly-Qualified-Segment`);
   if [Conditions/Proposition] {
     " such that ";
     list (#separ = " and ", #elems = `Conditions/Proposition`);
