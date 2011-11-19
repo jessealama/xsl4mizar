@@ -464,6 +464,10 @@ tpl [Item[@kind='Identify']] {
 
 }
 
+tpl [Item[@kind = "Reduction"]] {
+  "reduce "; apply [*[2]]; " to "; apply [*[1]]; ";"; "\n";
+}
+
 tpl [Item[@kind='Cluster']] {
   apply [*[1]]; // should be just one child, right?
 }
@@ -494,10 +498,11 @@ tpl [Consistency] {
   "consistency";
 }
 
-tpl [Item[@kind='Correctness-Condition']] {
-  if [not(@condition)] {
-    die (#message = "Correctness-Condition items must have a condition attribute");
-  }
+tpl [Item[@kind = "Correctness-Condition" and not(@condition)]] {
+  die (#message = "Correctness-Condition items must have a condition attribute");
+}
+
+tpl [Item[@kind = "Correctness-Condition" and @condition]] {
   `@condition`;
   if [Block[@kind='Proof']] {
     "\n";
