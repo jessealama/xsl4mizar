@@ -464,6 +464,10 @@ tpl [Item[@kind='Identify']] {
 
 }
 
+tpl [Item[@kind = "Reduction"]] {
+  "reduce "; apply [*[2]]; " to "; apply [*[1]]; ";"; "\n";
+}
+
 tpl [Item[@kind='Cluster']] {
   apply [*[1]]; // should be just one child, right?
 }
