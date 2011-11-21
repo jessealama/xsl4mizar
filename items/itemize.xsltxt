@@ -32,20 +32,29 @@ tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and @shape = "Comp
   // look for a sign that we can't promote this toplevel unexported lemma to a proper theorem
   for-each [Proposition] {
     $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
-    if [$bad = "1"] {
-      msg "we cannot promote this lemma to a theorem";
-      <Text-Proper {
-        <Item { @kind = "Section-Pragma"; }
-        apply [$context];
+    choose {
+      when [$bad = "1"] {
+        msg "we cannot promote this lemma to a theorem";
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          apply [$context];
+        }
       }
-    } else {
-      if [descendant::Private-Predicate-Formula] {
+      when [descendant::Private-Functor-Term] {
+        msg "we cannot promote this lemma to a theorem because it contains a private functor term";
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          apply [$context];
+        }
+      }
+      when [descendant::Private-Predicate-Formula] {
         msg "we cannot promote this lemma to a because it contains a private predicate formula";
         <Text-Proper {
           <Item { @kind = "Section-Pragma"; }
           apply [$context];
         }
-      } else {
+      }
+      otherwise {
         msg "we can promote this lemma to a theorem";
         <Text-Proper {
           <Item { @kind = "Section-Pragma"; }
