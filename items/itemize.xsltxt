@@ -157,14 +157,20 @@ tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
                             and @kind = "Regular-Statement"
                             and @shape = "Compact-Statement"]/Proposition[Label[@idnr = $idnr]][1]] {
     $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
-    if [$bad = "1"] {
-      msg "Unable to rewrite a local lemma reference due to unexportability.";
-      copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
-    } else {
-      if [descendant::Private-Predicate-Formula] {
+    choose {
+      when [$bad = "1"] {
+        msg "Unable to rewrite a local lemma reference due to unexportability.";
+        copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
+      }
+      when [descendant::Private-Predicate-Formula] {
         msg "Unable to rewrite a local lemma reference due to presence of a private predicate symbol.";
         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
-      } else {
+      }
+      when [descendant::Private-Functor-Term] {
+        msg "Unable to rewrite a local lemma reference due to presence of a private functor symbol.";
+        copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
+      }
+      otherwise {
         msg "Rewriting a local lemma reference; it is safe because it is exportable";
         $num-previous = `count (preceding::Item[parent::Text-Proper])`;
         $position = `$num-previous + 1`;
