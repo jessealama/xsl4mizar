@@ -169,7 +169,36 @@ tpl [/] {
     <body {
       choose {
         when [$style = "gentzen"] {
-          apply [Derivation] mode="gentzen";
+          if [descendant::Derivation[@name and not(@name = "axiom") and @name = following::Derivation[@name]/@name and not(@name = preceding::Derivation[@name]/@name)]] {
+            <table {
+              <caption {
+                "Subderivations appearing multiple times in this derivation";
+              }
+              <colgroup {
+                <col;
+                <col;
+                <col;
+              }
+              <thead {
+                <tr {
+                  <th { "Name"; }
+                  <th { "Conclusion"; }
+                  <th { "Derivation"; }
+                }
+              }
+              <tbody {
+                for-each [descendant::Derivation[@name = following::Derivation[@name]/@name
+                                                 and not(@name = preceding::Derivation[@name]/@name)]] {
+                  <tr {
+                    <td { `@name`; }
+                    <td { apply [*[1]]; }
+                    <td { apply [.] mode="gentzen"; }
+                  }
+                }
+              }
+            }
+          }
+          apply [Derivation[1]] mode="gentzen";
         }
         otherwise {
           $message = `concat ("The value supplied for the 'style' parameter,&#xa;&#xa;  ", $style, "&#xa;&#xa;is not acceptable.  The only acceptable values for the stylesheet parameter 'style' are:&#xa;&#xa;", $styles-string, "&#xa")`;
@@ -182,7 +211,7 @@ tpl [/] {
 
 // Rendering Derivation elements
 
-tpl [Derivation[@name and Rule[@name = "axiom"]]] mode="gentzen" {
+tpl [Derivation[@name and Rule[@name = "axiom"]]] (#seen) mode="gentzen" {
   <span {
     @class = "derivation-label";
     `@name`;
@@ -190,7 +219,7 @@ tpl [Derivation[@name and Rule[@name = "axiom"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[@name and Rule[@name = "definition"]]] mode="gentzen" {
+tpl [Derivation[@name and Rule[@name = "definition"]]] (#seen) mode="gentzen" {
   <span {
     @class = "derivation-label";
     `@name`;
@@ -198,7 +227,7 @@ tpl [Derivation[@name and Rule[@name = "definition"]]] mode="gentzen" {
   apply [*[1]]; // just the formula
 }
 
-tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "definition")]]] mode="gentzen" {
+tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "definition") and not(@name = following::Derivation[@name]/@name)]]] mode="gentzen" {
   <table {
     @class = "derivation";
     @summary = `@name`;
@@ -237,6 +266,21 @@ tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "d
       }
       <td; // empty cell for the rule name, just above
 
+    }
+  }
+}
+
+tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "definition")] and @name = following::Derivation[@name]/@name]] mode="gentzen" {
+  <table {
+    @class = "derivation";
+    @summary = `@name`;
+    @title = `@name`;
+    <caption {
+      @class = "derivation-caption";
+      `@name`;
+    }
+    <tr {
+      <td { `@name`; }
     }
   }
 }
@@ -319,13 +363,21 @@ tpl [function[@name]] {
   $constructor = { if [contains ($n, "__")] {
                      `substring-before ($n, "__")`;
                    } else {
-                     `substring-before ($n, "_")`;
+                     if [contains ($n, "_")] {
+                       `substring-before ($n, "_")`;
+                     } else {
+                       `$n`;
+                     }
                    }
                  }
   $article = { if [contains ($n, "__")] {
                  `substring-after ($n, "__")`;
                } else {
-                 `substring-after ($n, "_")`;
+                 if [contains ($n, "_")] {
+                   `substring-after ($n, "_")`;
+                 } else {
+                   "";
+                 }
                }
              }
   <span {
@@ -428,12 +480,13 @@ tpl [quantifier[@type = "universal" or @type = "existential"]] {
 
 // Special instantiation rule
 
-tpl [Rule[@name = "instantiate"]] {
+tpl [Rule[@name = "instantiate" and not(Substitution)]] {
+    die (#message = "We found an application of the instantiation rule that has no Substitution children!");
+}
+
+tpl [Rule[@name = "instantiate" and Substitution]] {
   `@name`;
   $num-variables = `count (variable)`;
-  if [not(Substitution)] {
-    die (#message = "We found an application of the instantiation rule that has no Substitution children!");
-  }
   "[";
   for-each [Substitution] {
     apply [*[1]]; " := "; apply [*[2]];
