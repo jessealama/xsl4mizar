@@ -128,14 +128,15 @@ tpl [/] mode="sanity-check" {
 //////////////////////////////////////////////////////////////////////
 
 tpl [/] {
-  apply [.] mode="sanity-check"; // don't proceed unless the sanity checks pass
+  // don't proceed unless the sanity checks pass
+  apply [.] mode="sanity-check";
 
   // The proof styles we support.
   //
   // We define the value of this variable here, rather than as a
   // stlyehseet parameter, to prevent users from tampering with the
   // value.
-  $styles = ",gentzen,";
+  $styles = ",gentzen,fitch";
 
   $styles-string = render-token-string (#token-string = $styles,
                                         #before-item = "  * ",
@@ -200,6 +201,9 @@ tpl [/] {
           }
           apply [Derivation[1]] mode="gentzen";
         }
+        when [$style = "fitch"] {
+          apply [Derivation[1]] mode="fitch";
+        }
         otherwise {
           $message = `concat ("The value supplied for the 'style' parameter,&#xa;&#xa;  ", $style, "&#xa;&#xa;is not acceptable.  The only acceptable values for the stylesheet parameter 'style' are:&#xa;&#xa;", $styles-string, "&#xa")`;
           die (#message = $message);
@@ -209,7 +213,7 @@ tpl [/] {
   }
 }
 
-// Rendering Derivation elements
+// Rendering Derivation elements á la Gentzen
 
 tpl [Derivation[@name and Rule[@name = "axiom"]]] (#seen) mode="gentzen" {
   <span {
@@ -271,6 +275,82 @@ tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "d
 }
 
 tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "definition")] and @name = following::Derivation[@name]/@name]] mode="gentzen" {
+  <table {
+    @class = "derivation";
+    @summary = `@name`;
+    @title = `@name`;
+    <caption {
+      @class = "derivation-caption";
+      `@name`;
+    }
+    <tr {
+      <td { `@name`; }
+    }
+  }
+}
+
+// Rendering Derivation elements á la Fitch
+
+tpl [Derivation[@name and Rule[@name = "axiom"]]] mode="fitch" {
+  <span {
+    @class = "derivation-label";
+    `@name`;
+  }
+  apply [*[1]]; // just the formula
+}
+
+tpl [Derivation[@name and Rule[@name = "definition"]]] (#seen) mode="fitch" {
+  <span {
+    @class = "derivation-label";
+    `@name`;
+  }
+  apply [*[1]]; // just the formula
+}
+
+tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "definition") and not(@name = following::Derivation[@name]/@name)]]] mode="fitch" {
+  <table {
+    @class = "derivation";
+    @summary = `@name`;
+    @title = `@name`;
+    <caption {
+      @class = "derivation-caption";
+      `@name`;
+    }
+    <tr {
+      for-each [Derivation[@name]] {
+        <td {
+          apply [.] mode="fitch";
+        }
+      }
+      <td; // empty cell for the rule name, coming up
+    }
+    <tr {
+      <td {
+        @colspan = `count (Derivation[@name])`;
+        <hr;
+      }
+      <td {
+        @class = "rule-name";
+        apply [Rule];
+      }
+    }
+    <tr {
+      <td {
+        @class = "rule-conclusion";
+        @colspan = `count (Derivation[@name])`;
+        <span {
+          @class = "derivation-label";
+          `@name`;
+        }
+        apply [*[1]];
+      }
+      <td; // empty cell for the rule name, just above
+
+    }
+  }
+}
+
+tpl [Derivation[@name and Rule[@name and not(@name = "axiom") and not(@name = "definition")] and @name = following::Derivation[@name]/@name]] mode="fitch" {
   <table {
     @class = "derivation";
     @summary = `@name`;
