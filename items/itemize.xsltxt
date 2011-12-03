@@ -123,10 +123,10 @@ tpl [Text-Proper/*/Straightforward-Justification/Link] {
 
 tpl [Scheme-Justification[@nr = "0"
                           and @idnr = preceding::Item[parent::Text-Proper
-                                                      and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme/@idnr]] {
+                                                      and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr]/@idnr]] {
   $context = `.`;
   $idnr = `@idnr`;
-  for-each [preceding::Item[parent::Text-Proper and @kind = "Scheme-Block-Item" and descendant::Scheme[@idnr = $idnr]]] {
+  for-each [preceding::Item[parent::Text-Proper and @kind = "Scheme-Block-Item" and descendant::Scheme[@idnr = $idnr]][1]] {
     $num-previous = `count (preceding::Item[parent::Text-Proper])`;
     $position = `$num-previous + 1`;
     $spelling = `concat ("CKB", $position)`;
