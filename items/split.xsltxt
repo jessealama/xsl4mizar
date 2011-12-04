@@ -12,7 +12,7 @@ tpl [*] {
   }
 }
 
-tpl [Text-Proper/Item[@kind = "Reservation" and not(child::Variables)]] {
+tpl [Text-Proper/Item[@kind = "Reservation" and not(Variables)]] {
   die (#message = "We require that a Reservation item have a Variables child!");
 }
 
@@ -35,7 +35,7 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
   }
 }
 
-tpl [Item[@kind = "Loci-Declaration" and child::Explicitly-Qualified-Segment]] {
+tpl [Item[@kind = "Loci-Declaration" and Explicitly-Qualified-Segment]] {
   $loci = `.`;
   $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
   for-each [Explicitly-Qualified-Segment/Variables/Variable] {
@@ -53,7 +53,7 @@ tpl [Item[@kind = "Loci-Declaration" and child::Explicitly-Qualified-Segment]] {
   }
 }
 
-tpl [Item[@kind = "Loci-Declaration" and child::Implicitly-Qualified-Segment]] {
+tpl [Item[@kind = "Loci-Declaration" and Implicitly-Qualified-Segment]] {
   $loci = `.`;
   $variable = `Implicitly-Qualified-Segment/Variable[1]`;
   $variable-idnr = `$variable/@idnr`;
@@ -245,7 +245,7 @@ tpl split-explicitly-qualified-segment (#variables, #type) {
   }
 }
 
-tpl [Item[@kind = "Generalization" and child::Explicitly-Qualified-Segment]] {
+tpl [Item[@kind = "Generalization" and Explicitly-Qualified-Segment]] {
   $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
   for-each [Explicitly-Qualified-Segment/Variables/Variable] {
     <Item {
