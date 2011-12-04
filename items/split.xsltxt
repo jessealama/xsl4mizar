@@ -12,10 +12,6 @@ tpl [*] {
   }
 }
 
-tpl count-preceding-eliminable-toplevel-items {
-  `count (preceding::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Regular-Statement" or @kind = "Loci-Declaration"])`;
-}
-
 tpl [Text-Proper/Item[@kind = "Reservation" and not(child::Variables)]] {
   die (#message = "We require that a Reservation item have a Variables child!");
 }
@@ -23,7 +19,6 @@ tpl [Text-Proper/Item[@kind = "Reservation" and not(child::Variables)]] {
 tpl [Text-Proper/Item[@kind = "Reservation"]] {
   $context = `.`;
   $type = `*[position() = last()]`;
-  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
   // sanity check: all Variable descendants have an idnr attribute
   for-each [Variables/Variable[not(@idnr)]] {
     die (#message = "We found a variable that lacks an idnr attribute; unable to proceed.");
@@ -31,7 +26,6 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
   for-each [Variables/Variable] {
     <Item {
       for-each [$context/@*] { copy-of `.`; }
-      @toplevel-binder-number = `position() + $num-previous-toplevel`;
       @idnr = `@idnr`;
       <Variables {
         apply [.];
@@ -44,12 +38,10 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
 tpl [Item[@kind = "Loci-Declaration" and child::Explicitly-Qualified-Segment]] {
   $loci = `.`;
   $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
-  $num_preceding = count-preceding-eliminable-toplevel-items ();
   for-each [Explicitly-Qualified-Segment/Variables/Variable] {
     $pos = `position ()`;
     <Item {
       for-each [$loci/@*] { copy-of `.`; }
-      @toplevel-binder-number = `$num_preceding + $pos`;
       @idnr = `@idnr`;
       <Explicitly-Qualified-Segment {
         <Variables {
@@ -65,10 +57,8 @@ tpl [Item[@kind = "Loci-Declaration" and child::Implicitly-Qualified-Segment]] {
   $loci = `.`;
   $variable = `Implicitly-Qualified-Segment/Variable[1]`;
   $variable-idnr = `$variable/@idnr`;
-  $num_preceding = count-preceding-eliminable-toplevel-items ();
   <Item {
     for-each [$loci/@*] { copy-of `.`; }
-    @toplevel-binder-number = `$num_preceding + 1`;
     @idnr = $variable-idnr;
     <Implicitly-Qualified-Segment {
       apply [$variable];
