@@ -30,10 +30,7 @@ tpl [/] {
 
 tpl [Constructors] {
   for-each [Constructor] {
-    apply [.];
-    if [not(position() = last())] {
-      "\n";
-    }
+    apply [.]; "\n";
   }
 }
 
