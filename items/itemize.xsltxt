@@ -34,13 +34,22 @@ tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and @shape = "Comp
     $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
     choose {
       when [$bad = "1"] {
-        apply [$context] mode="make-item";
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          apply [$context];
+        }
       }
       when [descendant::Private-Functor-Term] {
-        apply [$context] mode="make-item";
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          apply [$context];
+        }
       }
       when [descendant::Private-Predicate-Formula] {
-        apply [$context] mode="make-item";
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          apply [$context];
+        }
       }
       otherwise {
         <Text-Proper {
