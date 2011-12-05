@@ -34,28 +34,24 @@ tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and @shape = "Comp
     $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
     choose {
       when [$bad = "1"] {
-        msg "we cannot promote this lemma to a theorem";
         <Text-Proper {
           <Item { @kind = "Section-Pragma"; }
           apply [$context];
         }
       }
       when [descendant::Private-Functor-Term] {
-        msg "we cannot promote this lemma to a theorem because it contains a private functor term";
         <Text-Proper {
           <Item { @kind = "Section-Pragma"; }
           apply [$context];
         }
       }
       when [descendant::Private-Predicate-Formula] {
-        msg "we cannot promote this lemma to a because it contains a private predicate formula";
         <Text-Proper {
           <Item { @kind = "Section-Pragma"; }
           apply [$context];
         }
       }
       otherwise {
-        msg "we can promote this lemma to a theorem";
         <Text-Proper {
           <Item { @kind = "Section-Pragma"; }
           <Item {
@@ -87,12 +83,7 @@ tpl bad-term-hunting (#candidates) {
       when [starts-with ($spelling, "D")] {
         "1";
       }
-      // when [preceding::Item[parent::Text-Proper and @kind = "Choice-Statement"]/*/Variables/Variable[@idnr = $idnr]] {
-      //   msg "choice variable introduced";
-      //   "1";
-      // }
       when [starts-with ($spelling, "C")] {
-        msg "choice variable introduced";
         "1";
       }
       otherwise {
@@ -159,19 +150,15 @@ tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
     $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
     choose {
       when [$bad = "1"] {
-        msg "Unable to rewrite a local lemma reference due to unexportability.";
         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
       }
       when [descendant::Private-Predicate-Formula] {
-        msg "Unable to rewrite a local lemma reference due to presence of a private predicate symbol.";
         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
       }
       when [descendant::Private-Functor-Term] {
-        msg "Unable to rewrite a local lemma reference due to presence of a private functor symbol.";
         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
       }
       otherwise {
-        msg "Rewriting a local lemma reference; it is safe because it is exportable";
         $num-previous = `count (preceding::Item[parent::Text-Proper])`;
         $position = `$num-previous + 1`;
         $new_spelling = `concat ("CKB", $position)`;
