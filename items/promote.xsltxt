@@ -6,39 +6,26 @@ include ../utils/die.xsl;
 include ../utils/tokens.xsl;
 
 // This stylesheet operates on .atr files output by the mizar
-// accommodator. The result is another .atr file. There are four
-// parameters:
+// accommodator. The result is another .atr file. There is one
+// parameter:
 //
-// * kind
-// * nr
-// * relnr
-// * aid
+// * constructors
 //
-// and searches a given .atr file for a constructor identified by
-// these four criteria. Each of these four parameters should be token
-// lists; the interpretation is the the four parameters specify a set
-// of constructors.  If there is no constructor that matches all these
- // criteria, the result is an unchanged .atr file ("unchanged"
- // means: up to whitespace differences and any XSL processing
- // instructions). Any constructor that matches these criteria
- // (there should be only one) will be "promoted" in the sense that
- // its arguments (if there are any) will be assumed to take terms
- // of type 'set', and the "result value", if any, will also be
- // promoted to the type 'set'. (There is an exception to this rule:
- // structure constructors will be promoted to have the "result
- // type" of a 'mere structure', and not the type 'set'.)
+// which should be a comma-delimited list (starting and ending with a
+// comma, if not empty).  The format of each constructor should be:
+//
+// <article-ID>:<kind>:<nr>:<relnr>
+//
+// Any constructor that matches this pattern in the .atr will be
+// "promoted" in the sense that its arguments (if there are any) will
+// be assumed to take terms of type 'set', and the "result value", if
+// any, will also be promoted to the type 'set'. (There is an
+// exception to this rule: structure constructors will be promoted to
+// have the "result type" of a 'mere structure', and not the type
+// 'set'.)
 
-// The target constructor kind
-#kind-list = { ""; }
-
-// The target constructor nr
-#nr-list = { ""; }
-
-// The target constructor relnr
-#relnr-list = { ""; }
-
-// The target constructor's article
-#aid-list = { ""; }
+// The constructors for which we will hunt.
+#constructors = { ""; }
 
 tpl [*] {
   $element = `local-name ()`;
@@ -54,69 +41,8 @@ tpl [*] {
   }
 }
 
-tpl ensure-valid-token-strings {
-  $kind-ok = ensure-token-string (#string = $kind-list);
-  if [$kind-ok = "1"] {
-    $nr-ok = ensure-token-string (#string = $nr-list);
-    if [$nr-ok = "1"] {
-      $relnr-ok = ensure-token-string (#string = $relnr-list);
-      if [$relnr-ok = "1"] {
-        $aid-ok = ensure-token-string (#string = $aid-list);
-        if [$aid-ok = "1"] {
-          "1";
-        } else {
-          $message = `concat ("The aid token string '", $aid-list, "' is not a valid token string")`;
-          die (#message = $message);
-        }
-      } else {
-        $message = `concat ("The relnr token string '", $relnr-list, "' is not a valid token string")`;
-        die (#message = $message);
-      }
-    } else {
-      $message = `concat ("The nr token string '", $nr-list, "' is not a valid token string")`;
-      die (#message = $message);
-    }
-  } else {
-    $message = `concat ("The kind token string '", $kind-list, "' is not a valid token string")`;
-    die (#message = $message);
-  }
-}
-
-tpl ensure-equal-length-token-strings {
-  $kind-length = token-string-length (#token-string = $kind-list);
-  $nr-length = token-string-length (#token-string = $nr-list);
-  if [$kind-length = $nr-length] {
-    $relnr-length = token-string-length (#token-string = $relnr-list);
-    if [$kind-length = $relnr-length] {
-      $aid-length = token-string-length (#token-string = $aid-list);
-      if [$kind-length = $aid-length] {
-        "1";
-      } else {
-        $message = `concat ("The kind token string '", $kind-list, "' has ", $kind-length, " items, whereas the aid token string '", $aid-list, "' has ", $aid-length, " items.  Since these are different, we cannot proceed.")`;
-        die (#message = $message);
-      }
-    } else {
-      $message = `concat ("The kind token string '", $kind-list, "' has ", $kind-length, " items, whereas the relnr token string '", $relnr-list, "' has ", $relnr-length, " items.  Since these are different, we cannot proceed.")`;
-      die (#message = $message);
-    }
-  } else {
-    $message = `concat ("The kind token string '", $kind-list, "' has ", $kind-length, " items, whereas the nr token string '", $nr-list, "' has ", $nr-length, " items.  Since these are different, we cannot proceed.")`;
-    die (#message = $message);
-  }
-}
-
 tpl [/] {
-  $valid-token-strings = ensure-valid-token-strings ();
-  if [$valid-token-strings = "1"] {
-    $equal-lengths = ensure-equal-length-token-strings ();
-    if [$equal-lengths = "1"] {
-      apply [Constructors];
-    } else {
-      die (#message = "Something went wrong when checking that all the parameter token strings have the same length!");
-    }
-  } else {
-    die (#message = "Something went wrong when checking that the paramter token strings really are token strings!");
-  }
+  apply [Constructors];
 }
 
 tpl escape-backslash (#str) {
@@ -130,83 +56,13 @@ tpl escape-backslash (#str) {
   }
 }
 
-tpl found-helper (#target-item-one, #token-string-one, #target-item-two, #token-string-two, #target-item-three, #token-string-three, #target-item-four, #token-string-four) {
-  if [$token-string-one = ""] {
-    "0";
-  } else {
-    $tail-one = token-string-tail (#token-string = $token-string-one);
-    $tail-two = token-string-tail (#token-string = $token-string-two);
-    $tail-three = token-string-tail (#token-string = $token-string-three);
-    $tail-four = token-string-tail (#token-string = $token-string-four);
-    $item-one = first-item (#token-string = $token-string-one);
-    if [$item-one = $target-item-one] {
-      $item-two = first-item (#token-string = $token-string-two);
-      if [$item-two = $target-item-two] {
-        $item-three = first-item (#token-string = $token-string-three);
-        if [$item-three = $target-item-three] {
-          $item-four = first-item (#token-string = $token-string-four);
-          if [$item-four = $target-item-four] {
-            "1";
-          } else {
-            found-helper (#target-item-one = $target-item-one,
-                          #target-item-two = $target-item-two,
-                          #target-item-three = $target-item-three,
-                          #target-item-four = $target-item-four,
-                          #token-string-one = $tail-one,
-                          #token-string-two = $tail-two,
-                          #token-string-three = $tail-three,
-                          #token-string-four = $tail-four);
-          }
-        } else {
-          found-helper (#target-item-one = $target-item-one,
-                        #target-item-two = $target-item-two,
-                        #target-item-three = $target-item-three,
-                        #target-item-four = $target-item-four,
-                        #token-string-one = $tail-one,
-                        #token-string-two = $tail-two,
-                        #token-string-three = $tail-three,
-                        #token-string-four = $tail-four);
-        }
-      } else {
-        found-helper (#target-item-one = $target-item-one,
-                      #target-item-two = $target-item-two,
-                      #target-item-three = $target-item-three,
-                      #target-item-four = $target-item-four,
-                      #token-string-one = $tail-one,
-                      #token-string-two = $tail-two,
-                      #token-string-three = $tail-three,
-                      #token-string-four = $tail-four);
-      }
-    } else {
-      found-helper (#target-item-one = $target-item-one,
-                   #target-item-two = $target-item-two,
-                   #target-item-three = $target-item-three,
-                   #target-item-four = $target-item-four,
-                   #token-string-one = $tail-one,
-                   #token-string-two = $tail-two,
-                   #token-string-three = $tail-three,
-                   #token-string-four = $tail-four);
-    }
-  }
-}
-
-// Determine whether there is a position N such that
-//
-// * the Nth item of $kind-list is $kind,
-// * the Nth item of $nr-list is $nr,
-// * the Nth item of $relnr-list is $relnr,
-// * the Nth item of $aid-list is $aid
-//
-// Returns "1" or "0".
 tpl found (#kind, #nr, #relnr, #aid) {
-  found-helper (#target-item-one = $kind,
-                #token-string-one = $kind-list,
-                #target-item-two = $nr,
-                #token-string-two = $nr-list,
-                #target-item-three = $relnr,
-                #token-string-three = $relnr-list,
-                #target-item-four = $aid,
-                #token-string-four = $aid-list);
+  $token = `concat ($aid, ":", $kind, ":", $nr, ":", $relnr)`;
+  if [contains ($constructors, $token)] {
+    "1";
+  } else {
+    "0";
+  }
 }
 
 tpl [Constructors] {
@@ -312,6 +168,7 @@ tpl [Constructor[@kind = "V" and not(@promoted = "yes")]] {
     if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
+      apply [Typ] mode="promote"; // result type (?)
     } else {
       @promoted = "no";
       apply [*];
