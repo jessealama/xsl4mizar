@@ -1,0 +1,15 @@
+stylesheet 1.0;
+
+output method=text;
+
+tpl [/] {
+  apply [descendant::Proof];
+}
+
+tpl [Proof] {
+  apply [*];
+}
+
+tpl [*[not(self::Proof)]] {
+  `local-name (.)`; "\n";
+}
