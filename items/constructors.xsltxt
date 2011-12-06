@@ -38,6 +38,6 @@ tpl [Constructor[not(@aid and @kind and @nr and @relnr)]] {
   msg terminate="yes" "We require that every Constructor item have an aid, kind, nr, and relnr attribute.";
 }
 
-tpl [Constructor[@aid and @kind and @nr and @relnr]] {
-  `@aid`; ":"; `@kind`; ":"; `@nr`; ":"; `@relnr`;
+tpl [Constructor[@aid and @kind and @nr]] {
+  `@aid`; ":"; `@kind`; ":"; `@nr`;
 }
