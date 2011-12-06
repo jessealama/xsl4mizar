@@ -1,0 +1,86 @@
+// dependencies.xsl : Print the dependencies of a mizar article (sans its constructor dependencies)
+
+stylesheet 1.0;
+
+output method="text";
+
+$lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
+$ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+
+tpl lc (#s) { `translate($s, $ucletters, $lcletters)`; }
+tpl uc (#s) { `translate($s, $lcletters, $ucletters)`; }
+
+tpl [/] {
+  if [Article] {
+    apply [Article];
+  } else {
+    msg terminate="yes" "Error: no Article root element was found.";
+  }
+}
+
+tpl [Article[not(@aid)]] {
+  msg terminate="yes" "Error: we don't know how to handle an article that lacks an aid attribute.";
+}
+
+tpl [Article[@aid]] {
+  $aid-lc = lc (#s = `@aid`);
+
+  // definiftions
+  for-each [descendant::Ref[@kind = "D" and @absnr and @aid]] {
+    apply [.]; "\n";
+  }
+
+  // theorems
+  for-each [descendant::Ref[@kind = "T"]] {
+    apply [.]; "\n";
+  }
+
+  // needed schemes
+  $esh = `concat ($aid-lc, ".esh")`;
+  for-each [document ($esh, /)] {
+    apply [Schemes];
+  }
+
+  // needed definientia
+  $dfs = `concat ($aid-lc, ".dfs")`;
+  for-each [document ($dfs, /)] {
+    apply [Definientia];
+  }
+}
+
+tpl [Ref[not(@aid) or not(@absnr)]] {
+  msg terminate="yes" "Error: to handle references, we require that aid and absnr information be present.";
+}
+
+tpl [Ref[@kind = "T" and @aid and @absnr]] {
+  $aid-lc = lc (#s = `@aid`);
+  $aid-lc; ":"; "theorem"; ":"; `@absnr`;
+}
+
+tpl [Ref[@kind = "D" and @aid and @absnr]] {
+  $aid-lc = lc (#s = `@aid`);
+  $aid-lc; ":"; "deftheorem"; ":"; `@absnr`;
+}
+
+tpl [Schemes] {
+  for-each [Scheme] {
+    apply [.]; "\n";
+  }
+}
+
+tpl [Scheme[@aid and @nr]] {
+   $aid-lc = lc (#s = `@aid`);
+   $aid-lc; ":"; "scheme"; ":"; `@nr`;
+}
+
+tpl [Definientia] {
+  for-each [Definiens] {
+    apply [.]; "\n";
+  }
+}
+
+tpl [Definiens[@aid and @constrkind and @defnr]] {
+  $aid-lc = lc (#s = `@aid`);
+  $kind-lc = lc (#s = `@constrkind`);
+  $aid-lc; ":"; $kind-lc; "definiens"; ":"; `@defnr`;
+}
