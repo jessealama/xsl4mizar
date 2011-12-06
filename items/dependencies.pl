@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use File::Basename qw(basename);
+use File::Basename qw(basename dirname);
 
 unless (scalar @ARGV == 1) {
   print 'Usage: dependencies.pl ARTICLE', "\n";
@@ -11,9 +11,10 @@ unless (scalar @ARGV == 1) {
 my $article = $ARGV[0];
 
 my $article_basename = basename ($article, '.miz');
-my $article_miz = "${article_basename}.miz";
-my $article_xml = "${article_basename}.xml";
-my $article_absolute_xml = "${article_basename}.xml1";
+my $article_dirname = dirname ($article);
+my $article_miz = "${article_dirname}/${article_basename}.miz";
+my $article_xml = "${article_dirname}/${article_basename}.xml";
+my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
 unless (-e $article_miz) {
   print 'Error: the .miz for ', $article_basename, ' does not exist.', "\n";
