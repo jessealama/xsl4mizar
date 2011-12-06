@@ -82,10 +82,6 @@ tpl [ArgTypes] mode="promote" {
   }
 }
 
-tpl [Properties] mode="promote" {
-  <Properties; // empty list of properties
-}
-
 // Promote a type to the topmost type 'set'
 tpl [Typ] mode="promote" {
   <Typ {
@@ -101,7 +97,7 @@ tpl [Constructor[@kind = "M" and not(@promoted = "yes")]] {
     $found = found (#kind = "M", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
-      apply [Properties] mode="promote";
+      // apply [Properties] mode="promote";
       apply [ArgTypes] mode="promote"; // argument types
       apply [Typ] mode="promote";
     } else {
@@ -111,17 +107,34 @@ tpl [Constructor[@kind = "M" and not(@promoted = "yes")]] {
   }
 }
 
-// For right functor brackets, there is nothing to do
-tpl [Constructor[@kind = "L"]] {
+tpl [Constructor[@kind = "L" and not(Typ)]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    if [$kind = "L"] {
-      msg terminate="no" "Promoting a right functor bracket; there is nothing to do.";
+    $found = found (#kind = "G", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    if [$found = "1"] {
       @promoted = "yes";
+      apply [ArgTypes] mode="promote"; // argument types
+      apply [Fields]; // nothing to do here
     } else {
       @promoted = "no";
+      apply [*];
     }
-    apply [*];
+  }
+}
+
+tpl [Constructor[@kind = "L" and Typ]] {
+  <Constructor {
+    for-each [@*] { copy-of `.`; }
+    $found = found (#kind = "G", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    if [$found = "1"] {
+      @promoted = "yes";
+      apply [ArgTypes] mode="promote"; // argument types
+      apply [Typ]; // not sure how to promote this
+      apply [Fields]; // nothing to do here
+    } else {
+      @promoted = "no";
+      apply [*];
+    }
   }
 }
 
@@ -182,7 +195,7 @@ tpl [Constructor[@kind = "R" and not(@promoted = "yes")]] {
     $found = found (#kind = "R", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
-      apply [Properties] mode="promote"; // ignore properties
+      // apply [Properties] mode="promote"; // ignore properties
       apply [ArgTypes] mode="promote"; // argument types
     } else {
       @promoted = "no";
@@ -197,7 +210,7 @@ tpl [Constructor[@kind = "K" and not(@promoted = "yes")]] {
     $found = found (#kind = "K", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
-      apply [Properties] mode="promote"; // ignore properties
+      // apply [Properties] mode="promote"; // ignore properties
       apply [ArgTypes] mode="promote"; // argument types
       apply [Typ] mode="promote"; // result type
     } else {
