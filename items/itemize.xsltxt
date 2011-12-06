@@ -232,6 +232,22 @@ tpl [Item[parent::Text-Proper
   }
 }
 
+tpl [Item[parent::Text-Proper
+          and @kind = "Regular-Statement"
+          and @exportable = "no"]] mode="make-item" {
+  $context = `.`;
+  <Text-Proper {
+    <Item { @kind = "Section-Pragma"; }
+    prepend-context-for-item (#item = $context);
+    <Item {
+      for-each [@*] { copy-of `.`; }
+      @promoted-lemma = "no";
+      @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
+      apply [*];
+    }
+  }
+}
+
 tpl [Item[parent::Text-Proper and @kind = "Theorem-Item"]] mode="make-item" {
   $context = `.`;
   <Text-Proper {
