@@ -952,10 +952,10 @@
   </xsl:template>
 
   <!-- add plevel explicitly to items and propositions -->
-  <xsl:template match="Conclusion | Assume | Take | Thesis | BlockThesis | 
+  <xsl:template match="Conclusion | Assume | Take | Thesis | BlockThesis |
     Case | Suppose | PerCases | SchemeFuncDecl | SchemePredDecl |
-   UnknownCorrCond | Coherence | 
-   Compatibility | Consistency | Existence | Uniqueness | 
+   UnknownCorrCond | Coherence |
+   Compatibility | Consistency | Existence | Uniqueness |
    Correctness | JustifiedProperty">
     <xsl:param name="s"/>
     <xsl:copy>
@@ -1032,12 +1032,12 @@
   <xsl:template name="prevconsts">
     <xsl:param name="el"/>
     <xsl:for-each select="$el">
-      <xsl:value-of select="count(preceding-sibling::Reconsider/*[(name() = &quot;Var&quot;) or 
-    (name() = &quot;LocusVar&quot;) or (name() = &quot;Const&quot;) or (name() = &quot;InfConst&quot;) 
-    or (name() = &quot;Num&quot;) or (name() = &quot;Func&quot;) or (name() = &quot;PrivFunc&quot;) 
-    or (name() = &quot;Fraenkel&quot;) or (name() = &quot;QuaTrm&quot;) or (name() = &quot;It&quot;) 
+      <xsl:value-of select="count(preceding-sibling::Reconsider/*[(name() = &quot;Var&quot;) or
+    (name() = &quot;LocusVar&quot;) or (name() = &quot;Const&quot;) or (name() = &quot;InfConst&quot;)
+    or (name() = &quot;Num&quot;) or (name() = &quot;Func&quot;) or (name() = &quot;PrivFunc&quot;)
+    or (name() = &quot;Fraenkel&quot;) or (name() = &quot;QuaTrm&quot;) or (name() = &quot;It&quot;)
     or (name() = &quot;Choice&quot;) or (name() = &quot;ErrorTrm&quot;)]) +
-     count(preceding-sibling::*[(name() = &quot;Let&quot;) or (name() = &quot;TakeAsVar&quot;) 
+     count(preceding-sibling::*[(name() = &quot;Let&quot;) or (name() = &quot;TakeAsVar&quot;)
      or (name() = &quot;Given&quot;) or (name() = &quot;Consider&quot;) or (name() = &quot;Set&quot;)]/Typ)"/>
     </xsl:for-each>
   </xsl:template>
@@ -1046,12 +1046,12 @@
   <!-- adds the @plevel and @propnr  attributes -->
   <xsl:template match="Assume/Proposition | Given/Proposition | Consider/Proposition |
      Reconsider/Proposition | Conclusion/Proposition | PerCases/Proposition |
-     Case/Proposition | Suppose/Proposition | 
-    JustifiedTheorem/Proposition | DefTheorem/Proposition | 
-    UnknownCorrCond/Proposition | Coherence/Proposition | 
-    Compatibility/Proposition | Consistency/Proposition | 
-    Existence/Proposition | Uniqueness/Proposition | 
-    SchemePremises/Proposition | 
+     Case/Proposition | Suppose/Proposition |
+    JustifiedTheorem/Proposition | DefTheorem/Proposition |
+    UnknownCorrCond/Proposition | Coherence/Proposition |
+    Compatibility/Proposition | Consistency/Proposition |
+    Existence/Proposition | Uniqueness/Proposition |
+    SchemePremises/Proposition |
     Correctness/Proposition | JustifiedProperty/Proposition">
     <xsl:param name="s"/>
     <xsl:variable name="s0">
@@ -1201,19 +1201,19 @@
   <xsl:template name="prevprops">
     <xsl:param name="el"/>
     <xsl:for-each select="$el">
-      <xsl:value-of select="count(preceding-sibling::*[(name() = &quot;Assume&quot;) or (name() = &quot;Given&quot;) 
-	or (name() = &quot;Consider&quot;) or (name() = &quot;Reconsider&quot;) 
-	or (name() = &quot;Conclusion&quot;) or (name() = &quot;PerCases&quot;) 
-	or (name() = &quot;JustifiedTheorem&quot;) or (name() = &quot;DefTheorem&quot;) 
-	or (name() = &quot;Case&quot;) or (name() = &quot;Suppose&quot;) 
-	or (name() = &quot;UnknownCorrCond&quot;) or (name() = &quot;Coherence&quot;) 
-	or (name() = &quot;Compatibility&quot;) or (name() = &quot;Consistency&quot;) 
-	or (name() = &quot;Existence&quot;) or (name() = &quot;Uniqueness&quot;)
-	or (name() = &quot;SchemePremises&quot;)
-	or (name() = &quot;Correctness&quot;) or (name() = &quot;JustifiedProperty&quot;)]/*[(name() = &quot;Now&quot;) 
-	or (name() = &quot;Proposition&quot;) or (name() = &quot;IterEquality&quot;)]) +
-     count(preceding-sibling::*[(name() = &quot;Now&quot;) or (name() = &quot;Proposition&quot;) 
-	or (name() = &quot;IterEquality&quot;)])"/>
+      <xsl:value-of select="count(preceding-sibling::*[(name() = &quot;Assume&quot;) or (name() = &quot;Given&quot;)
+        or (name() = &quot;Consider&quot;) or (name() = &quot;Reconsider&quot;)
+        or (name() = &quot;Conclusion&quot;) or (name() = &quot;PerCases&quot;)
+        or (name() = &quot;JustifiedTheorem&quot;) or (name() = &quot;DefTheorem&quot;)
+        or (name() = &quot;Case&quot;) or (name() = &quot;Suppose&quot;)
+        or (name() = &quot;UnknownCorrCond&quot;) or (name() = &quot;Coherence&quot;)
+        or (name() = &quot;Compatibility&quot;) or (name() = &quot;Consistency&quot;)
+        or (name() = &quot;Existence&quot;) or (name() = &quot;Uniqueness&quot;)
+        or (name() = &quot;SchemePremises&quot;)
+        or (name() = &quot;Correctness&quot;) or (name() = &quot;JustifiedProperty&quot;)]/*[(name() = &quot;Now&quot;)
+        or (name() = &quot;Proposition&quot;) or (name() = &quot;IterEquality&quot;)]) +
+     count(preceding-sibling::*[(name() = &quot;Now&quot;) or (name() = &quot;Proposition&quot;)
+        or (name() = &quot;IterEquality&quot;)])"/>
     </xsl:for-each>
   </xsl:template>
 
@@ -1280,42 +1280,42 @@
     <xsl:for-each select="$el">
       <xsl:choose>
         <xsl:when test="parent::*[(name() = &quot;Conclusion&quot;) or (name() = &quot;JustifiedTheorem&quot;)
-       or (name() = &quot;UnknownCorrCond&quot;) or (name() = &quot;Coherence&quot;) 
-       or (name() = &quot;Compatibility&quot;) or (name() = &quot;Consistency&quot;) 
+       or (name() = &quot;UnknownCorrCond&quot;) or (name() = &quot;Coherence&quot;)
+       or (name() = &quot;Compatibility&quot;) or (name() = &quot;Consistency&quot;)
        or (name() = &quot;Existence&quot;) or (name() = &quot;Uniqueness&quot;)
        or (name() = &quot;Correctness&quot;) or (name() = &quot;JustifiedProperty&quot;)]">
           <xsl:for-each select="parent::*">
-            <xsl:value-of select="count(preceding-sibling::*[(name() = &quot;Proof&quot;) or (name() = &quot;Now&quot;) 
-	or (name() = &quot;CaseBlock&quot;) or (name() = &quot;SupposeBlock&quot;) or 
-	(name() = &quot;PerCasesReasoning&quot;) or (name() = &quot;Definition&quot;) or
-	(name() = &quot;Registration&quot;) or (name() = &quot;IterEquality&quot;) or
-	(name() = &quot;IdentifyRegistration&quot;) or (name() = &quot;SkippedProof&quot;) or
-	(name() = &quot;DefinitionBlock&quot;) or (name() = &quot;RegistrationBlock&quot;) or 
-	(name() = &quot;NotationBlock&quot;) or (name() = &quot;SchemeBlock&quot;)]) +
-	count(preceding-sibling::*[(name() = &quot;Conclusion&quot;) 
-	 or (name() = &quot;JustifiedTheorem&quot;) or (name() = &quot;UnknownCorrCond&quot;) 
-	 or (name() = &quot;Coherence&quot;) or (name() = &quot;Compatibility&quot;) 
-	 or (name() = &quot;Consistency&quot;) or (name() = &quot;Existence&quot;) 
-	 or (name() = &quot;Uniqueness&quot;) or (name() = &quot;Correctness&quot;)
-	 or (name() = &quot;JustifiedProperty&quot;)]/*[(name() = &quot;Proof&quot;) or 
-	 (name() = &quot;Now&quot;) or (name() = &quot;SkippedProof&quot;) or (name() = &quot;IterEquality&quot;)])"/>
+            <xsl:value-of select="count(preceding-sibling::*[(name() = &quot;Proof&quot;) or (name() = &quot;Now&quot;)
+        or (name() = &quot;CaseBlock&quot;) or (name() = &quot;SupposeBlock&quot;) or
+        (name() = &quot;PerCasesReasoning&quot;) or (name() = &quot;Definition&quot;) or
+        (name() = &quot;Registration&quot;) or (name() = &quot;IterEquality&quot;) or
+        (name() = &quot;IdentifyRegistration&quot;) or (name() = &quot;SkippedProof&quot;) or
+        (name() = &quot;DefinitionBlock&quot;) or (name() = &quot;RegistrationBlock&quot;) or
+        (name() = &quot;NotationBlock&quot;) or (name() = &quot;SchemeBlock&quot;)]) +
+        count(preceding-sibling::*[(name() = &quot;Conclusion&quot;)
+         or (name() = &quot;JustifiedTheorem&quot;) or (name() = &quot;UnknownCorrCond&quot;)
+         or (name() = &quot;Coherence&quot;) or (name() = &quot;Compatibility&quot;)
+         or (name() = &quot;Consistency&quot;) or (name() = &quot;Existence&quot;)
+         or (name() = &quot;Uniqueness&quot;) or (name() = &quot;Correctness&quot;)
+         or (name() = &quot;JustifiedProperty&quot;)]/*[(name() = &quot;Proof&quot;) or
+         (name() = &quot;Now&quot;) or (name() = &quot;SkippedProof&quot;) or (name() = &quot;IterEquality&quot;)])"/>
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="count(preceding-sibling::*[(name() = &quot;Proof&quot;) or (name() = &quot;Now&quot;) 
-	or (name() = &quot;CaseBlock&quot;) or (name() = &quot;SupposeBlock&quot;) or 
-	(name() = &quot;PerCasesReasoning&quot;) or (name() = &quot;Definition&quot;) or
-	(name() = &quot;Registration&quot;) or (name() = &quot;IterEquality&quot;) or
-	(name() = &quot;IdentifyRegistration&quot;) or (name() = &quot;SkippedProof&quot;) or
-	(name() = &quot;DefinitionBlock&quot;) or (name() = &quot;RegistrationBlock&quot;) or 
-	(name() = &quot;NotationBlock&quot;) or (name() = &quot;SchemeBlock&quot;)]) +
-         count(preceding-sibling::*[(name() = &quot;Conclusion&quot;) 
-	 or (name() = &quot;JustifiedTheorem&quot;) or (name() = &quot;UnknownCorrCond&quot;) 
-	 or (name() = &quot;Coherence&quot;) or (name() = &quot;Compatibility&quot;) 
-	 or (name() = &quot;Consistency&quot;) or (name() = &quot;Existence&quot;) 
-	 or (name() = &quot;Uniqueness&quot;) or (name() = &quot;Correctness&quot;)
-	 or (name() = &quot;JustifiedProperty&quot;)]/*[(name() = &quot;Proof&quot;) or 
-	 (name() = &quot;Now&quot;) or (name() = &quot;SkippedProof&quot;) or (name() = &quot;IterEquality&quot;)])"/>
+          <xsl:value-of select="count(preceding-sibling::*[(name() = &quot;Proof&quot;) or (name() = &quot;Now&quot;)
+        or (name() = &quot;CaseBlock&quot;) or (name() = &quot;SupposeBlock&quot;) or
+        (name() = &quot;PerCasesReasoning&quot;) or (name() = &quot;Definition&quot;) or
+        (name() = &quot;Registration&quot;) or (name() = &quot;IterEquality&quot;) or
+        (name() = &quot;IdentifyRegistration&quot;) or (name() = &quot;SkippedProof&quot;) or
+        (name() = &quot;DefinitionBlock&quot;) or (name() = &quot;RegistrationBlock&quot;) or
+        (name() = &quot;NotationBlock&quot;) or (name() = &quot;SchemeBlock&quot;)]) +
+         count(preceding-sibling::*[(name() = &quot;Conclusion&quot;)
+         or (name() = &quot;JustifiedTheorem&quot;) or (name() = &quot;UnknownCorrCond&quot;)
+         or (name() = &quot;Coherence&quot;) or (name() = &quot;Compatibility&quot;)
+         or (name() = &quot;Consistency&quot;) or (name() = &quot;Existence&quot;)
+         or (name() = &quot;Uniqueness&quot;) or (name() = &quot;Correctness&quot;)
+         or (name() = &quot;JustifiedProperty&quot;)]/*[(name() = &quot;Proof&quot;) or
+         (name() = &quot;Now&quot;) or (name() = &quot;SkippedProof&quot;) or (name() = &quot;IterEquality&quot;)])"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
