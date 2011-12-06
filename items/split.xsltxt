@@ -336,3 +336,57 @@ tpl [Item[@kind = "Canceled-Pragma" and @number]] {
                          #line = `@line`,
                          #col = `@col`);
 }
+
+// Mark whether a toplevel unexported theorem is exportable
+
+tpl bad-term-hunting (#candidates) {
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    if [not($candidate/@spelling)] {
+      die (#message = "To determine whether there is a bad term in the current item, we require that all terms have a spelling, but we just found a term that lacks one.");
+    }
+    $spelling = `$candidate/@spelling`;
+    $n = `local-name ($candidate)`;
+    choose {
+      when [$n = "Schematic-Variable"] {
+        "1";
+      }
+      when [starts-with ($spelling, "D")] {
+        "1";
+      }
+      when [starts-with ($spelling, "C")] {
+        "1";
+      }
+      otherwise {
+        bad-term-hunting (#candidates = `$candidates[position() > 1]`);
+      }
+    }
+  } else {
+    "0";
+  }
+}
+
+tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and @shape = "Compact-Statement"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    for-each [Proposition] {
+      $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
+      if [$bad = "1"
+          or descendant::Private-Functor-Term
+          or descendant::Private-Predicate-Formula] {
+        @exportable = "no";
+      } else {
+        @exportable = "yes";
+      }
+    }
+    apply [*];
+  }
+}
+
+tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and not(@shape = "Compact-Statement")]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    @exportable = "no";
+    apply [*];
+  }
+}
