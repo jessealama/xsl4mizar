@@ -150,27 +150,23 @@ tpl item-uses-item (#item, #user) {
   }
 }
 
-// Determine whether there is a member C of $candidates such that
-//
-// * C uses $item
-// * $user uses C
-tpl some-needed-item-uses (#user, #item, #candidates) {
-  if [$candidates] {
-    $candidate = `$candidates[1]`;
-    $later-candidates = `$candidates[position() > 1]`;
-    $candidate-uses-item = item-uses-item (#item = $item, #user = $candidate);
-    if [$candidate-uses-item = "1"] {
-      $user-uses-candidate = item-uses-item (#user = $user, #item = $candidate);
-      if [$user-uses-candidate = "1"] {
-        "1";
+tpl exists-path-from-to (#start, #end, #between) {
+  $occurs-in-item = item-uses-item (#item = $start, #user = $end);
+  if [$occurs-in-item = "1"] {
+    "1";
+  } else {
+    if [$between] {
+      $later-candidates = `$between[position() > 1]`;
+      $candidate = `$between[1]`;
+      $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
+      if [$candidate-uses = "1"] {
+        exists-path-from-to (#start = $candidate, #end = $end, #between = $later-candidates);
       } else {
-        some-needed-item-uses (#user = $user, #item = $item, #candidates = $later-candidates);
+        exists-path-from-to (#start = $start, #end = $end, #between = $later-candidates);
       }
     } else {
-      some-needed-item-uses (#user = $user, #item = $item, #candidates = $later-candidates);
+      "0";
     }
-  } else {
-    "0";
   }
 }
 
@@ -178,14 +174,9 @@ tpl needed-for-item (#item, #candidates) {
   if [$candidates] {
     $candidate = `$candidates[1]`;
     $later-candidates = `$candidates[position() > 1]`;
-    $occurs-in-item = item-uses-item (#item = $candidate, #user = $item);
-    if [$occurs-in-item = "1"] {
+    $exists-path = exists-path-from-to (#start = $candidate, #end = $item, #between = $later-candidates);
+    if [$exists-path = "1"] {
       apply [$candidate];
-    } else {
-      $occurs-in-needed-item = some-needed-item-uses (#user = $item, #item = $candidate, #candidates = $later-candidates);
-      if [$occurs-in-needed-item = "1"] {
-        apply [$candidate];
-      }
     }
     needed-for-item (#item = $item, #candidates = $later-candidates);
   }
@@ -231,11 +222,27 @@ tpl [Item[parent::Text-Proper
       <Item {
         @kind = "Theorem-Item";
         @promoted-lemma = "yes";
+        @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
         apply [.];
         for-each [following-sibling::*] {
           apply [.];
         }
       }
+    }
+  }
+}
+
+tpl [Item[parent::Text-Proper and @kind = "Theorem-Item"]] mode="make-item" {
+  $context = `.`;
+  <Text-Proper {
+    <Item { @kind = "Section-Pragma"; }
+    prepend-context-for-item (#item = $context);
+    <Item {
+      for-each [@*] { copy-of `.`; }
+      @promoted-lemma = "no";
+      @theorem-number = `count (preceding-sibling::Item[@kind = "Theorem-Item"]) + 1`;
+      @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
+      apply [*];
     }
   }
 }
