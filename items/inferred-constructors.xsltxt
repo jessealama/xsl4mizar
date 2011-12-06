@@ -84,9 +84,13 @@ tpl [*[not(@absnr)]] {
 }
 
 tpl [Pattern[@constraid and @constrkind and @absconstrnr]] {
-  `@constraid`; ":"; `@constrkind`; ":"; `@absconstrnr`; "\n";
+  $aid-lc = lc (#s = `@constraid`);
+  $kind-lc = lc (#s = `@constrkind`);
+  $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absconstrnr`; "\n";
 }
 
 tpl [*[@aid and @kind and @absnr]] {
-  `@aid`; ":"; `@kind`; ":"; `@absnr`; "\n";
+  $aid-lc = lc (#s = `@aid`);
+  $kind-lc = lc (#s = `@kind`);
+  $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absnr`; "\n";
 }
