@@ -20,52 +20,220 @@ tpl [Text-Proper] {
   }
 }
 
+tpl term-with-idnr-occurs-in-context (#idnr) {
+  if [descendant::Variable[@idnr = $idnr] | descendant::Simple-Term[@idnr = $idnr]] {
+    "1";
+  } else {
+    "0";
+  }
+}
+
+tpl private-functor-term-with-idnr-occurs-in-context (#idnr) {
+  if [descendant::Private-Functor-Term[@idnr = $idnr]] {
+    "1";
+  } else {
+    "0";
+  }
+}
+
+tpl private-predicate-formula-with-idnr-occurs-in-context (#idnr) {
+  if [descendant::Private-Predicate-Formula[@idnr = $idnr]] {
+    "1";
+  } else {
+    "0";
+  }
+}
+
+tpl some-variable-used-in-context (#variables) {
+  if [$variables] {
+    $variable = `$variables[1]`;
+    $remaining-variables = `$variables[position() > 1]`;
+    $variable-idnr = `$variable/@idnr`;
+    if [not($variable-idnr)] {
+      die (#message = "We found a variable that lacks and idnr attribute!");
+    }
+    $occurs = term-with-idnr-occurs-in-context (#idnr = $variable-idnr);
+    if [$occurs = "1"] {
+      "1";
+    } else {
+      some-variable-used-in-context (#variables = $remaining-variables);
+    }
+  } else {
+    "0";
+  }
+}
+
+tpl reference-to-label-in-context (#label-idnr) {
+  if [descendant::Local-Reference[@idnr = $label-idnr]] {
+    "1";
+  } else {
+    "0";
+  }
+}
+
+tpl item-uses-item (#item, #user) {
+  for-each [$item] {
+    choose {
+      when [self::Item[@kind = "Reservation"]] {
+        $idnr = `Variables/Variable[@idnr]/@idnr`;
+        if [not($idnr)] {
+          die (#message = "A reservation has a variable that lacks an idnr attribute!");
+        }
+        for-each [$user] {
+          term-with-idnr-occurs-in-context (#idnr = $idnr);
+        }
+      }
+      when [self::Item[@kind = "Private-Predicate-Definition"]] {
+        $idnr = `Variable[@idnr]/@idnr`;
+        if [not($idnr)] {
+          die (#message = "A private predicate definition has a variable that lacks an idnr attribute!");
+        }
+        for-each [$user] {
+          private-predicate-formula-with-idnr-occurs-in-context (#idnr = $idnr);
+        }
+      }
+      when [self::Item[@kind = "Private-Functor-Definition"]] {
+        $idnr = `Variable[@idnr]/@idnr`;
+        if [not($idnr)] {
+          die (#message = "A private predicate definition has a variable that lacks an idnr attribute!");
+        }
+        for-each [$user] {
+          private-functor-term-with-idnr-occurs-in-context (#idnr = $idnr);
+        }
+      }
+      when [self::Item[@kind = "Type-Changing-Statement"]] {
+        $idnr = `Equality/Variable[@idnr]/@idnr`;
+        if [not($idnr)] {
+          die (#message = "A type-changing statement having the shape of an equality has a variable that lacks an idnr attribute!");
+        }
+        for-each [$user] {
+          term-with-idnr-occurs-in-context (#idnr = $idnr);
+        }
+      }
+      when [self::Item[@kind = "Choice-Statement" and Explicitly-Qualified-Segment]] {
+        $variables = `Explicitly-Qualified-Segment/Variables/Variable`;
+        for-each [$user] {
+          some-variable-used-in-context (#variables = $variables);
+        }
+      }
+      when [self::Item[@kind = "Constant-Definition" and Variable]] {
+        $idnr = `Variable[@idnr]/@idnr`;
+        if [not($idnr)] {
+          die (#message = "A constant definition has a variable that lacks an idnr attribute!");
+        }
+        for-each [$user] {
+          term-with-idnr-occurs-in-context (#idnr = $idnr);
+        }
+      }
+      when [self::Item[@kind = "Regular-Statement" and Proposition and @exportable = "no"]] {
+        $label-idnr = `Proposition/Label[@idnr]/@idnr`;
+        if [$label-idnr] {
+          for-each [$user] {
+            reference-to-label-in-context (#label-idnr = $label-idnr);
+          }
+        }
+      }
+      when [self::Item[@kind = "Regular-Statement" and not(Proposition) and @exportable = "no"]] {
+        $label-idnr = `Label[@idnr]/@idnr`;
+        if [$label-idnr] {
+          for-each [$user] {
+            reference-to-label-in-context (#label-idnr = $label-idnr);
+          }
+        }
+      }
+      otherwise {
+        $k = `@kind`;
+        $message = `concat ("Don't know how to determine whether an element of type ", $k, " is needed.")`;
+        die (#message = $message);
+      }
+    }
+  }
+}
+
+// Determine whether there is a member C of $candidates such that
+//
+// * C uses $item
+// * $user uses C
+tpl some-needed-item-uses (#user, #item, #candidates) {
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    $later-candidates = `$candidates[position() > 1]`;
+    $candidate-uses-item = item-uses-item (#item = $item, #user = $candidate);
+    if [$candidate-uses-item = "1"] {
+      $user-uses-candidate = item-uses-item (#user = $user, #item = $candidate);
+      if [$user-uses-candidate = "1"] {
+        "1";
+      } else {
+        some-needed-item-uses (#user = $user, #item = $item, #candidates = $later-candidates);
+      }
+    } else {
+      some-needed-item-uses (#user = $user, #item = $item, #candidates = $later-candidates);
+    }
+  } else {
+    "0";
+  }
+}
+
+tpl needed-for-item (#item, #candidates) {
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    $later-candidates = `$candidates[position() > 1]`;
+    $occurs-in-item = item-uses-item (#item = $candidate, #user = $item);
+    if [$occurs-in-item = "1"] {
+      apply [$candidate];
+    } else {
+      $occurs-in-needed-item = some-needed-item-uses (#user = $item, #item = $candidate, #candidates = $later-candidates);
+      if [$occurs-in-needed-item = "1"] {
+        apply [$candidate];
+      }
+    }
+    needed-for-item (#item = $item, #candidates = $later-candidates);
+  }
+}
+
+tpl prepend-context-for-item (#item) {
+  needed-for-item (#item = $item,
+                   #candidates = `preceding::Item[parent::Text-Proper
+                                                  and (@kind = "Reservation"
+                                                       or @kind = "Type-Changing-Statement"
+                                                       or (@kind = "Regular-Statement" and @exportable = "no")
+                                                       or @kind = "Choice-Statement"
+                                                       or @kind = "Constant-Definition"
+                                                       or @kind = "Private-Predicate-Definition"
+                                                       or @kind = "Private-Functor-Definition")]`);
+}
+
+// tpl prepend-context-for-item (#item) {
+//   for-each [preceding::Item[parent::Text-Proper
+//                             and (@kind = "Reservation"
+//                                  or @kind = "Type-Changing-Statement"
+//                                  or (@kind = "Regular-Statement" and @exportable = "no"))]`);
+//     apply [.] mode="needed-for-item";
+// }
+
 tpl [*] mode="make-item" {
+  $context = `.`;
   <Text-Proper {
     <Item { @kind = "Section-Pragma"; }
+    prepend-context-for-item (#item = $context);
     apply [.];
   }
 }
 
-tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and @shape = "Compact-Statement"]] mode="make-item" {
+tpl [Item[parent::Text-Proper
+          and @kind = "Regular-Statement"
+          and @exportable = "yes"]] mode="make-item" {
   $context = `.`;
-  // look for a sign that we can't promote this toplevel unexported lemma to a proper theorem
-  for-each [Proposition] {
-    $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
-    choose {
-      when [$bad = "1"] {
-        msg "we cannot promote this lemma to a theorem";
-        <Text-Proper {
-          <Item { @kind = "Section-Pragma"; }
-          apply [$context];
-        }
-      }
-      when [descendant::Private-Functor-Term] {
-        msg "we cannot promote this lemma to a theorem because it contains a private functor term";
-        <Text-Proper {
-          <Item { @kind = "Section-Pragma"; }
-          apply [$context];
-        }
-      }
-      when [descendant::Private-Predicate-Formula] {
-        msg "we cannot promote this lemma to a because it contains a private predicate formula";
-        <Text-Proper {
-          <Item { @kind = "Section-Pragma"; }
-          apply [$context];
-        }
-      }
-      otherwise {
-        msg "we can promote this lemma to a theorem";
-        <Text-Proper {
-          <Item { @kind = "Section-Pragma"; }
-          <Item {
-            @kind = "Theorem-Item";
-            @promoted-lemma = "yes";
-            apply [.];
-            for-each [following-sibling::*] {
-              apply [.];
-            }
-          }
+  <Text-Proper {
+    <Item { @kind = "Section-Pragma"; }
+    prepend-context-for-item (#item = $context);
+    for-each [Proposition] {
+      <Item {
+        @kind = "Theorem-Item";
+        @promoted-lemma = "yes";
+        apply [.];
+        for-each [following-sibling::*] {
+          apply [.];
         }
       }
     }
@@ -87,12 +255,7 @@ tpl bad-term-hunting (#candidates) {
       when [starts-with ($spelling, "D")] {
         "1";
       }
-      // when [preceding::Item[parent::Text-Proper and @kind = "Choice-Statement"]/*/Variables/Variable[@idnr = $idnr]] {
-      //   msg "choice variable introduced";
-      //   "1";
-      // }
       when [starts-with ($spelling, "C")] {
-        msg "choice variable introduced";
         "1";
       }
       otherwise {
@@ -159,19 +322,15 @@ tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
     $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
     choose {
       when [$bad = "1"] {
-        msg "Unable to rewrite a local lemma reference due to unexportability.";
         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
       }
       when [descendant::Private-Predicate-Formula] {
-        msg "Unable to rewrite a local lemma reference due to presence of a private predicate symbol.";
         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
       }
       when [descendant::Private-Functor-Term] {
-        msg "Unable to rewrite a local lemma reference due to presence of a private functor symbol.";
         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
       }
       otherwise {
-        msg "Rewriting a local lemma reference; it is safe because it is exportable";
         $num-previous = `count (preceding::Item[parent::Text-Proper])`;
         $position = `$num-previous + 1`;
         $new_spelling = `concat ("CKB", $position)`;
