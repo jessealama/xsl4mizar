@@ -158,9 +158,14 @@ tpl exists-path-from-to (#start, #end, #between) {
     if [$between] {
       $later-candidates = `$between[position() > 1]`;
       $candidate = `$between[1]`;
-      $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
-      if [$candidate-uses = "1"] {
-        exists-path-from-to (#start = $candidate, #end = $end, #between = $later-candidates);
+      $path-from-candidate = exists-path-from-to (#start = $candidate, #end = $end, #candidates = $later-candidates);
+      if [$path-from-candidate = "1"] {
+        $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
+        if [$candidate-uses = "1"] {
+          "1";
+        } else {
+          exists-path-from-to (#start = $start, #end = $end, #between = $later-candidates);
+        }
       } else {
         exists-path-from-to (#start = $start, #end = $end, #between = $later-candidates);
       }
