@@ -51,7 +51,7 @@ foreach my $i (1 .. scalar @dcos) {
     $num = 1;
     $constructors{$kind} = 2;
   }
-  print $article_basename, ':', 'fragment', ':', $dco, ' => ', $article_basename, ':', $kind_lc, 'constructor', ':', $num, "\n";
+  print $article_basename, ':', $kind_lc, 'constructor', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
 }
 
 # Definientia
@@ -80,7 +80,7 @@ foreach my $i (1 .. scalar @defs) {
     $num = 1;
     $definiens{$constrkind} = 2;
   }
-  print $article_basename, ':', 'fragment', ':', $def, ' => ', $article_basename, ':', $constrkind_lc, 'definiens', ':', $num, "\n";
+  print $article_basename, ':', $constrkind_lc, 'definiens', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $def, "\n";
 }
 
 
@@ -93,7 +93,7 @@ my %deftheorems = ();
 
 foreach my $i (1 .. scalar @thes) {
   my $the = $thes[$i - 1];
-  print $article_basename, ':', 'fragment', ':', $the, ' => ', $article_basename, ':', 'deftheorem' , ':', $i, "\n";
+  print $article_basename, ':', 'deftheorem' , ':', $i, ' => ', $article_basename, ':', 'fragment', ':', $the, "\n";
 }
 
 # Schemes
@@ -106,7 +106,7 @@ my %schemes = ();
 foreach my $i (1 .. scalar @schs) {
   my $sch = $schs[$i - 1];
   my $sch_path = "$prel_subdir/ckb${sch}.sch";
-  print $article_basename, ':', 'fragment', ':', $sch, ' => ', $article_basename, ':', 'scheme', ':', $i, "\n";
+  print $article_basename, ':', 'scheme', ':', $i, ' => ', $article_basename, ':', 'fragment', ':', $sch, "\n";
 }
 
 # Clusters
@@ -136,7 +136,7 @@ foreach my $i (1 .. scalar @dcls) {
     $num = 1;
     $clusters{$kind} = 2;
   }
-  print $article_basename, ':', 'fragment', ':', $dcl, ' => ', $article_basename, ':', $kind_lc, 'cluster', ':', $num, "\n";
+  print $article_basename, ':', $kind_lc, 'cluster', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dcl, "\n";
 }
 
 # Notations
@@ -167,7 +167,7 @@ foreach my $i (1 .. scalar @dnos) {
     $num = 1;
     $patterns{$constrkind} = 2;
   }
-  print $article_basename, ':', 'fragment', ':', $dno, ' => ', $article_basename, ':', $constrkind_lc, 'pattern', ':', $num, "\n";
+  print $article_basename, ':', $constrkind_lc, 'pattern', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dno, "\n";
 }
 
 # Theorems
@@ -208,7 +208,7 @@ foreach my $theorem (@theorems) {
   if ($theorem->exists ('@theorem-number')) {
     my $theorem_number = $theorem->findvalue ('@theorem-number');
     my $fragment_number = $theorem->findvalue ('count (preceding::Text-Proper) + 1');
-    print $article_basename, ':', 'fragment', ':', $fragment_number, ' => ', $article_basename, ':', 'theorem', ':', $theorem_number, "\n";
+    print $article_basename, ':', 'theorem', ':', $theorem_number, ' => ', $article_basename, ':', 'fragment', ':', $fragment_number, "\n";
   } else {
     print 'Error: we did not find the theorem-number attribute for a theorem!', "\n";
     exit 1;
@@ -226,7 +226,7 @@ foreach my $lemma (@lemmas) {
   if ($lemma->exists ('@lemma-number')) {
     my $lemma_number = $lemma->findvalue ('@lemma-number');
     my $fragment_number = $lemma->findvalue ('count (preceding::Text-Proper) + 1');
-    print $article_basename, ':', 'fragment', ':', $fragment_number, ' => ', $article_basename, ':', 'lemma', ':', $lemma_number, "\n";
+    print $article_basename, ':', 'lemma', ':', $lemma_number, ' => ', $article_basename, ':', 'fragment', ':', $fragment_number, "\n";
   } else {
     print 'Error: we did not find the lemma-number attribute for a promoted lemma!', "\n";
     exit 1;
@@ -244,7 +244,7 @@ foreach my $lemma (@unexportable_lemmas) {
   if ($lemma->exists ('@lemma-number')) {
     my $lemma_number = $lemma->findvalue ('@lemma-number');
     my $fragment_number = $lemma->findvalue ('count (preceding::Text-Proper) + 1');
-    print $article_basename, ':', 'fragment', ':', $fragment_number, ' => ', $article_basename, ':', 'lemma', ':', $lemma_number, "\n";
+    print $article_basename, ':', 'lemma', ':', $lemma_number, ' => ', $article_basename, ':', 'fragment', ':', $fragment_number, "\n";
   } else {
     print 'Error: we did not find the lemma-number attribute for an unpromoted lemma!', "\n";
     exit 1;
