@@ -29,6 +29,14 @@ tpl term-with-idnr-occurs-in-context (#idnr) {
   }
 }
 
+tpl reserved-variable-with-idnr-in-context (#idnr) {
+  if [descendant::Implicitly-Qualified-Segment/Variable[@idnr = $idnr] | descendant::Simple-Term[@idnr = $idnr]] {
+    "1";
+  } else {
+    "0";
+  }
+}
+
 tpl private-functor-term-with-idnr-occurs-in-context (#idnr) {
   if [descendant::Private-Functor-Term[@idnr = $idnr]] {
     "1";
@@ -81,7 +89,7 @@ tpl item-uses-item (#item, #user) {
           die (#message = "A reservation has a variable that lacks an idnr attribute!");
         }
         for-each [$user] {
-          term-with-idnr-occurs-in-context (#idnr = $idnr);
+          reserved-variable-with-idnr-in-context (#idnr = $idnr);
         }
       }
       when [self::Item[@kind = "Private-Predicate-Definition"]] {
