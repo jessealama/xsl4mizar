@@ -158,7 +158,7 @@ tpl exists-path-from-to (#start, #end, #between) {
     if [$between] {
       $later-candidates = `$between[position() > 1]`;
       $candidate = `$between[1]`;
-      $path-from-candidate = exists-path-from-to (#start = $candidate, #end = $end, #candidates = $later-candidates);
+      $path-from-candidate = exists-path-from-to (#start = $candidate, #end = $end, #between = $later-candidates);
       if [$path-from-candidate = "1"] {
         $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
         if [$candidate-uses = "1"] {
@@ -188,6 +188,11 @@ tpl needed-for-item (#item, #candidates) {
 }
 
 tpl prepend-context-for-item (#item) {
+  // for-each [$item] {
+  //   $num-prev = `count (preceding::Item[parent::Text-Proper])`;
+  //   $message = `concat ("Computing needed.  There are ", $num-prev, " previous items")`;
+  //   msg $message;
+  // }
   needed-for-item (#item = $item,
                    #candidates = `preceding::Item[parent::Text-Proper
                                                   and (@kind = "Reservation"
@@ -199,15 +204,11 @@ tpl prepend-context-for-item (#item) {
                                                        or @kind = "Private-Functor-Definition")]`);
 }
 
-// tpl prepend-context-for-item (#item) {
-//   for-each [preceding::Item[parent::Text-Proper
-//                             and (@kind = "Reservation"
-//                                  or @kind = "Type-Changing-Statement"
-//                                  or (@kind = "Regular-Statement" and @exportable = "no"))]`);
-//     apply [.] mode="needed-for-item";
-// }
+tpl [*[not(parent::Text-Proper)]] mode="make-item" {
+  msg terminate="yes" "Why are we attepting to make an item from a non-toplevel item?";
+}
 
-tpl [*] mode="make-item" {
+tpl [*[parent::Text-Proper]] mode="make-item" {
   $context = `.`;
   <Text-Proper {
     <Item { @kind = "Section-Pragma"; }
