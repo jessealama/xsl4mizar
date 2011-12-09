@@ -76,19 +76,6 @@ if ($xml_doc->exists ('/Notations[@aid]')) {
   exit 1;
 }
 
-my $mizfiles;
-if ($xml_doc->exists ('/Notations[@mizfiles]')) {
-  $mizfiles = $xml_doc->findvalue ('/Notations/@mizfiles')
-} else {
-  print 'Error: the patterns file at ', $article_eno, ' does not have a root Notations element with a mizfiles attribute.', "\n";
-  exit 1;
-}
-
-$mizfiles =~ s/\//&#47;/g; # we need to escape the '/'
-
-# DEBUG
-# warn 'aid is ', $aid, ' and mizfiles is ', $mizfiles;
-
 sub write_element_table {
   my @elements = @{shift ()};
   my %table = %{shift ()};
@@ -100,7 +87,6 @@ sub write_element_table {
   # DEBUG
   # warn 'There are ', scalar @elements, ' available; we will now print just ', scalar (keys %table), ' of them now to ', $path;
   $root->setAttribute ('aid', $aid);
-  $root->setAttribute ('mizfiles', $mizfiles);
   $root->appendText ("\n");
   foreach my $i (0 .. scalar @elements - 1) {
     if (defined $table{$i}) {
@@ -112,8 +98,6 @@ sub write_element_table {
   $new_doc->setDocumentElement ($root);
   $new_doc->toFile ($path);
 
-  # ARGH
-  system ("perl -pi -e 's/mizfiles=\".*\"/mizfiles=\"$mizfiles\"/' $path");
 }
 
 sub verify {
