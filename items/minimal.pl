@@ -357,7 +357,3 @@ foreach my $extension_to_minimize (@extensions_to_minimize) {
     exit 1;
   }
 }
-
-# Constructors last
-
-my $
