@@ -159,31 +159,6 @@ tpl item-uses-item (#item, #user) {
   }
 }
 
-tpl exists-path-from-to (#start, #end, #between) {
-  $occurs-in-item = item-uses-item (#item = $start, #user = $end);
-  if [$occurs-in-item = "1"] {
-    "1";
-  } else {
-    if [$between] {
-      $later-candidates = `$between[position() > 1]`;
-      $candidate = `$between[1]`;
-      $path-from-candidate = exists-path-from-to (#start = $candidate, #end = $end, #between = $later-candidates);
-      if [$path-from-candidate = "1"] {
-        $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
-        if [$candidate-uses = "1"] {
-          "1";
-        } else {
-          exists-path-from-to (#start = $start, #end = $end, #between = $later-candidates);
-        }
-      } else {
-        exists-path-from-to (#start = $start, #end = $end, #between = $later-candidates);
-      }
-    } else {
-      "0";
-    }
-  }
-}
-
 // Find a path from $start to $end, possibly via the items in
 // $between.  The result is either the empty string (indicating that
 // there is no path from $start to $end via $beteen), or a token list
