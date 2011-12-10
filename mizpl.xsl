@@ -212,10 +212,10 @@
     <xsl:param name="el"/>
     <xsl:for-each select="$el">
       <xsl:choose>
-        <xsl:when test="(@pid=$pid_Or) 
+        <xsl:when test="(@pid=$pid_Or)
         and (*[1][@pid=$pid_Or_And]) and (count(*[1]/*)=2)
-	and (*[1]/*[1][@pid=$pid_Or_LeftNot])
-	and (*[1]/*[2][@pid=$pid_Or_RightNot])">
+        and (*[1]/*[1][@pid=$pid_Or_LeftNot])
+        and (*[1]/*[2][@pid=$pid_Or_RightNot])">
           <xsl:text>1</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -229,9 +229,9 @@
     <xsl:param name="el"/>
     <xsl:for-each select="$el">
       <xsl:choose>
-        <xsl:when test="(@pid=$pid_Impl) 
+        <xsl:when test="(@pid=$pid_Impl)
         and (*[1][@pid=$pid_Impl_And]) and (count(*[1]/*)=2)
-	and (*[1]/*[2][@pid=$pid_Impl_RightNot])">
+        and (*[1]/*[2][@pid=$pid_Impl_RightNot])">
           <xsl:text>1</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -245,9 +245,9 @@
     <xsl:param name="el"/>
     <xsl:for-each select="$el">
       <xsl:choose>
-        <xsl:when test="(@pid=$pid_Impl) 
+        <xsl:when test="(@pid=$pid_Impl)
         and (*[1][@pid=$pid_Impl_And]) and (count(*[1]/*)&gt;2)
-	and (*[1]/*[@pid=$pid_Impl_RightNot])">
+        and (*[1]/*[@pid=$pid_Impl_RightNot])">
           <xsl:text>1</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -261,9 +261,9 @@
     <xsl:param name="el"/>
     <xsl:for-each select="$el">
       <xsl:choose>
-        <xsl:when test="(@pid=$pid_Impl) 
+        <xsl:when test="(@pid=$pid_Impl)
         and (*[1][@pid=$pid_Impl_And]) and (count(*[1]/*)&gt;=2)
-	and (*[1]/*[@pid=$pid_Impl_RightNot])">
+        and (*[1]/*[@pid=$pid_Impl_RightNot])">
           <xsl:text>1</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -336,7 +336,7 @@
     <xsl:param name="el2"/>
     <xsl:choose>
       <xsl:when test=" not(name($el1)=name($el2)) or not(count($el1/*)=count($el2/*))
-	or not(count($el1/@*)=count($el2/@*))">
+        or not(count($el1/@*)=count($el2/@*))">
         <xsl:text>0</xsl:text>
       </xsl:when>
       <xsl:otherwise>
@@ -1341,9 +1341,9 @@
       <xsl:choose>
         <xsl:when test="name($el/..) = &quot;BlockThesis&quot;">
           <xsl:for-each select="$el/../../*[
-	    (name()=&quot;Let&quot;) or (name()=&quot;Conclusion&quot;) or (name()=&quot;Assume&quot;) or (name()=&quot;Given&quot;) or 
-	    (name()=&quot;Take&quot;) or (name()=&quot;TakeAsVar&quot;) or (name()=&quot;Case&quot;) or (name()=&quot;Suppose&quot;) or 
-	    (name()=&quot;PerCasesReasoning&quot;)][$thes_nr + 1]">
+            (name()=&quot;Let&quot;) or (name()=&quot;Conclusion&quot;) or (name()=&quot;Assume&quot;) or (name()=&quot;Given&quot;) or
+            (name()=&quot;Take&quot;) or (name()=&quot;TakeAsVar&quot;) or (name()=&quot;Case&quot;) or (name()=&quot;Suppose&quot;) or
+            (name()=&quot;PerCasesReasoning&quot;)][$thes_nr + 1]">
             <xsl:call-template name="do_nd">
               <xsl:with-param name="thes_nr" select="$thes_nr"/>
             </xsl:call-template>
@@ -1351,9 +1351,9 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:for-each select="$el/following-sibling::*[
-            (name()=&quot;Let&quot;) or (name()=&quot;Conclusion&quot;) or (name()=&quot;Assume&quot;) or (name()=&quot;Given&quot;) or 
-	    (name()=&quot;Take&quot;) or (name()=&quot;TakeAsVar&quot;) or (name()=&quot;Case&quot;) or (name()=&quot;Suppose&quot;) or 
-	    (name()=&quot;PerCasesReasoning&quot;)][1]">
+            (name()=&quot;Let&quot;) or (name()=&quot;Conclusion&quot;) or (name()=&quot;Assume&quot;) or (name()=&quot;Given&quot;) or
+            (name()=&quot;Take&quot;) or (name()=&quot;TakeAsVar&quot;) or (name()=&quot;Case&quot;) or (name()=&quot;Suppose&quot;) or
+            (name()=&quot;PerCasesReasoning&quot;)][1]">
             <xsl:call-template name="do_nd">
               <xsl:with-param name="thes_nr" select="$thes_nr"/>
             </xsl:call-template>
@@ -1891,7 +1891,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="($parent_nm = &quot;Proof&quot;) or ($parent_nm = &quot;Now&quot;) or 
+      <xsl:when test="($parent_nm = &quot;Proof&quot;) or ($parent_nm = &quot;Now&quot;) or
            ($parent_nm = &quot;Article&quot;) or (contains($parent_nm, &quot;Block&quot;))">
         <xsl:text>auxiliary_lemma</xsl:text>
       </xsl:when>
@@ -2623,11 +2623,11 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:text>])],[</xsl:text>
-      <xsl:for-each select=".//By[((name(preceding-sibling::*[1])=&quot;Proposition&quot;) 
-	              or (name(..)=&quot;IterStep&quot;))
-	            and ((@linked=&quot;true&quot;) or (count(Ref)&gt;0))] 
-	     | .//From[((name(preceding-sibling::*[1])=&quot;Proposition&quot;) 
-	                 or (name(..)=&quot;IterStep&quot;))]
+      <xsl:for-each select=".//By[((name(preceding-sibling::*[1])=&quot;Proposition&quot;)
+                      or (name(..)=&quot;IterStep&quot;))
+                    and ((@linked=&quot;true&quot;) or (count(Ref)&gt;0))]
+             | .//From[((name(preceding-sibling::*[1])=&quot;Proposition&quot;)
+                         or (name(..)=&quot;IterStep&quot;))]
              | .//ThesisExpansions[count(Ref)&gt;0]">
         <xsl:choose>
           <xsl:when test="name()=&quot;ThesisExpansions&quot;">
@@ -2827,7 +2827,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:for-each select="Var|LocusVar|Const|InfConst|Num|Func|PrivFunc|Fraenkel|
-	      QuaTrm|It|Choice|ErrorTrm">
+              QuaTrm|It|Choice|ErrorTrm">
       <xsl:variable name="nr" select="$cnr + position() - 1"/>
       <xsl:variable name="nm">
         <xsl:text>c</xsl:text>
@@ -2972,7 +2972,7 @@
       </xsl:call-template>
     </xsl:variable>
     <!-- the type hierarchy formula for "M" | "L" | "K" | "U" | "G" -->
-    <xsl:if test="(@kind=&apos;M&apos;) or (@kind=&apos;L&apos;) or (@kind=&apos;K&apos;) or 
+    <xsl:if test="(@kind=&apos;M&apos;) or (@kind=&apos;L&apos;) or (@kind=&apos;K&apos;) or
         (@kind=&apos;U&apos;) or (@kind=&apos;G&apos;)">
       <xsl:text>fof(dt_</xsl:text>
       <xsl:call-template name="absc1">
@@ -3310,7 +3310,7 @@
                 <xsl:with-param name="separ">
                   <xsl:text>,</xsl:text>
                 </xsl:with-param>
-                <xsl:with-param name="elems" select="ArgTypes/Typ[(position() &gt; $s) 
+                <xsl:with-param name="elems" select="ArgTypes/Typ[(position() &gt; $s)
                                   and (position() &lt; $l)]"/>
                 <xsl:with-param name="s" select="$s"/>
               </xsl:call-template>
@@ -4835,7 +4835,7 @@
       <xsl:choose>
         <xsl:when test="(name() = &quot;Reconsider&quot;)">
           <xsl:value-of select="count(Var|LocusVar|Const|InfConst|
-		  Num|Func|PrivFunc|Fraenkel|QuaTrm|It|Choice|ErrorTrm)"/>
+                  Num|Func|PrivFunc|Fraenkel|QuaTrm|It|Choice|ErrorTrm)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="count(Typ)"/>
@@ -5189,9 +5189,9 @@
     <xsl:choose>
       <xsl:when test="$mml=&quot;0&quot;">
         <xsl:apply-templates select="//Constructor|//Proposition[not(name(..)=&quot;Reconsider&quot;)]|//Now|//IterEquality|
-	     //Let|//Given|//TakeAsVar|//Consider|//Set|
-	     //Reconsider|//SchemeFuncDecl|//SchemeBlock|
-	     //CCluster|//FCluster|//RCluster|//IdentifyWithExp|//Identify|//Thesis|//PerCasesReasoning|/ByExplanations"/>
+             //Let|//Given|//TakeAsVar|//Consider|//Set|
+             //Reconsider|//SchemeFuncDecl|//SchemeBlock|
+             //CCluster|//FCluster|//RCluster|//IdentifyWithExp|//Identify|//Thesis|//PerCasesReasoning|/ByExplanations"/>
         <xsl:call-template name="dumproptable"/>
       </xsl:when>
       <xsl:otherwise>
