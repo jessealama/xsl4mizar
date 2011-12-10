@@ -18,6 +18,8 @@ my $article_miz = "${article_dirname}/${article_basename}.miz";
 my $article_err = "${article_dirname}/${article_basename}.err";
 my $article_eno = "${article_dirname}/${article_basename}.eno";
 my $article_refx = "${article_dirname}/${article_basename}.refx";
+my $article_esh = "${article_dirname}/${article_basename}.esh";
+my $article_eth = "${article_dirname}/${article_basename}.eth";
 
 foreach my $extension ('miz', 'refx', 'eno') {
   my $article_with_extension = "${article_dirname}/${article_basename}.${extension}";
@@ -51,12 +53,6 @@ sub max {
   }
 }
 
-# Theorems and schemes
-my $parsed_ref = ParseRef ($article_refx);
-PruneRefXML ('Scheme', 'esh', $article_sans_extension, $parsed_ref);
-PruneRefXML ('Theorem', 'eth', $article_sans_extension, $parsed_ref);
-
-# my @extensions_to_minimize = ('eno');
 my @extensions_to_minimize = ('eno', 'erd', 'epr', 'dfs', 'eid', 'ecl');
 my %extension_to_element_table = ('eno' => 'Notations',
                                   'erd' => 'ReductionRegistrations',
@@ -112,115 +108,147 @@ sub verify {
   }
 }
 
-## only callable with .eth or .esh; $refs is an array pointer of three hashes returned by ParseRef
-sub PruneRefXML
-{
-  my ($xml_elem, $file_ext, $basename, $refs_ref) = @_;
+sub prune_theorems {
+  my $refx_parser = XML::LibXML->new ();
+  my $refx_doc = $refx_parser->parse_file ($article_refx);
+  my %theorems = ();
+  my %definitions = ();
 
-  if ($file_ext ne 'esh' && $file_ext ne 'eth') {
-    print 'Error: PruneRefXML works only with .esh and .eth files, not ', $file_ext, ' files.', "\n";
+  my @middle_sy_three_dots = $refx_doc->findnodes ('Parser/syThreeDots[preceding-sibling::sySemiColon and following-sibling::sySemiColon[2]]');
+  # DEBUG
+  # print 'In the middle sySemiColon segment, there are ', scalar @middle_sy_three_dots, ' syThreeDots elements.', "\n";
+  foreach my $sy_three_dots (@middle_sy_three_dots) {
+    my $aid = $sy_three_dots->findvalue ('following-sibling::Int[1]/@x');
+    my $nr = $sy_three_dots->findvalue ('following-sibling::Int[2]/@x');
+    unless (defined $aid && defined $nr) {
+      print 'Error: we failed to extract either the first or the second Int following an syThreeDots element!', "\n";
+      exit 1;
+    }
+    $theorems{"$aid:$nr"} = 0;
+  }
+  my @final_sy_three_dots = $refx_doc->findnodes ('Parser/syThreeDots[preceding-sibling::sySemiColon and following-sibling::sySemiColon[1] and not(following-sibling::sySemiColon[2])]');
+  # DEBUG
+  # print 'In the final sySemiColon segment, there are ', scalar @final_sy_three_dots, ' syThreeDots elements.', "\n";
+  foreach my $sy_three_dots (@final_sy_three_dots) {
+    my $aid = $sy_three_dots->findvalue ('following-sibling::Int[1]/@x');
+    my $nr = $sy_three_dots->findvalue ('following-sibling::Int[2]/@x');
+    unless (defined $aid && defined $nr) {
+      print 'Error: we failed to extract either the first or the second Int following an syThreeDots element!', "\n";
+      exit 1;
+    }
+    $definitions{"$aid:$nr"} = 0;
+  }
+
+  if (-e $article_eth) {
+    print 'Minimizing eth...';
+    my $eth_parser = XML::LibXML->new ();
+    my $eth_doc = $eth_parser->parse_file ($article_eth);
+
+    # Create the new .eth document
+    my $new_eth_doc = XML::LibXML::Document->createDocument ();
+    my $eth_root = $new_eth_doc->createElement ('Theorems');
+
+    $eth_root->setAttribute ('aid', $aid);
+    $eth_root->appendText ("\n");
+    my @theorem_nodes = $eth_doc->findnodes ('Theorems/Theorem');
+    my $num_needed = 0;
+    foreach my $theorem_node (@theorem_nodes) {
+      unless ($theorem_node->exists ('@articlenr')) {
+        print 'Error: we found a Theorem node that lacks an articlenr attribute!', "\n";
+        exit 1;
+      }
+      unless ($theorem_node->exists ('@nr')) {
+        print 'Error: we found a Theorem node that lacks an nr attribute!', "\n";
+        exit 1;
+      }
+      unless ($theorem_node->exists ('@kind')) {
+        print 'Error: we found a Theorem node that lacks a kind attribute!', "\n";
+        exit 1;
+      }
+      my $articlenr = $theorem_node->findvalue ('@articlenr');
+      my $nr = $theorem_node->findvalue ('@nr');
+      my $kind = $theorem_node->findvalue ('@kind');
+      if ($kind eq 'T') {
+        if (defined $theorems{"${articlenr}:${nr}"}) {
+          $num_needed++;
+          $eth_root->appendChild ($theorem_node);
+          $eth_root->appendText ("\n");
+        }
+      } elsif ($kind eq 'D') {
+        if (defined $definitions{"${articlenr}:${nr}"}) {
+          $num_needed++;
+          $eth_root->appendChild ($theorem_node);
+          $eth_root->appendText ("\n");
+        }
+      }
+    }
+    $new_eth_doc->setDocumentElement ($eth_root);
+    $new_eth_doc->toFile ($article_eth);
+
+    print 'done.  The initial environment contained ', scalar @theorem_nodes, ' elements, but we actually need only ', $num_needed, "\n";
+
+  } else {
+    print 'The .eth file does not exist for ', $article_basename, ', so there is nothing to minimize.', "\n";
     exit 1;
-  }
-
-  my $xitemfile = "$basename.$file_ext";
-
-  if (! -e $xitemfile) {
-    print "Nothing to trim for $xml_elem\n";
-    return;
-  }
-
-  if (-e $xitemfile) {
-    {
-      open(XML, $xitemfile) or die "Unable to open an output filehandle for $xitemfile!";
-      local $/; $_ = <XML>;
-      close(XML);
-    }
-  }
-
-  my @refs = @{$refs_ref};
-  my ($schs, $ths, $defs) = @refs;
-  my $res = 0;
-
-  my ($xmlbeg,$xmlnodes,$xmlend) = $_ =~ m/(.*?)([<]$xml_elem\b.*[<]\/$xml_elem>)(.*)/s;
-  if (defined $xmlbeg) {
-
-    my @xmlelems = $xmlnodes =~ m/(<$xml_elem\b.*?<\/$xml_elem>)/sg; # this is a multiline match
-
-    open(XML1, '>', $xitemfile) or die "Unable to open an output filehandle for $xitemfile: $!";
-    print XML1 $xmlbeg;
-
-    if ($file_ext eq 'eth') {
-      foreach my $elemnr (0 .. scalar(@xmlelems)-1) {
-        my $first_line = (split /\n/, $xmlelems[$elemnr] )[0];
-
-        $first_line =~ m/.*articlenr=\"(\d+)\".* nr=\"(\d+)\".* kind=\"([DT])\"/ or die "bad element $first_line";
-
-        my ($ref, $kind) = ( "$1:$2", $3);
-        my $needed = ($kind eq 'T')? $ths : $defs;
-
-        if ( exists $needed->{$ref}) {
-          print XML1 $xmlelems[$elemnr];
-          $res++;
-        }
-      }
-    }
-
-    if ($file_ext eq 'esh') {
-      foreach my $elemnr (0 .. scalar(@xmlelems)-1) {
-        my $first_line = (split /\n/, $xmlelems[$elemnr] )[0];
-        $first_line =~ m/.*articlenr=\"(\d+)\".* nr=\"(\d+)\".*/ or die "bad element $first_line";
-
-        if ( exists $schs->{"$1:$2"}) {
-          print XML1 $xmlelems[$elemnr];
-          $res++;
-        }
-      }
-    }
-
-    print XML1 $xmlend;
-    close(XML1);
-    return $res;
   }
 }
 
-## return three hash pointers - first for schemes, then theorems, then definitions
-sub ParseRef
-  {
-    my ($refx) = @_;
-    open(REF,'<', "$refx") or die "Unable to open an input filehandle for $refx: $!";
-    my @refs = ({},{},{});
-    my $i = 0;
-    while(<REF>)
-      {
-        if(/syThreeDots/)
-          {
-            $_ = <REF>;
-            $_ =~ /x=\"(\d+)\"/ or die "bad REFX file";
-            my $articlenr = $1;
-            $_ = <REF>;
-            $_ =~ /x=\"(\d+)\"/ or die "bad REFX file";
-            my $refnr = $1;
-            <REF>; <REF>;
-            $refs[$i]->{"$articlenr:$refnr"} = 0;
-          }
-        if(/sySemiColon/)
-          {
-            $i++;
-          }
+# Ugh: This is nearly identical to the previous subroutine definition.
+sub prune_schemes {
+  my $refx_parser = XML::LibXML->new ();
+  my $refx_doc = $refx_parser->parse_file ($article_refx);
+  my %schemes = ();
+  my @initial_sy_three_dots = $refx_doc->findnodes ('Parser/syThreeDots[not(preceding-sibling::sySemiColon)]');
+  foreach my $sy_three_dots (@initial_sy_three_dots) {
+    my $aid = $sy_three_dots->findvalue ('following-sibling::Int[1]/@x');
+    my $nr = $sy_three_dots->findvalue ('following-sibling::Int[2]/@x');
+    unless (defined $aid && defined $nr) {
+      print 'Error: we failed to extract either the first or the second Int following an syThreeDots element!', "\n";
+      exit 1;
     }
-    close(REF);
-    die "Wrong number of ref kinds: $i" if($i != 3);
+    $schemes{"$aid:$nr"} = 0;
+  }
+  if (-e $article_esh) {
+    print 'Minimizing esh...';
+    my $esh_parser = XML::LibXML->new ();
+    my $esh_doc = $esh_parser->parse_file ($article_esh);
 
-    # DEBUG
-    # foreach my $i (0 .. 2) {
-    #  my %hash = %{$refs[$i]};
-      # warn "ParseRef: hash number $i";
-      # foreach my $key (keys (%hash)) {
-        # warn "key: $key, value ", $hash{$key};
-    #   }
-    # }
+    # Create the new .esh document
+    my $new_esh_doc = XML::LibXML::Document->createDocument ();
+    my $esh_root = $new_esh_doc->createElement ('Schemes');
 
-    return \@refs;
+    $esh_root->setAttribute ('aid', $aid);
+    $esh_root->appendText ("\n");
+    my @scheme_nodes = $esh_doc->findnodes ('Schemes/Scheme');
+    my $num_needed = 0;
+    foreach my $scheme_node (@scheme_nodes) {
+      unless ($scheme_node->exists ('@articlenr')) {
+        print "\n";
+        print 'Error: we found a Scheme node that lacks an articlenr attribute!', "\n";
+        exit 1;
+      }
+      unless ($scheme_node->exists ('@nr')) {
+        print "\n";
+        print 'Error: we found a Scheme node that lacks an nr attribute!', "\n";
+        exit 1;
+      }
+      my $articlenr = $scheme_node->findvalue ('@articlenr');
+      my $nr = $scheme_node->findvalue ('@nr');
+      if (defined $schemes{"${articlenr}:${nr}"}) {
+        $num_needed++;
+        $esh_root->appendChild ($scheme_node);
+        $esh_root->appendText ("\n");
+      }
+    }
+    $new_esh_doc->setDocumentElement ($esh_root);
+    $new_esh_doc->toFile ($article_esh);
+
+    print 'done.  The initial environment contained ', scalar @scheme_nodes, ' elements, but we actually need only ', $num_needed, "\n";
+
+  } else {
+    print 'The .esh file does not exist for ', $article_basename, ', so there is nothing to minimize.', "\n";
+    exit 1;
+  }
 }
 
 sub print_element {
@@ -316,6 +344,11 @@ sub minimize {
     }
   }
 }
+
+# Let's do it
+
+prune_schemes ();
+prune_theorems ();
 
 foreach my $extension_to_minimize (@extensions_to_minimize) {
   my $root_element_name = $extension_to_element_table{$extension_to_minimize};
