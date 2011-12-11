@@ -94,14 +94,14 @@ tpl apply-variable {
 
 tpl variable-list {
   if [Variables] {
-    list (#separ = ",", #elems = `Variables/Variable`);
+    list (#separ = " , ", #elems = `Variables/Variable`);
   } else {
-    list (#separ = ",", #elems = `Variable`);
+    list (#separ = " , ", #elems = `Variable`);
   }
 }
 
 tpl [Variables] {
-  list (#separ = ",", #elems = `Variable`);
+  list (#separ = " , ", #elems = `Variable`);
 }
 
 tpl [Variable] {
@@ -119,7 +119,7 @@ tpl [Standard-Type] {
   // this is so ugly.  How can I get rid of this?
   if [Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term | Global-Choice-Term] {
    "("; `@spelling`; " of ";
-    list (#separ = ",", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term | Global-Choice-Term`);
+    list (#separ = " , ", #elems = `Infix-Term | Simple-Term | Private-Functor-Term | Circumfix-Term | Qualification-Term | it-Term | Placeholder-Term | Internal-Selector-Term | Selector-Term | Numeral-Term | Fraenkel-Term | Forgetful-Functor-Term | Aggregate-Term | Global-Choice-Term`);
     ")";
   } else {
     `@spelling`;
@@ -455,7 +455,7 @@ tpl [Item[@kind='Identify']] {
     apply [(Operation-Functor-Pattern | Bracket-Functor-Pattern)[1]];
     if [*[3]] { // conditions for the identification
       " when ";
-      list (#separ = ",", #elems = `*[position() > 2]`); // assuming that the two patterns are the first two children of this Identify item
+      list (#separ = " , ", #elems = `*[position() > 2]`); // assuming that the two patterns are the first two children of this Identify item
     }
     ";"; "\n";
   } else {
@@ -519,7 +519,7 @@ tpl [NegatedAdjective] {
 tpl [Adjective] {
   ensure-spelling ();
   if [*[2]] {
-     "("; list (#separ = ",", #elems = `*`); ")";
+     "("; list (#separ = " , ", #elems = `*`); ")";
   } else {
     apply [*[1]]; " ";
   }
@@ -598,7 +598,7 @@ tpl [Definiens] {
           apply [../*[position()=last()]];
         }
       } else {
-        ",";
+        " , ";
       }
     }
   } else {
@@ -649,7 +649,7 @@ tpl [Loci](#parentheses) {
       "(";
     }
 
-    list (#separ = ",", #elems = `Locus`);
+    list (#separ = " , ", #elems = `Locus`);
 
     if [$parentheses = '1'] {
       ")";
@@ -671,7 +671,7 @@ tpl [Attribute-Pattern] {
 }
 
 tpl [Type-List] {
-  list (#separ = ",", #elems = `Standard-Type | Clustered-Type | Struct-Type`);
+  list (#separ = " , ", #elems = `Standard-Type | Clustered-Type | Struct-Type`);
 }
 
 tpl [Functor-Segment] {
@@ -717,7 +717,7 @@ tpl [Selector] {
 
 tpl [Field-Segment] {
   if [Selector] {
-    list (#separ = ",", #elems = `Selector`);
+    list (#separ = " , ", #elems = `Selector`);
     ensure-type ();
     " -> "; apply-type ();
   } else {
@@ -734,12 +734,12 @@ tpl [Structure-Pattern] {
     }
   }
   "(# ";
-  list (#separ = ",", #elems = `Field-Segment`);
+  list (#separ = " , ", #elems = `Field-Segment`);
   " #)";
 }
 
 tpl [Ancestors] {
-  list (#separ = ",", #elems = `*`);
+  list (#separ = " , ", #elems = `*`);
 }
 
 tpl [Item[@kind='Structure-Definition']] {
@@ -760,7 +760,7 @@ tpl [Item[@kind='Structure-Definition']] {
 
 tpl [Explicitly-Qualified-Segment](#verb) {
   ensure-variables ();
-  list (#separ = ",", #elems = `Variables/Variable`);
+  list (#separ = " , ", #elems = `Variables/Variable`);
   " ";
   if [$verb = ""] {
     "being";
@@ -784,7 +784,7 @@ tpl [Forgetful-Functor-Term] {
 
 tpl [Aggregate-Term] {
   ensure-spelling ();
-  `@spelling`; " (# "; list (#separ = ",", #elems = `*`); " #)";
+  `@spelling`; " (# "; list (#separ = " , ", #elems = `*`); " #)";
 }
 
 tpl [Selector-Term] {
@@ -793,7 +793,7 @@ tpl [Selector-Term] {
 }
 
 tpl [Arguments] {
-  list (#separ = ",", #elems = `*`);
+  list (#separ = " , ", #elems = `*`);
 }
 
 tpl [Numeral-Term] {
@@ -807,7 +807,7 @@ tpl [Numeral-Term] {
 tpl [Private-Functor-Term] {
   ensure-spelling ();
   `@spelling`;
-  "("; list (#separ = ",", #elems = `./*`); ")";
+  "("; list (#separ = " , ", #elems = `./*`); ")";
 }
 
 tpl [Contradiction] {
@@ -824,7 +824,7 @@ tpl [Struct-Type] {
   `@spelling`;
   if [*[1]] { // dependent struct type
     " over ";
-    list (#separ = ",", #elems = `*`);
+    list (#separ = " , ", #elems = `*`);
   }
 }
 
@@ -848,7 +848,7 @@ tpl [Item[@kind='Private-Functor-Definition']] {
   "deffunc ";  apply-variable ();
   if [Type-List] {
     if [Type-List/*[1]] {
-      "("; list (#separ = ",", #elems = `Type-List/*`); ")";
+      "("; list (#separ = " , ", #elems = `Type-List/*`); ")";
     }
   }
   " = "; apply [*[3]]; ";"; "\n"; // doesn't feel safe to me
@@ -859,7 +859,7 @@ tpl [Item[@kind='Private-Predicate-Definition']] {
   "defpred "; apply-variable ();
   // sanity check: Type-List is present
   if [Type-List] {
-    "[ "; list(#separ = ",", #elems = `Type-List[1]/*`); " ]"; "\n";
+    "[ "; list(#separ = " , ", #elems = `Type-List[1]/*`); " ]"; "\n";
     " means"; "\n";
     apply [*[3]]; ";"; "\n";
   } else {
@@ -904,7 +904,7 @@ tpl [Item[@kind='Generalization']] { // very ugly.  I've asked Czeslaw to refact
 
 tpl [Private-Predicate-Formula] {
   ensure-spelling ();
-  `@spelling`; "[ "; list (#separ = ",", #elems = `*`); " ]";
+  `@spelling`; "[ "; list (#separ = " , ", #elems = `*`); " ]";
 }
 
 tpl [Conjunctive-Formula] {
@@ -1020,7 +1020,7 @@ tpl [Scheme-Justification] {
       ":sch "; `@idnr`;
     }
     if [*[1]] { // there are scheme arguments
-    "("; list (#separ = ",", #elems = `*`); ")";
+    "("; list (#separ = " , ", #elems = `*`); ")";
     }
   } else {
     die (#message = "Scheme-Justification lacks either a spelling, idnr, or nr attribute!");
@@ -1043,7 +1043,7 @@ tpl [Infix-Term] {
 
   if [Arguments[1]/*[1]] {
     if [Arguments[1]/*[2]] {
-      "("; list (#separ = ",", #elems = `Arguments[1]/*`); ")";
+      "("; list (#separ = " , ", #elems = `Arguments[1]/*`); ")";
     } else {
       apply [Arguments[1]/*[1]];
     }
@@ -1055,7 +1055,7 @@ tpl [Infix-Term] {
   if [Arguments[2]/*[1]] {
     " ";
     if [Arguments[2]/*[2]] {
-      "("; list (#separ = ",", #elems = `Arguments[2]/*`); ")";
+      "("; list (#separ = " , ", #elems = `Arguments[2]/*`); ")";
     } else {
       apply [Arguments[2]/*[1]];
     }
@@ -1070,7 +1070,7 @@ tpl [Bracket-Functor-Pattern] {
   if [Right-Circumflex-Symbol] {
     if [Loci] {
       `@spelling`;
-       list (#separ = ",", #elems = `Loci/Locus`);
+       list (#separ = " , ", #elems = `Loci/Locus`);
        apply [Right-Circumflex-Symbol[1]];
     } else {
       die (#message = "Bracket-Functor-Pattern lacks a Loci child!");
@@ -1111,7 +1111,7 @@ tpl [Fraenkel-Term] {
     for-each [Explicitly-Qualified-Segment] {
       apply [.](#verb = "is");
       if [not(position()=last())] {
-        ",";
+        " , ";
       }
     }
   }
@@ -1130,7 +1130,7 @@ tpl [Circumfix-Term] {
 
   `@spelling`;
   " ";
-  list (#separ = ",", #elems = `*[position() > 1]`); // everything after the Right-Circumflex-Symbol
+  list (#separ = " , ", #elems = `*[position() > 1]`); // everything after the Right-Circumflex-Symbol
   apply [Right-Circumflex-Symbol[1]];
 }
 
@@ -1168,14 +1168,14 @@ tpl [Item[@kind = "Choice-Statement" and Conditions]] {
 tpl [Straightforward-Justification[child::Link]] {
   if [*[2]] {
     " by ";
-    list (#separ = ",", #elems = `*[position() > 1]`);
+    list (#separ = " , ", #elems = `*[position() > 1]`);
   }
 }
 
 tpl [Straightforward-Justification[not(child::Link)]] {
   if [*[1]] {
     " by ";
-    list (#separ = ",", #elems = `*`);
+    list (#separ = " , ", #elems = `*`);
   }
 }
 
@@ -1313,7 +1313,7 @@ tpl [Conditions] {
 tpl [Item[@kind='Existential-Assumption']] {
   if [Implicitly-Qualified-Segment | Explicitly-Qualified-Segment] {
     "given ";
-    list (#separ = ",", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
+    list (#separ = " , ", #elems = `Implicitly-Qualified-Segment | Explicitly-Qualified-Segment`);
     " such that"; "\n";
     if [Conditions] {
       apply [Conditions[1]];
@@ -1521,7 +1521,7 @@ tpl [Block[@kind='Hereby-Reasoning']] {
 tpl [Item[@kind='Type-Changing-Statement']] {
   maybe-link ();
   "reconsider ";
-  list (#separ = ",", #elems = `Variable | Equality`);
+  list (#separ = " , ", #elems = `Variable | Equality`);
   ensure-type ();
   " as "; apply-type ();
   apply-justification-if-present (#end = "1");
@@ -1575,7 +1575,7 @@ tpl [Existential-Quantifier-Formula] {
 }
 
 tpl [Schematic-Variables] {
-  list (#separ = ",", #elems = `Functor-Segment | Predicate-Segment`);
+  list (#separ = " , ", #elems = `Functor-Segment | Predicate-Segment`);
 }
 
 tpl [Provisional-Formulas] {
