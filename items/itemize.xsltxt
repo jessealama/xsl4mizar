@@ -290,7 +290,7 @@ tpl [*[not(parent::Text-Proper)]] mode="make-item" {
   msg terminate="yes" "Why are we attepting to make an item from a non-toplevel item?";
 }
 
-tpl [*[parent::Text-Proper]] mode="make-item" {
+tpl [*[parent::Text-Proper and not(@kind = "Regular-Statement")]] mode="make-item" {
   $context = `.`;
   <Text-Proper {
     <Item { @kind = "Section-Pragma"; }
