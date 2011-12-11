@@ -30,10 +30,20 @@ tpl term-with-idnr-occurs-in-context (#idnr) {
 }
 
 tpl reserved-variable-with-idnr-in-context (#idnr) {
-  if [descendant::Implicitly-Qualified-Segment/Variable[@idnr = $idnr] | descendant::Simple-Term[@idnr = $idnr]] {
-    "1";
+  if [@implicitly-qualified-variables] {
+    $implicitly-qualified = `@implicitly-qualified-variables`;
+    $idnr-token = `concat (",", $idnr, ",")`;
+    if [contains ($implicitly-qualified, $idnr-token)] {
+      "1";
+    } else {
+      "0";
+    }
   } else {
-    "0";
+    if [descendant::Implicitly-Qualified-Segment/Variable[@idnr = $idnr] | descendant::Simple-Term[@idnr = $idnr]] {
+      "1";
+    } else {
+      "0";
+    }
   }
 }
 
