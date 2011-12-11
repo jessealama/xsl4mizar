@@ -174,75 +174,22 @@ tpl item-uses-item (#item, #user) {
 // there is no path from $start to $end via $beteen), or a token list
 // of numbers ',num-1,num-2,...,num-N,'.  The interpretation is that
 // item num-1 is item num-1 in the document; it is used by item num-2,
-// ..., until we get to item num-N.
-// tpl path-from-to (#start, #end, #between, #path-so-far) {
-//   $occurs-in-item = item-uses-item (#item = $start, #user = $end);
-//   if [$occurs-in-item = "1"] {
-//     for-each [$start] {
-//       $position-of-start = `count (preceding-sibling::Item) + 1`;
-//       cons-token-string-at-end (#item = $position-of-start, #token-string = $path-so-far);
-//     }
-//   } else {
-//     if [$between] {
-//       $later-candidates = `$between[position() > 1]`;
-//       $candidate = `$between[1]`;
-//       $path-from-candidate = path-from-to (#start = $candidate, #end = $end, #between = $later-candidates);
-//       if [$path-from-candidate = ""] { // there is no path
-//         path-from-to (#start = $start, #end = $end, #between = $later-candidates);
-//       } else {
-//         $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
-//         if [$candidate-uses = "1"] {
-//           for-each [$candidate] {
-//             $path-with-candidate-at-end = cons-token-string-at-end (#item = `count (preceding-sibling::Item) + 1`,
-//                                                                     #token-string = $path-so-far);
-//             for-each [$end] {
-//               cons-token-string-at-end (#item = `count (preceding-sibling::Item) + 1`,
-//                                         #token-string = $path-with-candidate-at-end);
-//             }
-//           }
-//         } else {
-//           path-from-to (#start = $start, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far);
-//         }
-//       }
-//     } else {
-//       ""; // no path
-//     }
-//   }
-// }
-
-// Find a path from $start to $end, possibly via the items in
-// $between.  The result is either the empty string (indicating that
-// there is no path from $start to $end via $beteen), or a token list
-// of numbers ',num-1,num-2,...,num-N,'.  The interpretation is that
-// item num-1 is item num-1 in the document; it is used by item num-2,
-// ..., until we get to item num-N.
+// ..., until we get to item num-N.  $dead-ends is a token list that
+// records the nodes from which we know that there is no path to $end.
 tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends) {
   for-each [$start] {
     $position-of-start = `count (preceding-sibling::Item) + 1`;
     $start-token = `concat (",", $position-of-start, ",")`;
     if [contains ($dead-ends, $start-token)] {
-      // $dead-ends already starts with a comma
-      if [not(starts-with ($dead-ends, ","))] {
-        $message = `concat ("The dead-ends token list is nonempty, but it does not start with a comma!  It is '", $dead-ends, "'")`;
-        die (#message = $message);
-      }
-      `concat ("", ",", $dead-ends)`;
+      `concat ("", ":", $dead-ends)`;
     } else {
       $occurs-in-item = item-uses-item (#item = $start, #user = $end);
       if [$occurs-in-item = "1"] {
         $path = cons-token-string-at-end (#item = $position-of-start, #token-string = $path-so-far);
-        if [$dead-ends = ""] {
-          // $path ends with a comma
-          $solution = `concat ($path, ",,", "")`;
-          $message = `concat ("Solution [1] is '", $solution, "'")`;
-          // msg $message;
-          $solution;
-        } else {
-          $solution = `concat ($path, ",,", $dead-ends)`;
-          $message = `concat ("Solution [2] is '", $solution, "'")`;
-          // msg $message;
-          $solution;
-        }
+        $solution = `concat ($path, ":", $dead-ends)`;
+        // $message = `concat ("Solution [1] is '", $solution, "'")`;
+        // msg $message;
+        $solution;
       } else {
         if [$between] {
           $later-candidates = `$between[position() > 1]`;
@@ -254,8 +201,8 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends) {
               path-from-to (#start = $start, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far, #dead-ends = $dead-ends);
             } else {
               $solution-from-candidate = path-from-to (#start = $candidate, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far, #dead-ends = $dead-ends);
-              $path-from-candidate = `substring-before ($solution-from-candidate, ",,")`;
-              $more-dead-ends = `substring-after ($solution-from-candidate, ",,")`;
+              $path-from-candidate = `substring-before ($solution-from-candidate, ":")`;
+              $more-dead-ends = `substring-after ($solution-from-candidate, ":")`;
               if [$path-from-candidate = ""] { // there is no path
                 $new-dead-ends = cons-token-string-at-end (#item = $candidate-position, #token-string = $more-dead-ends);
                 path-from-to (#start = $start, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far, #dead-ends = $new-dead-ends);
@@ -266,19 +213,10 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends) {
                                                                           #token-string = $path-so-far);
                   for-each [$end] {
                     $solution-path = cons-token-string-at-end (#item = `count (preceding-sibling::Item) + 1`, #token-string = $path-with-candidate-at-end);
-                    if [$dead-ends = ""] {
-                      // $solution-path ends with a comma; only one new one is needed
-                      $solution = `concat ($solution-path, ",,", "")`;
-                      $message = `concat ("Solution [3] is '", $solution, "'")`;
-                      // msg $message;
-                      $solution;
-                    } else {
-                      // $dead-ends ends with a comma, as does $solution-path, so no new comma is needed
-                      $solution = `concat ($solution-path, ",,", $dead-ends)`;
-                      $message = `concat ("Solution [4] is '", $solution, "'")`;
-                      // msg $message;
-                      $solution;
-                    }
+                    $solution = `concat ($solution-path, ":", $dead-ends)`;
+                    // $message = `concat ("Solution [2] is '", $solution, "'")`;
+                    // msg $message;
+                    $solution;
                   }
                 } else {
                   path-from-to (#start = $start, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far, #dead-ends = $dead-ends);
@@ -288,9 +226,8 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends) {
           }
         } else {
           $new-dead-ends = cons-token-string-at-end (#item = $position-of-start, #token-string = $dead-ends);
-          // $new-dead-ends starts with a comma
-          $solution = `concat ("", ",,", $new-dead-ends)`;
-          $message = `concat ("Solution [5] is '", $solution, "'")`;
+          $solution = `concat ("", ":", $new-dead-ends)`;
+          // $message = `concat ("Solution [3] is '", $solution, "'")`;
           // msg $message;
           $solution;
         }
@@ -307,23 +244,19 @@ tpl needed-for-item (#item, #candidates, #registered-paths) {
       $candidate-num = `count (preceding-sibling::Item) + 1`;
       $token = `concat (",", $candidate-num, ",")`;
       if [contains ($registered-paths, $token)] {
-        $message = "We already know about this path";
+        // $message = "We already know about this path";
         // msg $message;
         apply [$candidate];
         needed-for-item (#item = $item, #candidates = $later-candidates, #registered-paths = $registered-paths);
       } else {
         $path-solution = path-from-to (#start = $candidate, #end = $item, #between = $later-candidates);
-        if [not(contains ($path-solution, ",,"))] {
-          $message = `concat ("Path solution does not contain two consecutive commas! (it is '", $path-solution, "')")`;
-          die (#message = $message);
-        }
-        $path = `substring-before ($path-solution, ",,")`;
-        $dead-ends = `substring-after ($path-solution, ",,")`;
+        $path = `substring-before ($path-solution, ":")`;
+        $dead-ends = `substring-after ($path-solution, ":")`;
         if [$path = ""] { // there is no path
           // msg "No path.";
           needed-for-item (#item = $item, #candidates = $later-candidates, #registered-paths = $registered-paths);
         } else {
-          $message = `concat ("We found a path: ", $path)`;
+          // $message = `concat ("We found a path: ", $path)`;
           // msg $message;
           apply [$candidate];
           $new-registered-paths = append-token-strings (#token-string-a = $registered-paths,
@@ -339,7 +272,7 @@ tpl prepend-context-for-item (#item) {
   for-each [$item] {
     $num-prev = `count (preceding::Item[parent::Text-Proper])`;
     $message = `concat ("Computing needed.  There are ", $num-prev, " previous items")`;
-    // msg $message;
+    msg $message;
   }
   needed-for-item (#item = $item,
                    #candidates = `preceding::Item[parent::Text-Proper
