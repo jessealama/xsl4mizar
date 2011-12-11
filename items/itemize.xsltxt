@@ -21,23 +21,17 @@ tpl enumerate-items (#items, #users, #non-users) {
   if [$items] {
     $item = `$items[1]`;
     for-each [$item] {
-      $new-users-and-non-users = prepend-context-for-item (#item = $item, #users = $users, #non-users = $non-users);
+      $needed-new-users-and-non-users = prepend-context-for-item (#item = $item, #users = $users, #non-users = $non-users);
+      $needed = `substring-before ($needed-new-users-and-non-users, ":")`;
+      $new-users-and-non-users = `substring-after ($needed-new-users-and-non-users, ":")`;
       $new-users = `substring-before ($new-users-and-non-users, ":")`;
       $new-non-users = `substring-after ($new-users-and-non-users, ":")`;
-      // if [$new-users = ""] {
-      //   msg "No new users.";
-      // } else {
-      //   msg "New users:";
-      //   msg $new-users;
-      //   msg "Did you see anything?";
-      // }
-      // msg "New non-users:";
-      // msg $new-non-users;
-      <Text-Proper {
-        <Item { @kind = "Section-Pragma"; }
-        choose {
-          when [self::Item[@kind = "Regular-Statement" and @exportable = "yes"]] {
-          for-each [Proposition] {
+      choose {
+        when [self::Item[@kind = "Regular-Statement" and @exportable = "yes"]] {
+        for-each [Proposition] {
+          <Text-Proper {
+            <Item { @kind = "Section-Pragma"; }
+            emit-needed (#needed = $needed);
             <Item {
               @kind = "Theorem-Item";
               @promoted-lemma = "yes";
@@ -49,7 +43,11 @@ tpl enumerate-items (#items, #users, #non-users) {
             }
           }
         }
-        when [Item[@kind = "Regular-Statement" and @exportable = "no"]] {
+      }
+      when [self::Item[@kind = "Regular-Statement" and @exportable = "no"]] {
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          emit-needed (#needed = $needed);
           <Item {
             for-each [@*] { copy-of `.`; }
             @promoted-lemma = "no";
@@ -57,7 +55,11 @@ tpl enumerate-items (#items, #users, #non-users) {
             apply [*];
           }
         }
-        when [Item[@kind = "Theorem-Item"]] {
+      }
+      when [self::Item[@kind = "Theorem-Item"]] {
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          emit-needed (#needed = $needed);
           <Item {
             for-each [@*] { copy-of `.`; }
             @promoted-lemma = "no";
@@ -66,14 +68,18 @@ tpl enumerate-items (#items, #users, #non-users) {
             apply [*];
           }
         }
-        otherwise {
-          apply [.];
+      }
+      otherwise {
+        <Text-Proper {
+          <Item { @kind = "Section-Pragma"; }
+          emit-needed (#needed = $needed);
+          apply [$item];
         }
       }
-      enumerate-items (#items = `$items[position() > 1]`,
-                       #users = $new-users,
-                       #non-users = $new-non-users);
-      }
+    }
+    enumerate-items (#items = `$items[position() > 1]`,
+                     #users = $new-users,
+                     #non-users = $new-non-users);
     }
   }
 }
@@ -436,7 +442,7 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non
   }
 }
 
-tpl needed-for-item (#item, #candidates, #registered-paths, #users, #non-users) {
+tpl needed-for-item (#item, #candidates, #registered-paths, #users, #non-users, #needed) {
   $users-message = `concat ("Known users so far: ", $users)`;
   $non-users-message = `concat ("Known non-users so far: ", $non-users)`;
   // msg $users-message;
@@ -451,15 +457,17 @@ tpl needed-for-item (#item, #candidates, #registered-paths, #users, #non-users) 
       // msg $message;
 
 
-      apply [$candidate];
       // $message = `concat ("We would have included item ", $candidate-num, " in the current context")`;
       // msg $message;
+
+      $new-needed = cons-token-string-at-end (#item = $candidate-num, #token-string = $needed);
 
       needed-for-item (#item = $item,
                        #candidates = $later-candidates,
                        #registered-paths = $registered-paths,
                        #users = $users,
-                       #non-users = $non-users);
+                       #non-users = $non-users,
+                       #needed = $new-needed);
     } else {
       $path-solution = path-from-to (#start = $candidate,
                                      #end = $item,
@@ -479,15 +487,16 @@ tpl needed-for-item (#item, #candidates, #registered-paths, #users, #non-users) 
                          #candidates = $later-candidates,
                          #registered-paths = $registered-paths,
                          #users = $more-users,
-                         #non-users = $more-non-users);
+                         #non-users = $more-non-users,
+                         #needed = $needed);
       } else {
         // $message = `concat ("We found a path from ", $candidate-num, ": ", $path)`;
         // msg $message;
 
-
-        apply [$candidate];
         // $message = `concat ("We would have included item ", $candidate-num, " in the current context")`;
         // msg $message;
+
+        $new-needed = cons-token-string-at-end (#item = $candidate-num, #token-string = $needed);
 
         $new-registered-paths = append-token-strings (#token-string-a = $registered-paths,
                                                       #token-string-b = $path);
@@ -495,18 +504,30 @@ tpl needed-for-item (#item, #candidates, #registered-paths, #users, #non-users) 
                          #candidates = $later-candidates,
                          #registered-paths = $new-registered-paths,
                          #users = $more-users,
-                         #non-users = $more-non-users);
+                         #non-users = $more-non-users,
+                         #needed = $new-needed);
       }
     }
   } else {
-    `concat ($users, ":", $non-users)`;
+    `concat ($needed, ":", $users, ":", $non-users)`;
+  }
+}
+
+tpl emit-needed (#needed) {
+  if [not($needed = "")] {
+    $first-item-position = first-item (#token-string = $needed);
+    for-each [/Text-Proper/Item[position() = $first-item-position]] {
+      apply [.];
+    }
+    $needed-tail = token-string-tail (#token-string = $needed);
+    emit-needed (#needed = $needed-tail);
   }
 }
 
 tpl prepend-context-for-item (#item, #users, #non-users) {
   $num-prev = toplevel-position (#toplevel-item = $item);
   $message = `concat ("Computing needed.  There are ", $num-prev, " previous items")`;
-  // msg $message;
+  msg $message;
   $stuff = needed-for-item (#item = $item,
                    #candidates = `preceding::Item[parent::Text-Proper
                                                   and (@kind = "Reservation"
@@ -518,8 +539,9 @@ tpl prepend-context-for-item (#item, #users, #non-users) {
                                                        or @kind = "Private-Functor-Definition")]`,
                    #registered-paths = "",
                    #users = $users,
-                   #non-users = $non-users);
-  `$stuff`;
+                   #non-users = $non-users,
+                   #val = "");
+  $stuff;
 }
 
 tpl bad-term-hunting (#candidates) {
