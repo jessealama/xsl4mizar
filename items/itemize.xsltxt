@@ -13,11 +13,80 @@ tpl [*] {
   }
 }
 
+tpl [/] {
+  apply [Text-Proper];
+}
+
+tpl enumerate-items (#items, #users, #non-users) {
+  if [$items] {
+    $item = `$items[1]`;
+    for-each [$item] {
+      $new-users-and-non-users = prepend-context-for-item (#item = $item, #users = $users, #non-users = $non-users);
+      $new-users = `substring-before ($new-users-and-non-users, ":")`;
+      $new-non-users = `substring-after ($new-users-and-non-users, ":")`;
+      // if [$new-users = ""] {
+      //   msg "No new users.";
+      // } else {
+      //   msg "New users:";
+      //   msg $new-users;
+      //   msg "Did you see anything?";
+      // }
+      // msg "New non-users:";
+      // msg $new-non-users;
+      <Text-Proper {
+        <Item { @kind = "Section-Pragma"; }
+        choose {
+          when [self::Item[@kind = "Regular-Statement" and @exportable = "yes"]] {
+          for-each [Proposition] {
+            <Item {
+              @kind = "Theorem-Item";
+              @promoted-lemma = "yes";
+              @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
+              apply [.];
+              for-each [following-sibling::*] {
+                apply [.];
+              }
+            }
+          }
+        }
+        when [Item[@kind = "Regular-Statement" and @exportable = "no"]] {
+          <Item {
+            for-each [@*] { copy-of `.`; }
+            @promoted-lemma = "no";
+            @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
+            apply [*];
+          }
+        }
+        when [Item[@kind = "Theorem-Item"]] {
+          <Item {
+            for-each [@*] { copy-of `.`; }
+            @promoted-lemma = "no";
+            @theorem-number = `count (preceding-sibling::Item[@kind = "Theorem-Item"]) + 1`;
+            @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
+            apply [*];
+          }
+        }
+        otherwise {
+          apply [.];
+        }
+      }
+      enumerate-items (#items = `$items[position() > 1]`,
+                       #users = $new-users,
+                       #non-users = $new-non-users);
+      }
+    }
+  }
+}
+
 tpl [Text-Proper] {
   <Fragments {
-    for-each [Item] {
-      apply [.] mode="make-item";
-    }
+    enumerate-items (#items = `Item`, #users = "", #non-users = "");
+  }
+}
+
+tpl toplevel-position (#toplevel-item) {
+  for-each [$toplevel-item] {
+    `count (preceding-sibling::Item) + 1`;
   }
 }
 
@@ -231,105 +300,214 @@ tpl item-uses-item (#item, #user) {
 // item num-1 is item num-1 in the document; it is used by item num-2,
 // ..., until we get to item num-N.  $dead-ends is a token list that
 // records the nodes from which we know that there is no path to $end.
-tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends) {
-  for-each [$start] {
-    $position-of-start = `count (preceding-sibling::Item) + 1`;
-    $start-token = `concat (",", $position-of-start, ",")`;
-    if [contains ($dead-ends, $start-token)] {
-      `concat ("", ":", $dead-ends)`;
+// $non-users is a token list of colon-separated pairs
+// item-num-A:item-num-B with the interpretation: the toplevel item at
+// position item-num-A does not immediately use the toplevel item at
+// position item-num-B.
+tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non-users) {
+  $position-of-start = toplevel-position (#toplevel-item = $start);
+  $position-of-end = toplevel-position (#toplevel-item = $end);
+  $start-token = `concat (",", $position-of-start, ",")`;
+  if [contains ($dead-ends, $start-token)] {
+    `concat ("", ":", $dead-ends, ":", $users, ":", $non-users)`;
+  } else {
+    $user-pair = `concat ($position-of-end, "#", $position-of-start)`;
+    $user-token = `concat (",", $user-pair, ",")`;
+    if [contains ($users, $user-token)] {
+      $path = cons-token-string-at-end (#item = $position-of-start, #token-string = $path-so-far);
+      $solution = `concat ($path, ":", $dead-ends, ":", $users, ":", $non-users)`;
+      // $message = `concat ("Solution [1] is '", $solution, "'")`;
+      // msg $message;
+      $solution;
     } else {
-      $occurs-in-item = item-uses-item (#item = $start, #user = $end);
-      if [$occurs-in-item = "1"] {
-        $path = cons-token-string-at-end (#item = $position-of-start, #token-string = $path-so-far);
-        $solution = `concat ($path, ":", $dead-ends)`;
-        // $message = `concat ("Solution [1] is '", $solution, "'")`;
-        // msg $message;
-        $solution;
-      } else {
+      if [contains ($non-users, $user-token)] {
         if [$between] {
           $later-candidates = `$between[position() > 1]`;
           $candidate = `$between[1]`;
-          for-each [$candidate] {
-            $candidate-position = `count (preceding-sibling::Item) + 1`;
-            $candidate-token = `concat (",", $candidate-position, ",")`;
-            if [contains ($dead-ends, $candidate-token)] {
-              path-from-to (#start = $start, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far, #dead-ends = $dead-ends);
+          $candidate-position = toplevel-position (#toplevel-item = $candidate);
+          $candidate-token = `concat (",", $candidate-position, ",")`;
+          if [contains ($dead-ends, $candidate-token)] {
+            path-from-to (#start = $start,
+                          #end = $end,
+                          #between = $later-candidates,
+                          #path-so-far = $path-so-far,
+                          #dead-ends = $dead-ends,
+                          #users = $users,
+                          #non-users = $non-users);
+          } else {
+            $solution-from-candidate = path-from-to (#start = $candidate,
+                                                     #end = $end,
+                                                     #between = $later-candidates,
+                                                     #path-so-far = $path-so-far,
+                                                     #dead-ends = $dead-ends,
+                                                     #users = $users,
+                                                     #non-users = $non-users);
+            $path-from-candidate = `substring-before ($solution-from-candidate, ":")`;
+            $after-path = `substring-after ($solution-from-candidate, ":")`;
+            $more-dead-ends = `substring-before ($after-path, ":")`;
+            $after-dead-ends = `substring-after ($after-path, ":")`;
+            $more-users = `substring-before ($after-dead-ends, ":")`;
+            $more-non-users = `substring-after ($after-dead-ends, ":")`;
+            if [$path-from-candidate = ""] { // there is no path
+              $new-dead-ends = cons-token-string-at-end (#item = $candidate-position, #token-string = $more-dead-ends);
+              path-from-to (#start = $start,
+                            #end = $end,
+                            #between = $later-candidates,
+                            #path-so-far = $path-so-far,
+                            #dead-ends = $new-dead-ends,
+                            #users = $more-users,
+                            #non-users = $more-non-users);
             } else {
-              $solution-from-candidate = path-from-to (#start = $candidate, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far, #dead-ends = $dead-ends);
-              $path-from-candidate = `substring-before ($solution-from-candidate, ":")`;
-              $more-dead-ends = `substring-after ($solution-from-candidate, ":")`;
-              if [$path-from-candidate = ""] { // there is no path
-                $new-dead-ends = cons-token-string-at-end (#item = $candidate-position, #token-string = $more-dead-ends);
-                path-from-to (#start = $start, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far, #dead-ends = $new-dead-ends);
+              $candidate-user-pair = `concat ($candidate-position, "#", $position-of-start)`;
+              $candidate-user-token = `concat (",", $candidate-user-pair, ",")`;
+              if [contains ($more-users, $candidate-user-token)] {
+                $path-with-candidate-at-end = cons-token-string-at-end (#item = $candidate-position,
+                                                                        #token-string = $path-so-far);
+                $end-position = toplevel-position (#toplevel-item = $end);
+                $solution-path = cons-token-string-at-end (#item = $end-position, #token-string = $path-with-candidate-at-end);
+                $solution = `concat ($solution-path, ":", $dead-ends, ":", $more-users, ":", $more-non-users)`;
+                // $message = `concat ("Solution [2] is '", $solution, "'")`;
+                // msg $message;
+                $solution;
               } else {
-                $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
-                if [$candidate-uses = "1"] {
-                  $path-with-candidate-at-end = cons-token-string-at-end (#item = $candidate-position,
-                                                                          #token-string = $path-so-far);
-                  for-each [$end] {
-                    $solution-path = cons-token-string-at-end (#item = `count (preceding-sibling::Item) + 1`, #token-string = $path-with-candidate-at-end);
-                    $solution = `concat ($solution-path, ":", $dead-ends)`;
-                    // $message = `concat ("Solution [2] is '", $solution, "'")`;
-                    // msg $message;
-                    $solution;
-                  }
+                if [contains ($more-non-users, $candidate-user-token)] {
+                  path-from-to (#start = $start,
+                                #end = $end,
+                                #between = $later-candidates,
+                                #path-so-far = $path-so-far,
+                                #dead-ends = $more-dead-ends,
+                                #users = $more-users,
+                                #non-users = $more-non-users);
                 } else {
-                  path-from-to (#start = $start, #end = $end, #between = $later-candidates, #path-so-far = $path-so-far, #dead-ends = $dead-ends);
+                  $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
+                  if [$candidate-uses = "1"] {
+                    $new-users = cons-token-string (#item = $candidate-user-pair, #token-string = $more-users);
+                    path-from-to (#start = $start,
+                                  #end = $end,
+                                  #between = $between,
+                                  #path-so-far = $path-so-far,
+                                  #dead-ends = $more-dead-ends,
+                                  #users = $new-users,
+                                  #non-users = $more-non-users);
+                  } else {
+                    $new-non-users = cons-token-string (#item = $candidate-user-pair, #token-string = $more-non-users);
+                    path-from-to (#start = $start,
+                                  #end = $end,
+                                  #between = $between,
+                                  #path-so-far = $path-so-far,
+                                  #dead-ends = $more-dead-ends,
+                                  #users = $more-users,
+                                  #non-users = $new-non-users);
+                  }
                 }
               }
             }
           }
         } else {
           $new-dead-ends = cons-token-string-at-end (#item = $position-of-start, #token-string = $dead-ends);
-          $solution = `concat ("", ":", $new-dead-ends)`;
+          $solution = `concat ("", ":", $new-dead-ends, ":", $users, ":", $non-users)`;
           // $message = `concat ("Solution [3] is '", $solution, "'")`;
           // msg $message;
           $solution;
         }
-      }
-    }
-  }
-}
-
-tpl needed-for-item (#item, #candidates, #registered-paths) {
-  if [$candidates] {
-    $candidate = `$candidates[1]`;
-    $later-candidates = `$candidates[position() > 1]`;
-    for-each [$candidate] {
-      $candidate-num = `count (preceding-sibling::Item) + 1`;
-      $token = `concat (",", $candidate-num, ",")`;
-      if [contains ($registered-paths, $token)] {
-        // $message = "We already know about this path";
-        // msg $message;
-        apply [$candidate];
-        needed-for-item (#item = $item, #candidates = $later-candidates, #registered-paths = $registered-paths);
       } else {
-        $path-solution = path-from-to (#start = $candidate, #end = $item, #between = $later-candidates);
-        $path = `substring-before ($path-solution, ":")`;
-        $dead-ends = `substring-after ($path-solution, ":")`;
-        if [$path = ""] { // there is no path
-          // msg "No path.";
-          needed-for-item (#item = $item, #candidates = $later-candidates, #registered-paths = $registered-paths);
+        $occurs-in-item = item-uses-item (#item = $start, #user = $end);
+        if [$occurs-in-item = "1"] {
+          $new-users = cons-token-string (#item = $user-pair, #token-string = $users);
+          path-from-to (#start = $start,
+                        #end = $end,
+                        #between = $between,
+                        #path-so-far = $path-so-far,
+                        #dead-ends = $dead-ends,
+                        #users = $new-users,
+                        #non-users = $non-users);
         } else {
-          // $message = `concat ("We found a path: ", $path)`;
-          // msg $message;
-          apply [$candidate];
-          $new-registered-paths = append-token-strings (#token-string-a = $registered-paths,
-                                                        #token-string-b = $path);
-          needed-for-item (#item = $item, #candidates = $later-candidates, #registered-paths = $new-registered-paths);
+          $new-non-users = cons-token-string (#item = $user-pair, #token-string = $non-users);
+          path-from-to (#start = $start,
+                        #end = $end,
+                        #between = $between,
+                        #path-so-far = $path-so-far,
+                        #dead-ends = $dead-ends,
+                        #users = $users,
+                        #non-users = $new-non-users);
         }
       }
     }
   }
 }
 
-tpl prepend-context-for-item (#item) {
-  for-each [$item] {
-    $num-prev = `count (preceding::Item[parent::Text-Proper])`;
-    $message = `concat ("Computing needed.  There are ", $num-prev, " previous items")`;
-    msg $message;
+tpl needed-for-item (#item, #candidates, #registered-paths, #users, #non-users) {
+  $users-message = `concat ("Known users so far: ", $users)`;
+  $non-users-message = `concat ("Known non-users so far: ", $non-users)`;
+  // msg $users-message;
+  // msg $non-users-message;
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    $later-candidates = `$candidates[position() > 1]`;
+    $candidate-num = toplevel-position (#toplevel-item = $candidate);
+    $token = `concat (",", $candidate-num, ",")`;
+    if [contains ($registered-paths, $token)] {
+      // $message = "We already know about this path";
+      // msg $message;
+
+
+      apply [$candidate];
+      // $message = `concat ("We would have included item ", $candidate-num, " in the current context")`;
+      // msg $message;
+
+      needed-for-item (#item = $item,
+                       #candidates = $later-candidates,
+                       #registered-paths = $registered-paths,
+                       #users = $users,
+                       #non-users = $non-users);
+    } else {
+      $path-solution = path-from-to (#start = $candidate,
+                                     #end = $item,
+                                     #between = $later-candidates,
+                                     #users = $users,
+                                     #non-users = $non-users);
+      $path = `substring-before ($path-solution, ":")`;
+      $after-path = `substring-after ($path-solution, ":")`;
+      $dead-ends = `substring-before ($after-path, ":")`;
+      $after-dead-ends = `substring-after ($after-path, ":")`;
+      $more-users = `substring-before ($after-dead-ends, ":")`;
+      $more-non-users = `substring-after ($after-dead-ends, ":")`;
+      if [$path = ""] { // there is no path
+        // $message = `concat ("There is no path from ", $candidate-num)`;
+        // msg $message;
+        needed-for-item (#item = $item,
+                         #candidates = $later-candidates,
+                         #registered-paths = $registered-paths,
+                         #users = $more-users,
+                         #non-users = $more-non-users);
+      } else {
+        // $message = `concat ("We found a path from ", $candidate-num, ": ", $path)`;
+        // msg $message;
+
+
+        apply [$candidate];
+        // $message = `concat ("We would have included item ", $candidate-num, " in the current context")`;
+        // msg $message;
+
+        $new-registered-paths = append-token-strings (#token-string-a = $registered-paths,
+                                                      #token-string-b = $path);
+        needed-for-item (#item = $item,
+                         #candidates = $later-candidates,
+                         #registered-paths = $new-registered-paths,
+                         #users = $more-users,
+                         #non-users = $more-non-users);
+      }
+    }
+  } else {
+    `concat ($users, ":", $non-users)`;
   }
-  needed-for-item (#item = $item,
+}
+
+tpl prepend-context-for-item (#item, #users, #non-users) {
+  $num-prev = toplevel-position (#toplevel-item = $item);
+  $message = `concat ("Computing needed.  There are ", $num-prev, " previous items")`;
+  // msg $message;
+  $stuff = needed-for-item (#item = $item,
                    #candidates = `preceding::Item[parent::Text-Proper
                                                   and (@kind = "Reservation"
                                                        or @kind = "Type-Changing-Statement"
@@ -338,72 +516,10 @@ tpl prepend-context-for-item (#item) {
                                                        or @kind = "Constant-Definition"
                                                        or @kind = "Private-Predicate-Definition"
                                                        or @kind = "Private-Functor-Definition")]`,
-                   #registered-paths = "");
-}
-
-tpl [*[not(parent::Text-Proper)]] mode="make-item" {
-  msg terminate="yes" "Why are we attepting to make an item from a non-toplevel item?";
-}
-
-tpl [*[parent::Text-Proper and not(@kind = "Regular-Statement")]] mode="make-item" {
-  $context = `.`;
-  <Text-Proper {
-    <Item { @kind = "Section-Pragma"; }
-    prepend-context-for-item (#item = $context);
-    apply [.];
-  }
-}
-
-tpl [Item[parent::Text-Proper
-          and @kind = "Regular-Statement"
-          and @exportable = "yes"]] mode="make-item" {
-  $context = `.`;
-  <Text-Proper {
-    <Item { @kind = "Section-Pragma"; }
-    prepend-context-for-item (#item = $context);
-    for-each [Proposition] {
-      <Item {
-        @kind = "Theorem-Item";
-        @promoted-lemma = "yes";
-        @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
-        apply [.];
-        for-each [following-sibling::*] {
-          apply [.];
-        }
-      }
-    }
-  }
-}
-
-tpl [Item[parent::Text-Proper
-          and @kind = "Regular-Statement"
-          and @exportable = "no"]] mode="make-item" {
-  $context = `.`;
-  <Text-Proper {
-    <Item { @kind = "Section-Pragma"; }
-    prepend-context-for-item (#item = $context);
-    <Item {
-      for-each [@*] { copy-of `.`; }
-      @promoted-lemma = "no";
-      @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
-      apply [*];
-    }
-  }
-}
-
-tpl [Item[parent::Text-Proper and @kind = "Theorem-Item"]] mode="make-item" {
-  $context = `.`;
-  <Text-Proper {
-    <Item { @kind = "Section-Pragma"; }
-    prepend-context-for-item (#item = $context);
-    <Item {
-      for-each [@*] { copy-of `.`; }
-      @promoted-lemma = "no";
-      @theorem-number = `count (preceding-sibling::Item[@kind = "Theorem-Item"]) + 1`;
-      @lemma-number = `count (preceding::Item[parent::Text-Proper and @kind = "Regular-Statement"]) + 1`;
-      apply [*];
-    }
-  }
+                   #registered-paths = "",
+                   #users = $users,
+                   #non-users = $non-users);
+  `$stuff`;
 }
 
 tpl bad-term-hunting (#candidates) {
