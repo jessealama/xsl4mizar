@@ -97,10 +97,16 @@ tpl toplevel-position (#toplevel-item) {
 }
 
 tpl term-with-idnr-occurs-in-context (#idnr) {
-  if [descendant::Variable[@idnr = $idnr] | descendant::Simple-Term[@idnr = $idnr]] {
-    "1";
-  } else {
-    "0";
+  choose {
+    when [descendant::Variable[@idnr = $idnr]] {
+      "1";
+    }
+    when [descendant::Simple-Term[@idnr = $idnr]] {
+      "1";
+    }
+    otherwise {
+      "0";
+    }
   }
 }
 
