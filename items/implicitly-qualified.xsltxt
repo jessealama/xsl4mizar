@@ -18,15 +18,20 @@ tpl [/] {
 }
 
 tpl implicitly-qualified-variables {
-  make-token-string (#elements = `descendant::Implicitly-Qualified-Segment/Variable[@idnr]/@idnr`);
+  make-token-string-no-duplicates (#elements = `descendant::Implicitly-Qualified-Segment/Variable[@idnr]/@idnr`);
+}
+
+tpl simple-terms {
+  make-token-string-no-duplicates (#elements = `descendant::Simple-Term[@idnr]/@idnr`);
 }
 
 tpl [Item[parent::Text-Proper]] {
   <Item {
     for-each [@*] { copy-of `.`; }
     $implicitly-qualified = implicitly-qualified-variables ();
-    $implicitly-qualified-uniq = remove-duplicates (#token-string = $implicitly-qualified);
-    @implicitly-qualified-variables = $implicitly-qualified-uniq;
+    $simple-terms = simple-terms ();
+    @implicitly-qualified-variables = $implicitly-qualified;
+    @simple-terms = $simple-terms;
     apply [*];
   }
 }
