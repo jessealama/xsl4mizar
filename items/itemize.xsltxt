@@ -347,7 +347,7 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non
     $user-pair = `concat ($position-of-end, "#", $position-of-start)`;
     $user-token = `concat (",", $user-pair, ",")`;
     if [contains ($users, $user-token)] {
-      $path = cons-token-string-at-end (#item = $position-of-start, #token-string = $path-so-far);
+      $path = cons-token-string-at-end (#item = $position-of-end, #token-string = $path-so-far);
       $solution = `concat ($path, ":", $dead-ends, ":", $users, ":", $non-users)`;
       $message = `concat ("Solution [1] is '", $path, "'")`;
       // msg $message;
