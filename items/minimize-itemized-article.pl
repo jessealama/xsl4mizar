@@ -71,7 +71,7 @@ unless (-r $prefer_environment_stylesheet) {
 
 print 'Minimizing the itemized article...';
 
-my $minimize_status = system ("$minimize_script $itemized_article_miz");
+my $minimize_status = system ("$minimize_script --verbose $itemized_article_miz");
 my $minimize_exit_code = $minimize_status >> 8;
 
 if ($minimize_exit_code != 0) {
@@ -117,12 +117,14 @@ foreach my $fragment (@fragments) {
   }
 }
 
-my $parallel_minimize_status = system ("find ${article_text_dir} -name 'ckb*.miz' | parallel ${minimize_script} {}");
+my $parallel_minimize_status = system ("find ${article_text_dir} -name 'ckb*.miz' | parallel --eta ${minimize_script} {}");
 my $parallel_minimize_exit_code = $parallel_minimize_status >> 8;
 
 if ($parallel_minimize_exit_code != 0) {
   print 'Error: parallel did not exit cleanly when minimizing the fragments under ', $article_text_dir, '.', "\n";
   exit 1;
 }
+
+print 'done.', "\n";
 
 exit 0;
