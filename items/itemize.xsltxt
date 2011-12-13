@@ -393,49 +393,14 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non
                             #users = $more-users,
                             #non-users = $more-non-users);
             } else {
-              $candidate-user-pair = `concat ($candidate-position, "#", $position-of-start)`;
-              $candidate-user-token = `concat (",", $candidate-user-pair, ",")`;
-              if [contains ($more-users, $candidate-user-token)] {
-                $path-with-candidate-at-end = cons-token-string-at-end (#item = $candidate-position,
-                                                                        #token-string = $path-so-far);
-                $end-position = toplevel-position (#toplevel-item = $end);
-                $solution-path = cons-token-string-at-end (#item = $end-position, #token-string = $path-with-candidate-at-end);
-                $solution = `concat ($solution-path, ":", $dead-ends, ":", $more-users, ":", $more-non-users)`;
-                // $message = `concat ("Solution [2] is '", $solution, "'")`;
-                // msg $message;
-                $solution;
-              } else {
-                if [contains ($more-non-users, $candidate-user-token)] {
-                  path-from-to (#start = $start,
-                                #end = $end,
-                                #between = $later-candidates,
-                                #path-so-far = $path-so-far,
-                                #dead-ends = $more-dead-ends,
-                                #users = $more-users,
-                                #non-users = $more-non-users);
-                } else {
-                  $candidate-uses = item-uses-item (#user = $candidate, #item = $start);
-                  if [$candidate-uses = "1"] {
-                    $new-users = cons-token-string (#item = $candidate-user-pair, #token-string = $more-users);
-                    path-from-to (#start = $start,
-                                  #end = $end,
-                                  #between = $between,
-                                  #path-so-far = $path-so-far,
-                                  #dead-ends = $more-dead-ends,
-                                  #users = $new-users,
-                                  #non-users = $more-non-users);
-                  } else {
-                    $new-non-users = cons-token-string (#item = $candidate-user-pair, #token-string = $more-non-users);
-                    path-from-to (#start = $start,
-                                  #end = $end,
-                                  #between = $between,
-                                  #path-so-far = $path-so-far,
-                                  #dead-ends = $more-dead-ends,
-                                  #users = $more-users,
-                                  #non-users = $new-non-users);
-                  }
-                }
-              }
+              $path-with-candidate-at-end = cons-token-string-at-end (#item = $candidate-position,
+                                                                      #token-string = $path-so-far);
+              $end-position = toplevel-position (#toplevel-item = $end);
+              $solution-path = cons-token-string-at-end (#item = $end-position, #token-string = $path-with-candidate-at-end);
+              $solution = `concat ($solution-path, ":", $dead-ends, ":", $more-users, ":", $more-non-users)`;
+              $message = `concat ("Solution [2] is '", $solution, "'")`;
+              // msg $message;
+              $solution;
             }
           }
         } else {
