@@ -4,33 +4,59 @@ use strict;
 use File::Basename qw(basename dirname);
 use XML::LibXML;
 use POSIX qw(floor ceil);
+use Getopt::Long;
+use Pod::Usage;
+
+=cut
+
+=head1 minimal.pl
+
+minimal.pl - Minimize the environment of a mizar article
+
+=head1 SYNOPSIS
+
+minimize.pl [options] mizar-article
+
+Options:
+  -help             brief help message
+  -man              full documentation
+  -verbose          say what we're doing
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--verbose>
+
+Say what environment file we're minimizing, and for each environment file, say how many environment "items" are present there and how many we really need.
+
+=back
+
+=head1 DESCRIPTION
+
+B<minimize.pl> will construct, in a brute-force manner, the smallest environment with respect to which the given article is verifiable.
+
+=cut
+
+my $verbose = 0;
+my $man = 0;
+my $help = 0;
+
+GetOptions('help|?' => \$help, 'man' => \$man, 'verbose'  => \$verbose) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 unless (scalar @ARGV == 1) {
   print 'Usage: minimal.pl ARTICLE', "\n";
   exit 1;
-}
-
-my $article = $ARGV[0];
-my $article_basename = basename ($article, '.miz');
-my $article_dirname = dirname ($article);
-my $article_sans_extension = "${article_dirname}/${article_basename}";
-my $article_miz = "${article_dirname}/${article_basename}.miz";
-my $article_err = "${article_dirname}/${article_basename}.err";
-my $article_eno = "${article_dirname}/${article_basename}.eno";
-my $article_refx = "${article_dirname}/${article_basename}.refx";
-my $article_esh = "${article_dirname}/${article_basename}.esh";
-my $article_eth = "${article_dirname}/${article_basename}.eth";
-
-foreach my $extension ('miz', 'refx', 'eno') {
-  my $article_with_extension = "${article_dirname}/${article_basename}.${extension}";
-  unless (-e $article_with_extension) {
-    print 'Error: the .', $extension, ' file for the supplied article ', $article, ' does not exist at the expected location (', $article_with_extension, ').', "\n";
-    exit 1;
-  }
-  unless (-r $article_with_extension) {
-    print 'Error: the .', $extension, ' file for the supplied article ', $article, ' is not readable.', "\n";
-    exit 1;
-  }
 }
 
 sub min {
@@ -50,6 +76,29 @@ sub max {
     return $b;
   } else {
     return $a;
+  }
+}
+
+my $article = $ARGV[0];
+my $article_basename = basename ($article, '.miz');
+my $article_dirname = dirname ($article);
+my $article_sans_extension = "${article_dirname}/${article_basename}";
+my $article_miz = "${article_dirname}/${article_basename}.miz";
+my $article_err = "${article_dirname}/${article_basename}.err";
+my $article_eno = "${article_dirname}/${article_basename}.eno";
+my $article_refx = "${article_dirname}/${article_basename}.refx";
+my $article_esh = "${article_dirname}/${article_basename}.esh";
+my $article_eth = "${article_dirname}/${article_basename}.eth";
+
+foreach my $extension ('miz', 'refx', 'eno') {
+  my $article_with_extension = "${article_dirname}/${article_basename}.${extension}";
+  unless (-e $article_with_extension) {
+    print 'Error: the .', $extension, ' file for the supplied article ', "\n", "\n", '  ', $article, "\n", "\n", 'does not exist at the expected location', "\n", "\n", '  ', $article_with_extension, "\n";
+    exit 1;
+  }
+  unless (-r $article_with_extension) {
+    print 'Error: the .', $extension, ' file for the supplied article ', $article, ' is not readable.', "\n";
+    exit 1;
   }
 }
 
@@ -140,7 +189,9 @@ sub prune_theorems {
   }
 
   if (-e $article_eth) {
-    print 'Minimizing eth...';
+    if ($verbose == 1) {
+      print 'Minimizing eth...';
+    }
     my $eth_parser = XML::LibXML->new ();
     my $eth_doc = $eth_parser->parse_file ($article_eth);
 
@@ -185,11 +236,14 @@ sub prune_theorems {
     $new_eth_doc->setDocumentElement ($eth_root);
     $new_eth_doc->toFile ($article_eth);
 
-    print 'done.  The initial environment contained ', scalar @theorem_nodes, ' elements, but we actually need only ', $num_needed, "\n";
+    if ($verbose == 1) {
+      print 'done.  The initial environment contained ', scalar @theorem_nodes, ' elements, but we actually need only ', $num_needed, "\n";
+    }
 
   } else {
-    print 'The .eth file does not exist for ', $article_basename, ', so there is nothing to minimize.', "\n";
-    exit 1;
+    if ($verbose == 1) {
+      print 'The .eth file does not exist for ', $article_basename, ', so there is nothing to minimize.', "\n";
+    }
   }
 }
 
@@ -209,7 +263,9 @@ sub prune_schemes {
     $schemes{"$aid:$nr"} = 0;
   }
   if (-e $article_esh) {
-    print 'Minimizing esh...';
+    if ($verbose == 1) {
+      print 'Minimizing esh...';
+    }
     my $esh_parser = XML::LibXML->new ();
     my $esh_doc = $esh_parser->parse_file ($article_esh);
 
@@ -223,12 +279,12 @@ sub prune_schemes {
     my $num_needed = 0;
     foreach my $scheme_node (@scheme_nodes) {
       unless ($scheme_node->exists ('@articlenr')) {
-        print "\n";
+        print "\n" if ($verbose == 1);
         print 'Error: we found a Scheme node that lacks an articlenr attribute!', "\n";
         exit 1;
       }
       unless ($scheme_node->exists ('@nr')) {
-        print "\n";
+        print "\n" if ($verbose == 1);
         print 'Error: we found a Scheme node that lacks an nr attribute!', "\n";
         exit 1;
       }
@@ -243,11 +299,14 @@ sub prune_schemes {
     $new_esh_doc->setDocumentElement ($esh_root);
     $new_esh_doc->toFile ($article_esh);
 
-    print 'done.  The initial environment contained ', scalar @scheme_nodes, ' elements, but we actually need only ', $num_needed, "\n";
+    if ($verbose == 1) {
+      print 'done.  The initial environment contained ', scalar @scheme_nodes, ' elements, but we actually need only ', $num_needed, "\n";
+    }
 
   } else {
-    print 'The .esh file does not exist for ', $article_basename, ', so there is nothing to minimize.', "\n";
-    exit 1;
+    if ($verbose == 1) {
+      print 'The .esh file does not exist for ', $article_basename, ', so there is nothing to minimize.', "\n";
+    }
   }
 }
 
@@ -362,12 +421,18 @@ foreach my $extension_to_minimize (@extensions_to_minimize) {
       foreach my $i (0 .. scalar @elements - 1) {
         $initial_table{$i} = 0;
       }
-      print 'Minimizing ', $extension_to_minimize, '...';
+      if ($verbose == 1) {
+        print 'Minimizing ', $extension_to_minimize, '...';
+      }
       my %minimized_table
         = %{minimize (\@elements, \%initial_table, $article_with_extension, $root_element_name, 0, scalar @elements - 1)};
-      print 'done.  The initial environment contained ', scalar @elements, ' elements, but we actually need only ', scalar keys %minimized_table, "\n";
+      if ($verbose == 1) {
+        print 'done.  The initial environment contained ', scalar @elements, ' elements, but we actually need only ', scalar keys %minimized_table, "\n";
+      }
     } else {
-      print 'The .', $extension_to_minimize, ' file for ', $article_basename, ' does not exist; nothing to minimize.', "\n";
+      if ($verbose == 1) {
+        print 'The .', $extension_to_minimize, ' file for ', $article_basename, ' does not exist; nothing to minimize.', "\n";
+      }
     }
   } else {
     print 'Error: we do not know how to deal with the ', $extension_to_minimize, ' files.', "\n";
