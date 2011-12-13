@@ -349,7 +349,7 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non
     if [contains ($users, $user-token)] {
       $path = cons-token-string-at-end (#item = $position-of-start, #token-string = $path-so-far);
       $solution = `concat ($path, ":", $dead-ends, ":", $users, ":", $non-users)`;
-      $message = `concat ("Solution [1] is '", $solution, "'")`;
+      $message = `concat ("Solution [1] is '", $path, "'")`;
       // msg $message;
       $solution;
     } else {
@@ -477,7 +477,7 @@ tpl needed-for-item (#item, #candidates, #registered-paths, #users, #non-users, 
       $more-users = `substring-before ($after-dead-ends, ":")`;
       $more-non-users = `substring-after ($after-dead-ends, ":")`;
       if [$path = ""] { // there is no path
-        // $message = `concat ("There is no path from ", $candidate-num)`;
+        $message = `concat ("There is no path from ", $candidate-num, " to ", $item-position)`;
         // msg $message;
         needed-for-item (#item = $item,
                          #candidates = $later-candidates,
@@ -486,7 +486,7 @@ tpl needed-for-item (#item, #candidates, #registered-paths, #users, #non-users, 
                          #non-users = $more-non-users,
                          #needed = $needed);
       } else {
-        // $message = `concat ("We found a path from ", $candidate-num, ": ", $path)`;
+        $message = `concat ("We found a path from ", $candidate-num, " to ", $item-position, ": ", $path)`;
         // msg $message;
 
         // $message = `concat ("We would have included item ", $candidate-num, " in the current context")`;
@@ -522,8 +522,8 @@ tpl emit-needed (#needed) {
 
 tpl prepend-context-for-item (#item, #users, #non-users) {
   $num-prev = toplevel-position (#toplevel-item = $item);
-  $message = `concat ("Computing needed.  There are ", $num-prev, " previous items")`;
-  msg $message;
+  $message = `concat ("Computing needed for item ", $num-prev)`;
+  // msg $message;
   $stuff = needed-for-item (#item = $item,
                    #candidates = `preceding::Item[parent::Text-Proper
                                                   and (@kind = "Reservation"
