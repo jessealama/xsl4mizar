@@ -330,8 +330,18 @@ tpl positions (#items) {
 tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non-users) {
   $position-of-start = toplevel-position (#toplevel-item = $start);
   $position-of-end = toplevel-position (#toplevel-item = $end);
+  $between-positions = positions (#items = $between);
+  if [$between-positions = ""] {
+    $message = `concat ("Searching for a path from ", $position-of-start, " to ", $position-of-end, " in one step")`;
+    // msg $message;
+  } else {
+    $message = `concat ("Searching for a path from ", $position-of-start, " to ", $position-of-end, " via ", $between-positions)`;
+    // msg $message;
+  }
   $start-token = `concat (",", $position-of-start, ",")`;
   if [contains ($dead-ends, $start-token)] {
+    $dead-end-message = `concat ("We won't even start the search because ", $position-of-start, " is a known dead-end to ", $position-of-end)`;
+    // msg $dead-end-message;
     `concat ("", ":", $dead-ends, ":", $users, ":", $non-users)`;
   } else {
     $user-pair = `concat ($position-of-end, "#", $position-of-start)`;
@@ -339,7 +349,7 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non
     if [contains ($users, $user-token)] {
       $path = cons-token-string-at-end (#item = $position-of-start, #token-string = $path-so-far);
       $solution = `concat ($path, ":", $dead-ends, ":", $users, ":", $non-users)`;
-      // $message = `concat ("Solution [1] is '", $solution, "'")`;
+      $message = `concat ("Solution [1] is '", $solution, "'")`;
       // msg $message;
       $solution;
     } else {
@@ -350,6 +360,8 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non
           $candidate-position = toplevel-position (#toplevel-item = $candidate);
           $candidate-token = `concat (",", $candidate-position, ",")`;
           if [contains ($dead-ends, $candidate-token)] {
+            $dead-end-message = `concat ("Candidate ", $candidate-position, " is a known dead-end to ", $position-of-end)`;
+            // msg $dead-end-message;
             path-from-to (#start = $start,
                           #end = $end,
                           #between = $later-candidates,
@@ -429,11 +441,13 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non
         } else {
           $new-dead-ends = cons-token-string-at-end (#item = $position-of-start, #token-string = $dead-ends);
           $solution = `concat ("", ":", $new-dead-ends, ":", $users, ":", $non-users)`;
-          // $message = `concat ("Solution [3] is '", $solution, "'")`;
+          $message = `concat ("Solution (dead end) [3] is '", $solution, "'")`;
           // msg $message;
           $solution;
         }
       } else {
+        $user-message = `concat ("We don't know whether item ", $position-of-start, " is used by item ", $position-of-end, "; computing...")`;
+        msg $user-message;
         $occurs-in-item = item-uses-item (#item = $start, #user = $end);
         if [$occurs-in-item = "1"] {
           $new-users = cons-token-string (#item = $user-pair, #token-string = $users);
