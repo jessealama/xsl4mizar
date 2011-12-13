@@ -605,117 +605,214 @@ tpl [Text-Proper/*/Straightforward-Justification/Link] {
 
 // Resolving scheme references
 
-tpl [Scheme-Justification[@nr = "0"
-                          and @idnr = preceding::Item[parent::Text-Proper
-                                                      and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr]/@idnr]] {
+tpl [Scheme-Justification[@idnr and @nr = "0"]] {
   $context = `.`;
   $idnr = `@idnr`;
-  for-each [preceding::Item[parent::Text-Proper and @kind = "Scheme-Block-Item" and descendant::Scheme[@idnr = $idnr]][1]] {
-    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
-    $position = `$num-previous + 1`;
-    $spelling = `concat ("CKB", $position)`;
-    <Scheme-Justification {
-      @spelling = $spelling;
-      @idnr = "1";
-      @nr = "1"; // might not be right
-      @promoted = "promoted";
-      apply [`$context/*`];
+  for-each [ancestor::Item[parent::Text-Proper]] {
+    if [@idnr = preceding-sibling::Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr]/@idnr] {
+      for-each [preceding-sibling::Item[@kind = "Scheme-Block-Item" and descendant::Scheme[@idnr = $idnr]][1]] {
+        $num-previous = `count (preceding-sibling::Item)`;
+        $position = `$num-previous + 1`;
+        $spelling = `concat ("CKB", $position)`;
+        <Scheme-Justification {
+          @spelling = $spelling;
+          @idnr = "1";
+          @nr = "1"; // might not be right
+          @promoted = "promoted";
+          apply [`$context/*`];
+        }
+      }
+    } else {
+      die (#message = "Unable to resolve an article-local Scheme-Justification");
     }
   }
 }
+
+// tpl [Scheme-Justification[@nr = "0"
+//                           and @idnr = preceding::Item[parent::Text-Proper
+//                                                       and @kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr]/@idnr]] {
+//   $context = `.`;
+//   $idnr = `@idnr`;
+//   for-each [preceding::Item[parent::Text-Proper and @kind = "Scheme-Block-Item" and descendant::Scheme[@idnr = $idnr]][1]] {
+//     $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+//     $position = `$num-previous + 1`;
+//     $spelling = `concat ("CKB", $position)`;
+//     <Scheme-Justification {
+//       @spelling = $spelling;
+//       @idnr = "1";
+//       @nr = "1"; // might not be right
+//       @promoted = "promoted";
+//       apply [`$context/*`];
+//     }
+//   }
+// }
 
 // Non-scheme references
 
 // By default, we don't know how to resolve; just copy.
-tpl [Local-Reference] {
-  copy-of `.`;
-}
+// tpl [Local-Reference] {
+//   copy-of `.`;
+// }
 
-// look for a previous unexported-but-exportable toplevel theorem (lemma)
-tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
-                                             and @kind = "Regular-Statement"
-                                             and @shape = "Compact-Statement"]/Proposition/Label[@idnr]/@idnr]] {
+// TODO: make a table for local refernce idnrs.  This could speed things up a lot.
+//
+tpl [Local-Reference[@idnr]] {
   $context = `.`;
   $idnr = `@idnr`;
-  for-each [preceding::Item[parent::Text-Proper
-                            and @kind = "Regular-Statement"
-                            and @shape = "Compact-Statement"]/Proposition[Label[@idnr = $idnr]][1]] {
-    $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
+  for-each [ancestor::Item[parent::Text-Proper]] {
     choose {
-      when [$bad = "1"] {
-        copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
-      }
-      when [descendant::Private-Predicate-Formula] {
-        copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
-      }
-      when [descendant::Private-Functor-Term] {
-        copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
-      }
-      otherwise {
-        $num-previous = `count (preceding::Item[parent::Text-Proper])`;
-        $position = `$num-previous + 1`;
-        $new_spelling = `concat ("CKB", $position)`;
-        <Theorem-Reference {
-          @spelling = $new_spelling;
-          @promoted = "promoted";
-          @"number" = "1";
+      when [@idnr = preceding-sibling::Item[@kind = "Regular-Statement"
+                                            and @shape = "Compact-Statement"
+                                            and @exportable = "yes"]/Proposition[Label[@idnr]/@idnr]] {
+        for-each [preceding-sibling::Item[@kind = "Regular-Statement"
+                                          and @shape = "Compact-Statement"
+                                          and @exportable = "yes"]/Proposition[Label[@idnr = $idnr]][1]] {
+          $num-previous = `count (preceding-sibling::Item)`;
+          $position = `$num-previous + 1`;
+          $new_spelling = `concat ("CKB", $position)`;
+          <Theorem-Reference {
+            @spelling = $new_spelling;
+            @promoted = "promoted";
+            @"number" = "1";
+          }
         }
       }
+      when [@idnr = preceding-sibling::Item[parent::Text-Proper
+                                            and @kind = "Theorem-Item"]/Proposition/Label[@idnr]/@idnr] {
+        for-each [preceding-sibling::Item[@kind = "Theorem-Item" and Proposition/Label[@idnr = $idnr]]] {
+          $num-previous = `count (preceding-sibling::Item)`;
+          $position = `$num-previous + 1`;
+          $new_spelling = `concat ("CKB", $position)`;
+          <Theorem-Reference {
+            @spelling = $new_spelling;
+            @promoted = "promoted";
+            @"number" = "1";
+          }
+        }
+      }
+      when [@idnr = preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
+                                                                                                                or @kind = "Attribute-Definition"
+                                                                                                                or @kind = "Predicate-Definition"
+                                                                                                                or @kind = "Structure-Definition"]/Definiens/Label[@idnr]/@idnr] {
+
+        for-each [preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
+                                                                                                              or @kind = "Attribute-Definition"
+                                                                                                              or @kind = "Predicate-Definition"
+                                                                                                              or @kind = "Structure-Definition"]/Definiens/Label[@idnr = $idnr]] {
+          $num-previous = `count (preceding-sibling::Item[parent::Text-Proper])`;
+          $position = `$num-previous + 1`;
+          $new_spelling = `concat ("CKB", $position)`;
+          <Definition-Reference {
+            @spelling = $new_spelling;
+            @promoted = "promoted";
+            @"number" = "1";
+          }
+        }
+      }
+      when [@idnr = preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label/@idnr] {
+        for-each [preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]] {
+          $num-previous = `count (preceding-sibling::Item)`;
+          $position = `$num-previous + 1`;
+          $new_spelling = `concat ("CKB", $position)`;
+          <Definition-Reference {
+            @spelling = $new_spelling;
+            @promoted = "promoted";
+            @"number" = "1";
+          }
+        }
+      }
+      otherwise {
+        copy-of `$context`;
+      }
     }
   }
 }
 
-// look for a previous exported toplevel theorem
-tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
-                                             and @kind = "Theorem-Item"]/Proposition/Label/@idnr]] {
-  $idnr = `@idnr`;
-  for-each [preceding::Item[parent::Text-Proper and @kind = "Theorem-Item" and Proposition/Label[@idnr = $idnr]]] {
-    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
-    $position = `$num-previous + 1`;
-    $new_spelling = `concat ("CKB", $position)`;
-    <Theorem-Reference {
-      @spelling = $new_spelling;
-      @promoted = "promoted";
-      @"number" = "1";
-    }
-  }
-}
+// // look for a previous unexported-but-exportable toplevel theorem (lemma)
+// tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+//                                              and @kind = "Regular-Statement"
+//                                              and @shape = "Compact-Statement"]/Proposition/Label[@idnr]/@idnr]] {
+//   $context = `.`;
+//   $idnr = `@idnr`;
+//   for-each [preceding::Item[parent::Text-Proper
+//                             and @kind = "Regular-Statement"
+//                             and @shape = "Compact-Statement"]/Proposition[Label[@idnr = $idnr]][1]] {
+//     $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
+//     choose {
+//       when [$bad = "1"] {
+//         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
+//       }
+//       when [descendant::Private-Predicate-Formula] {
+//         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
+//       }
+//       when [descendant::Private-Functor-Term] {
+//         copy-of `$context`; // the lemma that this local reference refers to cannot be promoted
+//       }
+//       otherwise {
+//         $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+//         $position = `$num-previous + 1`;
+//         $new_spelling = `concat ("CKB", $position)`;
+//         <Theorem-Reference {
+//           @spelling = $new_spelling;
+//           @promoted = "promoted";
+//           @"number" = "1";
+//         }
+//       }
+//     }
+//   }
+// }
 
-// look for a previous non-mode definition
-tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
-                                             and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
-                                                                                                                     or @kind = "Attribute-Definition"
-                                                                                                                     or @kind = "Predicate-Definition"
-                                                                                                                     or @kind = "Structure-Definition"]/Definiens/Label[@idnr]/@idnr]] {
-  $idnr = `@idnr`;
-  for-each [preceding::Item[parent::Text-Proper
-                            and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
-                                                                                                    or @kind = "Attribute-Definition"
-                                                                                                    or @kind = "Predicate-Definition"
-                                                                                                    or @kind = "Structure-Definition"]/Definiens/Label[@idnr = $idnr]] {
-    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
-    $position = `$num-previous + 1`;
-    $new_spelling = `concat ("CKB", $position)`;
-    <Definition-Reference {
-      @spelling = $new_spelling;
-      @promoted = "promoted";
-      @"number" = "1";
-    }
-  }
-}
+// // look for a previous exported toplevel theorem
+// tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+//                                              and @kind = "Theorem-Item"]/Proposition/Label/@idnr]] {
+//   $idnr = `@idnr`;
+//   for-each [preceding::Item[parent::Text-Proper and @kind = "Theorem-Item" and Proposition/Label[@idnr = $idnr]]] {
+//     $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+//     $position = `$num-previous + 1`;
+//     $new_spelling = `concat ("CKB", $position)`;
+//     <Theorem-Reference {
+//       @spelling = $new_spelling;
+//       @promoted = "promoted";
+//       @"number" = "1";
+//     }
+//   }
+// }
+
+// // look for a previous non-mode definition
+// tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+//                                              and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
+//                                                                                                                      or @kind = "Attribute-Definition"
+//                                                                                                                      or @kind = "Predicate-Definition"
+//                                                                                                                      or @kind = "Structure-Definition"]/Definiens/Label[@idnr]/@idnr]] {
+//   $idnr = `@idnr`;
+//   for-each [preceding::Item[parent::Text-Proper
+//                             and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
+//                                                                                                     or @kind = "Attribute-Definition"
+//                                                                                                     or @kind = "Predicate-Definition"
+//                                                                                                     or @kind = "Structure-Definition"]/Definiens/Label[@idnr = $idnr]] {
+//     $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+//     $position = `$num-previous + 1`;
+//     $new_spelling = `concat ("CKB", $position)`;
+//     <Definition-Reference {
+//       @spelling = $new_spelling;
+//       @promoted = "promoted";
+//       @"number" = "1";
+//     }
+//   }
+// }
 
 // look for a previous mode definition
-tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
-                                             and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label/@idnr]] {
-  $idnr = `@idnr`;
-  for-each [preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]] {
-    $num-previous = `count (preceding::Item[parent::Text-Proper])`;
-    $position = `$num-previous + 1`;
-    $new_spelling = `concat ("CKB", $position)`;
-    <Definition-Reference {
-      @spelling = $new_spelling;
-      @promoted = "promoted";
-      @"number" = "1";
-    }
-  }
-}
+// tpl [Local-Reference[@idnr = preceding::Item[parent::Text-Proper
+//                                              and @kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label/@idnr]] {
+//   $idnr = `@idnr`;
+//   for-each [preceding::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]] {
+//     $num-previous = `count (preceding::Item[parent::Text-Proper])`;
+//     $position = `$num-previous + 1`;
+//     $new_spelling = `concat ("CKB", $position)`;
+//     <Definition-Reference {
+//       @spelling = $new_spelling;
+//       @promoted = "promoted";
+//       @"number" = "1";
+//     }
+//   }
+// }
