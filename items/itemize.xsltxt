@@ -448,7 +448,7 @@ tpl path-from-to (#start, #end, #between, #path-so-far, #dead-ends, #users, #non
         }
       } else {
         $user-message = `concat ("We don't know whether item ", $position-of-start, " is used by item ", $position-of-end, "; computing...")`;
-        msg $user-message;
+        // msg $user-message;
         $occurs-in-item = item-uses-item (#item = $start, #user = $end);
         if [$occurs-in-item = "1"] {
           $new-users = cons-token-string (#item = $user-pair, #token-string = $users);
