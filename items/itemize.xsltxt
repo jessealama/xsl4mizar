@@ -623,7 +623,7 @@ tpl [Scheme-Justification[@idnr and @nr = "0"]] {
   $context = `.`;
   $idnr = `@idnr`;
   for-each [ancestor::Item[parent::Text-Proper]] {
-    if [@idnr = preceding-sibling::Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr]/@idnr] {
+    if [$idnr = preceding-sibling::Item[@kind = "Scheme-Block-Item"]/Block[@kind = "Scheme-Block"]/Item[@kind = "Scheme-Head"]/Scheme[@idnr]/@idnr] {
       for-each [preceding-sibling::Item[@kind = "Scheme-Block-Item" and descendant::Scheme[@idnr = $idnr]][1]] {
         $num-previous = `count (preceding-sibling::Item)`;
         $position = `$num-previous + 1`;
@@ -675,12 +675,13 @@ tpl [Local-Reference[@idnr]] {
   $idnr = `@idnr`;
   for-each [ancestor::Item[parent::Text-Proper]] {
     choose {
-      when [@idnr = preceding-sibling::Item[@kind = "Regular-Statement"
+      when [$idnr = preceding-sibling::Item[@kind = "Regular-Statement"
                                             and @shape = "Compact-Statement"
-                                            and @exportable = "yes"]/Proposition[Label[@idnr]/@idnr]] {
+                                            and @exportable = "yes"]/Proposition/Label[@idnr]/@idnr] {
         for-each [preceding-sibling::Item[@kind = "Regular-Statement"
                                           and @shape = "Compact-Statement"
-                                          and @exportable = "yes"]/Proposition[Label[@idnr = $idnr]][1]] {
+                                          and @exportable = "yes"
+                                          and Proposition/Label[@idnr = $idnr]][1]] {
           $num-previous = `count (preceding-sibling::Item)`;
           $position = `$num-previous + 1`;
           $new_spelling = `concat ("CKB", $position)`;
@@ -691,7 +692,7 @@ tpl [Local-Reference[@idnr]] {
           }
         }
       }
-      when [@idnr = preceding-sibling::Item[parent::Text-Proper
+      when [$idnr = preceding-sibling::Item[parent::Text-Proper
                                             and @kind = "Theorem-Item"]/Proposition/Label[@idnr]/@idnr] {
         for-each [preceding-sibling::Item[@kind = "Theorem-Item" and Proposition/Label[@idnr = $idnr]]] {
           $num-previous = `count (preceding-sibling::Item)`;
@@ -704,16 +705,16 @@ tpl [Local-Reference[@idnr]] {
           }
         }
       }
-      when [@idnr = preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
+      when [$idnr = preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
                                                                                                                 or @kind = "Attribute-Definition"
                                                                                                                 or @kind = "Predicate-Definition"
                                                                                                                 or @kind = "Structure-Definition"]/Definiens/Label[@idnr]/@idnr] {
 
-        for-each [preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
-                                                                                                              or @kind = "Attribute-Definition"
-                                                                                                              or @kind = "Predicate-Definition"
-                                                                                                              or @kind = "Structure-Definition"]/Definiens/Label[@idnr = $idnr]] {
-          $num-previous = `count (preceding-sibling::Item[parent::Text-Proper])`;
+        for-each [preceding-sibling::Item[@kind = "Definition-Item" and Block[@kind = "Definitional-Block"]/Item[@kind = "Functor-Definition"
+                                                                                                                 or @kind = "Attribute-Definition"
+                                                                                                                 or @kind = "Predicate-Definition"
+                                                                                                                 or @kind = "Structure-Definition"]/Definiens/Label[@idnr = $idnr]]] {
+          $num-previous = `count (preceding-sibling::Item)`;
           $position = `$num-previous + 1`;
           $new_spelling = `concat ("CKB", $position)`;
           <Definition-Reference {
@@ -723,8 +724,8 @@ tpl [Local-Reference[@idnr]] {
           }
         }
       }
-      when [@idnr = preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label/@idnr] {
-        for-each [preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]] {
+      when [$idnr = preceding-sibling::Item[@kind = "Definition-Item"]/Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label/@idnr] {
+        for-each [preceding-sibling::Item[@kind = "Definition-Item" and Block[@kind = "Definitional-Block"]/Item[@kind = "Mode-Definition"]/*/Definiens/Label[@idnr = $idnr]]] {
           $num-previous = `count (preceding-sibling::Item)`;
           $position = `$num-previous + 1`;
           $new_spelling = `concat ("CKB", $position)`;
