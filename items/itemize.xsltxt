@@ -305,6 +305,17 @@ tpl item-uses-item (#item, #user) {
   }
 }
 
+tpl positions (#items) {
+  if [$items] {
+    $item = `$items[1]`;
+    $item-pos = toplevel-position (#toplevel-item = $item);
+    $remainder-rendered = positions (#items = `$items[position() > 1]`);
+    cons-token-string (#item = $item-pos, #token-string = $remainder-rendered);
+  } else {
+    "";
+  }
+}
+
 // Find a path from $start to $end, possibly via the items in
 // $between.  The result is either the empty string (indicating that
 // there is no path from $start to $end via $beteen), or a token list
