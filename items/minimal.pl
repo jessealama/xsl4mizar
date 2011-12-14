@@ -18,9 +18,9 @@ minimal.pl - Minimize the environment of a mizar article
 minimize.pl [options] mizar-article
 
 Options:
-  -help             brief help message
-  -man              full documentation
-  -verbose          say what we're doing
+  -help                       Brief help message
+  -man                        Full documentation
+  -verbose                    Say what we're doing
 
 =head1 OPTIONS
 
@@ -36,13 +36,16 @@ Prints the manual page and exits.
 
 =item B<--verbose>
 
-Say what environment file we're minimizing, and for each environment file, say how many environment "items" are present there and how many we really need.
+Say what environment file we're minimizing, and for each environment
+file, say how many environment "items" are present there and how many
+we really need.
 
 =back
 
 =head1 DESCRIPTION
 
-B<minimize.pl> will construct, in a brute-force manner, the smallest environment with respect to which the given article is verifiable.
+B<minimize.pl> will construct, in a brute-force manner, the smallest
+environment with respect to which the given article is verifiable.
 
 =cut
 
@@ -50,7 +53,10 @@ my $verbose = 0;
 my $man = 0;
 my $help = 0;
 
-GetOptions('help|?' => \$help, 'man' => \$man, 'verbose'  => \$verbose) or pod2usage(2);
+GetOptions('help|?' => \$help,
+           'man' => \$man,
+           'verbose'  => \$verbose)
+  or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
