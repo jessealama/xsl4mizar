@@ -59,26 +59,6 @@ unless (scalar @ARGV == 1) {
   exit 1;
 }
 
-sub min {
-  my $a = shift;
-  my $b = shift;
-  if ($a < $b) {
-    return $a;
-  } else {
-    return $b;
-  }
-}
-
-sub max {
-  my $a = shift;
-  my $b = shift;
-  if ($a < $b) {
-    return $b;
-  } else {
-    return $a;
-  }
-}
-
 my $article = $ARGV[0];
 my $article_basename = basename ($article, '.miz');
 my $article_dirname = dirname ($article);
