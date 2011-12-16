@@ -2,6 +2,16 @@ nd/xboole_0/*
 *~
 *.xsl
 *.dx64fsl
+nd/xboole_0*
+items/polyform*
+items/afinsq_1*
+items/bhsp_1*
+items/clvect_*
+items/funct_1*
+items/setfam*
+items/topreal2*
+items/xboole_*
+items/zfmisc_1*
 /MHTML/ckb-text.xsltxt
 /MHTML/del-attr.xsltxt
 /MHTML/doc.xsltxt

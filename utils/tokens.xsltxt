@@ -193,6 +193,24 @@ tpl item-in-token-list (#token-list, #item) {
   }
 }
 
+tpl remove-duplicates (#token-string) {
+  $empty = token-string-is-empty (#token-string = $token-string);
+  if [$empty = "1"] {
+    $token-string;
+  } else {
+    $first-item = first-item (#token-string = $token-string);
+    $tail = token-string-tail (#token-string = $token-string);
+    $item-in-tail = item-in-token-list (#token-list = $tail, #item = $first-item);
+    if [$item-in-tail = "1"] {
+      remove-duplicates (#token-string = $tail);
+    } else {
+      $tail-sans-duplicates = remove-duplicates (#token-string = $tail);
+      cons-token-string (#item = $first-item,
+                         #token-string = $tail-sans-duplicates);
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////
 /// Printing token strings
 //////////////////////////////////////////////////////////////////////
@@ -221,4 +239,48 @@ tpl render-token-string (#token-string, #before-item, #after-item) {
     $message = `concat ("We cannot redner the token string&#xa;&#xa;  ", $token-string, "&#xa;&#xa;because it is not actually a token string!")`;
     die (#message = $message);
   }
+}
+
+//////////////////////////////////////////////////////////////////////
+/// Constructing token strings
+//////////////////////////////////////////////////////////////////////
+
+tpl make-token-string-helper (#elements, #val) {
+  if [$elements] {
+    $new-val = cons-token-string (#item = `$elements[1]`, #token-string = $val);
+    make-token-string-helper (#elements = `$elements[position() > 1]`,
+                              #val = $new-val);
+  } else {
+    $val;
+  }
+}
+
+tpl make-token-string (#elements) {
+  make-token-string-helper (#elements = $elements,
+                            #val = "");
+}
+
+
+tpl make-token-string-uniq (#elements, #val) {
+  if [$elements] {
+    $element = `$elements[1]`;
+    $token = `concat (",", $element, ",")`;
+    $contains = item-in-token-list (#item = $element, #token-list = $val);
+    if [$contains = "1"] {
+      make-token-string-uniq (#elements = `$elements[position() > 1]`,
+                              #val = $val);
+    } else {
+      $new-val = cons-token-string (#item = $element,
+                                    #token-string = $val);
+      make-token-string-uniq (#elements = `$elements[position() > 1]`,
+                              #val = $new-val);
+    }
+  } else {
+    $val;
+  }
+}
+
+tpl make-token-string-no-duplicates (#elements) {
+  make-token-string-uniq (#elements = $elements,
+                          #val = "");
 }
