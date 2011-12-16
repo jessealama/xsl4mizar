@@ -79,7 +79,7 @@ chomp @non_constructor_deps;
 
 # Sanity check: the stylsheet didn't produce any junk output
 if (grep (/^$/, @non_constructor_deps)) {
-  print 'Error: the dependencies stylesheet generated some junk output.', "\n";
+  print 'Error: the dependencies stylesheet generated some junk output (a blank line).', "\n";
   exit 1;
 }
 
