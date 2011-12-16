@@ -26,6 +26,8 @@ Options:
 
   -minimize-whole-article     Minimize the whole article and use its minimal environment in minimizing its fragments
 
+  -paranoid                   Check that the minimized fragments are verifiable
+
 =head1 OPTIONS
 
 =over 8
@@ -54,6 +56,10 @@ Such minimization may an expensive up-front cost, but it can save time
 in the long run, depending on the size of the original article's
 environment and how expensive it is to verify it.
 
+=item B<--paranoid>
+
+Call the verifier on each of the itemized articles.
+
 =back
 
 =head1 DESCRIPTION
@@ -67,6 +73,7 @@ which the given article is verifiable.
 my $verbose = 0;
 my $man = 0;
 my $help = 0;
+my $paranoid = 0;
 my $minimize_whole_article = 0;
 
 GetOptions('help|?' => \$help,
@@ -140,6 +147,14 @@ unless (-r $prefer_environment_stylesheet) {
 }
 
 
+my @fragments = `find $article_text_dir -name "ckb*.miz"`;
+chomp @fragments;
+
+if (scalar @fragments == 0) {
+  print 'Error: we found 0 fragments under ', $article_text_dir, '.', "\n";
+  exit 1;
+}
+
 if ($minimize_whole_article == 1) {
 
   if ($verbose == 1) {
@@ -158,50 +173,69 @@ if ($minimize_whole_article == 1) {
     exit 1;
   }
 
+  if ($paranoid == 1) {
+    my $verifier_status = system ("verifier -q -s -l $itemized_article_miz > /dev/null 2>&1");
+    my $verifier_exit_code = $verifier_status >> 8;
+    if ($verifier_exit_code != 0) {
+      print 'Error: the minimized whole article is not verifiable!', "\n";
+      exit 1;
+    }
+  }
+
   if ($verbose == 1) {
     print 'Done minimizing the itemized article.', "\n";
   }
-}
 
-my @fragments = `find $article_text_dir -name "ckb*.miz"`;
-chomp @fragments;
+  my @extensions = ('eno', 'erd', 'epr', 'dfs', 'eid', 'ecl');
 
-if (scalar @fragments == 0) {
-  print 'Error: we found 0 fragments under ', $article_text_dir, '.', "\n";
-  exit 1;
-}
+  if ($verbose == 1) {
+    print 'Rewriting each fragment\'s environment to use the minimized article\'s environment...';
+  }
 
-my @extensions = ('eno', 'erd', 'epr', 'dfs', 'eid', 'ecl');
+  foreach my $fragment (@fragments) {
+    my $fragment_basename = basename ($fragment);
+    foreach my $extension (@extensions) {
+      my $fragment_with_extension = "${article_text_dir}/${fragment_basename}.${extension}";
+      my $fragment_with_extension_orig = "${article_text_dir}/${fragment_basename}.${extension}.orig";
+      my $fragment_with_extension_tmp = "${article_text_dir}/${fragment_basename}.${extension}.tmp";
+      my $article_with_extension = "${article_dir}/${article_basename}.${extension}";
+      if (-e $article_with_extension && -e $fragment_with_extension) {
+        copy ($fragment_with_extension, $fragment_with_extension_orig);
 
-# Rewrite each fragment's environment to use the newly minimized whole article environment
-foreach my $fragment (@fragments) {
-  my $fragment_basename = basename ($fragment);
-  foreach my $extension (@extensions) {
-    my $fragment_with_extension = "${article_text_dir}/${fragment_basename}.${extension}";
-    my $fragment_with_extension_orig = "${article_text_dir}/${fragment_basename}.${extension}.orig";
-    my $fragment_with_extension_tmp = "${article_text_dir}/${fragment_basename}.${extension}.tmp";
-    my $article_with_extension = "${article_dir}/${article_basename}.${extension}";
-    if (-e $article_with_extension && -e $fragment_with_extension) {
-      copy ($fragment_with_extension, $fragment_with_extension_orig);
-      my $xsltproc_status = system ("xsltproc --output $fragment_with_extension_tmp --stringparam original-environment '$article_with_extension' $fragment_with_extension_tmp");
-      my $xsltproc_exit_code = $xsltproc_status >> 8;
-      if ($xsltproc_exit_code != 0) {
-        print 'Error: xsltproc did not exit cleanly when rewriting the .', $extension, ' file for ', $fragment, '.', "\n";
-        exit 1;
-      }
-      move ($fragment_with_extension_tmp, $fragment_with_extension);
-      # Sanity check: the fragment with the new environment is verifiable
-      my $verifier_status = system ("verifier -q -s -l $fragment > /dev/null 2>&1");
-      my $verifier_exit_code = $verifier_status >> 8;
-      if ($verifier_exit_code != 0) {
-        print 'Error: we are unable to verify ', $fragment, ' with its new environment.', "\n";
-        exit 1;
+        my $xsltproc_status = system ("xsltproc --output $fragment_with_extension_tmp --stringparam original-environment '$article_with_extension' $fragment_with_extension_tmp");
+        my $xsltproc_exit_code = $xsltproc_status >> 8;
+        if ($xsltproc_exit_code != 0) {
+          print 'Error: xsltproc did not exit cleanly when rewriting the .', $extension, ' file for ', $fragment, '.', "\n";
+          exit 1;
+        }
+
+        move ($fragment_with_extension_tmp, $fragment_with_extension);
+
+        if ($paranoid == 1) {
+          # Sanity check: the fragment with the new environment is verifiable
+          my $verifier_status = system ("verifier -q -s -l $fragment > /dev/null 2>&1");
+          my $verifier_exit_code = $verifier_status >> 8;
+          if ($verifier_exit_code != 0) {
+            print 'Error: we are unable to verify ', $fragment, ' with its new environment.', "\n";
+            exit 1;
+          }
+        }
+
       }
     }
   }
+
+  if ($verbose == 1) {
+    print 'done.', "\n";
+  }
+
 }
 
-my $parallel_minimize_status = system ("find ${article_text_dir} -name 'ckb*.miz' | parallel --eta ${minimize_script} {}");
+my $parallel_call =
+  ($verbose == 1) ? "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta ${minimize_script} {}"
+                  : "find ${article_text_dir} -name 'ckb*.miz' | parallel ${minimize_script} {}";
+
+my $parallel_minimize_status = system ($parallel_call);
 my $parallel_minimize_exit_code = $parallel_minimize_status >> 8;
 
 if ($parallel_minimize_exit_code != 0) {
@@ -209,6 +243,8 @@ if ($parallel_minimize_exit_code != 0) {
   exit 1;
 }
 
-print 'done.', "\n";
+if ($verbose == 1) {
+  print 'Done.', "\n";
+}
 
 exit 0;
