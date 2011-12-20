@@ -334,7 +334,7 @@ if ($parallel_minimize_exit_code != 0) {
 }
 
 if ($paranoid == 1) {
-  my @bad_guys = `find ${article_text_dir} -name 'ckb*.err' ! -empty -exec basename {} .err ';'`;
+  my @bad_guys = `find ${article_text_dir} -name 'ckb*.err' ! -empty -exec basename {} .err ';' | sed -e 's/ckb//' | sort --numeric-sort`;
   chomp @bad_guys;
   if (scalar @bad_guys > 0) {
     print 'Error: some fragments failed to be verified!  The failed fragments are:', "\n";
