@@ -95,7 +95,46 @@ tpl [formula[not(@name)]] {
   msg terminate="yes" "We encountered a formula element that lacks a name attribute.";
 }
 
-tpl [formula[@name]] {
+tpl [formula[@name and @status = "axiom"]] {
+  $safe-name = capitalize-after-underscore (#string = `@name`);
+  "axiom"; " "; `$safe-name`; ":"; "\n";
+  apply[*[1]]; ";"; "\n";
+}
+
+tpl [formula[@name and @status = "definition"]] {
+  $safe-name = capitalize-after-underscore (#string = `@name`);
+  $formula-position = `count (preceding-sibling::formula) + 1`;
+  // A heuristic to determine whether we can really read this formula
+  // as a definition in the sense that it is:
+  //
+  // * a universally quantified formula
+  // * whose matrix is an equivalence
+  // * the left-hand side of which is an atomic formula
+  //
+  // We might want to impose further conditions, but for now let's
+  // roll with these.
+  $looks-like-a-definition = detect-definition (#formula = `*[position() = last()]`);
+  if [$looks-like-a-definition = "1"] {
+    if [$debug = "1"] {
+      $message = `concat ("Formula #", $formula-position, " has the status of a definition, and we detect that it really is one.")`;
+      msg $message;
+    }
+    "definition"; "\n";
+    "  "; "pred";  " "; apply [*[position() = last()]] mode="extract-definiendum"; "\n";
+    "  "; "means"; " "; ":"; `$safe-name`; ":"; "\n";
+    "  "; apply [*[1]] mode="extract-definiens"; "\n";
+    "end;"; "\n";
+  } else {
+    if [$debug = "1"] {
+      $message = `concat ("Formula #", $formula-position, " has the status of a definition, but we were unable to unpack it as such.")`;
+      msg $message;
+    }
+    `$safe-name`; ":"; "\n";
+    apply[*[1]]; ";"; "\n";
+  }
+}
+
+tpl [formula[@name and not(@status = "axiom") and not(@status = "definition")]] {
   $safe-name = capitalize-after-underscore (#string = `@name`);
   `$safe-name`; ":"; "\n";
   apply[*[1]]; ";"; "\n";
@@ -239,4 +278,61 @@ tpl [non-logical-data] {
 tpl ilist(#separ,#elems) {
  for-each [$elems] {
   apply[.]; if [not(position()=last())] { $separ; } }
+}
+
+//////////////////////////////////////////////////////////////////////
+// Detecting definitions and extracting their parts
+//////////////////////////////////////////////////////////////////////
+
+// Determine whether $formula looks like a definition
+tpl detect-definition (#formula) {
+  for-each [$formula] {
+    if [self::quantifier[@type = "universal"]] {
+      choose {
+        when [*[position() = last()][self::quantifier[@type = "universal"]]] {
+          detect-definition (#formula = `*[position() = last()]`);
+        }
+        when [*[position() = last()][self::equivalence]] {
+          for-each [*[position() = last()]] {
+            for-each [*[1]] {
+    	      if [self::predicate] {
+    	        "1";
+    	      } else {
+    	        "0";
+    	      }
+    	    }
+          }
+        }
+        otherwise {
+          "0";
+        }
+      }
+    } else {
+      "0";
+    }
+  }
+}
+
+tpl [*] mode="extract-definiendum" {
+  msg terminate="yes" "Error: we were asked to extract the definiendum from a formula that we don't know how to handle.";
+}
+
+tpl [quantifier[@type = "universal"]] mode="extract-definiendum" {
+  apply [*[position() = last()]] mode="extract-definiendum";
+}
+
+tpl [equivalence] mode="extract-definiendum" {
+  apply [*[1]];
+}
+
+tpl [*] mode="extract-definiens" {
+  msg terminate="yes" "Error: we were asked to extract the definiens from a formula that we don't know how to handle.";
+}
+
+tpl [quantifier[@type = "universal"]] mode="extract-definiens" {
+  apply [*[position() = last()]] mode="extract-definiens";
+}
+
+tpl [equivalence] mode="extract-definiens" {
+  apply [*[2]];
 }
