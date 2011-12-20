@@ -176,7 +176,7 @@ unless (-x $minimize_script) {
 }
 
 unless (-d $stylesheet_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheet is not actually a directory.', "\n";
+  print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
   exit 1;
 }
 
