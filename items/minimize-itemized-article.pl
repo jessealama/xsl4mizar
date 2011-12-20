@@ -28,6 +28,10 @@ Options:
 
   -paranoid                   Check that the minimized fragments are verifiable
 
+  -script-home                Directory in which to look for auxiliary scripts
+
+  -stylesheet-home            Directory in which to look for needed stylesheets
+
 =head1 OPTIONS
 
 =over 8
@@ -60,6 +64,14 @@ environment and how expensive it is to verify it.
 
 Call the verifier on each of the itemized articles.
 
+=item B<--script-home=DIR>
+
+The directory in which we will look for any needed scripts.
+
+=item B<--stylesheet-home=DIR>
+
+The directory in which we will look for any needed stylesheets.
+
 =back
 
 =head1 DESCRIPTION
@@ -75,11 +87,15 @@ my $man = 0;
 my $help = 0;
 my $paranoid = 0;
 my $minimize_whole_article = 0;
+my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
-           'minimize-whole-article' => \$minimize_whole_article)
+           'minimize-whole-article' => \$minimize_whole_article,
+	   'script-home=s' => \$script_home,
+	   'stylesheet-home=s' => \$stylesheet_home)
   or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -90,8 +106,6 @@ if (scalar @ARGV != 1) {
 }
 
 my $article_dir = $ARGV[0];
-my $article_dirname = dirname ($article_dir);
-my $article_basename = basename ($article_dir);
 
 unless (-d $article_dir) {
   print 'Error: the supplied itemized-article directory ', $article_dir, ' is not actually directory.', "\n";
@@ -105,10 +119,24 @@ unless (-d $article_text_dir) {
   exit 1;
 }
 
-my $itemized_article_miz = "${article_dir}/${article_basename}.miz";
+my @miz_candidates = `find $article_dir -maxdepth 1 -mindepth 1 -type f -name "*.miz"`;
+chomp @miz_candidates;
+
+if (scalar @miz_candidates == 0) {
+  print 'Error: we did not find any .miz files under $article_dir.', "\n";
+  exit 1;
+}
+
+if (scalar @miz_candidates > 1) {
+  print 'Error: we found multiple .miz files under $article_dir; which one should we use?', "\n";
+  exit 1;
+}
+
+my $itemized_article_miz = $miz_candidates[0];
+my $itemized_article_basename = basename ($itemized_article_miz, '.miz');
 
 unless (-e $itemized_article_miz) {
-  print 'Error: there is no article by the name \'', $article_basename, '\' under ', $article_dir, '.', "\n";
+  print 'Error: there is no article by the name \'', $itemized_article_basename, '\' under ', $article_dir, '.', "\n";
   exit 1;
 }
 
@@ -117,7 +145,12 @@ unless (-r $itemized_article_miz) {
   exit 1;
 }
 
-my $minimize_script = '/Users/alama/sources/mizar/xsl4mizar/items/minimal.pl';
+unless (-d $script_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts is not actually a directory.', "\n";
+  exit 1;
+}
+
+my $minimize_script = "${script_home}/minimal.pl";
 
 unless (-e $minimize_script) {
   print 'Error: the minimization script does not exist at the expected location (', $minimize_script, ').', "\n";
@@ -134,7 +167,12 @@ unless (-x $minimize_script) {
   exit 1;
 }
 
-my $prefer_environment_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/items/prefer-environment.xsl';
+unless (-d $stylesheet_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheet is not actually a directory.', "\n";
+  exit 1;
+}
+
+my $prefer_environment_stylesheet = "${stylesheet_home}/prefer-environment.xsl";
 
 unless (-e $prefer_environment_stylesheet) {
   print 'Error: the prefer-environment stylesheet does not exist at the expected location (', $prefer_environment_stylesheet, ').', "\n";
@@ -198,7 +236,7 @@ if ($minimize_whole_article == 1) {
       my $fragment_with_extension = "${article_text_dir}/${fragment_basename}.${extension}";
       my $fragment_with_extension_orig = "${article_text_dir}/${fragment_basename}.${extension}.orig";
       my $fragment_with_extension_tmp = "${article_text_dir}/${fragment_basename}.${extension}.tmp";
-      my $article_with_extension = "${article_dir}/${article_basename}.${extension}";
+      my $article_with_extension = "${article_dir}/${itemized_article_basename}.${extension}";
       if (-e $article_with_extension && -e $fragment_with_extension) {
         copy ($fragment_with_extension, $fragment_with_extension_orig);
 
