@@ -32,6 +32,8 @@ Options:
 
   -stylesheet-home            Directory in which to look for needed stylesheets
 
+  -nice                       Use nice when minimizing the article's fragments
+
 =head1 OPTIONS
 
 =over 8
@@ -72,6 +74,10 @@ The directory in which we will look for any needed scripts.
 
 The directory in which we will look for any needed stylesheets.
 
+=item B<--nice>
+
+Use nice when minimizing the original article's fragments.
+
 =back
 
 =head1 DESCRIPTION
@@ -89,13 +95,15 @@ my $paranoid = 0;
 my $minimize_whole_article = 0;
 my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+my $nice = 0;
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
            'minimize-whole-article' => \$minimize_whole_article,
 	   'script-home=s' => \$script_home,
-	   'stylesheet-home=s' => \$stylesheet_home)
+	   'stylesheet-home=s' => \$stylesheet_home,
+	   'nice' => \$nice)
   or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -269,9 +277,21 @@ if ($minimize_whole_article == 1) {
 
 }
 
-my $parallel_call =
-  ($verbose == 1) ? "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta ${minimize_script} {}"
-                  : "find ${article_text_dir} -name 'ckb*.miz' | parallel ${minimize_script} {}";
+my $parallel_call = undef;
+
+if ($verbose == 1) {
+  if ($nice == 1) {
+    "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta nice ${minimize_script} {}"
+  } else {
+    "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta ${minimize_script} {}"
+  }
+} else {
+  if ($nice == 1) {
+    "find ${article_text_dir} -name 'ckb*.miz' | parallel nice ${minimize_script} {}"
+  } else {
+    "find ${article_text_dir} -name 'ckb*.miz' | parallel ${minimize_script} {}"
+  }
+}
 
 my $parallel_minimize_status = system ($parallel_call);
 my $parallel_minimize_exit_code = $parallel_minimize_status >> 8;
