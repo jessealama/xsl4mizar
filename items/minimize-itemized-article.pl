@@ -112,6 +112,7 @@ GetOptions('help|?' => \$help,
 	   'script-home=s' => \$script_home,
 	   'stylesheet-home=s' => \$stylesheet_home,
 	   'nice' => \$nice,
+	   'paranoid' => \$paranoid,
 	   'jobs=i' => \$num_jobs)
   or pod2usage(2);
 pod2usage(1) if $help;
