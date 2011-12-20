@@ -333,6 +333,21 @@ if ($parallel_minimize_exit_code != 0) {
   exit 1;
 }
 
+if ($paranoid == 1) {
+  my @bad_guys = `find ${article_text_dir} -name 'ckb*.err' ! -empty -exec basename {} .err ';'`;
+  chomp @bad_guys;
+  if (scalar @bad_guys > 0) {
+    print 'Error: some fragments failed to be verified!  The failed fragments are:', "\n";
+    foreach my $bad_guy (@bad_guys) {
+      print '* ', $bad_guy, "\n";
+    }
+    exit 1;
+  }
+  if ($verbose == 1) {
+    print 'Paranoia: all minimized fragments are still verifiable.', "\n";
+  }
+}
+
 if ($verbose == 1) {
   print 'Done.', "\n";
 }
