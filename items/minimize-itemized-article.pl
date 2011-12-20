@@ -34,6 +34,8 @@ Options:
 
   -nice                       Use nice when minimizing the article's fragments
 
+  -jobs                       Specify the number of jobs to run in parallel
+
 =head1 OPTIONS
 
 =over 8
@@ -78,6 +80,11 @@ The directory in which we will look for any needed stylesheets.
 
 Use nice when minimizing the original article's fragments.
 
+=item B<--jobs=NUM-JOBS>
+
+Run NUM-JOBS fragment minimization jobs in parallel.  By default, all
+available processors will be used.
+
 =back
 
 =head1 DESCRIPTION
@@ -96,6 +103,7 @@ my $minimize_whole_article = 0;
 my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $nice = 0;
+my $num_jobs = undef;
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
@@ -103,10 +111,17 @@ GetOptions('help|?' => \$help,
            'minimize-whole-article' => \$minimize_whole_article,
 	   'script-home=s' => \$script_home,
 	   'stylesheet-home=s' => \$stylesheet_home,
-	   'nice' => \$nice)
+	   'nice' => \$nice,
+	   'jobs=i' => \$num_jobs)
   or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if (defined $num_jobs) {
+  if ($num_jobs < 1) {
+    pod2usage(1);
+  }
+}
 
 if (scalar @ARGV != 1) {
   print 'Usage: minimize-itemized-article.pl ITEMIZED-ARTICLE-DIRECTORY', "\n";
@@ -281,15 +296,31 @@ my $parallel_call = undef;
 
 if ($verbose == 1) {
   if ($nice == 1) {
-    "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta nice ${minimize_script} {}"
+    if (defined $num_jobs) {
+      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} {}";
+    } else {
+      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} {}";
+    }
   } else {
-    "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta ${minimize_script} {}"
+    if (defined $num_jobs) {
+      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} {}";
+    } else {
+      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} {}";
+    }
   }
 } else {
   if ($nice == 1) {
-    "find ${article_text_dir} -name 'ckb*.miz' | parallel nice ${minimize_script} {}"
+    if (defined $num_jobs) {
+      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} {}";
+    } else {
+      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} {}";
+    }
   } else {
-    "find ${article_text_dir} -name 'ckb*.miz' | parallel ${minimize_script} {}"
+    if (defined $num_jobs) {
+      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} {}";
+    } else {
+      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} {}";
+    }
   }
 }
 
