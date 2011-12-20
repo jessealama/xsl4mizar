@@ -1,0 +1,82 @@
+stylesheet 1.0;
+
+output method="text";
+
+$lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
+$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+
+tpl lc (#s) { `translate($s, $ucletters, $lcletters)`; }
+
+tpl [/] {
+  apply [Article];
+}
+
+tpl [Article[not(@aid)]] {
+  msg terminate="yes" "Error: the Article element lacks an aid attibute!";
+}
+
+tpl [Article[@aid]] {
+  $aid = `@aid`;
+  if [$aid = ""] {
+    msg terminate="yes" "Error: the value of the aid attribute for the article element is empty.";
+  }
+  $aid-lc = lc (#s = $aid);
+  for-each [JustifiedTheorem] {
+    apply [.] (#aid = $aid-lc) mode="name"; " "; apply [.] mode="measure"; "\n";
+  }
+  for-each [Proposition] {
+    apply [.] (#aid = $aid-lc) mode="name"; " "; apply [.] mode="measure"; "\n";
+  }
+}
+
+tpl [JustifiedTheorem] (#aid) mode="name" {
+  "t"; `count (preceding-sibling::JustifiedTheorem) + 1`; "_"; `$aid`;
+}
+
+tpl [Proposition[@propnr]] (#aid) mode="name" {
+  "l"; `@propnr`; "_"; $aid;
+}
+
+tpl [Proposition[not(@propnr)]] (#aid) mode="name" {
+  msg terminate="yes" "Error: we found a toplevel Proposition element that lacks a propnr attribute!";
+}
+
+tpl [Proof] mode="measure" {
+  `count (descendant::Proposition)`;
+}
+
+tpl [JustifiedTheorem[Proof]] mode="measure" {
+  apply [Proof] mode="measure";
+}
+
+tpl [JustifiedTheorem[By]] mode="measure" {
+  "1";
+}
+
+tpl [JustifiedTheorem[From]] mode="measure" {
+  "1";
+}
+
+tpl [JustifiedTheorem[SkippedProof]] mode="measure" {
+  "0";
+}
+
+// tpl [JustifiedTheorem[not(Proof) and not(From) and not(By) and not(SkippedProof)]] mode="measure" {
+//   msg terminate="yes" "Error: we found a JustifiedTheorem element that lacks a Proof, a From, and a By child!";
+// }
+
+tpl [Proposition[following-sibling::*[1][self::By]]] mode="measure" {
+  "1";
+}
+
+tpl [Proposition[following-sibling::*[1][self::From]]] mode="measure" {
+  "1";
+}
+
+tpl [Proposition[following-sibling::*[1][self::SkippedProof]]] mode="measure" {
+  "0";
+}
+
+tpl [Proposition[following-sibling::*[1][self::Proof]]] mode="measure" {
+  apply [following-sibling::*[1]] mode="measure";
+}
