@@ -3,6 +3,7 @@
 use strict;
 use File::Basename qw(basename dirname);
 use File::Copy qw(copy move);
+use File::Copy::Recursive qw(dircopy);
 use Getopt::Long;
 use Pod::Usage;
 use File::Temp qw(tempdir);
@@ -238,7 +239,7 @@ if (defined $workdir) {
   if ($verbose == 1) {
     print 'Copying the itemized article directory', "\n", "\n", '  ', $article_dir, "\n", "\n", 'to the temporary directory', "\n", "\n", '  ', $real_workdir, "\n";
   }
-  copy ($article_dir, $real_workdir)
+  dircopy ($article_dir, $real_workdir)
     or (print 'Error: something went wrong copying', "\n", "\n", '  ', $article_dir, "\n", "\n", 'to', "\n", "\n", '  ', $real_workdir, "\n", "\n", $!, "\n" && exit 1);
 } else {
   $real_workdir = $article_dir;
