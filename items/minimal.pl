@@ -390,12 +390,17 @@ sub minimize {
   }
 }
 
-# Let's do it
+sub aid_for_element {
+  my $element = shift;
+  if ($element->exists ('@aid')) {
+    return $element->findvalue ('@aid');
+  } else {
+    return '';
+  }
+}
 
-prune_schemes ();
-prune_theorems ();
-
-foreach my $extension_to_minimize (@extensions_to_minimize) {
+sub minimize_extension {
+  my $extension_to_minimize = shift;
   my $root_element_name = $extension_to_element_table{$extension_to_minimize};
   if (defined $root_element_name) {
     my $article_with_extension = "${article_dirname}/${article_basename}.${extension_to_minimize}";
@@ -410,6 +415,88 @@ foreach my $extension_to_minimize (@extensions_to_minimize) {
       if ($verbose == 1) {
         print 'Minimizing ', $extension_to_minimize, '...';
       }
+
+      # Iteratively try to remove whole articles, i.e., remove all
+      # imported items from a given article
+
+      # First, harvest the articles that generated items in the current environment
+      my %articles = ();
+      my %element_article = ();
+      foreach my $element (@elements) {
+	my $aid = aid_for_element ($element);
+	if ($aid eq '') {
+	  print 'Error: we found an element that lacks an aid attribute!', "\n";
+	  exit 1;
+	} else {
+	  $element_article{$element} = $aid;
+	  unless (defined $articles{$aid}) {
+	    $articles{$aid} = 0;
+	  }
+	}
+      }
+
+      # Now try to remove whole articles
+      my $num_deletable_articles = 0;
+      my $num_undeletable_articles = 0;
+      my $num_deletable_items_from_deletable_articles = 0;
+      foreach my $article (keys %articles) {
+
+	my $num_elements_from_article = 0;
+
+	# Dump all elements from $article
+	foreach my $i (0 .. scalar @elements - 1) {
+	  my $element = $elements[$i];
+	  my $article_for_element = $element_article{$element};
+	  if (defined $article_for_element) {
+	    if ($article_for_element eq $article) {
+	      delete $initial_table{$i};
+	      $num_elements_from_article++;
+	    }
+	  } else {
+	    print 'Error: the element-article table does not contain an entry for the element', "\n";
+	    print_element ($element);
+	    print "\n";
+	    exit 1;
+	  }
+	}
+
+	write_element_table (\@elements, \%initial_table, $article_with_extension, $root_element_name);
+
+	my $deletable = verify ();
+	if ($deletable == 1) {
+	  $num_deletable_articles++;
+	  $num_deletable_items_from_deletable_articles += $num_elements_from_article;
+	  if ($verbose == 1) {
+	    print 'We can remove all ', $num_elements_from_article, ' elements from the article ', $article, '.', "\n";
+	  }
+	} else {
+	  $num_undeletable_articles++;
+	  if ($verbose == 1) {
+	    print 'At least one of the ', $num_elements_from_article, ' element from the article ', $article, ' cannot be removed.', "\n";
+	  }
+
+	  # Restore all the deleted elements
+	  foreach my $i (0 .. scalar @elements - 1) {
+	    my $element = $elements[$i];
+	    my $article_for_element = $element_article{$element};
+	    if (defined $article_for_element) {
+	      if ($article_for_element eq $article) {
+		$initial_table{$i} = 0;
+	      }
+	    } else {
+	      print 'Error: the element-article table does not contain an entry for the element', "\n", print_element ($element), "\n";
+	      exit 1;
+	    }
+	  }
+	  write_element_table (\@elements, \%initial_table, $article_with_extension, $root_element_name);
+	}
+
+      }
+
+      if ($verbose == 1) {
+	print 'Done eliminating whole articles.  We were able to delete all elements from ', $num_deletable_articles, ' articles', "\n", 'which allows us to get rid of ', $num_deletable_items_from_deletable_articles, ' items altogether.', "\n", 'There remain ', scalar keys %initial_table, ' elements to consider; at least ', $num_undeletable_articles, ' are undeletable.', "\n";
+      }
+
       my %minimized_table
         = %{minimize (\@elements, \%initial_table, $article_with_extension, $root_element_name, 0, scalar @elements - 1)};
       if ($verbose == 1) {
@@ -424,6 +511,15 @@ foreach my $extension_to_minimize (@extensions_to_minimize) {
     print 'Error: we do not know how to deal with the ', $extension_to_minimize, ' files.', "\n";
     exit 1;
   }
+}
+
+# Let's do it
+
+prune_schemes ();
+prune_theorems ();
+
+foreach my $extension_to_minimize (@extensions_to_minimize) {
+  minimize_extension ($extension_to_minimize);
 }
 
 # Check that the article is verifiable in the new minimized environment
