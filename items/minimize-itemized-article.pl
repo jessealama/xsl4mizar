@@ -263,9 +263,20 @@ if ($minimize_whole_article == 1) {
     print 'Minimizing the itemized article...', "\n";
   }
 
-  my $minimize_call =
-    ($verbose == 1) ? "$minimize_script --verbose $real_itemized_article_miz"
-                    : "$minimize_script $real_itemized_article_miz";
+  my $minimize_call = undef;
+  if ($verbose == 1) {
+    if ($nice == 1) {
+      "nice $minimize_script --verbose $real_itemized_article_miz"
+    } else {
+      "$minimize_script --verbose $real_itemized_article_miz"
+    }
+  } else {
+    if ($nice == 1) {
+      "nice $minimize_script $real_itemized_article_miz"
+    } else {
+      "$minimize_script $real_itemized_article_miz"
+    }
+  }
 
   my $minimize_status = system ($minimize_call);
   my $minimize_exit_code = $minimize_status >> 8;
