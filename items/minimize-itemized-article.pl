@@ -255,6 +255,8 @@ if (scalar @fragments == 0) {
   exit 1;
 }
 
+my $real_itemized_article_miz = "${real_workdir}/${itemized_article_basename}.miz";
+
 if ($minimize_whole_article == 1) {
 
   if ($verbose == 1) {
@@ -262,14 +264,14 @@ if ($minimize_whole_article == 1) {
   }
 
   my $minimize_call =
-    ($verbose == 1) ? "$minimize_script --verbose $itemized_article_miz"
-                    : "$minimize_script $itemized_article_miz";
+    ($verbose == 1) ? "$minimize_script --verbose $real_itemized_article_miz"
+                    : "$minimize_script $real_itemized_article_miz";
 
   my $minimize_status = system ($minimize_call);
   my $minimize_exit_code = $minimize_status >> 8;
 
   if ($minimize_exit_code != 0) {
-    print 'Error: minimization of the itemized article ', $itemized_article_miz, ' did not exit cleanly.', "\n";
+    print 'Error: minimization of the itemized article ', $real_itemized_article_miz, ' did not exit cleanly.', "\n";
     exit 1;
   }
 
@@ -298,7 +300,7 @@ if ($minimize_whole_article == 1) {
       my $fragment_with_extension = "${real_text_dir}/${fragment_basename}.${extension}";
       my $fragment_with_extension_orig = "${real_text_dir}/${fragment_basename}.${extension}.orig";
       my $fragment_with_extension_tmp = "${real_text_dir}/${fragment_basename}.${extension}.tmp";
-      my $article_with_extension = "${article_dir}/${itemized_article_basename}.${extension}";
+      my $article_with_extension = "${real_workdir}/${itemized_article_basename}.${extension}";
       if (-e $article_with_extension && -e $fragment_with_extension) {
         copy ($fragment_with_extension, $fragment_with_extension_orig);
 
