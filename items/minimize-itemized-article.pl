@@ -233,7 +233,7 @@ unless (-r $prefer_environment_stylesheet) {
 
 my $real_workdir = undef;
 if (defined $workdir) {
-  $real_workdir = tempdir ("minimization-$article_basename-XXXX",
+  $real_workdir = tempdir ("minimization-${itemized_article_basename}-XXXX",
 			   CLEANUP => 1,
 			   DIR => $workdir);
   if ($verbose == 1) {
