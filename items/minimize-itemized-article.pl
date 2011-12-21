@@ -5,6 +5,7 @@ use File::Basename qw(basename dirname);
 use File::Copy qw(copy move);
 use Getopt::Long;
 use Pod::Usage;
+use File::Temp qw(tempdir);
 
 =cut
 
@@ -35,6 +36,8 @@ Options:
   -nice                       Use nice when minimizing the article's fragments
 
   -jobs                       Specify the number of jobs to run in parallel
+
+  -workdir                    Do the minimization in a specified directory
 
 =head1 OPTIONS
 
@@ -85,6 +88,16 @@ Use nice when minimizing the original article's fragments.
 Run NUM-JOBS fragment minimization jobs in parallel.  By default, all
 available processors will be used.
 
+=item B<--workdir=DIR>
+
+Do the minimization in DIR (e.g., a ramdisk).  This means that before
+anything else, the directory to be minimized will be copied to DIR.
+Upon normal completion, the original direcory will be deleted and the
+contents of the newly minimized directory will be moved into the
+original directory.  If something goes wrong during the minimization,
+the original directory will not be deleted, and the itemized article
+subdirectory of DIR will be deleted.
+
 =back
 
 =head1 DESCRIPTION
@@ -104,6 +117,7 @@ my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $nice = 0;
 my $num_jobs = undef;
+my $workdir = undef;
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
@@ -113,7 +127,8 @@ GetOptions('help|?' => \$help,
 	   'stylesheet-home=s' => \$stylesheet_home,
 	   'nice' => \$nice,
 	   'paranoid' => \$paranoid,
-	   'jobs=i' => \$num_jobs)
+	   'jobs=i' => \$num_jobs,
+	   'workdir=s' => \$workdir)
   or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -121,6 +136,13 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 if (defined $num_jobs) {
   if ($num_jobs < 1) {
     pod2usage(1);
+  }
+}
+
+if (defined $workdir) {
+  unless (-d $workdir) {
+    print 'Error: the specified work directory', "\n", "\n", '  ', $workdir, "\n", "\n", 'is not actually a directory.', "\n";
+    exit 1;
   }
 }
 
@@ -208,12 +230,27 @@ unless (-r $prefer_environment_stylesheet) {
   exit 1;
 }
 
+my $real_workdir = undef;
+if (defined $workdir) {
+  $real_workdir = tempdir ("minimization",
+			   CLEANUP => 1,
+			   DIR => $workdir);
+  if ($verbose == 1) {
+    print 'Copying the itemized article directory', "\n", "\n", '  ', $article_dir, "\n", "\n", 'to the temporary directory', "\n", "\n", '  ', $real_workdir, "\n";
+  }
+  copy ($article_dir, $real_workdir)
+    or (print 'Error: something went wrong copying', "\n", "\n", '  ', $article_dir, "\n", "\n", 'to', "\n", "\n", '  ', $real_workdir, "\n", "\n", $!, "\n" && exit 1);
+} else {
+  $real_workdir = $article_dir;
+}
 
-my @fragments = `find $article_text_dir -name "ckb*.miz"`;
+my $real_text_dir = "${real_workdir}/text";
+
+my @fragments = `find $real_text_dir -name "ckb*.miz"`;
 chomp @fragments;
 
 if (scalar @fragments == 0) {
-  print 'Error: we found 0 fragments under ', $article_text_dir, '.', "\n";
+  print 'Error: we found 0 fragments under ', $real_text_dir, '.', "\n";
   exit 1;
 }
 
@@ -257,9 +294,9 @@ if ($minimize_whole_article == 1) {
   foreach my $fragment (@fragments) {
     my $fragment_basename = basename ($fragment);
     foreach my $extension (@extensions) {
-      my $fragment_with_extension = "${article_text_dir}/${fragment_basename}.${extension}";
-      my $fragment_with_extension_orig = "${article_text_dir}/${fragment_basename}.${extension}.orig";
-      my $fragment_with_extension_tmp = "${article_text_dir}/${fragment_basename}.${extension}.tmp";
+      my $fragment_with_extension = "${real_text_dir}/${fragment_basename}.${extension}";
+      my $fragment_with_extension_orig = "${real_text_dir}/${fragment_basename}.${extension}.orig";
+      my $fragment_with_extension_tmp = "${real_text_dir}/${fragment_basename}.${extension}.tmp";
       my $article_with_extension = "${article_dir}/${itemized_article_basename}.${extension}";
       if (-e $article_with_extension && -e $fragment_with_extension) {
         copy ($fragment_with_extension, $fragment_with_extension_orig);
@@ -298,29 +335,29 @@ my $parallel_call = undef;
 if ($verbose == 1) {
   if ($nice == 1) {
     if (defined $num_jobs) {
-      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} {}";
     } else {
-      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} {}";
     }
   } else {
     if (defined $num_jobs) {
-      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} {}";
     } else {
-      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} {}";
     }
   }
 } else {
   if ($nice == 1) {
     if (defined $num_jobs) {
-      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} {}";
     } else {
-      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} {}";
     }
   } else {
     if (defined $num_jobs) {
-      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} {}";
     } else {
-      $parallel_call = "find ${article_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} {}";
     }
   }
 }
@@ -329,12 +366,12 @@ my $parallel_minimize_status = system ($parallel_call);
 my $parallel_minimize_exit_code = $parallel_minimize_status >> 8;
 
 if ($parallel_minimize_exit_code != 0) {
-  print 'Error: parallel did not exit cleanly when minimizing the fragments under ', $article_text_dir, '.', "\n";
+  print 'Error: parallel did not exit cleanly when minimizing the fragments under ', $real_text_dir, '.', "\n";
   exit 1;
 }
 
 if ($paranoid == 1) {
-  my @bad_guys = `find ${article_text_dir} -name 'ckb*.err' ! -empty -exec basename {} .err ';' | sed -e 's/ckb//' | sort --numeric-sort`;
+  my @bad_guys = `find ${real_text_dir} -name 'ckb*.err' ! -empty -exec basename {} .err ';' | sed -e 's/ckb//' | sort --numeric-sort`;
   chomp @bad_guys;
   if (scalar @bad_guys > 0) {
     print 'Error: some fragments failed to be verified!  The failed fragments are:', "\n";
@@ -350,6 +387,14 @@ if ($paranoid == 1) {
 
 if ($verbose == 1) {
   print 'Done.', "\n";
+}
+
+if (defined $workdir) {
+  if ($verbose == 1) {
+    print 'Moving the newly minimized directory back from', "\n", "\n", '  ', $real_workdir, "\n", "\n", 'to', "\n", "\n", '  ', $article_dir, "\n";
+  }
+  move ($real_workdir, $article_dir)
+    or (print 'Error: something went wrong Moving the newly minimized directory back from', "\n", "\n", '  ', $real_workdir, "\n", "\n", 'to', "\n", "\n", '  ', $article_dir, "\n" && exit 1);
 }
 
 exit 0;
