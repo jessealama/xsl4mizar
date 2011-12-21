@@ -3,7 +3,7 @@
 use strict;
 use File::Basename qw(basename dirname);
 use File::Copy qw(copy move);
-use File::Copy::Recursive qw(dircopy);
+use File::Copy::Recursive qw(dircopy dirmove);
 use Getopt::Long;
 use Pod::Usage;
 use File::Temp qw(tempdir);
@@ -394,7 +394,7 @@ if (defined $workdir) {
   if ($verbose == 1) {
     print 'Moving the newly minimized directory back from', "\n", "\n", '  ', $real_workdir, "\n", "\n", 'to', "\n", "\n", '  ', $article_dir, "\n";
   }
-  move ($real_workdir, $article_dir)
+  dirmove ($real_workdir, $article_dir)
     or (print 'Error: something went wrong Moving the newly minimized directory back from', "\n", "\n", '  ', $real_workdir, "\n", "\n", 'to', "\n", "\n", '  ', $article_dir, "\n" && exit 1);
 }
 
