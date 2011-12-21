@@ -234,7 +234,7 @@ unless (-r $prefer_environment_stylesheet) {
 my $real_workdir = undef;
 if (defined $workdir) {
   $real_workdir = tempdir ('minimizationXXXX',
-			   CLEANUP => 0,
+			   CLEANUP => 1,
 			   DIR => $workdir);
   if ($verbose == 1) {
     print 'Copying the itemized article directory', "\n", "\n", '  ', $article_dir, "\n", "\n", 'to the temporary directory', "\n", "\n", '  ', $real_workdir, "\n";
