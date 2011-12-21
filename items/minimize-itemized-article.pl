@@ -266,15 +266,15 @@ if ($minimize_whole_article == 1) {
   my $minimize_call = undef;
   if ($verbose == 1) {
     if ($nice == 1) {
-      "nice $minimize_script --verbose $real_itemized_article_miz"
+      $minimize_call = "nice $minimize_script --verbose $real_itemized_article_miz";
     } else {
-      "$minimize_script --verbose $real_itemized_article_miz"
+      $minimize_call = "$minimize_script --verbose $real_itemized_article_miz";
     }
   } else {
     if ($nice == 1) {
-      "nice $minimize_script $real_itemized_article_miz"
+      $minimize_call = "nice $minimize_script $real_itemized_article_miz";
     } else {
-      "$minimize_script $real_itemized_article_miz"
+      $minimize_call = "$minimize_script $real_itemized_article_miz";
     }
   }
 
