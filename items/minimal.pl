@@ -581,6 +581,7 @@ sub minimize_extension {
       foreach my $i (0 .. scalar @elements - 1) {
         $initial_table{$i} = 0;
       }
+
       if ($verbose == 1) {
         print 'Minimizing ', $extension_to_minimize, '...';
       }
