@@ -349,15 +349,15 @@ my $parallel_call = undef;
 if ($verbose == 1) {
   if ($nice == 1) {
     if (defined $num_jobs) {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --verbose {}";
     } else {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --verbose {}";
     }
   } else {
     if (defined $num_jobs) {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --verbose {}";
     } else {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} {}";
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --verbose {}";
     }
   }
 } else {
