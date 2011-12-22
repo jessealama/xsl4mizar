@@ -645,7 +645,7 @@ foreach my $extension_to_minimize (@extensions_to_minimize) {
 
 # Check that the article is verifiable in the new minimized environment
 
-my $verifier_status = system ("verifier -q -s -l $article_miz > /dev/null 2>&1");
+my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
 my $verifier_exit_code = $verifier_status >> 8;
 
 if ($verifier_exit_code != 0) {
