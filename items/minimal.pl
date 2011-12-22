@@ -390,6 +390,175 @@ sub minimize {
   }
 }
 
+sub minimize_by_article {
+  my @elements = @{shift ()};
+  my @articles = @{shift ()};
+  my %table = %{shift ()};
+  my $path = shift;
+  my $root_element_name = shift;
+  my $begin = shift;
+  my $end = shift;
+  # DEBUG
+  # print 'begin = ', $begin, ' and end = ', $end, "\n";
+  if ($end < $begin) {
+    return \%table;
+  } elsif ($end == $begin) {
+    # Try deleting all items from the article
+    my $article = $articles[$begin];
+    foreach my $i (0 .. scalar @elements - 1) {
+      my $element = $elements[$i];
+      my $aid = aid_for_element ($element);
+      if ($aid eq $article) {
+	delete $table{$i};
+      }
+    }
+    # Save the table to disk
+    write_element_table (\@elements, \%table, $path, $root_element_name);
+    my $deletable = verify ();
+    if ($deletable == 1) {
+      if ($verbose == 1) {
+	print 'We can dump all elements from article ', $article, "\n";
+      }
+    } else {
+      if ($verbose == 1) {
+	print 'We cannot dump all elements from article ', $article, "\n";
+      }
+      # Restore all elements from $article
+      foreach my $i (0 .. scalar @elements - 1) {
+	my $element = $elements[$i];
+	my $aid = aid_for_element ($element);
+	if ($aid eq $article) {
+	  $table{$i} = 0;
+	}
+      }
+      write_element_table (\@elements, \%table, $path, $root_element_name);
+    }
+    return \%table;
+  } elsif ($begin + 1 == $end) {
+
+    my $begin_article = $articles[$begin];
+    foreach my $i (0 .. scalar @elements - 1) {
+      my $element = $elements[$i];
+      my $aid = aid_for_element ($element);
+      if ($aid eq $begin_article) {
+	delete $table{$i};
+      }
+    }
+
+    write_element_table (\@elements, \%table, $path, $root_element_name);
+    my $begin_deletable = verify ();
+
+    if ($begin_deletable == 1) {
+      if ($verbose == 1) {
+	print 'We can dump all elements from the article ', $begin_article, "\n";
+      }
+    } else {
+      if ($verbose == 1) {
+	print 'We cannot dump all elements from article ', $begin_article, "\n";
+      }
+
+      foreach my $i (0 .. scalar @elements - 1) {
+	my $element = $elements[$i];
+	my $aid = aid_for_element ($element);
+	if ($aid eq $begin_article) {
+	  $table{$i} = 0;
+	}
+      }
+
+      write_element_table (\@elements, \%table, $path, $root_element_name);
+    }
+
+    my $end_article = $articles[$end];
+
+    foreach my $i (0 .. scalar @elements - 1) {
+      my $element = $elements[$i];
+      my $aid = aid_for_element ($element);
+      if ($aid eq $end_article) {
+	delete $table{$i};
+      }
+    }
+
+    write_element_table (\@elements, \%table, $path, $root_element_name);
+
+    my $end_deletable = verify ();
+    if ($end_deletable == 1) {
+      if ($verbose == 1) {
+	print 'We can dump all elements from the article ', $end_article, "\n";
+      }
+    } else {
+      if ($verbose == 1) {
+	print 'We cannot dump all elements from the article ', $end_article, "\n";
+      }
+
+      foreach my $i (0 .. scalar @elements - 1) {
+	my $element = $elements[$i];
+	my $aid = aid_for_element ($element);
+	if ($aid eq $end_article) {
+	  $table{$i} = 0;
+	}
+      }
+
+      write_element_table (\@elements, \%table, $path, $root_element_name);
+    }
+
+    return \%table;
+
+  } else {
+
+    my $segment_length = $end - $begin + 1;
+    my $half_segment_length = floor ($segment_length / 2);
+
+    # Dump the lower half
+    foreach my $i ($begin .. $begin + $half_segment_length) {
+      my $article = $articles[$i];
+      foreach my $i (0 .. scalar @elements - 1) {
+	my $element = $elements[$i];
+	my $aid = aid_for_element ($element);
+	if ($aid eq $article) {
+	  delete $table{$i};
+	}
+      }
+    }
+
+    # Write this to disk
+    write_element_table (\@elements, \%table, $path, $root_element_name);
+
+    # Check that deleting the lower half is safe
+    my $lower_half_safe = verify ();
+    if ($lower_half_safe == 1) {
+      if ($verbose == 1) {
+	foreach my $i ($begin .. $begin + $half_segment_length) {
+	  my $article = $articles[$i];
+	  print 'We can dump all elements from ', $article, "\n";
+	}
+      }
+      return (minimize_by_article (\@elements, \@articles, \%table, $path, $root_element_name, $begin + $half_segment_length + 1, $end));
+    } else {
+
+      # Restore the lower half
+      foreach my $i ($begin .. $begin + $half_segment_length) {
+	my $article = $articles[$i];
+	foreach my $i (0 .. scalar @elements - 1) {
+	  my $element = $elements[$i];
+	  my $aid = aid_for_element ($element);
+	  if ($aid eq $article) {
+	    $table{$i} = 0;
+	  }
+	}
+      }
+
+      write_element_table (\@elements, \%table, $path, $root_element_name);
+
+      # Minimize just the lower half
+      # sleep 3;
+      my %table_for_lower_half
+        = %{minimize_by_article (\@elements, \@articles, \%table, $path, $root_element_name, $begin, $begin + $half_segment_length)};
+      # sleep 3;
+      return (minimize_by_article (\@elements, \@articles, \%table_for_lower_half, $path, $root_element_name, $begin + $half_segment_length + 1, $end));
+    }
+  }
+}
+
 sub aid_for_element {
   my $element = shift;
   if ($element->exists ('@aid')) {
@@ -420,85 +589,37 @@ sub minimize_extension {
       # imported items from a given article
 
       # First, harvest the articles that generated items in the current environment
-      my %articles = ();
-      my %element_article = ();
+      my %seen_articles = ();
       foreach my $element (@elements) {
 	my $aid = aid_for_element ($element);
 	if ($aid eq '') {
 	  print 'Error: we found an element that lacks an aid attribute!', "\n";
 	  exit 1;
 	} else {
-	  $element_article{$element} = $aid;
-	  unless (defined $articles{$aid}) {
-	    $articles{$aid} = 0;
+	  unless (defined $seen_articles{$aid}) {
+	    $seen_articles{$aid} = 0;
 	  }
 	}
       }
 
-      # Now try to remove whole articles
-      my $num_deletable_articles = 0;
-      my $num_undeletable_articles = 0;
-      my $num_deletable_items_from_deletable_articles = 0;
-      foreach my $article (keys %articles) {
-
-	my $num_elements_from_article = 0;
-
-	# Dump all elements from $article
-	foreach my $i (0 .. scalar @elements - 1) {
-	  my $element = $elements[$i];
-	  my $article_for_element = $element_article{$element};
-	  if (defined $article_for_element) {
-	    if ($article_for_element eq $article) {
-	      delete $initial_table{$i};
-	      $num_elements_from_article++;
-	    }
-	  } else {
-	    print 'Error: the element-article table does not contain an entry for the element', "\n";
-	    print_element ($element);
-	    print "\n";
-	    exit 1;
-	  }
-	}
-
-	write_element_table (\@elements, \%initial_table, $article_with_extension, $root_element_name);
-
-	my $deletable = verify ();
-	if ($deletable == 1) {
-	  $num_deletable_articles++;
-	  $num_deletable_items_from_deletable_articles += $num_elements_from_article;
-	  if ($verbose == 1) {
-	    print 'We can remove all ', $num_elements_from_article, ' elements from the article ', $article, '.', "\n";
-	  }
-	} else {
-	  $num_undeletable_articles++;
-	  if ($verbose == 1) {
-	    print 'At least one of the ', $num_elements_from_article, ' element from the article ', $article, ' cannot be removed.', "\n";
-	  }
-
-	  # Restore all the deleted elements
-	  foreach my $i (0 .. scalar @elements - 1) {
-	    my $element = $elements[$i];
-	    my $article_for_element = $element_article{$element};
-	    if (defined $article_for_element) {
-	      if ($article_for_element eq $article) {
-		$initial_table{$i} = 0;
-	      }
-	    } else {
-	      print 'Error: the element-article table does not contain an entry for the element', "\n", print_element ($element), "\n";
-	      exit 1;
-	    }
-	  }
-	  write_element_table (\@elements, \%initial_table, $article_with_extension, $root_element_name);
-	}
-
-      }
+      my @articles = keys %seen_articles;
 
       if ($verbose == 1) {
-	print 'Done eliminating whole articles.  We were able to delete all elements from ', $num_deletable_articles, ' articles', "\n", 'which allows us to get rid of ', $num_deletable_items_from_deletable_articles, ' items altogether.', "\n", 'There remain ', scalar keys %initial_table, ' elements to consider; at least ', $num_undeletable_articles, ' are undeletable.', "\n";
+	print 'The current environment file has elements coming from ', scalar @articles, ' article(s).', "\n";
+      }
+
+      my $num_initial_elements = scalar keys %initial_table;
+
+      my %minimized_by_article_table = %{minimize_by_article (\@elements, \@articles, \%initial_table, $article_with_extension, $root_element_name, 0, scalar @articles - 1)};
+
+      my $num_elements_post_whole_article_deletion = scalar keys %minimized_by_article_table;
+
+      if ($verbose == 1) {
+	print 'Done eliminating whole articles.  We started with ', $num_initial_elements, ' elements, but thanks to entire-article deletion, we have reduced this to ', $num_elements_post_whole_article_deletion, '.', "\n";
       }
 
       my %minimized_table
-        = %{minimize (\@elements, \%initial_table, $article_with_extension, $root_element_name, 0, scalar @elements - 1)};
+        = %{minimize (\@elements, \%minimized_by_article_table, $article_with_extension, $root_element_name, 0, scalar @elements - 1)};
       if ($verbose == 1) {
         print 'done.  The initial environment contained ', scalar @elements, ' elements, but we actually need only ', scalar keys %minimized_table, "\n";
       }
