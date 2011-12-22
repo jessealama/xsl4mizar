@@ -2,6 +2,7 @@
 *.xsl
 nd/xboole_0*
 items/polyform*
+items/fcont_3*
 items/afinsq_1*
 items/bhsp_1*
 items/clvect_*
