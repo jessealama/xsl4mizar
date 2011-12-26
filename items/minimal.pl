@@ -21,6 +21,7 @@ Options:
   -help                       Brief help message
   -man                        Full documentation
   -verbose                    Say what we're doing
+  -paranoid                   Check that the article is verifiable before and after we're done minimizing
 
 =head1 OPTIONS
 
@@ -40,6 +41,13 @@ Say what environment file we're minimizing, and for each environment
 file, say how many environment "items" are present there and how many
 we really need.
 
+=item B<--paranoid>
+
+Before minimizing, check that the article is verifiable.  If it is,
+the continue, otherwise exit uncleanly.  After minimization of the
+article's environment, check again that it is verifiable.  If it
+isn't, then exit uncleanly.
+
 =back
 
 =head1 DESCRIPTION
@@ -49,13 +57,15 @@ environment with respect to which the given article is verifiable.
 
 =cut
 
+my $paranoid = 0;
 my $verbose = 0;
 my $man = 0;
 my $help = 0;
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
-           'verbose'  => \$verbose)
+           'verbose'  => \$verbose,
+	   'paranoid' => \$paranoid)
   or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -637,6 +647,16 @@ sub minimize_extension {
 
 # Let's do it
 
+if ($paranoid == 1) {
+  my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
+  my $verifier_exit_code = $verifier_status >> 8;
+
+  if ($verifier_exit_code != 0) {
+    print 'Error: ', $article_basename, ' is not verifiable.', "\n";
+    exit 1;
+  }
+}
+
 prune_schemes ();
 prune_theorems ();
 
@@ -646,10 +666,12 @@ foreach my $extension_to_minimize (@extensions_to_minimize) {
 
 # Check that the article is verifiable in the new minimized environment
 
-my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
-my $verifier_exit_code = $verifier_status >> 8;
+if ($paranoid == 1) {
+  my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
+  my $verifier_exit_code = $verifier_status >> 8;
 
-if ($verifier_exit_code != 0) {
-  print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
-  exit 1;
+  if ($verifier_exit_code != 0) {
+    print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
+    exit 1;
+  }
 }
