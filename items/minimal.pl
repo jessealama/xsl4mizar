@@ -652,6 +652,10 @@ if ($paranoid == 1) {
     print 'Error: ', $article_basename, ' is not verifiable.', "\n";
     exit 1;
   }
+
+  if ($verbose == 1) {
+    print 'Paranoia: We have confirmed that, before minimization, ', $article_basename, ' is verifiable.', "\n";
+  }
 }
 
 prune_schemes ();
@@ -671,4 +675,9 @@ if ($paranoid == 1) {
     print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
     exit 1;
   }
+
+  if ($verbose == 1) {
+    print 'Paranoia: We have confirmed that, after minimization, ', $article_basename, ' is verifiable.', "\n";
+  }
+
 }
