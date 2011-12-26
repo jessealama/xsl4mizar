@@ -650,6 +650,6 @@ my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
 my $verifier_exit_code = $verifier_status >> 8;
 
 if ($verifier_exit_code != 0) {
-  print 'Error: we are unable to verify the article in its newly minimized environment.', "\n";
+  print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
   exit 1;
 }
