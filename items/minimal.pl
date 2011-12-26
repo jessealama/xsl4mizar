@@ -70,10 +70,7 @@ GetOptions('help|?' => \$help,
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
-unless (scalar @ARGV == 1) {
-  print 'Usage: minimal.pl ARTICLE', "\n";
-  exit 1;
-}
+pod2usage(1) unless (scalar @ARGV == 1);
 
 my $article = $ARGV[0];
 my $article_basename = basename ($article, '.miz');
