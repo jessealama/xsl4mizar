@@ -266,15 +266,31 @@ if ($minimize_whole_article == 1) {
   my $minimize_call = undef;
   if ($verbose == 1) {
     if ($nice == 1) {
-      $minimize_call = "nice $minimize_script --verbose $real_itemized_article_miz";
+      if ($paranoid == 1) {
+	$minimize_call = "nice $minimize_script --verbose --paranoid $real_itemized_article_miz";
+      } else {
+	$minimize_call = "nice $minimize_script --verbose $real_itemized_article_miz";
+      }
     } else {
-      $minimize_call = "$minimize_script --verbose $real_itemized_article_miz";
+      if ($paranoid == 1) {
+	$minimize_call = "$minimize_script --verbose --paranoid $real_itemized_article_miz";
+      } else {
+	$minimize_call = "$minimize_script --verbose $real_itemized_article_miz";
+      }
     }
   } else {
     if ($nice == 1) {
-      $minimize_call = "nice $minimize_script $real_itemized_article_miz";
+      if ($paranoid == 1) {
+	$minimize_call = "nice $minimize_script $real_itemized_article_miz";
+      } else {
+	$minimize_call = "nice $minimize_script --paranoid $real_itemized_article_miz";
+      }
     } else {
-      $minimize_call = "$minimize_script $real_itemized_article_miz";
+      if ($paranoid == 1) {
+	$minimize_call = "$minimize_script --verbose $real_itemized_article_miz";
+      } else {
+	$minimize_call = "$minimize_script $real_itemized_article_miz";
+      }
     }
   }
 
