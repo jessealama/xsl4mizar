@@ -380,7 +380,7 @@ my $parallel_minimize_status = system ($parallel_call);
 my $parallel_minimize_exit_code = $parallel_minimize_status >> 8;
 
 if ($parallel_minimize_exit_code != 0) {
-  print 'Error: parallel did not exit cleanly when minimizing the fragments under ', $real_text_dir, '.', "\n";
+  print 'Error: parallel did not exit cleanly when minimizing the fragments of ', $itemized_article_basename, ' under ', $real_text_dir, '.', "\n";
   exit 1;
 }
 
