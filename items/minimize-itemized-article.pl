@@ -408,7 +408,7 @@ if (defined $workdir) {
     print 'Moving the newly minimized directory back from', "\n", "\n", '  ', $real_workdir, "\n", "\n", 'to', "\n", "\n", '  ', $article_dir, "\n";
   }
   dirmove ($real_workdir, $article_dir)
-    or (print 'Error: something went wrong Moving the newly minimized directory back from', "\n", "\n", '  ', $real_workdir, "\n", "\n", 'to', "\n", "\n", '  ', $article_dir, "\n" && exit 1);
+    or (print 'Error: something went wrong moving the newly minimized directory back from', "\n", "\n", '  ', $real_workdir, "\n", "\n", 'to', "\n", "\n", '  ', $article_dir, "\n" && exit 1);
 }
 
 exit 0;
