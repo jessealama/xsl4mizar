@@ -536,7 +536,7 @@ sub minimize_by_article {
       if ($verbose == 1) {
 	foreach my $i ($begin .. $begin + $half_segment_length) {
 	  my $article = $articles[$i];
-	  print 'We can dump all elements from ', $article, "\n";
+	  print 'We can dump all elements from the article ', $article, "\n";
 	}
       }
       return (minimize_by_article (\@elements, \@articles, \%table, $path, $root_element_name, $begin + $half_segment_length + 1, $end));
