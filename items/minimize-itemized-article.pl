@@ -436,7 +436,7 @@ if ($paranoid == 1) {
   my @bad_guys = `find ${real_text_dir} -name 'ckb*.err' ! -empty -exec basename {} .err ';' | sed -e 's/ckb//' | sort --numeric-sort`;
   chomp @bad_guys;
   if (scalar @bad_guys > 0) {
-    print 'Error: some fragments failed to be verified!  The failed fragments are:', "\n";
+    print 'Error: some fragments of ', $itemized_article_basename, ' are not verifiable!  The failed fragments are:', "\n";
     foreach my $bad_guy (@bad_guys) {
       print '* ', $bad_guy, "\n";
     }
