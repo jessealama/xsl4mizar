@@ -111,7 +111,9 @@ my %extension_to_element_table = ('eno' => 'Notations',
                                   'epr' => 'PropertyRegistration',
                                   'dfs' => 'Definientia',
                                   'eid' => 'IdentifyRegistrations',
-                                  'ecl' => 'Registrations');
+                                  'ecl' => 'Registrations',
+				  'esh' => 'Schemes',
+				  'eth' => 'Theorems');
 
 my $xml_parser = XML::LibXML->new ();
 my $xml_doc = $xml_parser->parse_file ($article_eno);
