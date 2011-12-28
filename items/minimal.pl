@@ -715,7 +715,7 @@ sub confirm_minimality_of_extension {
 	my $element_pretty = render_element ($element);
 	# print 'Checking whether the element ', $element_pretty, ' can be removed from the .', $extension_to_minimize, ' file of ', $article_basename, '...';
 
-	delete $needed_elements_table{$element};
+	delete $needed_elements_table{$i};
 	write_element_table (\@elements, \%needed_elements_table, $article_with_extension, $root_element_name);
 
 	my $verifier_ok = verify ();
@@ -732,7 +732,7 @@ sub confirm_minimality_of_extension {
 	  # print 'unremovable!', "\n";
 	}
 
-	$needed_elements_table{$element} = 0;
+	$needed_elements_table{$i} = 0;
 	write_element_table (\@elements, \%needed_elements_table, $article_with_extension, $root_element_name);
 
 	$i++;
