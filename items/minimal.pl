@@ -1,12 +1,5 @@
 #!/usr/bin/perl -w
 
-use strict;
-use File::Basename qw(basename dirname);
-use XML::LibXML;
-use POSIX qw(floor ceil);
-use Getopt::Long;
-use Pod::Usage;
-
 =cut
 
 =head1 minimal.pl
@@ -56,6 +49,13 @@ B<minimize.pl> will construct, in a brute-force manner, the smallest
 environment with respect to which the given article is verifiable.
 
 =cut
+
+use strict;
+use File::Basename qw(basename dirname);
+use XML::LibXML;
+use POSIX qw(floor ceil);
+use Getopt::Long;
+use Pod::Usage;
 
 my $paranoid = 0;
 my $verbose = 0;
