@@ -1,13 +1,5 @@
 #!/usr/bin/perl -w
 
-use strict;
-use File::Basename qw(basename dirname);
-use File::Copy qw(copy move);
-use File::Copy::Recursive qw(dircopy dirmove);
-use Getopt::Long;
-use Pod::Usage;
-use File::Temp qw(tempdir);
-
 =cut
 
 =head1 minimize-itemized-article.pl
@@ -108,6 +100,14 @@ an itemized mizar article, the smallest environment with respect to
 which the given article is verifiable.
 
 =cut
+
+use strict;
+use File::Basename qw(basename dirname);
+use File::Copy qw(copy move);
+use File::Copy::Recursive qw(dircopy dirmove);
+use Getopt::Long;
+use Pod::Usage;
+use File::Temp qw(tempdir);
 
 my $verbose = 0;
 my $man = 0;
