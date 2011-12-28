@@ -641,10 +641,14 @@ sub minimize_extension {
       if ($verbose == 1) {
         print 'done.  The initial environment contained ', scalar @elements, ' elements, but we actually need only ', scalar keys %minimized_table, "\n";
       }
+      my @removable = keys %minimized_table;
+      return \@removable;
     } else {
       if ($verbose == 1) {
         print 'The .', $extension_to_minimize, ' file for ', $article_basename, ' does not exist; nothing to minimize.', "\n";
       }
+      my @removable = ();
+      return \@removable;
     }
   } else {
     print 'Error: we do not know how to deal with the ', $extension_to_minimize, ' files.', "\n";
