@@ -603,8 +603,8 @@ sub minimize_extension {
         print 'Minimizing ', $extension_to_minimize, '...';
       }
 
-      # Iteratively try to remove whole articles, i.e., remove all
-      # imported items from a given article
+      # Try to remove whole articles, i.e., remove all imported items
+      # from a given article
 
       # First, harvest the articles that generated items in the current environment
       my %seen_articles = ();
