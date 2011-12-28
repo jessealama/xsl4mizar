@@ -94,9 +94,10 @@ my $article_esh = "${article_dirname}/${article_basename}.esh";
 my $article_eth = "${article_dirname}/${article_basename}.eth";
 
 foreach my $extension ('miz', 'refx', 'eno') {
-  my $article_with_extension = "${article_dirname}/${article_basename}.${extension}";
+  my $article_with_extension = "${article_sans_extension}.${extension}";
+
   unless (-e $article_with_extension) {
-    print 'Error: the .', $extension, ' file for the supplied article ', "\n", "\n", '  ', $article, "\n", "\n", 'does not exist at the expected location', "\n", "\n", '  ', $article_with_extension, "\n";
+    print 'Error: the .', $extension, ' file for the supplied article ', "\n", "\n", '  ', $article_basename, "\n", "\n", 'does not exist at the expected location', "\n", "\n", '  ', $article_with_extension, "\n";
     exit 1;
   }
   unless (-r $article_with_extension) {
