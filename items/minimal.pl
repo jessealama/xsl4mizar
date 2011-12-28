@@ -313,12 +313,35 @@ sub prune_schemes {
   }
 }
 
+sub render_element {
+  my $element = shift;
+  my @attrs = $element->attributes ();
+  if (scalar @attrs == 0) {
+    return '[(element without attributes)]';
+  } else {
+    my @sorted_attrs = sort { $a->nodeName() cmp $b->nodeName() } @attrs;
+    my $rendered = '[';
+    my $num_attrs = scalar @sorted_attrs;
+    my $i = 0;
+    foreach (my $i = 0; $i < $num_attrs; $i++) {
+      my $attr = $sorted_attrs[$i];
+      my $attr_name = $attr->nodeName;
+      $rendered .= $attr_name;
+      $rendered .= ' ==> ';
+      my $val = $attr->getValue ();
+      $rendered .= $val;
+      if ($i < $num_attrs - 1) {
+	$rendered .= ', ';
+      }
+    }
+    $rendered .= ']';
+    return $rendered;
+  }
+}
+
 sub print_element {
   my $element = shift;
-  my $aid = $element->findvalue ('@aid');
-  my $kind = $element->findvalue ('@kind');
-  my $nr = $element->findvalue ('@nr');
-  print $aid, ':', $kind, ':', $nr, "\n";
+  print render_element ($element), "\n";
   return;
 }
 
