@@ -704,7 +704,7 @@ sub confirm_minimality_of_extension {
       my $num_elements = scalar @elements;
 
       # DEBUG
-      print 'We are about to inspect ', scalar @elements, ' elements, checking for removability.', "\n";
+      # print 'We are about to inspect ', scalar @elements, ' elements, checking for removability.', "\n";
 
       while ($i < $num_elements && $removable_element_found == 0) {
 
@@ -712,7 +712,7 @@ sub confirm_minimality_of_extension {
 
 	# DEBUG
 	my $element_pretty = render_element ($element);
-	print 'Checking whether the element ', $element_pretty, ' can be removed from the .', $extension_to_minimize, ' file of ', $article_basename, '...';
+	# print 'Checking whether the element ', $element_pretty, ' can be removed from the .', $extension_to_minimize, ' file of ', $article_basename, '...';
 
 	delete $needed_elements_table{$element};
 	write_element_table (\@elements, \%needed_elements_table, $article_with_extension, $root_element_name);
@@ -721,14 +721,14 @@ sub confirm_minimality_of_extension {
 	if ($verifier_ok == 1) {
 
 	  # DEBUG
-	  print 'removable!', "\n";
+	  # print 'removable!', "\n";
 
 	  my $element_pretty = render_element ($element);
 	  push (@removable, $element_pretty);
 	  $removable_element_found = 1;
 	} else {
 	  # DEBUG
-	  print 'unremovable!', "\n";
+	  # print 'unremovable!', "\n";
 	}
 
 	$needed_elements_table{$element} = 0;
@@ -805,7 +805,7 @@ if ($paranoid == 1 or $confirm_only == 1) {
     my @removable = @{confirm_minimality_of_extension ($extension)};
 
     # DEBUG
-    print 'We found ', scalar @removable, ' removable elements.', "\n";
+    # print 'We found ', scalar @removable, ' removable elements.', "\n";
 
     $removable_by_extension{$extension} = \@removable;
 
