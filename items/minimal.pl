@@ -15,6 +15,7 @@ Options:
   -man                        Full documentation
   -verbose                    Say what we're doing
   -paranoid                   Check that the article is verifiable before and after we're done minimizing
+  -confirm-only               Don't minimize; simply check that the computed environment really is minimal
 
 =head1 OPTIONS
 
@@ -41,6 +42,13 @@ the continue, otherwise exit uncleanly.  After minimization of the
 article's environment, check again that it is verifiable.  If it
 isn't, then exit uncleanly.
 
+=item B<--confirm-only>
+
+Don't do any minimization, but check that the environment computed by
+this program really is minimal in the sense that there is no item
+from any environment file (except the .atr file) that can be deleted
+while still preserving verifiability.
+
 =back
 
 =head1 DESCRIPTION
@@ -61,11 +69,13 @@ my $paranoid = 0;
 my $verbose = 0;
 my $man = 0;
 my $help = 0;
+my $confirm_only = 0;
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
-	   'paranoid' => \$paranoid)
+	   'paranoid' => \$paranoid,
+	   'confirm-only' => \$confirm_only)
   or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -642,42 +652,151 @@ sub minimize_extension {
   }
 }
 
+sub confirm_minimality_of_extension {
+  my $extension_to_minimize = shift;
+  my $root_element_name = $extension_to_element_table{$extension_to_minimize};
+  my @removable = ();
+  if (defined $root_element_name) {
+    my $article_with_extension = "${article_dirname}/${article_basename}.${extension_to_minimize}";
+    if (-e $article_with_extension) {
+
+      my $xml_parser = XML::LibXML->new ();
+      my $xml_doc = $xml_parser->parse_file ($article_with_extension);
+      my @elements = $xml_doc->findnodes ("/${root_element_name}/*");
+
+      my %needed_elements_table = ();
+      foreach my $i (0 .. scalar @elements - 1) {
+        $needed_elements_table{$i} = 0;
+      }
+
+      my $removable_element_found = 0;
+      my $i = 0;
+      my $num_elements = scalar @elements;
+
+      # DEBUG
+      print 'We are about to inspect ', scalar @elements, ' elements, checking for removability.', "\n";
+
+      while ($i < $num_elements && $removable_element_found == 0) {
+
+	my $element = $elements[$i];
+
+	# DEBUG
+	my $element_pretty = render_element ($element);
+	print 'Checking whether the element ', $element_pretty, ' can be removed from the .', $extension_to_minimize, ' file of ', $article_basename, '...';
+
+	delete $needed_elements_table{$element};
+	write_element_table (\@elements, \%needed_elements_table, $article_with_extension, $root_element_name);
+
+	my $verifier_ok = verify ();
+	if ($verifier_ok == 1) {
+
+	  # DEBUG
+	  print 'removable!', "\n";
+
+	  my $element_pretty = render_element ($element);
+	  push (@removable, $element_pretty);
+	  $removable_element_found = 1;
+	} else {
+	  # DEBUG
+	  print 'unremovable!', "\n";
+	}
+
+	$needed_elements_table{$element} = 0;
+	write_element_table (\@elements, \%needed_elements_table, $article_with_extension, $root_element_name);
+
+	$i++;
+
+      }
+    }
+
+    return \@removable;
+
+  } else {
+    print 'Error: we do not know how to deal with the ', $extension_to_minimize, ' files.', "\n";
+    exit 1;
+  }
+}
+
 # Let's do it
 
-if ($paranoid == 1) {
-  my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
-  my $verifier_exit_code = $verifier_status >> 8;
+unless ($confirm_only == 1) {
 
-  if ($verifier_exit_code != 0) {
-    print 'Error: ', $article_basename, ' is not verifiable.', "\n";
-    exit 1;
+  if ($paranoid == 1) {
+    my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
+    my $verifier_exit_code = $verifier_status >> 8;
+
+    if ($verifier_exit_code != 0) {
+      print 'Error: ', $article_basename, ' is not verifiable.', "\n";
+      exit 1;
+    }
+
+    if ($verbose == 1) {
+      print 'Paranoia: We have confirmed that, before minimization, ', $article_basename, ' is verifiable.', "\n";
+    }
   }
 
-  if ($verbose == 1) {
-    print 'Paranoia: We have confirmed that, before minimization, ', $article_basename, ' is verifiable.', "\n";
+  prune_schemes ();
+  prune_theorems ();
+
+  foreach my $extension_to_minimize (@extensions_to_minimize) {
+    minimize_extension ($extension_to_minimize);
+  }
+
+  # Check that the article is verifiable in the new minimized environment
+
+  if ($paranoid == 1) {
+    my $verifier_ok = verify ();
+    if ($verifier_ok == 0) {
+      print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
+      exit 1;
+    }
+
+    if ($verbose == 1) {
+      print 'Paranoia: We have confirmed that, after minimization, ', $article_basename, ' is verifiable.', "\n";
+    }
+
   }
 }
 
-prune_schemes ();
-prune_theorems ();
-
-foreach my $extension_to_minimize (@extensions_to_minimize) {
-  minimize_extension ($extension_to_minimize);
-}
-
-# Check that the article is verifiable in the new minimized environment
-
-if ($paranoid == 1) {
-  my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
-  my $verifier_exit_code = $verifier_status >> 8;
-
-  if ($verifier_exit_code != 0) {
-    print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
-    exit 1;
-  }
+if ($paranoid == 1 or $confirm_only == 1) {
 
   if ($verbose == 1) {
-    print 'Paranoia: We have confirmed that, after minimization, ', $article_basename, ' is verifiable.', "\n";
+    print 'Confirming minimality...', "\n";
+  }
+
+  my @extensions_to_minimize = ('eno', 'erd', 'epr', 'dfs', 'eid', 'ecl', 'esh', 'eth');
+  my %removable_by_extension = ();
+  foreach my $extension (@extensions_to_minimize) {
+
+    if ($verbose == 1) {
+      print 'Confirmining minimality of the .', $extension, ' file...';
+    }
+
+    my @removable = @{confirm_minimality_of_extension ($extension)};
+
+    # DEBUG
+    print 'We found ', scalar @removable, ' removable elements.', "\n";
+
+    $removable_by_extension{$extension} = \@removable;
+
+    if ($verbose == 1) {
+      print 'done.', "\n";
+    }
+  }
+
+  my $some_extension_unminimized = 0;
+
+  foreach my $extension (keys %removable_by_extension) {
+    my @removable = @{$removable_by_extension{$extension}};
+    unless (scalar @removable == 0) {
+      my $removable_item = $removable[0];
+      print 'Error: the .', $extension, ' file of the article ', $article_basename, ' is not minimized: ', $removable_item, ' can be safely deleted (and possiby others, too).', "\n";
+      $some_extension_unminimized = 1;
+    }
+  }
+
+  if ($some_extension_unminimized == 1) {
+    exit 1;
   }
 
 }
