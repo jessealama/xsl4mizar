@@ -152,8 +152,9 @@ sub write_element_table {
 }
 
 sub verify {
-  system ("verifier -q -s -l $article_miz > /dev/null 2>&1");
-  if (-z $article_err) {
+  my $verifier_status = system ("verifier -q -s -l $article_miz > /dev/null 2>&1");
+  my $verifier_exit_code = $verifier_status >> 8;
+  if ($verifier_exit_code == 0 && -z $article_err) {
     return 1;
   } else {
     # DEBUG
