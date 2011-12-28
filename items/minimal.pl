@@ -15,7 +15,7 @@ Options:
   -man                        Full documentation
   -verbose                    Say what we're doing
   -paranoid                   Check that the article is verifiable before and after we're done minimizing
-  -confirm-only               Don't minimize; simply check that the computed environment really is minimal
+  -confirm-only               Don't minimize; simply check that the environment really is minimal
 
 =head1 OPTIONS
 
@@ -44,10 +44,10 @@ isn't, then exit uncleanly.
 
 =item B<--confirm-only>
 
-Don't do any minimization, but check that the environment computed by
-this program really is minimal in the sense that there is no item
-from any environment file (except the .atr file) that can be deleted
-while still preserving verifiability.
+Don't do any minimization, but check that the environment really is
+minimal in the sense that there is no item from any environment file
+(except the .atr file) that can be deleted while still preserving
+verifiability.
 
 =back
 
