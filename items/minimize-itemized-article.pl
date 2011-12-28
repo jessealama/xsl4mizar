@@ -365,29 +365,61 @@ my $parallel_call = undef;
 if ($verbose == 1) {
   if ($nice == 1) {
     if (defined $num_jobs) {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --verbose {}";
+      if ($paranoid == 1) {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --paranoid --verbose {}";
+      } else {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --verbose {}";
+      }
     } else {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --verbose {}";
+      if ($paranoid == 1) {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --paranoid --verbose {}";
+      } else {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --verbose {}";
+      }
     }
   } else {
     if (defined $num_jobs) {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --verbose {}";
+      if ($paranoid == 1) {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --paranoid --verbose {}";
+      } else {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --verbose {}";
+      }
     } else {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --verbose {}";
+      if ($paranoid == 1) {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --paranoid --verbose {}";
+      } else {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --verbose {}";
+      }
     }
   }
 } else {
   if ($nice == 1) {
     if (defined $num_jobs) {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} {}";
+      if ($paranoid == 1) {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} --paranoid {}";
+      } else {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} {}";
+      }
     } else {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} {}";
+      if ($paranoid == 1) {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} --paranoid {}";
+      } else {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} {}";
+      }
     }
   } else {
     if (defined $num_jobs) {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} {}";
+      if ($paranoid == 1) {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} --paranoid {}";
+      } else {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} {}";
+      }
     } else {
-      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} {}";
+      if ($paranoid == 1) {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} --paranoid {}";
+      } else {
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} {}";
+      }
     }
   }
 }
