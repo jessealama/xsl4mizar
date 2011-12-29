@@ -116,8 +116,18 @@ my %extension_to_element_table = ('eno' => 'Notations',
 				  'esh' => 'Schemes',
 				  'eth' => 'Theorems');
 
-my $xml_parser = XML::LibXML->new ();
-my $xml_doc = $xml_parser->parse_file ($article_eno);
+my $xml_parser = XML::LibXML->new (suppress_errors => 1,
+				   suppress_warnings => 1);
+my $xml_doc = undef;
+
+eval {
+  $xml_doc = $xml_parser->parse_file ($article_eno);
+};
+
+if ($@) {
+  print 'Error: the .eno file of ', $article_basename, ' is not well-formed XML.', "\n";
+  exit 1;
+}
 
 my $aid;
 if ($xml_doc->exists ('/Notations[@aid]')) {
@@ -165,8 +175,15 @@ sub verify {
 }
 
 sub prune_theorems {
-  my $refx_parser = XML::LibXML->new ();
-  my $refx_doc = $refx_parser->parse_file ($article_refx);
+  my $refx_doc = undef;
+  eval {
+    $refx_doc = $xml_parser->parse_file ($article_refx);
+  };
+  if ($@) {
+    print 'Error: the .refx file of ', $article_basename, ' is not well-formed XML.', "\n";
+    exit 1;
+  }
+
   my %theorems = ();
   my %definitions = ();
 
@@ -199,8 +216,14 @@ sub prune_theorems {
     if ($verbose == 1) {
       print 'Minimizing eth...';
     }
-    my $eth_parser = XML::LibXML->new ();
-    my $eth_doc = $eth_parser->parse_file ($article_eth);
+    my $eth_doc = undef;
+    eval {
+      $eth_doc = $xml_parser->parse_file ($article_eth);
+    };
+    if ($@) {
+      print 'Error: the .eth file of ', $article_basename, ' is not well-formed XML.', "\n";
+      exit 1;
+    }
 
     # Create the new .eth document
     my $new_eth_doc = XML::LibXML::Document->createDocument ();
@@ -256,8 +279,14 @@ sub prune_theorems {
 
 # Ugh: This is nearly identical to the previous subroutine definition.
 sub prune_schemes {
-  my $refx_parser = XML::LibXML->new ();
-  my $refx_doc = $refx_parser->parse_file ($article_refx);
+  my $refx_doc = undef;
+  eval {
+    $refx_doc = $xml_parser->parse_file ($article_refx);
+  };
+  if ($@) {
+    print 'Error: the .refx file of ', $article_basename, ' is not well-formed XML.', "\n";
+    exit 1;
+  }
   my %schemes = ();
   my @initial_sy_three_dots = $refx_doc->findnodes ('Parser/syThreeDots[not(preceding-sibling::sySemiColon)]');
   foreach my $sy_three_dots (@initial_sy_three_dots) {
@@ -273,8 +302,14 @@ sub prune_schemes {
     if ($verbose == 1) {
       print 'Minimizing esh...';
     }
-    my $esh_parser = XML::LibXML->new ();
-    my $esh_doc = $esh_parser->parse_file ($article_esh);
+    my $esh_doc = undef;
+    eval {
+      $esh_doc = $xml_parser->parse_file ($article_esh);
+    };
+    if ($@) {
+      print 'Error: the .esh file of ', $article_basename, ' is not well-formed XML.', "\n";
+      exit 1;
+    }
 
     # Create the new .esh document
     my $new_esh_doc = XML::LibXML::Document->createDocument ();
@@ -618,8 +653,14 @@ sub minimize_extension {
   if (defined $root_element_name) {
     my $article_with_extension = "${article_dirname}/${article_basename}.${extension_to_minimize}";
     if (-e $article_with_extension) {
-      my $xml_parser = XML::LibXML->new ();
-      my $xml_doc = $xml_parser->parse_file ($article_with_extension);
+      my $xml_doc;
+      eval {
+	$xml_doc = $xml_parser->parse_file ($article_with_extension);
+      };
+      if ($@) {
+	print 'Error: the .', $extension_to_minimize, ' file of ', $article_basename, ' is not well-formed XML.', "\n";
+	exit 1;
+      }
       my @elements = $xml_doc->findnodes ("/${root_element_name}/*");
       my %initial_table = ();
       foreach my $i (0 .. scalar @elements - 1) {
@@ -690,9 +731,14 @@ sub confirm_minimality_of_extension {
   if (defined $root_element_name) {
     my $article_with_extension = "${article_dirname}/${article_basename}.${extension_to_minimize}";
     if (-e $article_with_extension) {
-
-      my $xml_parser = XML::LibXML->new ();
-      my $xml_doc = $xml_parser->parse_file ($article_with_extension);
+      my $xml_doc = undef;
+      eval {
+	$xml_doc = $xml_parser->parse_file ($article_with_extension);
+      };
+      if ($@) {
+	print 'Error: the .', $extension_to_minimize, ' file of ', $article_basename, ' is not well-formed XML.', "\n";
+	exit 1;
+      }
       my @elements = $xml_doc->findnodes ("/${root_element_name}/*");
 
       my %needed_elements_table = ();
