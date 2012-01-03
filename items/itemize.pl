@@ -134,6 +134,7 @@ my $article_dirname = dirname ($article);
 my $article_sans_extension = "${article_dirname}/${article_basename}";
 my $article_miz = "${article_dirname}/${article_basename}.miz";
 my $article_err = "${article_dirname}/${article_basename}.err";
+my $article_evl = "${article_dirname}/${article_basename}.evl";
 
 unless (-e $article_miz) {
   print 'Error: there is no Mizar article at ', $article_miz, "\n";
