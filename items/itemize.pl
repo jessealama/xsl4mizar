@@ -299,3 +299,242 @@ if ($xsltproc_itemize_exit_code != 0) {
   print 'Error: xsltproc did not exit cleanly when applying the itemize stylesheet at ', $itemize_stylesheet, ' to ', $article_split_wsx_in_target_dir, '.', "\n";
   exit 1;
 }
+
+# Load the article's environment
+
+unless (-e $article_evl_in_target_dir) {
+  print 'Error: the .evl file for ', $article_basename, ' does not exist.', "\n";
+  exit 1;
+}
+
+unless (-r $article_evl_in_target_dir) {
+  print 'Error: the .evl file for ', $article_basename, ' is unreadable.', "\n";
+  exit 1;
+}
+
+my $xml_parser = XML::LibXML->new (suppress_warnings => 1,
+				   suppress_errors => 1);
+
+my $article_evl_doc = undef;
+eval {
+  $article_evl_doc = $xml_parser->parse_file ($article_evl_in_target_dir);
+};
+if ($@) {
+  print 'Error: ', $article_evl_in_target_dir, ' is not well-formed XML.', "\n";
+  exit 1;
+}
+
+sub ident_name {
+  my $ident_node = shift;
+  return ($ident_node->getAttribute ('name'));
+}
+
+my @notations_nodes
+  = $article_evl_doc->findnodes ('Environ/Directive[@name = "Notations"]/Ident[@name]');
+my @notations = map { ident_name($_) } @notations_nodes;
+my @registrations_nodes
+  = $article_evl_doc->findnodes ('Environ/Directive[@name = "Registrations"]/Ident[@name]');
+my @registrations = map { ident_name($_) } @registrations_nodes;
+my @definitions_nodes
+  = $article_evl_doc->findnodes ('Environ/Directive[@name = "Definitions"]/Ident[@name]');
+my @definitions = map { ident_name($_) } @definitions_nodes;
+my @theorems_nodes
+  = $article_evl_doc->findnodes ('Environ/Directive[@name = "Theorems"]/Ident[@name]');
+my @theorems = map { ident_name($_) } @theorems_nodes;
+my @schemes_nodes
+  = $article_evl_doc->findnodes ('Environ/Directive[@name = "Schemes"]/Ident[@name]');
+my @schemes = map { ident_name($_) } @schemes_nodes;
+my @constructors_nodes
+  = $article_evl_doc->findnodes ('Environ/Directive[@name = "Constructors"]/Ident[@name]');
+my @constructors = map { ident_name($_) } @constructors_nodes;
+
+# Now print the items
+
+my $itemized_article_doc = undef;
+
+eval {
+  $itemized_article_doc
+    = $xml_parser->parse_file ($article_itemized_wsx_in_target_dir);
+};
+
+if ($@) {
+  print 'Error: the XML in ', $article_itemized_wsx_in_target_dir, ' is not well-formed.', "\n";
+  exit 1;
+}
+
+sub list_as_token_string {
+  my @lst = @{shift ()};
+  my $val = '';
+  my $num_elements = scalar @lst;
+  for (my $i = 0; $i < $num_elements; $i++) {
+    $val .= $lst[$i];
+    $val .= ',';
+  }
+  return $val;
+}
+
+sub fragment_number {
+  my $fragment_path = shift;
+  $fragment_path =~ m/^ckb([0-9]+)\./;
+  my $fragment_number = $1;
+  if (defined $fragment_number) {
+    return $fragment_number;
+  } else {
+    print 'Error: we could not extract the fragment number from the path \'', $fragment_path, '\'.', "\n";
+    exit 1;
+  }
+}
+
+my @fragments = $itemized_article_doc->findnodes ('/Fragments/Text-Proper');
+
+if ($verbose && scalar @fragments == 0) {
+  print 'Warning: there are 0 Fragment elements in the itemized wsx file for ', $article_basename, ' at ', $article_itemized_wsx_in_target_dir, '.', "\n";
+}
+
+# Separate the XML for the fragments into separate files
+
+foreach my $i (1 .. scalar @fragments) {
+  my $fragment = $fragments[$i - 1];
+  my $fragment_doc = XML::LibXML::Document->createDocument ();
+  $fragment->setAttribute ('original-article', $article_basename);
+  $fragment->setAttribute ('fragment-number', $i);
+  $fragment_doc->setDocumentElement ($fragment);
+  my $fragment_path = "${target_directory}/fragment-${i}.wsx";
+  $fragment_doc->toFile ($fragment_path);
+}
+
+chdir $target_directory
+  or (print ('Error: unable to change directory to ', $target_directory, '.', "\n") && exit 1);
+
+foreach my $i (1 .. scalar @fragments) {
+
+  my $fragment = $fragments[$i - 1];
+
+  my $fragment_path = "${target_directory}/fragment-${i}.wsx";
+  my $fragment_evl = "${target_directory}/fragment-${i}.evl";
+  my $fragment_miz = "${target_text_subdir}/ckb${i}.miz";
+
+  # Extend the evl of the initial article by inspecting the contents
+  # of the prel subdirectory
+  opendir (PREL_DIR, $target_prel_subdir)
+    or (print ('Error: unable to open the directory at ', $target_prel_subdir, '.', "\n") && exit 1);
+  my @prel_files = readdir (PREL_DIR);
+  closedir PREL_DIR
+    or (print ('Error: unable to close the directory filehandle for ', $target_prel_subdir, '.', "\n") && exit 1);
+
+  if ($verbose) {
+    print 'We found the following files in the prel subdirectory: ', @prel_files, "\n";
+  }
+
+  my @new_notations = ();
+  my @new_registrations = ();
+  my @new_definitions = ();
+  my @new_theorems = ();
+  my @new_schemes = ();
+  my @new_constructors = ();
+
+  foreach my $prel_file (@prel_files) {
+    my $prel_path = "${target_prel_subdir}/${prel_file}";
+    if (-f $prel_path) {
+      if ($verbose) {
+	print 'File in the prel db: ', $prel_file, "\n";
+      }
+      my $fragment_number = fragment_number ($prel_file);
+      my $fragment_article_name_uc = 'CKB' . $fragment_number;
+
+      if ($prel_file =~ /\.dno$/) {
+	push (@new_notations, $fragment_article_name_uc);
+      }
+      if ($prel_file =~ /\.drd$/) {
+	push (@new_registrations, $fragment_article_name_uc);
+      }
+      if ($prel_file =~ /\.dcl$/) {
+	push (@new_registrations, $fragment_article_name_uc)
+      }
+      if ($prel_file =~ /\.eid$/) {
+	push (@new_registrations, $fragment_article_name_uc)
+      }
+      if ($prel_file =~ /\.did$/) {
+	push (@new_registrations, $fragment_article_name_uc)
+      }
+      if ($prel_file =~ /\.sch$/) {
+	push (@new_schemes, $fragment_article_name_uc)
+      }
+      if ($prel_file =~ /\.dco$/) {
+	push (@new_constructors, $fragment_article_name_uc)
+      }
+      if ($prel_file =~ /\.def$/) {
+	push (@new_definitions, $fragment_article_name_uc)
+      }
+      if ($prel_file =~ /\.the$/) {
+	push (@new_theorems, $fragment_article_name_uc)
+      }
+    }
+  }
+
+  my $all_notations_token_string = list_as_token_string (\@new_notations);
+  my $all_definitions_token_string = list_as_token_string (\@new_definitions);
+  my $all_theorems_token_string = list_as_token_string (\@new_theorems);
+  my $all_registrations_token_string = list_as_token_string (\@new_registrations);
+  my $all_constructors_token_string = list_as_token_string (\@new_constructors);
+  my $all_schemes_token_string = list_as_token_string (\@new_schemes);
+
+  if ($verbose) {
+    print 'New notations: ', $all_notations_token_string, "\n";
+  }
+
+  my $xsltproc_extend_evl_status
+    = system ("xsltproc --output $fragment_evl --stringparam notations '$all_notations_token_string' --stringparam definitions '$all_definitions_token_string' --stringparam theorems '$all_theorems_token_string' --stringparam registrations '$all_registrations_token_string' --stringparam constructors '$all_constructors_token_string' --stringparam schemes '$all_schemes_token_string' $extend_evl_stylesheet $article_evl_in_target_dir 2>/dev/null");
+  my $xsltproc_extend_evl_exit_code = $xsltproc_extend_evl_status >> 8;
+  if ($xsltproc_extend_evl_exit_code != 0) {
+    print 'Error: xsltproc did not exit cleanly when applying the extend-evl stylesheet to ', $article_evl_in_target_dir, '.', "\n";
+    exit 1;
+  }
+
+  # Now render the fragment's XML as a mizar article
+  my $xsltproc_wsm_status
+    = system ("xsltproc --output $fragment_miz --stringparam evl '$fragment_evl' $wsm_stylesheet $fragment_path 2>/dev/null");
+  my $xsltproc_wsm_exit_code = $xsltproc_wsm_status >> 8;
+  if ($xsltproc_wsm_exit_code != 0) {
+    print 'Error: xsltproc did not exit cleanly when applying the WSM stylesheet to ', $fragment_path, '.', "\n";
+    exit 1;
+  }
+
+  if ($paranoid) {
+    my $verifier_ok = verify ($fragment_path);
+    if ($verifier_ok != 1) {
+      print 'Paranoia: fragment number ', $i, ' of ', $article_basename, ' is not verifiable.', "\n";
+      exit 1;
+    }
+  }
+
+  # Now export and transfer the fragment
+
+  my $accom_ok = run_mizar_tool ('accom', $fragment_miz);
+  if ($accom_ok == 1) {
+    my $verifier_ok = run_mizar_tool ('verifier', $fragment_miz);
+    if ($verifier_ok == 1) {
+      my $exporter_ok = run_mizar_tool ('exporter', $fragment_miz);
+      if ($exporter_ok == 1) {
+	my $transfer_ok = run_mizar_tool ('transfer', $fragment_miz);
+	if ($transfer_ok != 1) {
+	  if ($verbose) {
+	    print 'Warning: fragment number ', $i, ' of ', $article_basename, ' is not transferrable.', "\n";
+	  }
+	}
+      } else {
+	if ($verbose) {
+	  print 'Warning: fragment number ', $i, ' of ', $article_basename, ' is not expotable.', "\n";
+	}
+      }
+    } else {
+      if ($verbose) {
+	print 'Warning: verifier did not exit cleanly when applied to fragment number ', $i, ' of ', $article_basename, '.', "\n";
+      }
+    }
+  } else {
+    if ($verbose) {
+      print 'Warning: accom did not exit cleanly when applied to fragment number ', $i, ' of ', $article_basename, '.', "\n";
+    }
+  }
+}
