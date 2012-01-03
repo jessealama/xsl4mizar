@@ -227,21 +227,25 @@ copy ($article_miz, $article_miz_in_target_dir)
 sub run_mizar_tool {
   my $tool = shift;
   my $article = shift;
-  print $tool, '...' if $verbose;
+  print $tool, ' ', $article, '...' if $verbose;
   my $tool_status = system ("$tool -l -q $article > /dev/null 2>&1");
   print 'done.', "\n" if $verbose;
   my $tool_exit_code = $tool_status >> 8;
   unless ($tool_exit_code == 0 && -z $article_err_in_target_dir) {
-    print 'Error: the ', $tool, ' Mizar tool did not exit cleanly when applied to ', $article, ' (or the .err file is non-empty).', "\n";
-    exit 1;
+    if ($verbose) {
+      print 'Error: the ', $tool, ' Mizar tool did not exit cleanly when applied to ', $article, ' (or the .err file is non-empty).', "\n";
+    }
+    return 0;
   }
   return 1;
 }
 
+my $article_evl_in_target_dir = "${target_directory}/${article_basename}.evl";
 my $article_msm_in_target_dir = "${target_directory}/${article_basename}.msm";
 my $article_tpr_in_target_dir = "${target_directory}/${article_basename}.tpr";
 
 run_mizar_tool ('accom', $article_miz_in_target_dir);
+run_mizar_tool ('verifier', $article_miz_in_target_dir);
 run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
 run_mizar_tool ('msmprocessor', $article_miz_in_target_dir);
 run_mizar_tool ('msplit', $article_miz_in_target_dir);
