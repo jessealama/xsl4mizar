@@ -230,9 +230,7 @@ copy ($article_miz, $article_miz_origin_target_dir)
 sub run_mizar_tool {
   my $tool = shift;
   my $article = shift;
-  print $tool, ' ', $article, '...' if $verbose;
   my $tool_status = system ("$tool -l -q $article > /dev/null 2>&1");
-  print 'done.', "\n" if $verbose;
   my $tool_exit_code = $tool_status >> 8;
   unless ($tool_exit_code == 0 && -z $article_err_in_target_dir) {
     if ($verbose) {
@@ -425,10 +423,6 @@ foreach my $i (1 .. scalar @fragments) {
   closedir PREL_DIR
     or (print ('Error: unable to close the directory filehandle for ', $target_prel_subdir, '.', "\n") && exit 1);
 
-  if ($verbose) {
-    print 'We found the following files in the prel subdirectory: ', @prel_files, "\n";
-  }
-
   my @new_notations = ();
   my @new_registrations = ();
   my @new_definitions = ();
@@ -439,12 +433,8 @@ foreach my $i (1 .. scalar @fragments) {
   foreach my $prel_file (@prel_files) {
     my $prel_path = "${target_prel_subdir}/${prel_file}";
     if (-f $prel_path) {
-      if ($verbose) {
-	print 'File in the prel db: ', $prel_file, "\n";
-      }
       my $fragment_number = fragment_number ($prel_file);
       my $fragment_article_name_uc = 'CKB' . $fragment_number;
-
       if ($prel_file =~ /\.dno$/) {
 	push (@new_notations, $fragment_article_name_uc);
       }
@@ -481,10 +471,6 @@ foreach my $i (1 .. scalar @fragments) {
   my $all_registrations_token_string = list_as_token_string (\@new_registrations);
   my $all_constructors_token_string = list_as_token_string (\@new_constructors);
   my $all_schemes_token_string = list_as_token_string (\@new_schemes);
-
-  if ($verbose) {
-    print 'New notations: ', $all_notations_token_string, "\n";
-  }
 
   my $xsltproc_extend_evl_status
     = system ("xsltproc --output $fragment_evl --stringparam notations '$all_notations_token_string' --stringparam definitions '$all_definitions_token_string' --stringparam theorems '$all_theorems_token_string' --stringparam registrations '$all_registrations_token_string' --stringparam constructors '$all_constructors_token_string' --stringparam schemes '$all_schemes_token_string' $extend_evl_stylesheet $article_evl_in_target_dir 2>/dev/null");
