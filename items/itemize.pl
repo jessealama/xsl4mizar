@@ -189,8 +189,8 @@ Jesse Alama L<jesse.alama@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-This source is offered under the terms of the GNU GPL version 3.  See
-L<http://www.gnu.org/licenses/gpl-3.0.en.html>.
+This source is offered under the terms of
+L<the GNU GPL version 3|http://www.gnu.org/licenses/gpl-3.0.en.html>.
 
 =cut
 
