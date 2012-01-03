@@ -161,9 +161,11 @@ unless (-d $stylesheet_home) {
 }
 
 my $split_stylesheet = "${stylesheet_home}/split.xsl";
-my $itemize_stylesheet = "${stylesheet_home}/split.xsl";
+my $itemize_stylesheet = "${stylesheet_home}/itemize.xsl";
+my $wsm_stylesheet = "${stylesheet_home}/wsm.xsl";
+my $extend_evl_stylesheet = "${stylesheet_home}/extend-evl.xsl";
 
-my @stylesheets = ('split', 'itemize');
+my @stylesheets = ('split', 'itemize', 'wsm', 'extend-evl');
 
 foreach my $stylesheet (@stylesheets) {
   my $stylesheet_path = "${stylesheet_home}/${stylesheet}.xsl";
