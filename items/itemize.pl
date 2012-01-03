@@ -185,7 +185,7 @@ None known.
 
 =head1 AUTHOR
 
-Jesse Alama L<jesse.alama@gmail.com>
+Jesse Alama <jesse.alama@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
