@@ -222,7 +222,7 @@ my $article_err_in_target_dir = "${target_directory}/${article_basename}.err";
 
 copy ($article_miz, $article_miz_in_target_dir)
   or (print ('Error: unable to copy the article at ', $article_miz, ' to ', $article_miz_in_target_dir, '.', "\n") && exit 1);
-copy ($article_miz, $article_miz_origin_target_dir)
+copy ($article_miz, $article_miz_orig_in_target_dir)
   or (print ('Error: unable to copy the article at ', $article_miz, ' to ', $article_miz_orig_in_target_dir, '.', "\n") && exit 1);
 
 # Transform the new miz
