@@ -190,6 +190,10 @@ if (defined $target_directory) {
 } else {
   my $cwd = cwd ();
   $target_directory = "${cwd}/${article_basename}";
+  if (-e $target_directory) {
+    print 'Error: there is already a directory called \'', $article_basename, '\' in the current working directory.  Please move it out of the way.', "\n";
+    exit 1;
+  }
   mkdir $target_directory
     or (print ('Error: unable to make the directory \'', $article_basename, '\' in the current working directory.', "\n") && exit 1);
 }
