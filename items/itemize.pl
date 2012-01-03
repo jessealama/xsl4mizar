@@ -86,6 +86,8 @@ unless (-d $mizfiles) {
 
 my @mizar_programs = ('verifier',
 		      'accom',
+		      'exporter',
+		      'transfer',
 		      'msmprocessor',
 		      'wsmparser',
 		      'msplit',
