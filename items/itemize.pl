@@ -245,19 +245,52 @@ my $article_evl_in_target_dir = "${target_directory}/${article_basename}.evl";
 my $article_msm_in_target_dir = "${target_directory}/${article_basename}.msm";
 my $article_tpr_in_target_dir = "${target_directory}/${article_basename}.tpr";
 
-run_mizar_tool ('accom', $article_miz_in_target_dir);
-run_mizar_tool ('verifier', $article_miz_in_target_dir);
-run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
-run_mizar_tool ('msmprocessor', $article_miz_in_target_dir);
-run_mizar_tool ('msplit', $article_miz_in_target_dir);
+my $accom_ok = run_mizar_tool ('accom', $article_miz_in_target_dir);
+if ($accom_ok == 0) {
+  print 'Error: the initial article did not could not be accom\'d.';
+  exit 1;
+}
+
+my $verifier_ok = run_mizar_tool ('verifier', $article_miz_in_target_dir);
+if ($verifier_ok == 0) {
+  print 'Error: the initial article could not be verified.';
+  exit 1;
+}
+
+my $wsmparser_ok = run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
+if ($wsmparser_ok == 0) {
+  print 'Error: wsmparser failed on the initial article.';
+  exit 1;
+}
+
+my $msmprocessor_ok = run_mizar_tool ('msmprocessor', $article_miz_in_target_dir);
+if ($msmprocessor_ok == 0) {
+  print 'Error: msmprocessor failed on the initial article.';
+  exit 1;
+}
+
+my $msplit_ok = run_mizar_tool ('msplit', $article_miz_in_target_dir);
+if ($msplit_ok == 0) {
+  print 'Error: msplit failed on the initial article.';
+  exit 1;
+}
 
 print 'Rewrite text proper...' if $verbose;
 copy ($article_msm_in_target_dir, $article_tpr_in_target_dir)
   or (print ('Error: we are unable to copy ', $article_msm_in_target_dir, ' to ', $article_tpr_in_target_dir, '.', "\n") && exit 1);
 print 'done.', "\n" if $verbose;
 
-run_mizar_tool ('mglue', $article_miz_in_target_dir);
-run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
+my $mglue_ok = run_mizar_tool ('mglue', $article_miz_in_target_dir);
+if ($mglue_ok == 0) {
+  print 'Error: mglue failed on the initial article.';
+  exit 1;
+}
+
+$wsmparser_ok = run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
+if ($wsmparser_ok == 0) {
+  print 'Error: wsmparser failed on the WSMified article.';
+  exit 1;
+}
 
 my $article_wsx_in_target_dir = "${target_directory}/${article_basename}.wsx";
 my $article_split_wsx_in_target_dir = "${article_wsx_in_target_dir}.split";
