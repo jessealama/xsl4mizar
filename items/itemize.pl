@@ -80,13 +80,13 @@ in addition, are required:
 
 =over 8
 
-=item split.xsl
+=item F<split.xsl>
 
-=item itemize.xsl
+=item F<itemize.xsl>
 
-=item wsm.xsl
+=item F<wsm.xsl>
 
-=item extend-evl.xsl
+=item F<extend-evl.xsl>
 
 =back
 
@@ -166,7 +166,7 @@ failed.  At present we do not pass along whatever error messages
 xsltproc generated, nor do we explain any Mizar error files.  If a
 Mizar program fails, you can see for yourself how it failed by
 consulting the .err file corresponding to the failing .err file; see
-also the file mizar.msg under the MIZFILES environment variable.
+also the file F<mizar.msg> under the MIZFILES environment variable.
 
 =head1 BUGS AND LIMITATIONS
 
