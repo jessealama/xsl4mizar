@@ -191,7 +191,7 @@ if (defined $target_directory) {
   my $cwd = cwd ();
   $target_directory = "${cwd}/${article_basename}";
   if (-e $target_directory) {
-    print 'Error: there is already a directory called \'', $article_basename, '\' in the current working directory.  Please move it out of the way.', "\n";
+    print 'Error: since the target-directory option was not used, we are to save our wok in \'', $article_basename, '\'; but there is already a directory by that name in the current working directory.  Please move it out of the way.', "\n";
     exit 1;
   }
   mkdir $target_directory
