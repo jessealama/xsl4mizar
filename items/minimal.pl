@@ -12,11 +12,17 @@ my $verbose = 0;
 my $man = 0;
 my $help = 0;
 my $confirm_only = 0;
+my $checker_only = 0;
+my $fast_theorems = 0;
+my $fast_schemes = 0;
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
 	   'paranoid' => \$paranoid,
+	   'fast-schemes' => \$fast_schemes,
+	   'fast-theorems' => \$fast_theorems,
+	   'checker-only' => \$checker_only,
 	   'confirm-only' => \$confirm_only)
   or pod2usage(2);
 pod2usage(1) if $help;
@@ -104,7 +110,13 @@ sub write_element_table {
 }
 
 sub verify {
-  my $verifier_status = system ("verifier -q -s -l $article_miz > /dev/null 2>&1");
+  my $verifier_call = undef;
+  if ($checker_only) {
+    $verifier_call = "verifier -c -q -s -l $article_miz > /dev/null 2>&1"
+  } else {
+    $verifier_call = "verifier -q -s -l $article_miz > /dev/null 2>&1"
+  }
+  my $verifier_status = system ($verifier_call);
   my $verifier_exit_code = $verifier_status >> 8;
   if ($verifier_exit_code == 0 && -z $article_err) {
     return 1;
@@ -753,7 +765,13 @@ sub confirm_minimality_of_extension {
 unless ($confirm_only == 1) {
 
   if ($paranoid == 1) {
-    my $verifier_status = system ("verifier -q -l $article_miz > /dev/null 2>&1");
+    my $verifier_call = undef;
+    if ($checker_only) {
+      $verifier_call = "verifier -c -q -l $article_miz > /dev/null 2>&1"
+    } else {
+      $verifier_call = "verifier -q -l $article_miz > /dev/null 2>&1"
+    }
+    my $verifier_status = system ($verifier_call);
     my $verifier_exit_code = $verifier_status >> 8;
 
     if ($verifier_exit_code != 0) {
@@ -766,8 +784,17 @@ unless ($confirm_only == 1) {
     }
   }
 
-  prune_schemes ();
-  prune_theorems ();
+  if ($fast_schemes) {
+    prune_schemes ();
+  } else {
+    push (@extensions_to_minimize, 'esh');
+  }
+
+  if ($fast_theorems) {
+    prune_theorems ();
+  } else {
+    push (@extensions_to_minimize, 'eth');
+  }
 
   foreach my $extension_to_minimize (@extensions_to_minimize) {
     minimize_extension ($extension_to_minimize);
