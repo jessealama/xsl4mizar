@@ -1,11 +1,58 @@
 #!/usr/bin/perl -w
 
 use strict;
-use File::Basename;
+use File::Basename qw(basename);
+use Getopt::Long;
+use Pod::Usage;
 
-unless (scalar @ARGV == 1) {
-  print 'Usage: itemized-article-dependencies.pl ITEMIZED-ARTICLE-DIRECTORY', "\n";
-  exit 1;
+my $stylesheet_home = undef;
+my $script_home = undef;
+my $verbose = 0;
+my $man = 0;
+my $help = 0;
+
+GetOptions('help|?' => \$help,
+           'man' => \$man,
+           'verbose'  => \$verbose,
+	   'stylesheet-home=s' => \$stylesheet_home,
+	   'script-home=s', \$script_home)
+  or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+pod2usage(1) if (scalar @ARGV != 1);
+
+if (defined $stylesheet_home) {
+  if (! -e $stylesheet_home) {
+    die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
+  }
+  if (! -d $stylesheet_home) {
+    die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
+  }
+} else {
+  $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+  if (! -e $stylesheet_home) {
+    die 'Error: the default directory in which we look for stylesheets', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'does not exist.  Consider using the --stylesheet-home option.', "\n";
+  }
+  if (! -d $stylesheet_home) {
+    die 'Error: the default directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --stylesheet-home option.', "\n";
+  }
+}
+
+if (defined $script_home) {
+  if (! -e $script_home) {
+    die 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary scripts does not exist.', "\n";
+  }
+  if (! -d $script_home) {
+    die 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary is not actually a directory.', "\n";
+  }
+} else {
+  $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+  if (! -e $script_home) {
+    die 'Error: the default directory in which we look for needed auxiliary scripts', "\n", "\n", '  ', $script_home, "\n", "\n", 'does not exist.  Consider using the --script-home option.', "\n";
+  }
+  if (! -d $script_home) {
+    die 'Error: the default directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --script-home option.', "\n";
+  }
 }
 
 my $article_dir = $ARGV[0];
@@ -17,40 +64,24 @@ unless (-d $article_dir) {
 
 my $article_basename = basename ($article_dir);
 
-my $map_ckb_script = '/Users/alama/sources/mizar/xsl4mizar/items/map-ckbs.pl';
-my $dependencies_script = '/Users/alama/sources/mizar/xsl4mizar/items/dependencies.pl';
+my %script_paths = ('map-ckbs.pl' => "${script_home}/map-ckbs.pl",
+		    'dependencies.pl' => "${script_home}/dependencies.pl");
 
-unless (-e $map_ckb_script) {
-  print 'Error: the item-to-fragment script does not exist at the expected location (', $map_ckb_script, ').', "\n";
-  exit 1;
+foreach my $script (keys %script_paths) {
+  my $script_path = $script_paths{$script};
+  if (! -e $script_path) {
+    die 'Error: the needed auxiliary script', "\n", "\n", '  ', $script, "\n", "\n", 'does not exist at the expected location', "\n", "\n", '  ', $script_path, "\n";
+  }
+  if (! -r $script_path) {
+    die 'Error: the needed auxiliary script', "\n", "\n", '  ', $script, "\n", "\n", 'at', "\n", "\n", '  ', $script_path, "\n", "\n", 'is unreadable.';
+  }
+  if (! -x $script_path) {
+    die 'Error: the needed auxiliary script', "\n", "\n", '  ', $script, 'at', "\n", "\n", '  ', $script_path, 'is not executable.';
+  }
 }
 
-unless (-r $map_ckb_script) {
-  print 'Error: the item-to-fragment script at ', $map_ckb_script, ' is unreadable.', "\n";
-  exit 1;
-}
-
-unless (-x $map_ckb_script) {
-  print 'Error: the item-to-fragment script at ', $map_ckb_script, ' is not executable.', "\n";
-  exit 1;
-}
-
-unless (-e $dependencies_script) {
-  print 'Error: the dependencies script does not exist at the expected location (', $dependencies_script, ').', "\n";
-  exit 1;
-}
-
-unless (-r $dependencies_script) {
-  print 'Error: the dependencies script at ', $dependencies_script, ' is unreadable.', "\n";
-  exit 1;
-}
-
-unless (-x $dependencies_script) {
-  print 'Error: the dependencies script at ', $dependencies_script, ' is not executable.', "\n";
-  exit 1;
-}
-
-my @item_to_fragment_lines = `$map_ckb_script $article_dir 2>/dev/null`;
+my $map_ckb_script = $script_paths{'map-ckbs.pl'};
+my @item_to_fragment_lines = `$map_ckb_script $article_dir`;
 
 my ($item_to_fragment_exit_code, $item_to_fragment_message) = ($? >> 8, $!);
 if ($item_to_fragment_exit_code != 0) {
@@ -58,6 +89,10 @@ if ($item_to_fragment_exit_code != 0) {
   print 'the exit code was ', $item_to_fragment_exit_code, ' and the message was:', "\n";
   print $item_to_fragment_message, "\n";
   exit 1;
+}
+
+if (scalar @item_to_fragment_lines == 0) {
+  warn 'Warning: there are 0 fragments under ', $article_dir, '.';
 }
 
 chomp @item_to_fragment_lines;
@@ -138,6 +173,7 @@ sub resolve_item {
   return $resolved;
 }
 
+my $dependencies_script = $script_paths{'dependencies.pl'};
 foreach my $item (keys %item_to_fragment_table) {
   my $fragment = $item_to_fragment_table{$item};
   $fragment =~ m/^${article_basename}:fragment:([0-9]+)$/;
@@ -152,7 +188,7 @@ foreach my $item (keys %item_to_fragment_table) {
     print 'Error: the .miz file for fragment ', $fragment_number, ' of ', $article_basename, ' does not exist at the expected location (', $fragment_miz, ').', "\n";
     exit 1;
   }
-  my @fragment_dependencies = `$dependencies_script $fragment_miz 2> /dev/null`;
+  my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} --script-home=${script_home} $fragment_miz 2> /dev/null`;
   (my $dependencies_exit_code, my $dependencies_message) = ($? >> 8, $!);
   if ($dependencies_exit_code != 0) {
     print 'Error: something went wrong when calling the dependencies script on fragment ', $fragment_number, ' of ', $article_basename, ';', "\n";
