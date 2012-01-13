@@ -55,7 +55,9 @@ if (! -e $article_xml) {
 
 if (! -e $article_absolute_xml) {
 
-  print 'The absolute form of the XML for ', $article_basename, ' does not exist.  Generating...';
+  if ($verbose) {
+    print 'The absolute form of the XML for ', $article_basename, ' does not exist.  Generating...';
+  }
 
   my $absrefs_stylesheet = $stylesheet_paths{'absrefs'};
   my $xsltproc_status = system ("xsltproc --output $article_absolute_xml $absrefs_stylesheet $article_xml 2>/dev/null | sort -u | uniq");
@@ -65,12 +67,16 @@ if (! -e $article_absolute_xml) {
   # .bex'.  But we will check that the $article_absolute_xml exists.
 
   if (! -e $article_absolute_xml) {
-    print "\n";
+    if ($verbose) {
+      print "\n";
+    }
     die 'Error: we failed to generate the absolute form of the XML for ', $article_basename, '.', "\n";
     exit 1;
   }
 
-  print 'done.', "\n";
+  if ($verbose) {
+    print 'done.', "\n";
+  }
 }
 
 my $dependencies_stylesheet = $stylesheet_paths{'dependencies'};
