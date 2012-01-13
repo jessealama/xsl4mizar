@@ -353,9 +353,8 @@ sub list_as_token_string {
 
 sub fragment_number {
   my $fragment_path = shift;
-  $fragment_path =~ m/^ckb([0-9]+)\./;
-  my $fragment_number = $1;
-  if (defined $fragment_number) {
+  if ($fragment_path =~ m{ \A ckb ([0-9]+) [.] }x) {
+    my $fragment_number = $1;
     return $fragment_number;
   } else {
     print 'Error: we could not extract the fragment number from the path \'', $fragment_path, '\'.', "\n";
