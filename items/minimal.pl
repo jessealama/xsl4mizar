@@ -1,63 +1,5 @@
 #!/usr/bin/perl -w
 
-=cut
-
-=head1 minimal.pl
-
-minimal.pl - Minimize the environment of a mizar article
-
-=head1 SYNOPSIS
-
-minimize.pl [options] mizar-article
-
-Options:
-  -help                       Brief help message
-  -man                        Full documentation
-  -verbose                    Say what we're doing
-  -paranoid                   Check that the article is verifiable before and after we're done minimizing
-  -confirm-only               Don't minimize; simply check that the environment really is minimal
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<--help>
-
-Print a brief help message and exits.
-
-=item B<--man>
-
-Prints the manual page and exits.
-
-=item B<--verbose>
-
-Say what environment file we're minimizing, and for each environment
-file, say how many environment "items" are present there and how many
-we really need.
-
-=item B<--paranoid>
-
-Before minimizing, check that the article is verifiable.  If it is,
-the continue, otherwise exit uncleanly.  After minimization of the
-article's environment, check again that it is verifiable.  If it
-isn't, then exit uncleanly.
-
-=item B<--confirm-only>
-
-Don't do any minimization, but check that the environment really is
-minimal in the sense that there is no item from any environment file
-(except the .atr file) that can be deleted while still preserving
-verifiability.
-
-=back
-
-=head1 DESCRIPTION
-
-B<minimize.pl> will construct, in a brute-force manner, the smallest
-environment with respect to which the given article is verifiable.
-
-=cut
-
 use strict;
 use File::Basename qw(basename dirname);
 use XML::LibXML;
@@ -877,3 +819,63 @@ if ($paranoid == 1 or $confirm_only == 1) {
   }
 
 }
+
+__END__
+
+=cut
+
+=head1 minimal.pl
+
+minimal.pl - Minimize the environment of a mizar article
+
+=head1 SYNOPSIS
+
+minimize.pl [options] mizar-article
+
+Options:
+  -help                       Brief help message
+  -man                        Full documentation
+  -verbose                    Say what we're doing
+  -paranoid                   Check that the article is verifiable before and after we're done minimizing
+  -confirm-only               Don't minimize; simply check that the environment really is minimal
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--verbose>
+
+Say what environment file we're minimizing, and for each environment
+file, say how many environment "items" are present there and how many
+we really need.
+
+=item B<--paranoid>
+
+Before minimizing, check that the article is verifiable.  If it is,
+the continue, otherwise exit uncleanly.  After minimization of the
+article's environment, check again that it is verifiable.  If it
+isn't, then exit uncleanly.
+
+=item B<--confirm-only>
+
+Don't do any minimization, but check that the environment really is
+minimal in the sense that there is no item from any environment file
+(except the .atr file) that can be deleted while still preserving
+verifiability.
+
+=back
+
+=head1 DESCRIPTION
+
+B<minimize.pl> will construct, in a brute-force manner, the smallest
+environment with respect to which the given article is verifiable.
+
+=cut
