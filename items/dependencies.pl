@@ -41,6 +41,7 @@ my $article = $ARGV[0];
 
 my $article_basename = basename ($article, '.miz');
 my $article_dirname = dirname ($article);
+my $article_miz = "${article_dirname}/${article_basename}.miz";
 my $article_xml = "${article_dirname}/${article_basename}.xml";
 my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
@@ -58,8 +59,65 @@ foreach my $stylesheet (keys %stylesheet_paths) {
   }
 }
 
+sub ensure_sensible_mizar_environment {
+  # MIZFILES is set and refers to an existing directory
+  if (! defined $ENV{'MIZFILES'}) {
+    die 'Error: we were asked to ensure a sensible Mizar environment, but the MIZFILES environment variable appears not to be set.';
+  }
+  my $mizfiles = $ENV{'MIZFILES'};
+  if (! -e $mizfiles) {
+    die 'Error: we were asked to ensure a sensible Mizar environment, but the value of the MIZFILES environment variable,', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'does not exist.';
+  }
+  if (! -d $mizfiles) {
+    die 'Error: we were asked to ensure a sensible Mizar environment, but the value of the MIZFILES environment variable,', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'is not a directory.';
+  }
+  my @mizar_tools = ('accom', 'verifier');
+  foreach my $tool (@mizar_tools) {
+    my $which_status = system ("which $tool > /dev/null 2>&1");
+    my $which_exit_code = $which_status >> 8;
+    if ($which_exit_code != 0) {
+      die 'Error: we were asked to ensure a sensible Mizar environment, but the needed Mizar tool ', $tool, ' could not be found (or is not executable).';
+    }
+  }
+  return 1;
+}
+
+sub run_mizar_tool {
+  my $tool = shift;
+  my $article_err = "${article_dirname}/${article_basename}.err";
+  my $tool_status = system ("$tool $article_miz > /dev/null 2>&1");
+  my $tool_exit_code = $tool_status >> 8;
+  unless ($tool_exit_code == 0 && -z $article_err) {
+    if ($verbose) {
+      print 'Error: the ', $tool, ' Mizar tool did not exit cleanly when applied to ', $article_miz, ' (or the .err file is non-empty).', "\n";
+    }
+    return 0;
+  }
+  return 1;
+}
+
+sub accom {
+  my $article = shift;
+  return (run_mizar_tool ('accom -s -l -q'));
+}
+
+sub verifier {
+  my $article = shift;
+  return (run_mizar_tool ('verifier -s -l -q'));
+}
+
 if (! -e $article_xml) {
-  die 'The XML for ', $article_basename, ' does not exist.  Please run the article fist through the verifier.';
+  if ($verbose) {
+    print 'The semantic XML for ', $article_basename, ' does not exist.  Generating...';
+  }
+  ensure_sensible_mizar_environment ();
+  if (accom ($article_miz)) {
+    if (! verifier ($article_miz)) {
+      die 'Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to verify the article.';
+    }
+  } else {
+    die 'Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to accommodate the article.';
+  }
 }
 
 if (! -e $article_absolute_xml) {
