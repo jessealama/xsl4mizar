@@ -2,9 +2,6 @@ stylesheet 1.0;
 
 output method=xml indent="yes";
 
-include ../utils/die.xsl;
-include ../utils/tokens.xsl;
-
 // This stylesheet operates on .atr files output by the mizar
 // accommodator. The result is another .atr file. There is one
 // parameter:
