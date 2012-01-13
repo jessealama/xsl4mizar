@@ -1,41 +1,58 @@
 #!/usr/bin/perl -w
 
 use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
 use File::Basename qw(basename dirname);
 
-unless (scalar @ARGV == 1) {
-  print 'Usage: dependencies.pl ARTICLE', "\n";
-  exit 1;
-}
+my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+my $verbose = 0;
+my $man = 0;
+my $help = 0;
+
+GetOptions('help|?' => \$help,
+           'man' => \$man,
+           'verbose'  => \$verbose,
+	   'stylesheet-home=s' => \$stylesheet_home)
+  or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+pod2usage(1) unless (scalar @ARGV == 1);
 
 my $article = $ARGV[0];
 
 my $article_basename = basename ($article, '.miz');
 my $article_dirname = dirname ($article);
-my $article_miz = "${article_dirname}/${article_basename}.miz";
 my $article_xml = "${article_dirname}/${article_basename}.xml";
 my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
-unless (-e $article_miz) {
-  print 'Error: the .miz for ', $article_basename, ' does not exist.', "\n";
+unless (-e $stylesheet_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
   exit 1;
 }
 
-unless (-r $article_miz) {
-  print 'Error: the .miz for ', $article_basename, ' is unreadable.', "\n";
+unless (-d $stylesheet_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
   exit 1;
 }
 
-my $absrefs_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/addabsrefs.xsl';
+my $absrefs_stylesheet = "${stylesheet_home}/addabsrefs.xsl";
+my $inferred_constructors_stylesheet = "${stylesheet_home}/inferred-constructors.xsl";
+my $dependencies_stylesheet = "${stylesheet_home}/dependencies.xsl";
 
-unless (-e $absrefs_stylesheet) {
-  print 'Error: the absolutizer stylesheet does not exist at the expected location (', $absrefs_stylesheet, ').', "\n";
-  exit 1;
-}
+my @stylesheets = ('absrefs', 'inferred-constructors', 'dependencies');
 
-unless (-r $absrefs_stylesheet) {
-  print 'Error: the absolutizer stylesheet at ', $absrefs_stylesheet, ' is unreadable.', "\n";
-  exit 1;
+foreach my $stylesheet (@stylesheets) {
+  my $stylesheet_path = "${stylesheet_home}/${stylesheet}.xsl";
+  unless (-e $stylesheet_path) {
+    print 'Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').', "\n";
+    exit 1;
+  }
+  unless (-r $stylesheet_path) {
+    print 'Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.', "\n";
+    exit 1;
+  }
 }
 
 if (! -e $article_xml) {
@@ -62,18 +79,6 @@ if (! -e $article_absolute_xml) {
   print 'done.', "\n";
 }
 
-my $dependencies_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/items/dependencies.xsl';
-
-unless (-e $dependencies_stylesheet) {
-  print 'Error: the dependencies stylesheet does not exist at the expected location (', $dependencies_stylesheet, ').', "\n";
-  exit 1;
-}
-
-unless (-r $dependencies_stylesheet) {
-  print 'Error: the dependencies stylesheet at ', $dependencies_stylesheet, ' is unreadable.', "\n";
-  exit 1;
-}
-
 my @non_constructor_deps = `xsltproc $dependencies_stylesheet $article_absolute_xml 2>/dev/null`;
 chomp @non_constructor_deps;
 
@@ -84,16 +89,6 @@ if (grep (/^$/, @non_constructor_deps)) {
 }
 
 # Constructors are a special case
-
-my $inferred_constructors_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/items/inferred-constructors.xsl';
-
-unless (-e $inferred_constructors_stylesheet) {
-  print 'Error: the inferred-constructors stylesheet does not exist at the expected location (', $inferred_constructors_stylesheet, ').', "\n";
-}
-
-unless (-r $inferred_constructors_stylesheet) {
-  print 'Error: the inferred-constructors stylesheet at ', $inferred_constructors_stylesheet, ' is unreadable.', "\n";
-}
 
 my @constructor_deps = `xsltproc $inferred_constructors_stylesheet $article_absolute_xml 2>/dev/null | sort -u | uniq`;
 chomp @constructor_deps;
@@ -107,3 +102,39 @@ if (grep (/^$/, @constructor_deps)) {
 foreach my $dep (@constructor_deps, @non_constructor_deps) {
   print $dep, "\n";
 }
+
+__END__
+
+=head1 DEPENDENCIES
+
+dependencies.pl - Print the dependencies of a Mizar article
+
+=head1 SYNOPSIS
+
+dependencies.pl [options] mizar-article
+
+Options:
+  --help            brief help message
+  --man             full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<dependencies.pl> will consult the given article as well as its
+environment to determine the article's dependencies, which it prints
+(one per line) to standard output.
+
+=cut
