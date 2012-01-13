@@ -465,14 +465,6 @@ foreach my $i (1 .. scalar @fragments) {
     exit 1;
   }
 
-  if ($paranoid) {
-    my $verifier_ok = verify ($fragment_path);
-    if ($verifier_ok != 1) {
-      print 'Paranoia: fragment number ', $i, ' of ', $article_basename, ' is not verifiable.', "\n";
-      exit 1;
-    }
-  }
-
   # Now export and transfer the fragment
 
   my $accom_ok = run_mizar_tool ('accom', $fragment_miz);
