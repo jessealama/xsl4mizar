@@ -114,10 +114,6 @@ dependencies.pl - Print the dependencies of a Mizar article
 
 dependencies.pl [options] mizar-article
 
-Options:
-  --help            brief help message
-  --man             full documentation
-
 =head1 OPTIONS
 
 =over 8
