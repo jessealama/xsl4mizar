@@ -147,7 +147,7 @@ if (! -e $article_absolute_xml) {
 }
 
 my $dependencies_stylesheet = $stylesheet_paths{'dependencies'};
-my @non_constructor_deps = `xsltproc $dependencies_stylesheet $article_absolute_xml 2>/dev/null`;
+my @non_constructor_deps = `xsltproc $dependencies_stylesheet $article_absolute_xml`;
 chomp @non_constructor_deps;
 
 # Sanity check: the stylsheet didn't produce any junk output
@@ -158,7 +158,7 @@ if (grep (/^$/, @non_constructor_deps)) {
 # Constructors are a special case
 
 my $inferred_constructors_stylesheet = $stylesheet_paths{'inferred-constructors'};
-my @constructor_deps = `xsltproc $inferred_constructors_stylesheet $article_absolute_xml 2>/dev/null | sort -u | uniq`;
+my @constructor_deps = `xsltproc $inferred_constructors_stylesheet $article_absolute_xml | sort -u | uniq`;
 chomp @constructor_deps;
 
 # Sanity check: the stylesheet didn't produce any junk output
