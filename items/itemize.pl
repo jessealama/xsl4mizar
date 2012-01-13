@@ -467,14 +467,12 @@ foreach my $i (1 .. scalar @fragments) {
 
   # Now export and transfer the fragment
 
-  my $accom_ok = run_mizar_tool ('accom', $fragment_miz);
-  if ($accom_ok == 1) {
-    my $verifier_ok = run_mizar_tool ('verifier', $fragment_miz);
-    if ($verifier_ok == 1) {
-      my $exporter_ok = run_mizar_tool ('exporter', $fragment_miz);
-      if ($exporter_ok == 1) {
-	my $transfer_ok = run_mizar_tool ('transfer', $fragment_miz);
-	if ($transfer_ok != 1) {
+  if (run_mizar_tool ('accom', $fragment_miz)) {
+    if (run_mizar_tool ('verifier', $fragment_miz)) {
+      if (run_mizar_tool ('exporter', $fragment_miz)) {
+	if (run_mizar_tool ('transfer', $fragment_miz)) {
+	  # nothing to do
+	} else {
 	  if ($verbose) {
 	    print 'Warning: fragment number ', $i, ' of ', $article_basename, ' is not transferrable.', "\n";
 	  }
