@@ -420,31 +420,31 @@ foreach my $i (1 .. scalar @fragments) {
     if (-f $prel_path) {
       my $fragment_number = fragment_number ($prel_file);
       my $fragment_article_name_uc = 'CKB' . $fragment_number;
-      if ($prel_file =~ /\.dno$/) {
+      if ($prel_file =~ / [.]dno \z /x) {
 	push (@new_notations, $fragment_article_name_uc);
       }
-      if ($prel_file =~ /\.drd$/) {
+      if ($prel_file =~ / [.]drd \z /x) {
 	push (@new_registrations, $fragment_article_name_uc);
       }
-      if ($prel_file =~ /\.dcl$/) {
+      if ($prel_file =~ / [.]dcl \z /x) {
 	push (@new_registrations, $fragment_article_name_uc)
       }
-      if ($prel_file =~ /\.eid$/) {
+      if ($prel_file =~ / [.]eid \z /x) {
 	push (@new_registrations, $fragment_article_name_uc)
       }
-      if ($prel_file =~ /\.did$/) {
+      if ($prel_file =~ / [.]did \z /x) {
 	push (@new_registrations, $fragment_article_name_uc)
       }
-      if ($prel_file =~ /\.sch$/) {
+      if ($prel_file =~ / [.]sch \z /x) {
 	push (@new_schemes, $fragment_article_name_uc)
       }
-      if ($prel_file =~ /\.dco$/) {
+      if ($prel_file =~ / [.]dco \z /x) {
 	push (@new_constructors, $fragment_article_name_uc)
       }
-      if ($prel_file =~ /\.def$/) {
+      if ($prel_file =~ / [.]def \z /x) {
 	push (@new_definitions, $fragment_article_name_uc)
       }
-      if ($prel_file =~ /\.the$/) {
+      if ($prel_file =~ / [.]the \z /x) {
 	push (@new_theorems, $fragment_article_name_uc)
       }
     }
