@@ -9,9 +9,10 @@ output method=xml indent="yes";
 // * constructors
 //
 // which should be a comma-delimited list (starting and ending with a
-// comma, if not empty).  The format of each constructor should be:
+// comma, if not empty).  The format of each constructor should be in
+// the mizar-items notation for constructors:
 //
-// <article-ID>:<kind>:<nr>:<relnr>
+// <article-ID>:<kind>constructor:<nr>
 //
 // Any constructor that matches this pattern in the .atr will be
 // "promoted" in the sense that its arguments (if there are any) will
@@ -53,8 +54,15 @@ tpl escape-backslash (#str) {
   }
 }
 
-tpl found (#kind, #nr, #relnr, #aid) {
-  $token = `concat ($aid, ":", $kind, ":", $nr, ":", $relnr)`;
+$lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
+$ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+
+tpl lowercase (#string) { `translate($string, $ucletters, $lcletters)`; }
+
+tpl found (#kind, #nr, #aid) {
+  $kind-lc = lowercase (#string = $kind);
+  $aid-lc = lowercase (#string = $aid);
+  $token = `concat ($aid-lc, ":", $kind-lc, "constructor", ":", $nr)`;
   if [contains ($constructors, $token)] {
     "1";
   } else {
@@ -91,10 +99,10 @@ tpl [Typ] mode="promote" {
 tpl [Constructor[@kind = "M" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    $found = found (#kind = "M", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    $found = found (#kind = "M", #nr = `@nr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
-      // apply [Properties] mode="promote";
+      // apply [Properties]
       apply [ArgTypes] mode="promote"; // argument types
       apply [Typ] mode="promote";
     } else {
@@ -107,7 +115,7 @@ tpl [Constructor[@kind = "M" and not(@promoted = "yes")]] {
 tpl [Constructor[@kind = "L" and not(Typ)]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    $found = found (#kind = "G", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    $found = found (#kind = "G", #nr = `@nr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
@@ -122,7 +130,7 @@ tpl [Constructor[@kind = "L" and not(Typ)]] {
 tpl [Constructor[@kind = "L" and Typ]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    $found = found (#kind = "G", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    $found = found (#kind = "G", #nr = `@nr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
@@ -138,7 +146,7 @@ tpl [Constructor[@kind = "L" and Typ]] {
 tpl [Constructor[@kind = "G" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    $found = found (#kind = "G", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    $found = found (#kind = "G", #nr = `@nr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
@@ -159,7 +167,7 @@ tpl [Constructor[@kind = "G" and not(@promoted = "yes")]] {
 tpl [Constructor[@kind = "U" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    $found = found (#kind = "U", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    $found = found (#kind = "U", #nr = `@nr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
@@ -174,7 +182,7 @@ tpl [Constructor[@kind = "U" and not(@promoted = "yes")]] {
 tpl [Constructor[@kind = "V" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    $found = found (#kind = "V", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    $found = found (#kind = "V", #nr = `@nr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
       apply [ArgTypes] mode="promote"; // argument types
@@ -189,10 +197,10 @@ tpl [Constructor[@kind = "V" and not(@promoted = "yes")]] {
 tpl [Constructor[@kind = "R" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    $found = found (#kind = "R", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    $found = found (#kind = "R", #nr = `@nr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
-      // apply [Properties] mode="promote"; // ignore properties
+      apply [Properties]; // preserve properties
       apply [ArgTypes] mode="promote"; // argument types
     } else {
       @promoted = "no";
@@ -204,10 +212,10 @@ tpl [Constructor[@kind = "R" and not(@promoted = "yes")]] {
 tpl [Constructor[@kind = "K" and not(@promoted = "yes")]] {
   <Constructor {
     for-each [@*] { copy-of `.`; }
-    $found = found (#kind = "K", #nr = `@nr`, #relnr = `@relnr`, #aid = `@aid`);
+    $found = found (#kind = "K", #nr = `@nr`, #aid = `@aid`);
     if [$found = "1"] {
       @promoted = "yes";
-      // apply [Properties] mode="promote"; // ignore properties
+      apply [Properties]; // preseve properties
       apply [ArgTypes] mode="promote"; // argument types
       apply [Typ] mode="promote"; // result type
     } else {
