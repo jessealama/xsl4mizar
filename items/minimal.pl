@@ -343,9 +343,13 @@ sub minimize {
     write_element_table (\@elements, \%table, $path, $root_element_name);
     my $deletable = verify ();
     if ($deletable == 1) {
-      # print 'We can dump element #', $begin, "\n";
+      if ($verbose) {
+	print 'We can dump element #', $begin, "\n";
+      }
     } else {
-      # print 'We cannot dump element #', $begin, "\n";
+      if ($verbose) {
+	print 'We cannot dump element #', $begin, "\n";
+      }
       $table{$begin} = 0;
       write_element_table (\@elements, \%table, $path, $root_element_name);
     }
@@ -357,9 +361,13 @@ sub minimize {
     my $begin_deletable = verify ();
 
     if ($begin_deletable == 1) {
-      # print 'We can dump element #', $begin, "\n";
+      if ($verbose) {
+	print 'We can dump element #', $begin, "\n";
+      }
     } else {
-      # print 'We cannot dump element #', $begin, "\n";
+      if ($verbose) {
+	print 'We cannot dump element #', $begin, "\n";
+      }
       $table{$begin} = 0;
       write_element_table (\@elements, \%table, $path, $root_element_name);
     }
@@ -368,9 +376,13 @@ sub minimize {
     write_element_table (\@elements, \%table, $path, $root_element_name);
     my $end_deletable = verify ();
     if ($end_deletable == 1) {
-      # print 'We can dump element #', $end, "\n";
+      if ($verbose) {
+	print 'We can dump element #', $end, "\n";
+      }
     } else {
-      # print 'We cannot dump element #', $end, "\n";
+      if ($verbose) {
+	print 'We cannot dump element #', $end, "\n";
+      }
       $table{$end} = 0;
       write_element_table (\@elements, \%table, $path, $root_element_name);
     }
