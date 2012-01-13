@@ -37,14 +37,12 @@ unless (-d $stylesheet_home) {
   exit 1;
 }
 
-my $absrefs_stylesheet = "${stylesheet_home}/addabsrefs.xsl";
-my $inferred_constructors_stylesheet = "${stylesheet_home}/inferred-constructors.xsl";
-my $dependencies_stylesheet = "${stylesheet_home}/dependencies.xsl";
+my %stylesheet_paths = ('absrefs' => "${stylesheet_home}/addabsrefs.xsl",
+			'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
+			'dependencies' => "${stylesheet_home}/dependencies.xsl");
 
-my @stylesheets = ('absrefs', 'inferred-constructors', 'dependencies');
-
-foreach my $stylesheet (@stylesheets) {
-  my $stylesheet_path = "${stylesheet_home}/${stylesheet}.xsl";
+foreach my $stylesheet (keys %stylesheet_paths) {
+  my $stylesheet_path = $stylesheet_paths{$stylesheet};
   unless (-e $stylesheet_path) {
     print 'Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').', "\n";
     exit 1;
@@ -64,6 +62,7 @@ if (! -e $article_absolute_xml) {
 
   print 'The absolute form of the XML for ', $article_basename, ' does not exist.  Generating...';
 
+  my $absrefs_stylesheet = $stylesheet_paths{'absrefs'};
   my $xsltproc_status = system ("xsltproc --output $article_absolute_xml $absrefs_stylesheet $article_xml 2>/dev/null | sort -u | uniq");
 
   # Skip checking the exit code of xsltproc; we can be safe even when
@@ -79,6 +78,7 @@ if (! -e $article_absolute_xml) {
   print 'done.', "\n";
 }
 
+my $dependencies_stylesheet = $stylesheet_paths{'dependencies'};
 my @non_constructor_deps = `xsltproc $dependencies_stylesheet $article_absolute_xml 2>/dev/null`;
 chomp @non_constructor_deps;
 
@@ -90,6 +90,7 @@ if (grep (/^$/, @non_constructor_deps)) {
 
 # Constructors are a special case
 
+my $inferred_constructors_stylesheet = $stylesheet_paths{'inferred-constructors'};
 my @constructor_deps = `xsltproc $inferred_constructors_stylesheet $article_absolute_xml 2>/dev/null | sort -u | uniq`;
 chomp @constructor_deps;
 
