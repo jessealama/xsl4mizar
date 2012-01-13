@@ -20,6 +20,14 @@ pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 pod2usage(1) unless (scalar @ARGV == 1);
 
+if (! -e $stylesheet_home) {
+  die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
+}
+
+if (! -d $stylesheet_home) {
+  die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
+}
+
 my $article = $ARGV[0];
 
 my $article_basename = basename ($article, '.miz');
@@ -27,24 +35,16 @@ my $article_dirname = dirname ($article);
 my $article_xml = "${article_dirname}/${article_basename}.xml";
 my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
-unless (-e $stylesheet_home) {
-  die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
-}
-
-unless (-d $stylesheet_home) {
-  die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
-}
-
 my %stylesheet_paths = ('absrefs' => "${stylesheet_home}/addabsrefs.xsl",
 			'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
 			'dependencies' => "${stylesheet_home}/dependencies.xsl");
 
 foreach my $stylesheet (keys %stylesheet_paths) {
   my $stylesheet_path = $stylesheet_paths{$stylesheet};
-  unless (-e $stylesheet_path) {
+  if (! -e $stylesheet_path) {
     die 'Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').';
   }
-  unless (-r $stylesheet_path) {
+  if (! -r $stylesheet_path) {
     die 'Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.';
   }
 }
@@ -64,7 +64,7 @@ if (! -e $article_absolute_xml) {
   # it is non-zero, owing to errors like 'Missing .fex' and 'Missing
   # .bex'.  But we will check that the $article_absolute_xml exists.
 
-  unless (-e $article_absolute_xml) {
+  if (! -e $article_absolute_xml) {
     print "\n";
     die 'Error: we failed to generate the absolute form of the XML for ', $article_basename, '.', "\n";
     exit 1;
