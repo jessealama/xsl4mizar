@@ -6,7 +6,7 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Basename qw(basename dirname);
 
-my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+my $stylesheet_home = undef;
 my $verbose = 0;
 my $man = 0;
 my $help = 0;
