@@ -20,12 +20,21 @@ pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 pod2usage(1) unless (scalar @ARGV == 1);
 
-if (! -e $stylesheet_home) {
-  die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
-}
-
-if (! -d $stylesheet_home) {
-  die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
+if (defined $stylesheet_home) {
+  if (! -e $stylesheet_home) {
+    die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
+  }
+  if (! -d $stylesheet_home) {
+    die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
+  }
+} else {
+  $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+  if (! -e $stylesheet_home) {
+    die 'Error: the default directory in which we look for stylesheets', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'does not exist.  Consider using the --stylesheet-home option.', "\n";
+  }
+  if (! -d $stylesheet_home) {
+    die 'Error: the default directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --stylesheet-home option.', "\n";
+  }
 }
 
 my $article = $ARGV[0];
