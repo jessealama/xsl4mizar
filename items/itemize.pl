@@ -302,10 +302,7 @@ my $xml_parser = XML::LibXML->new (suppress_warnings => 1,
 				   suppress_errors => 1);
 
 my $article_evl_doc = undef;
-eval {
-  $article_evl_doc = $xml_parser->parse_file ($article_evl_in_target_dir);
-};
-if ($@) {
+unless ($article_evl_doc = eval { $xml_parser->parse_file ($article_evl_in_target_dir)  } ) {
   print 'Error: ', $article_evl_in_target_dir, ' is not well-formed XML.', "\n";
   exit 1;
 }
@@ -338,12 +335,7 @@ my @constructors = map { ident_name($_) } @constructors_nodes;
 
 my $itemized_article_doc = undef;
 
-eval {
-  $itemized_article_doc
-    = $xml_parser->parse_file ($article_itemized_wsx_in_target_dir);
-};
-
-if ($@) {
+unless ($itemized_article_doc = eval { $xml_parser->parse_file ($article_itemized_wsx_in_target_dir) } ) {
   print 'Error: the XML in ', $article_itemized_wsx_in_target_dir, ' is not well-formed.', "\n";
   exit 1;
 }
