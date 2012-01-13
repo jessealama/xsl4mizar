@@ -50,7 +50,7 @@ foreach my $stylesheet (keys %stylesheet_paths) {
 }
 
 if (! -e $article_xml) {
-  die 'The XML for ', $article_basename, ' does not exist.';
+  die 'The XML for ', $article_basename, ' does not exist.  Please run the article fist through the verifier.';
 }
 
 if (! -e $article_absolute_xml) {
