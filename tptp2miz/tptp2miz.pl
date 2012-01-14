@@ -26,7 +26,9 @@ my $db = undef;
 my $verbose = 0;
 
 GetOptions ("db=s"     => \$db,
-            "verbose"  => \$verbose);
+            "verbose"  => \$verbose,
+	    'help' => \$help,
+	    'man' => \$man);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 pod2usage(1) if (scalar @ARGV != 1);
