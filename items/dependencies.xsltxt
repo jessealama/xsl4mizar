@@ -42,7 +42,7 @@ tpl [Article[not(@aid)]] {
 tpl [Article[@aid]] {
   $aid-lc = lc (#s = `@aid`);
 
-  // definiftions
+  // deftheorems
   for-each [descendant::Ref[@kind = "D" and @absnr and @aid]] {
     apply [.]; "\n";
   }
