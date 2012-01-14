@@ -58,8 +58,7 @@ if (defined $script_home) {
 my $article_dir = $ARGV[0];
 
 unless (-d $article_dir) {
-  print 'Error: ', $article_dir, ' is not a directory.', "\n";
-  exit 1;
+  die 'Error: ', $article_dir, ' is not a directory.', "\n";
 }
 
 my $article_basename = basename ($article_dir);
@@ -85,10 +84,17 @@ my @item_to_fragment_lines = `$map_ckb_script $article_dir`;
 
 my ($item_to_fragment_exit_code, $item_to_fragment_message) = ($? >> 8, $!);
 if ($item_to_fragment_exit_code != 0) {
-  print 'Error: something went wrong computing the item-to-fragment table;', "\n";
-  print 'the exit code was ', $item_to_fragment_exit_code, ' and the message was:', "\n";
-  print $item_to_fragment_message, "\n";
-  exit 1;
+  if (-z $map_ckb_err_file) {
+    die 'Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, the map-ckb script did not produce any error output.)';
+  } elsif (! -r $map_ckb_err_file) {
+    die 'Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, we are unable to read the error output file of the map-ckb script.)';
+  } else {
+    print STDERR ('Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", 'Here is the error output produced by the map-ckb script:', "\n");
+    print '----------------------------------------------------------------------', "\n";
+    system ('cat', $map_ckb_err_file);
+    print '----------------------------------------------------------------------', "\n";
+    die;
+  }
 }
 
 if (scalar @item_to_fragment_lines == 0) {
@@ -126,16 +132,14 @@ sub resolve_item {
     (my $item_fragment_num, my $item_kind) = ($1, $2);
     unless (defined $item_fragment_num && defined $item_kind) {
       print "\n";
-      print 'Error: we could not extract the fragment number and item kind from the string "', $item, '"', "\n";
-      exit 1;
+      die 'Error: we could not extract the fragment number and item kind from the string "', $item, '"';
     }
     my $item_fragment = "${article_basename}:fragment:${item_fragment_num}";
     if (defined $fragment_to_item_table{$item_fragment}) {
       my @generated_items = @{$fragment_to_item_table{$item_fragment}};
       if (scalar @generated_items == 0) {
         print "\n";
-        print 'Error: somehow the entry in the fragment-to-item table for ', $item_fragment, ' is an empty list.', "\n";
-        exit 1;
+        die 'Error: somehow the entry in the fragment-to-item table for ', $item_fragment, ' is an empty list.', "\n";
       }
       if (scalar @generated_items == 1) {
         # Easy: the dependent fragment generated exactly one item;
@@ -148,24 +152,21 @@ sub resolve_item {
         my @candidate_items = grep (/:${item_kind}:/, @generated_items);
         if (scalar @candidate_items == 0) {
           print "\n";
-          print 'Error: there are no candidate matches for ', $item_fragment, ' in the fragment-to-item table.', "\n";
-          exit 1;
+          die 'Error: there are no candidate matches for ', $item_fragment, ' in the fragment-to-item table.', "\n";
         }
         if (scalar @candidate_items > 1) {
           print "\n";
-          print 'Error: there are multiple candidate matches for ', $item_fragment, ' in the fragment-to-item table:', "\n";
+          print STDERR ('Error: there are multiple candidate matches for ', $item_fragment, ' in the fragment-to-item table:');
           foreach my $candidate (@candidate_items) {
-            print '* ', $candidate, "\n";
+            print STDERR ('* ', $candidate, "\n");
           }
-          print 'We require that there be exactly one.', "\n";
-          exit 1;
+          die 'We require that there be exactly one.';
         }
 
         $resolved = $candidate_items[0];
       }
     } else {
-      print 'Error: the fragment-to-item table does not contain ', $item, '.', "\n";
-      exit 1;
+      die 'Error: the fragment-to-item table does not contain ', $item, '.', "\n";
     }
   } else {
     $resolved = $item;
@@ -179,22 +180,18 @@ foreach my $item (keys %item_to_fragment_table) {
   $fragment =~ m/^${article_basename}:fragment:([0-9]+)$/;
   my $fragment_number = $1;
   unless (defined $fragment_number) {
-    print 'Error: we could not extract the article fragment number from the text', "\n";
-    print '  ', $fragment, "\n";
-    exit 1;
+    die 'Error: we could not extract the article fragment number from the text', "\n", '  ', $fragment;
   }
   my $fragment_miz = "${article_dir}/text/ckb${fragment_number}.miz";
   unless (-e $fragment_miz) {
-    print 'Error: the .miz file for fragment ', $fragment_number, ' of ', $article_basename, ' does not exist at the expected location (', $fragment_miz, ').', "\n";
-    exit 1;
+    die 'Error: the .miz file for fragment ', $fragment_number, ' of ', $article_basename, ' does not exist at the expected location (', $fragment_miz, ').';
   }
   my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} --script-home=${script_home} $fragment_miz 2> /dev/null`;
   (my $dependencies_exit_code, my $dependencies_message) = ($? >> 8, $!);
   if ($dependencies_exit_code != 0) {
-    print 'Error: something went wrong when calling the dependencies script on fragment ', $fragment_number, ' of ', $article_basename, ';', "\n";
-    print 'The exit code was ', $dependencies_exit_code, ' and the message was:', "\n";
-    print $dependencies_message, "\n";
-    exit 1;
+    print STDERR ('Error: something went wrong when calling the dependencies script on fragment ', $fragment_number, ' of ', $article_basename, ';', "\n");
+    print STDERR ('The exit code was ', $dependencies_exit_code, ' and the message was:', "\n");
+    die $dependencies_message, "\n";
   }
 
   print $item;
@@ -205,8 +202,7 @@ foreach my $item (keys %item_to_fragment_table) {
 
       unless (defined $resolved_dep) {
         print "\n";
-        print 'Error: we were unable to resolve the item ', $dep, '.', "\n";
-        exit 1;
+        die 'Error: we were unable to resolve the item ', $dep, '.';
       }
 
       # Special case: if we are computing the dependencies of a
