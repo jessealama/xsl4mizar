@@ -19,20 +19,16 @@ pod2usage(1) if (! defined $db);
 
 pod2usage(1) if (scalar @ARGV != 1);
 
-if (-e $db) {
-  die 'Error: the specified directory', "\n", "\n", '  ', $db, "\n", "\n", 'in which we are to save our work already exists.', "\n", 'Please use a different name';
-} else {
-  mkdir $db;
+sub strip_extension {
+  my $path = shift;
+  if ($path =~ /(.+)[.][^.]+$/) {
+    return $1;
+  } else {
+    return $path;
+  }
 }
 
 my $tptp_file = $ARGV[0];
-my $tptp_basename = basename ($tptp_file);
-my $tptp_short_name = substr $tptp_basename,0,8;
-my $tptp_dirname = dirname ($tptp_file);
-
-if ($verbose == 1) {
-  print 'Using \'', $tptp_short_name, '\' as the name of the file.', "\n";
-}
 
 if (! -e $tptp_file) {
   die 'Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'does not exist.';
@@ -41,6 +37,45 @@ if (! -e $tptp_file) {
 if (! -r $tptp_file) {
   die 'Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'is not readable.';
 }
+
+my $tptp_basename = basename ($tptp_file);
+my $tptp_sans_extension = strip_extension ($tptp_basename);
+
+if (length $tptp_sans_extension == 0) {
+  die 'Error: after stipping the extension of the supplied TPTP theory file, we are left with just the empty string, which is an unacceptable name for a Mizar article.';
+}
+
+my $tptp_short_name = substr $tptp_basename,0,8;
+
+if ($verbose == 1) {
+  print 'Using \'', $tptp_short_name, '\' as the name of the file.', "\n";
+}
+
+if (length $tptp_sans_extension > 8) {
+  print STDERR ('Warning: the length of the basename of the supplied file, even when its extension is stripped, exceeds 8 characters.', "\n", 'Since Mizar articles are requires to have names at most 8 characters long, we have truncated the name to \'', $tptp_short_name, '\'.', "\n");
+}
+
+if ($tptp_short_name !~ /[a-zA-Z0-9_]{1,8}/) {
+  die 'Error: the name that we will use for the Mizar article, \'', $tptp_short_name, '\', is unacceptabl as the name of a Mizar article.', "\n", 'Valid names for Mizar articles are alphanumeric characters and the underscore \'_\'.';
+}
+
+if (defined $db) {
+  if (-e $db) {
+    die 'Error: the specified directory', "\n", "\n", '  ', $db, "\n", "\n", 'in which we are to save our work already exists.', "\n", 'Please use a different name';
+  } else {
+    mkdir $db
+      or die 'Error: unable to make a directory at ', $db;
+  }
+} else {
+  if (-e $tptp_short_name) {
+    die 'Error: we are to save our work in the directory \'', $tptp_short_name, '\' inferred from the name of the supplied TPTP theory.  But there is already a file or directory by that name in the current working directory.  Use the --db option to specify a destination, or move the current file or directory out of the way.';
+  }
+  mkdir $tptp_short_name
+    or die 'Error: unable to make the directory \'', $tptp_short_name, '\' in the current working directory.';
+  $db = $tptp_short_name;
+}
+
+my $tptp_dirname = dirname ($tptp_file);
 
 # Check that tptp4X is available
 
