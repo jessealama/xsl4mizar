@@ -4,6 +4,19 @@ stylesheet 1.0;
 
 output method="text";
 
+//////////////////////////////////////////////////////////////////////
+// Stylesheet parameters
+//////////////////////////////////////////////////////////////////////
+
+// The directory in which to look for the given article's environment.
+// If unset, we will look in whatever direcory the XSLT processor is
+// working in.
+#article-directory = { ""; }
+
+//////////////////////////////////////////////////////////////////////
+// Utilities
+//////////////////////////////////////////////////////////////////////
+
 $lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
 $ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
@@ -35,14 +48,16 @@ tpl [Article[@aid]] {
     apply [.]; "\n";
   }
 
-  // needed schemes
+  // schemes
   $esh = `concat ($aid-lc, ".esh")`;
+  $full-esh = `concat ($article-directory, $esh)`;
   for-each [document ($esh, /)] {
     apply [Schemes];
   }
 
   // needed definientia
   $dfs = `concat ($aid-lc, ".dfs")`;
+  $full-dfs = `concat ($article-directory, $dfs)`;
   for-each [document ($dfs, /)] {
     apply [Definientia];
   }
