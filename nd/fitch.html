@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
+<head>
+  <link rel="stylesheet" type="text/css" href="fitch.css"/>
+  <title>WebPelican Web Tutorials</title>
+</head>
+<body>
+  <table cellspacing="0">
+    <tr>
+      <td class="number">1</td>
+      <td colspan="3">&exist;<i>x</i> P(<i>x</i>)</td>
+      <td class="justification">premise</td>
+    </tr>
+    <tr>
+      <td class="number">2</td>
+      <td colspan="3">&forall;x(P(<i>x</i>) &rarr; (R(<i>x</i>) &or; Q(<i>x</i>)))</td>
+      <td class="justification">premise</td>
+    </tr>
+    <tr>
+      <td class="number">3</td>
+      <td colspan="3">&forall;<i>x</i>(R(<i>x</i>) &rarr; S(<i>x</i>))</td>
+      <td class="justification">premise</td>
+    </tr>
+    <tr>
+      <td class="number"></td>
+      <td colspan="3" class="let"><span class="fixed-variable"><i>x</i><sub>0</sub></span></td>
+      <td class="justification"></td>
+    </tr>
+    <tr>
+      <td class="number">4</td>
+      <td class="first-subproof"></td>
+      <td colspan="2" class="first-subproof-formula">P(<i>x</i><sub>0</sub>)</td>
+      <td class="justification">assumption</td>
+    </tr>
+    <tr>
+      <td class="number">5</td>
+      <td class="subproof"></td>
+      <td colspan="2">P(<i>x</i><sub>0</sub>) &rarr; (R(<i>x</i><sub>0</sub>) &or; Q(<i>x</i><sub>0</sub>))</td>
+      <td class="justification">&forall;-E, 2</td>
+    </tr>
+    <tr>
+      <td class="number">6</td>
+      <td class="subproof"></td>
+      <td colspan="2">R(<i>x</i><sub>0</sub>) &or; Q(<i>x</i><sub>0</sub>)</td>
+      <td class="justification">&rarr;-E, 4, 5</td>
+    </tr>
+    <tr>
+      <td class="number">7</td>
+      <td class="subproof"></td>
+      <td class="first-subproof"></td>
+      <td class="first-subproof-formula">R(<i>x</i><sub>0</sub>)</td>
+      <td class="justification">assumption</td>
+    </tr>
+    <tr>
+      <td class="number">8</td>
+      <td class="subproof"></td>
+      <td class="subproof"></td>
+      <td>R(<i>x</i><sub>0</sub>) &rarr; S(<i>x</i><sub>0</sub>)</td>
+      <td class="justification">&forall;-E</td>
+    </tr>
+    <tr>
+      <td class="number">9</td>
+      <td class="subproof"></td>
+      <td class="subproof"></td>
+      <td>S(<i>x</i><sub>0</sub>)</td>
+      <td class="justification">&rarr;-E</td>
+    </tr>
+    <tr>
+      <td class="number">10</td>
+      <td class="subproof"></td>
+      <td class="subproof"></td>
+      <td>S(<i>x</i><sub>0</sub>) &or; Q(<i>x</i><sub>0</sub>)</td>
+      <td class="justification">&or;-I</td>
+    </tr>
+    <tr>
+      <td class="number">11</td>
+      <td class="subproof"></td>
+      <td class="last-subproof"></td>
+      <td class="last-subproof-formula">&exist;<i>x</i>(S(<i>x</i>) &or; Q(<i>x</i>)</td>
+      <td class="justification">&exist;-I</td>
+    </tr>
+    <tr>
+      <td class="number">12</td>
+      <td class="last-subproof"></td>
+      <td colspan="2" class="last-subproof-formula">&exist;<i>x</i>(S(<i>x</i>) &or; Q(<i>x</i>)</td>
+      <td class="justification">&or;-E</td>
+    </tr>
+    <tr>
+      <td class="number">13</td>
+      <td colspan="3">&exist;<i>x</i>(S(<i>x</i>) &or; Q(<i>x</i>)</td>
+      <td class="justification">&exist;-E</td>
+    </tr>
+  </table>
+</body>
+</html>
