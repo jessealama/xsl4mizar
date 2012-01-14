@@ -1,0 +1,361 @@
+stylesheet "1.0";
+
+output method="xml" encoding="utf-8" indent="yes";
+output doctype-public="-//W3C//DTD XHTML 1.1//EN";
+output doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd";
+output omit-xml-declaration="no";
+
+//////////////////////////////////////////////////////////////////////
+/// Utilities
+//////////////////////////////////////////////////////////////////////
+
+tpl list (#separ, #elems) {
+ for-each [$elems] {
+  apply[.];
+  if [not(position()=last())] { copy-of $separ; } }
+}
+
+tpl [/] {
+  apply [Ivy-Proof];
+}
+
+tpl [Ivy-Proof] {
+  <html {
+    @"xmlns" = "http://www.w3.org/1999/xhtml";
+    @xml:lang = "en";
+    @"lang" = "en";
+    <head {
+      <meta {
+        @http-equiv = "content-type";
+        @content = "text/html; charset=UTF-8";
+      }
+      <title {
+        "hey there";
+      }
+      <link {
+        @rel = "stylesheet";
+        @type = "text/css";
+        @href = "tstp.css";
+      }
+    }
+    <body {
+      <table {
+        @rules = "rows";
+        for-each [Step] {
+          apply [.]; "\n";
+        }
+      }
+    }
+  }
+}
+
+tpl [Step[@number and Rule[@name = "axiom"]]] {
+  $n = `@number`;
+  <tr {
+    @"id" = `concat ("step-", $n)`;
+    <td { `@number`; }
+    <td { @class = "rule-name"; "Axiom"; }
+    <td { @class = "rule-info"; ""; } // nothing extra in the case of axioms
+    <td { apply [*[1]]; }
+  }
+}
+
+tpl [Step[@number and Rule[@name = "instantiate" and @argument]]] {
+  $n = `@number`;
+  $arg = `Rule[@argument]/@argument`;
+  <tr {
+    @"id" = `concat ("step-", $n)`;
+    <td { `@number`; }
+    <td { @class = "rule-name"; "Instantiate"; }
+    <td { @class = "rule-info"; <a { @href = `concat ("#step-", $arg)`; `$arg`; } }
+    <td { apply [*[1]]; }
+  }
+}
+
+tpl [Step[@number and Rule[@name = "paramod" and @formula-1 and @formula-2]]] {
+  $n = `@number`;
+  $arg-1 = `Rule[@formula-1]/@formula-1`;
+  $arg-2 = `Rule[@formula-2]/@formula-2`;
+  <tr {
+    @"id" = `concat ("step-", $n)`;
+    <td { `@number`; }
+    <td { @class = "rule-name"; "Paramod"; }
+    <td { @class = "rule-info"; <a { @href = `concat ("#step-", $arg-1)`; `$arg-1`; } ", "; <a { @href = `concat ("#step-", $arg-2)`; `$arg-2`; } }
+    <td { apply [*[1]]; }
+  }
+}
+
+tpl [Step[@number and Rule[@name = "propositional" and @argument]]] {
+  $n = `@number`;
+  $arg = `Rule[@argument]/@argument`;
+  <tr {
+    @"id" = `concat ("step-", $n)`;
+    <td { `@number`; }
+    <td { @class = "rule-name"; "Propositional"; }
+    <td { @class = "rule-info"; <a { @href = `concat ("#step-", $arg)`; `$arg`; } }
+    <td { apply [*[1]]; }
+  }
+}
+
+tpl [Step[@number and Rule[@name = "resolve" and @formula-1 and @formula-2]]] {
+  $n = `@number`;
+  $arg-1 = `Rule[@formula-1]/@formula-1`;
+  $arg-2 = `Rule[@formula-2]/@formula-2`;
+  <tr {
+    @"id" = `concat ("step-", $n)`;
+    <td { `@number`; }
+    <td { @class = "rule-name"; "Resolve"; }
+    <td { @class = "rule-info"; <a { @href = `concat ("#step-", $arg-1)`; `$arg-1`; } ", "; <a { @href = `concat ("#step-", $arg-2)`; `$arg-2`; } }
+    <td { apply [*[1]]; }
+  }
+}
+
+tpl [Step[@number and Rule[@name = "flip" and @argument]]] {
+  $n = `@number`;
+  $arg = `Rule[@argument]/@argument`;
+  <tr {
+    @"id" = `concat ("step-", $n)`;
+    <td { `@number`; }
+    <td { @class = "rule-name"; "Flip"; }
+    <td { @class = "rule-info"; <a { @href = `concat ("#step-", $arg)`; `$arg`; } }
+    <td { apply [*[1]]; }
+  }
+}
+
+// Rendering formulas
+
+tpl [formula[not(@name)]] {
+  msg terminate="yes" "We require that a formula element have a name attribute!";
+}
+
+tpl [formula[not(@status)]] {
+  msg terminate="yes" "We require that a formula element have a status attribute!";
+}
+
+tpl [defined-predicate[not(@name)]] {
+  msg terminate="yes" "We require that a defined-predicate element have a name attribute!";
+}
+
+tpl [defined-predicate[@name = "true"]] {
+  "&#8868;";
+}
+
+tpl [defined-predicate[@name = "false"]] {
+  "&#8869;";
+}
+
+tpl [defined-predicate[@name and not(@name = "true") and not(@name = "false")]] {
+  $n = `@name`;
+  $message = `concat ("We don't know how to deal with a defined predicate whose name is neither 'true' nor 'false' (the name is '", $n, "'")`;
+  msg terminate="yes" `$message`;
+}
+
+// variables
+
+tpl [variable[not(@name)]] {
+  msg terminate="yes" "We require that variables have a name attribute!";
+}
+
+tpl [variable[@name]] {
+  <span {
+    @class = "variable";
+    `@name`;
+  }
+}
+
+// formula shapes
+
+tpl [predicate[not(@name)]] {
+  msg terminate="yes" "We require that a variable have a name attribute!";
+}
+
+tpl [predicate[@name = "=" and not(child::*[2])]] {
+  msg terminate="yes" "We require that an equality predicate element have at least two children!";
+}
+
+tpl [predicate[@name = "=" and child::*[3]]] {
+  msg terminate="yes" "We require that an equality predicate element have fewer than three children!";
+}
+
+tpl [predicate[@name = "="]] {
+  "(";
+  apply [*[1]];
+  <span {
+    @class = "predicate";
+    " = ";
+  }
+  apply [*[2]];
+  ")";
+}
+
+tpl [predicate[@name and not(@name = "=")]] {
+  $n = `@name`;
+  $constructor = `substring-before ($n, "_")`;
+  $article = `substring-after ($n, "_")`;
+  <span {
+    @class = "predicate";
+    <span {
+      @class = "constructor";
+      `$constructor`;
+    }
+    <sub {
+      <span {
+        @class = "article";
+        `$article`;
+      }
+    }
+  }
+  "(";
+  list (#separ = ", ", #elems = `*`);
+  ")";
+}
+
+tpl [function[not(@name)]] {
+  msg terminate="yes" "We require that a function have a name attribute!";
+}
+
+tpl [function[@name]] {
+  $n = `@name`;
+  $constructor = { if [contains ($n, "__")] {
+                     `substring-before ($n, "__")`;
+                   } else {
+                     `substring-before ($n, "_")`;
+                   }
+                 }
+  $article = { if [contains ($n, "__")] {
+                 `substring-after ($n, "__")`;
+               } else {
+                 `substring-after ($n, "_")`;
+               }
+             }
+  <span {
+    @class = "function";
+    <span {
+      @class = "constructor";
+      `$constructor`;
+     }
+    <sub {
+      <span {
+        @class = "article";
+        `$article`;
+      }
+    }
+  }
+  if [*] {
+    "("; list (#separ = ", ", #elems = `*`); ")";
+  }
+}
+
+tpl [*[not(child::*[2])]] mode="binary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent binary connectives, but we have found such an element that lacks two children")`;
+  msg terminate="yes" $message;
+}
+
+tpl [*[child::*[3]]] mode="binary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent binary connectives, but we have found such an element that has more than two children")`;
+  msg terminate="yes" $message;
+}
+
+tpl [*] (#connective) mode="binary-connective" {
+  <table {
+    @class = "binary-connective";
+    <tbody {
+      <tr { <td { apply [*[1]]; } }
+      <tr { <td { `$connective`; } }
+      <tr { <td { apply [*[2]]; } }
+    }
+  }
+}
+
+tpl [implication] {
+  apply [.] (#connective = "&#8594;") mode="binary-connective";
+}
+
+tpl [equivalence] {
+  apply [.] (#connective = "&#8596;") mode="binary-connective";
+}
+
+tpl [disjunction] {
+  apply [.] (#connective = "&#8744;") mode="binary-connective";
+}
+
+tpl [conjunction] {
+  apply [.] (#connective = "&#8743;") mode="binary-connective";
+}
+
+// unary connectives
+
+tpl [*[not(child::*)]] mode="unary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent unary connectives, but we have found such an element that lacks a child!")`;
+  msg terminate="yes" $message;
+}
+
+tpl [*[child::*[3]]] mode="unary-connective" {
+  $shape = `local-name (.)`;
+  $message = `concat ("Elements of type '", $shape, "' are intended to represent unary connectives, but we have found such an element that has more than one child")`;
+  msg terminate="yes" $message;
+}
+
+tpl [*] (#connective) mode="unary-connective" {
+  <table {
+    @class = "unary-connective";
+    <tr {
+      <td { `$connective`; }
+      <td {
+        @class = "formula";
+        apply [*[1]];
+      }
+    }
+  }
+}
+
+tpl [negation] {
+  apply [.] (#connective = "&#172;") mode="unary-connective";
+}
+
+// quantifiers
+
+tpl [quantifier[not(@type)]] {
+  msg terminate="yes" "Quantifiers must have a type attribute, but we found one that lacks this attribute!";
+}
+
+tpl [quantifier[@type and not(@type = "universal" or @type = "existential")]] {
+  msg terminate="yes" "We assume that quantifiers are either universal or existential!";
+}
+
+tpl [quantifer[not(child::variable)]] {
+  msg terminate="yes" "We require that quantifiers have at least one variable child!";
+}
+
+tpl [quantifier[not(child::*[2])]] {
+  msg terminate="yes" "We require that quantifiers have at least two child elements!";
+}
+
+tpl [quantifier[@type = "universal" or @type = "existential"]] {
+  $type = `@type`;
+  <table {
+    @class = "formula";
+    <tbody {
+      <tr {
+        <td {
+          if [$type = "universal"] {
+            "&#8704;";
+          } else {
+            "&#8707;";
+          }
+        }
+        <td {
+          @class = "variable-list";
+          list (#elems = `variable`, #separ = ", ");
+        }
+        <td {
+          @class = "quantifier-matrix";
+          apply [*[position() = last()]];
+        }
+      }
+    }
+  }
+}
