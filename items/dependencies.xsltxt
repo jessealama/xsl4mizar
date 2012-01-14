@@ -23,6 +23,10 @@ $ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 tpl lc (#s) { `translate($s, $ucletters, $lcletters)`; }
 tpl uc (#s) { `translate($s, $lcletters, $ucletters)`; }
 
+//////////////////////////////////////////////////////////////////////
+// Document templates
+//////////////////////////////////////////////////////////////////////
+
 tpl [/] {
   if [Article] {
     apply [Article];
