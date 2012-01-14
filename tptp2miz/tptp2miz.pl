@@ -17,52 +17,6 @@ pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 pod2usage(1) unless defined $db;
 
-=cut
-
-=head1 TPTP2MIZ
-
-tptp2miz.pl - Transform a TPTP file into a Mizar article
-
-=head1 SYNOPSIS
-
-tptp2miz.pl [options] [tptp-file]
-
-Options:
-  -help            brief help message
-  -man             full documentation
-  -verbose         verbose operation
-  -db              the directory where we will save our work
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<--help>
-
-Prints a brief help message and exits.
-
-=item B<--man>
-
-Prints the manual page and exits.
-
-=item B<--verbose>
-
-Say what we're doing.
-
-=item B<--db>
-
-Multiple files will be generated from a single TPTP file.  Save our
-results to the directory indicated by this option.
-
-=back
-
-=head1 DESCRIPTION
-
-B<tptp2miz.pl> will transform the supplied TPTP file into a
-corresponding Mizar article.
-
-=cut
-
 if (-e $db) {
   print 'Error: the specified directory', "\n", "\n", '  ', $db, "\n", "\n", 'in which we are to save our work already exists.', "\n", 'Please use a different name', "\n";
   exit 1;
@@ -203,3 +157,51 @@ if ($xsltproc_exit_code != 0) {
     print 'Error: xsltproc did not exit cleanly when generating the .miz file for', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'The exit code was ', $xsltproc_exit_code, "\n";
     exit 1;
   }
+
+__END__
+
+=pod
+
+=head1 TPTP2MIZ
+
+tptp2miz.pl - Transform a TPTP file into a Mizar article
+
+=head1 SYNOPSIS
+
+tptp2miz.pl [options] [tptp-file]
+
+Options:
+  -help            brief help message
+  -man             full documentation
+  -verbose         verbose operation
+  -db              the directory where we will save our work
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--verbose>
+
+Say what we're doing.
+
+=item B<--db>
+
+Multiple files will be generated from a single TPTP file.  Save our
+results to the directory indicated by this option.
+
+=back
+
+=head1 DESCRIPTION
+
+B<tptp2miz.pl> will transform the supplied TPTP file into a
+corresponding Mizar article.
+
+=cut
