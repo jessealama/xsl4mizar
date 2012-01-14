@@ -61,10 +61,6 @@ if (length $tptp_sans_extension == 0) {
 
 my $tptp_short_name = substr $tptp_basename,0,8;
 
-if ($verbose == 1) {
-  print 'Using \'', $tptp_short_name, '\' as the name of the file.', "\n";
-}
-
 if (length $tptp_sans_extension > 8) {
   print STDERR ('Warning: the length of the basename of the supplied file, even when its extension is stripped, exceeds 8 characters.', "\n", 'Since Mizar articles are requires to have names at most 8 characters long, we have truncated the name to \'', $tptp_short_name, '\'.', "\n");
 }
