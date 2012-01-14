@@ -1,0 +1,101 @@
+// by-steps.xsltxt : Extract the by reproving problems from an MPTP problem
+
+stylesheet "1.0";
+
+output method="xml" encoding="utf-8" indent="yes";
+
+include ../utils/die.xsl;
+
+//////////////////////////////////////////////////////////////////////
+/// Parameters
+//////////////////////////////////////////////////////////////////////
+
+// The MPTP axiom file.  It should be an absolute path.
+#mptp-axiom-file = { "/Users/alama/sources/mizar/xsl4mizar/nd/00allmmlax.xml"; }
+
+tpl [*] {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*];
+  }
+}
+
+tpl [*] mode="copy" {
+  $element = `local-name ()`;
+  <$element {
+    for-each [@*] { copy-of `.`; }
+    apply [*] mode="copy";
+  }
+}
+
+tpl [comment] mode="copy" {
+  // do nothing
+}
+
+//////////////////////////////////////////////////////////////////////
+// Sanity checks as templates
+//////////////////////////////////////////////////////////////////////
+
+tpl [formula[not(@name)]] mode="sanity-check" {
+  die (#message = "We requre that formula elements have names");
+}
+
+tpl [formula[not(@status)]] mode="sanity-check" {
+  die (#message = "We requre that formula elements have a status!");
+}
+
+tpl [formula[@status and not(@status = "plain"
+                             or @status = "assumption"
+                             or @status = "definition"
+                             or @status = "axiom"
+                             or @status = "theorem")]] mode="sanity-check" {
+  $status = `@status`;
+  $message = `concat ("We know how to deal only with the with formula elements whose status is one of these kinds: plain, assumption, definition, axiom, theorem.  The status of the current formula element is '", $status, "'")`;
+  die (#message = $message);
+}
+
+tpl [/] mode="sanity-check" {
+  apply [descendant::formula] mode="sanity-check";
+}
+
+tpl [/] {
+  // if [not(tstp)] {
+  //   die (#message = "The required tstp element is missing!");
+  // }
+  apply [.] mode="sanity-check";
+  apply [*];
+}
+
+tpl [tstp] {
+  if [not(formula)] {
+    die (#message = "We require that a tstp element have at least one formula child element!");
+  }
+  <Problems {
+    for-each [formula[source/non-logical-data[@name = "inference"]/non-logical-data[@name = "mizar_by" or @name = "mizar_from"]]] {
+      apply [.] mode="conjecturize";
+    }
+  }
+}
+
+tpl [formula[@name]] mode="conjecturize" {
+  $assumptions = `source/non-logical-data[@name = "inference" and non-logical-data[@name = "mizar_by" or @name = "mizar_from"]]/non-logical-data[position() = last()]/non-logical-data[@name]`;
+  <tstp {
+    for-each [document ($mptp-axiom-file, /)] {
+      for-each [formula[@name]] {
+        $n = `@name`;
+        if [$assumptions/formula[$name = $n]] {
+          copy-of `.`;
+        }
+      }
+    }
+    <formula {
+      @"name" = `@name`;
+      @syntax = "formula";
+      @status = "conjecture";
+      apply [*[1]];
+      <source; // don't care
+      <useful-info; // don't care
+    }
+  }
+}

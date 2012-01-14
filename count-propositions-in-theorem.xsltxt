@@ -1,0 +1,44 @@
+// count-propositions-in-theorem.xsl : Count the propositions appearing in the proof of a theorem
+
+stylesheet 1.0;
+output method="text";
+
+// The number of the theorem to consult (starting from 1).  If this is
+// empty, we will count the number of propositions in all theorems in
+// the article.  Otherwise, only the supplied theorem will be
+// consulted.
+#theorem = { ""; }
+
+tpl [/] {
+  apply [Article];
+}
+
+tpl [Article] {
+  $num-theorems = `count (JustifiedTheorem)`;
+  choose {
+    when [$theorem = ""] {
+      for-each [JustifiedTheorem] {
+        `position()`; ":"; apply [.]; "\n";
+      }
+    }
+    when [0 < $theorem and $theorem <= $num-theorems] {
+      `$theorem`; ":"; apply [JustifiedTheorem[position() = $theorem]]; "\n";
+    }
+    otherwise {
+      $message = `concat ("Error: for the supplied mizar xml file, the theorem parameter, if it is non-empty, should be greater than 0 and at most ", $num-theorems, ", but the value '", $theorem, "' was given")`;
+      msg terminate="yes" $message;
+    }
+  }
+}
+
+tpl [JustifiedTheorem[Proof]] {
+  apply [Proof];
+}
+
+tpl [JustifiedTheorem[not(Proof)]] {
+  "0";
+}
+
+tpl [Proof] {
+  `count (descendant::Proposition)`;
+}

@@ -1,0 +1,37 @@
+// tstp-premises.xsl : Emit the external premises used in a TSTP proof
+
+stylesheet "1.0";
+
+output method="text";
+
+tpl [/] {
+  apply [tstp];
+}
+
+tpl [tstp] {
+  for-each [formula] {
+    apply [.];
+  }
+}
+
+tpl [formula[not(source)]] {
+  // do nothing
+}
+
+tpl [formula[source]] {
+  apply [source];
+}
+
+tpl [source[non-logical-data[@name = "file"]]] {
+  apply [non-logical-data[@name = "file"]];
+}
+
+tpl [source[not(non-logical-data[@name = "file"])]] {
+  // do nothing
+}
+
+tpl [non-logical-data[@name = "file"]] {
+  for-each [non-logical-data[@name]] {
+    `@name`; "\n";
+  }
+}
