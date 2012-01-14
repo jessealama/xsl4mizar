@@ -152,12 +152,6 @@ tptp2miz.pl - Transform a TPTP file into a Mizar article
 
 tptp2miz.pl [options] [tptp-file]
 
-Options:
-  -help            brief help message
-  -man             full documentation
-  -verbose         verbose operation
-  -db              the directory where we will save our work
-
 =head1 OPTIONS
 
 =over 8
@@ -174,10 +168,12 @@ Prints the manual page and exits.
 
 Say what we're doing.
 
-=item B<--db>
+=item B<--db=DIRECTORY>
 
-Multiple files will be generated from a single TPTP file.  Save our
-results to the directory indicated by this option.
+By default, results will be saved in a directory whose name is derived
+from the name of the supplied Mizar article (stripping the '.miz'
+extension, if present).  This option permits saving work to some other
+directory.  It is an error if the supplied directory already exists.
 
 =back
 
