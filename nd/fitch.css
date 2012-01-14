@@ -1,0 +1,48 @@
+td.subproof {
+	border-left-style: solid;
+	border-left-width: thin;
+}
+
+td.first-subproof {
+	border-left-style: solid;
+	border-left-width: thin;
+	border-top-style: solid;
+	border-top-width: thin;
+	padding-right: 5px;
+}
+
+td.first-subproof-formula {
+	border-top-style: solid;
+	border-top-width: thin;
+}
+
+td.last-subproof {
+	border-left-style: solid;
+	border-left-width: thin;
+	border-bottom-style: solid;
+	border-bottom-width: thin;
+}
+
+td.last-subproof-formula {
+	border-bottom-style: solid;
+	border-bottom-width: thin;
+}
+
+td.number {
+	text-align: right;
+	padding-right: 5px;
+}
+
+span.fixed-variable {
+	font-weight: bold;
+}
+
+td.justification {
+	padding-left: 25px;
+}
+
+td.let {
+	border-left-style: solid;
+	border-left-width: thin;
+	padding-left: 5px;
+}
