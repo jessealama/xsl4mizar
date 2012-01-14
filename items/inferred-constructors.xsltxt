@@ -1,0 +1,96 @@
+// inferred-constructors.xsl : Infer the set of constructors needed for a mizar article
+
+stylesheet 1.0;
+
+output method="text";
+
+$lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
+$ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+
+tpl lc (#s) { `translate($s, $ucletters, $lcletters)`; }
+tpl uc (#s) { `translate($s, $lcletters, $ucletters)`; }
+
+tpl [/] {
+  apply [Article];
+}
+
+tpl print-everything (#except) {
+  apply [descendant::Pred[@aid and @kind and @absnr and not(@aid = $except)]];
+  apply [descendant::Func[@aid and @kind and @absnr and not(@aid = $except)]];
+  apply [descendant::Adjective[@aid and @kind and @absnr and not(@aid = $except)]];
+  apply [descendant::Typ[@aid and @kind and @absnr and not(@aid = $except)]];
+}
+
+tpl [Article[@aid]] {
+  $aid = `@aid`;
+  $aid-lc = lc (#s = $aid);
+  print-everything (#except = $aid);
+
+  // grab the patterns from the xml
+  apply [descendant::Pattern[@constraid and @constrkind and @absconstrnr and not(@constraid = $aid)]];
+
+  // inspect the .eno
+  $eno = `concat ($aid-lc, ".eno")`;
+  for-each [document ($eno, /)] {
+    print-everything (#except = $aid);
+  }
+
+  // inspect the .dfs
+  $dfs = `concat ($aid-lc, ".dfs")`;
+  for-each [document ($dfs, /)] {
+    print-everything (#except = $aid);
+  }
+
+  // inspect the .ecl
+  $ecl = `concat ($aid-lc, ".ecl")`;
+  for-each [document ($ecl, /)] {
+    print-everything (#except = $aid);
+  }
+
+  // inspect the .eid
+  $eid = `concat ($aid-lc, ".eid")`;
+  for-each [document ($eid, /)] {
+    print-everything (#except = $aid);
+  }
+
+  // inspect the .epr
+  $epr = `concat ($aid-lc, ".epr")`;
+  for-each [document ($epr, /)] {
+    print-everything (#except = $aid);
+  }
+
+  // inspect the .erd
+  $erd = `concat ($aid-lc, ".erd")`;
+  for-each [document ($erd, /)] {
+    print-everything (#except = $aid);
+  }
+
+  // inspect the .esh
+  $esh = `concat ($aid-lc, ".esh")`;
+  for-each [document ($esh, /)] {
+    print-everything (#except = $aid);
+  }
+
+  // inspect the .eth
+  $eth = `concat ($aid-lc, ".eth")`;
+  for-each [document ($eth, /)] {
+    print-everything (#except = $aid);
+  }
+
+}
+
+tpl [*[not(@absnr)]] {
+  msg terminate="yes" "Error: we found an element that lacks an absnr attribute.  This stylesheet must be applied to an absolutized mizar .xml.";
+}
+
+tpl [Pattern[@constraid and @constrkind and @absconstrnr]] {
+  $aid-lc = lc (#s = `@constraid`);
+  $kind-lc = lc (#s = `@constrkind`);
+  $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absconstrnr`; "\n";
+}
+
+tpl [*[@aid and @kind and @absnr]] {
+  $aid-lc = lc (#s = `@aid`);
+  $kind-lc = lc (#s = `@kind`);
+  $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absnr`; "\n";
+}

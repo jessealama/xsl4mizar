@@ -12,18 +12,13 @@ tpl [*] {
   }
 }
 
-tpl count-preceding-eliminable-toplevel-items {
-  `count (preceding::Item[@kind = "Reservation" or @kind = "Private-Functor-Definition" or @kind = "Choice-Statement" or @kind = "Constant-Definition" or @kind = "Type-Changing-Statement" or @kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Regular-Statement" or @kind = "Loci-Declaration"])`;
-}
-
-tpl [Text-Proper/Item[@kind = "Reservation" and not(child::Variables)]] {
+tpl [Text-Proper/Item[@kind = "Reservation" and not(Variables)]] {
   die (#message = "We require that a Reservation item have a Variables child!");
 }
 
 tpl [Text-Proper/Item[@kind = "Reservation"]] {
   $context = `.`;
   $type = `*[position() = last()]`;
-  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
   // sanity check: all Variable descendants have an idnr attribute
   for-each [Variables/Variable[not(@idnr)]] {
     die (#message = "We found a variable that lacks an idnr attribute; unable to proceed.");
@@ -31,7 +26,6 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
   for-each [Variables/Variable] {
     <Item {
       for-each [$context/@*] { copy-of `.`; }
-      @toplevel-binder-number = `position() + $num-previous-toplevel`;
       @idnr = `@idnr`;
       <Variables {
         apply [.];
@@ -41,101 +35,13 @@ tpl [Text-Proper/Item[@kind = "Reservation"]] {
   }
 }
 
-tpl [Text-Proper/Item[@kind = "Choice-Statement"]] {
-  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    @toplevel-binder-number = `$num-previous-toplevel + 1`;
-    apply [*];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Private-Predicate-Definition" or @kind = "Private-Functor-Definition" or @kind = "Constant-Definition"]] {
-  if [Variable[2]] {
-    die (#message = "We assume that private predicate/functor definitions bind at most one variable, but we found one that binds at least two!");
-  }
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    $num-previous = count-preceding-eliminable-toplevel-items ();
-    @toplevel-binder-number = `$num-previous + 1`;
-    @idnr = `Variable[1]/@idnr`;
-    apply [*];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and child::Equality]] {
-  $num-children = `count (*)`;
-  $justification = `*[position() = $num-children]`;
-  $num-children-minus-one = `$num-children - 1`;
-  $type = `*[position() = $num-children-minus-one]`;
-  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-  for-each [Equality] {
-    $variable = `Variable`;
-    $variable-idnr = `$variable/@idnr`;
-    $definiens = `*[position() = last()]`;
-    <Item {
-      for-each [@*] { copy-of `.`; }
-      @kind = "Type-Changing-Statement";
-      @toplevel-binder-number = `position() + $num-previous-toplevel`;
-      @idnr = $variable-idnr;
-      <Equality {
-        apply [$variable];
-        apply [$definiens];
-      }
-      apply [$type];
-      apply [$justification];
-    }
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Type-Changing-Statement" and not(child::Equality)]] {
-  $num-children = `count (*)`;
-  $justification = `*[position() = $num-children]`;
-  $num-children-minus-one = `$num-children - 1`;
-  $type = `*[position() = $num-children-minus-one]`;
-  $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-  $variable = `Variable`;
-  $variable-idnr = `$variable/@idnr`;
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    @kind = "Type-Changing-Statement";
-    @toplevel-binder-number = `$num-previous-toplevel + 1`;
-    @idnr = $variable-idnr;
-    apply [$variable];
-    apply [$type];
-    apply [$justification];
-  }
-}
-
-tpl [Text-Proper/Item[@kind = "Regular-Statement"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    choose {
-      when [Proposition/Label] {
-        @idnr = `Proposition/Label[1]/@idnr`;
-      }
-      when [@shape = "Diffuse-Statement" and Label] {
-        @idnr = `Label[1]/@idnr`;
-      }
-      otherwise {
-        @idnr = "";
-      }
-    }
-    $num-previous-toplevel = count-preceding-eliminable-toplevel-items ();
-    @toplevel-binder-number = `$num-previous-toplevel + 1`;
-    apply [*];
-  }
-}
-
-tpl [Item[@kind = "Loci-Declaration" and child::Explicitly-Qualified-Segment]] {
+tpl [Item[@kind = "Loci-Declaration" and Explicitly-Qualified-Segment]] {
   $loci = `.`;
   $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
-  $num_preceding = count-preceding-eliminable-toplevel-items ();
   for-each [Explicitly-Qualified-Segment/Variables/Variable] {
     $pos = `position ()`;
     <Item {
       for-each [$loci/@*] { copy-of `.`; }
-      @toplevel-binder-number = `$num_preceding + $pos`;
       @idnr = `@idnr`;
       <Explicitly-Qualified-Segment {
         <Variables {
@@ -147,14 +53,12 @@ tpl [Item[@kind = "Loci-Declaration" and child::Explicitly-Qualified-Segment]] {
   }
 }
 
-tpl [Item[@kind = "Loci-Declaration" and child::Implicitly-Qualified-Segment]] {
+tpl [Item[@kind = "Loci-Declaration" and Implicitly-Qualified-Segment]] {
   $loci = `.`;
   $variable = `Implicitly-Qualified-Segment/Variable[1]`;
   $variable-idnr = `$variable/@idnr`;
-  $num_preceding = count-preceding-eliminable-toplevel-items ();
   <Item {
     for-each [$loci/@*] { copy-of `.`; }
-    @toplevel-binder-number = `$num_preceding + 1`;
     @idnr = $variable-idnr;
     <Implicitly-Qualified-Segment {
       apply [$variable];
@@ -168,22 +72,33 @@ tpl [Item[@kind="Definition-Item"]] {
 }
 
 tpl [Block[@kind="Definitional-Block"]] (#context) {
-  apply [Item[@kind = "Attribute-Definition" or @kind = "Functor-Definition" or @kind = "Predicate-Definition" or @kind = "Mode-Definition" or @kind = "Structure-Definition"]](#definitions = `Item[@kind = "Private-Predicate-Definition" or @kind="Private-Functor-Definition"]`, #context = $context);
+  apply [Item[@kind = "Attribute-Definition"
+              or @kind = "Functor-Definition"
+              or @kind = "Predicate-Definition"
+              or @kind = "Mode-Definition"
+              or @kind = "Structure-Definition"]](#context = $context);
 }
 
-tpl [Block[@kind = "Registration-Block"]] {
-  choose {
-    when [Item[@kind = "Cluster"]] {
-      apply [Item[@kind = "Cluster"]];
-    }
-    when [Item[@kind = "Identify"]] {
-      apply [Item[@kind = "Identify"]];
-    }
-  }
+tpl [Block[@kind = "Registration-Block" and Item[@kind = "Cluster"]]] {
+  apply [Item[@kind = "Cluster"]];
+}
+
+tpl [Block[@kind = "Registration-Block" and Item[@kind = "Identify"]]] {
+  apply [Item[@kind = "Identify"]];
+}
+
+tpl [Block[@kind = "Registration-Block" and Item[@kind = "Reduction"]]] {
+  apply [Item[@kind = "Reduction"]];
 }
 
 tpl [Block[@kind = "Notation-Block"]] {
-  apply [Item[@kind = "Pred-Antonym" or @kind = "Pred-Synonym" or @kind = "Attr-Antonym" or @kind = "Attr-Synonym" or @kind = "Func-Synonym" or @kind = "Func-Antonym" or @kind = "Mode-Synonym" or @kind = "Mode-Antonym"]];
+  apply [Item[@kind = "Pred-Antonym" or @kind = "Pred-Synonym"
+              or @kind = "Attr-Antonym"
+              or @kind = "Attr-Synonym"
+              or @kind = "Func-Synonym"
+              or @kind = "Func-Antonym"
+              or @kind = "Mode-Synonym"
+              or @kind = "Mode-Antonym"]];
 }
 
 tpl [Item[@kind = "Cluster"]] {
@@ -193,7 +108,9 @@ tpl [Item[@kind = "Cluster"]] {
     if [@col] { @col = `@col`; }
     <Block {
       @kind = "Registration-Block";
-      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"
+                                        or @kind = "Type-Changing-Statement"
+                                        or @kind = "Constant-Definition"]] {
         apply [.];
       }
       <Item {
@@ -224,6 +141,25 @@ tpl [Item[@kind = "Identify"]] {
   }
 }
 
+tpl [Item[@kind = "Reduction"]] {
+  <Item {
+    @kind = "Definition-Item";
+    if [@line] { @line = `@line`; }
+    if [@col] { @col = `@col`; }
+    <Block {
+      @kind = "Registration-Block";
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"]] {
+        apply [.];
+      }
+      <Item {
+        @kind = "Reduction";
+        apply [*];
+      }
+      correctness-conditions (#candidates = `following-sibling::*`);
+    }
+  }
+}
+
 tpl correctness-conditions (#candidates, #definitions, #stop) {
   if [not($stop = "1")] {
     if [$candidates] {
@@ -231,7 +167,9 @@ tpl correctness-conditions (#candidates, #definitions, #stop) {
       for-each [$candidate] {
         $candidate_name = `local-name(.)`;
         $candidate_kind = `$candidate/@kind`;
-        if [$candidate_name = "Item" and ($candidate_kind = "Correctness-Condition" or $candidate_kind = "Property" or $candidate_kind = "Correctness")] {
+        if [$candidate_name = "Item" and ($candidate_kind = "Correctness-Condition"
+                                          or $candidate_kind = "Property"
+                                          or $candidate_kind = "Correctness")] {
           apply [$candidate](#definitions = $definitions);
           correctness-conditions (#candidates = `$candidates[position() > 1]`,
                                   #definitions = $definitions);
@@ -243,17 +181,12 @@ tpl correctness-conditions (#candidates, #definitions, #stop) {
   }
 }
 
-tpl [Item[@kind = "Correctness-Condition" or @kind = "Property" or @kind = "Correctness"]](#definitions) {
+tpl [Item[@kind = "Correctness-Condition"
+          or @kind = "Property"
+          or @kind = "Correctness"]](#definitions) {
   <Item {
     for-each [@*] { copy-of `.`; }
     apply [*](#definitions = $definitions);
-  }
-}
-
-tpl [Item[@kind = "Theorem-Item"]] {
-  <Item {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
   }
 }
 
@@ -277,13 +210,24 @@ tpl [Block[@kind = "Proof"]](#definitions) {
   }
 }
 
-tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kind = "Predicate-Definition" or @kind = "Mode-Definition" or @kind = "Structure-Definition"]](#definitions, #context) {
+tpl [Item[@kind = "Functor-Definition"
+          or @kind = "Attribute-Definition"
+          or @kind = "Predicate-Definition"
+          or @kind = "Mode-Definition"
+          or @kind = "Structure-Definition"]](#definitions, #context) {
   <Item {
     for-each [$context/@*] { copy-of `.`; }
     @kind = "Definition-Item";
     <Block {
       @kind = "Definitional-Block";
-      for-each [preceding-sibling::Item[@kind = "Loci-Declaration" or @kind = "Assumption" or @kind = "Existential-Assumption" or @kind = "Constant-Definition" or @kind = "Regular-Statement" or @kind = "Choice-Statement"]] {
+      for-each [preceding-sibling::Item[@kind = "Loci-Declaration"
+                                        or @kind = "Assumption"
+                                        or @kind = "Existential-Assumption"
+                                        or @kind = "Constant-Definition"
+                                        or @kind = "Regular-Statement"
+                                        or @kind = "Choice-Statement"
+                                        or @kind = "Private-Functor-Definition"
+                                        or @kind = "Private-Predicate-Definition"]] {
         apply [.];
       }
       <Item {
@@ -295,7 +239,14 @@ tpl [Item[@kind = "Functor-Definition" or @kind = "Attribute-Definition" or @kin
   }
 }
 
-tpl [Item[@kind = "Pred-Synonym" or @kind = "Pred-Antonym" or @kind = "Attr-Synonym" or @kind = "Attr-Antonym" or @kind = "Func-Synonym" or @kind = "Func-Antonym" or @kind = "Mode-Synonym" or @kind = "Mode-Antonym"]] {
+tpl [Item[@kind = "Pred-Synonym"
+          or @kind = "Pred-Antonym"
+          or @kind = "Attr-Synonym"
+          or @kind = "Attr-Antonym"
+          or @kind = "Func-Synonym"
+          or @kind = "Func-Antonym"
+          or @kind = "Mode-Synonym"
+          or @kind = "Mode-Antonym"]] {
   <Item {
     @kind = "Definition-Item";
     <Block {
@@ -328,7 +279,7 @@ tpl split-explicitly-qualified-segment (#variables, #type) {
   }
 }
 
-tpl [Item[@kind = "Generalization" and child::Explicitly-Qualified-Segment]] {
+tpl [Item[@kind = "Generalization" and Explicitly-Qualified-Segment]] {
   $type = `Explicitly-Qualified-Segment/*[position() = last()]`;
   for-each [Explicitly-Qualified-Segment/Variables/Variable] {
     <Item {
@@ -384,4 +335,58 @@ tpl [Item[@kind = "Canceled-Pragma" and @number]] {
   emit-canceled-theorem (#times = `@number`,
                          #line = `@line`,
                          #col = `@col`);
+}
+
+// Mark whether a toplevel unexported theorem is exportable
+
+tpl bad-term-hunting (#candidates) {
+  if [$candidates] {
+    $candidate = `$candidates[1]`;
+    if [not($candidate/@spelling)] {
+      die (#message = "To determine whether there is a bad term in the current item, we require that all terms have a spelling, but we just found a term that lacks one.");
+    }
+    $spelling = `$candidate/@spelling`;
+    $n = `local-name ($candidate)`;
+    choose {
+      when [$n = "Schematic-Variable"] {
+        "1";
+      }
+      when [starts-with ($spelling, "D")] {
+        "1";
+      }
+      when [starts-with ($spelling, "C")] {
+        "1";
+      }
+      otherwise {
+        bad-term-hunting (#candidates = `$candidates[position() > 1]`);
+      }
+    }
+  } else {
+    "0";
+  }
+}
+
+tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and @shape = "Compact-Statement"]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    for-each [Proposition] {
+      $bad = bad-term-hunting (#candidates = `descendant::Simple-Term`);
+      if [$bad = "1"
+          or descendant::Private-Functor-Term
+          or descendant::Private-Predicate-Formula] {
+        @exportable = "no";
+      } else {
+        @exportable = "yes";
+      }
+    }
+    apply [*];
+  }
+}
+
+tpl [Item[parent::Text-Proper and @kind = "Regular-Statement" and not(@shape = "Compact-Statement")]] {
+  <Item {
+    for-each [@*] { copy-of `.`; }
+    @exportable = "no";
+    apply [*];
+  }
 }

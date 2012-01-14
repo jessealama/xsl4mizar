@@ -1,23 +1,23 @@
-stylesheet "1.0" 
+stylesheet "1.0"
 extension-element-prefixes = "exsl exsl-str xt";
-xmlns exsl "http://exslt.org/common"; 
+xmlns exsl "http://exslt.org/common";
 xmlns exsl-str "http://exslt.org/strings";
 xmlns xt "http://www.jclark.com/xt";
 output method=text;
 
 // $Revision: 1.61 $
 //
-// File: mizpl.xsltxt - stylesheet translating Mizar XML terms, 
+// File: mizpl.xsltxt - stylesheet translating Mizar XML terms,
 //                      formulas and types to Prolog TSTP-like format.
 //
 // Author: Josef Urban
 //
 // License: GPL (GNU GENERAL PUBLIC LICENSE)
 
-// XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking 
+// XSLTXT (https://xsltxt.dev.java.net/) stylesheet taking
 // Mizar XML terms, formulas and types to Prolog TSTP-like format.
 
-// To produce standard XSLT from this call make, or do e.g.: 
+// To produce standard XSLT from this call make, or do e.g.:
 // java -jar xsltxt.jar toXSL mizpl.xsltxt | sed -e 's/<!\-\- *\(<\/*xsl:document.*\) *\-\->/\1/g' >mizpl.xsl
 
 // ##NOTE: TPTP types 'theorem' and 'definition' are wider
@@ -41,7 +41,7 @@ strip-space "*";
 #do_nd = { "1"; }
 
 // dump the table of Mizar identifiers for propositions;
-// this will probably slow down the processing a bit by 
+// this will probably slow down the processing a bit by
 // loading the .idx file and by the lookups
 #dump_prop_labels = { "0"; }
 
@@ -64,7 +64,7 @@ strip-space "*";
 #fail = { "zzz k l-**)))))))"; }
 
 $lcletters= { "abcdefghijklmnopqrstuvwxyz"; }
-$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; } 
+$ucletters= { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
 tpl lc(#s) { `translate($s, $ucletters, $lcletters)`; }
 tpl uc(#s) { `translate($s, $lcletters, $ucletters)`; }
@@ -109,8 +109,8 @@ key "D_I" [Symbol[@kind='I']] `@nr`;
 // private - look up the name of id
 tpl get_vid_name(#vid)
 {
-  for-each [document($ids, /)] 
-  { 
+  for-each [document($ids, /)]
+  {
      for-each [key('D_I', $vid)] { `@name`; }
   }
 }
@@ -120,149 +120,149 @@ tpl get_vid_name(#vid)
 // Formulas
 
 // old versions without pretty-printing
-// // #i is nr of the bound variable, 1 by default 
+// // #i is nr of the bound variable, 1 by default
 // // empty list can be after ':' for type 'set'
-// tpl [For](#i,#pl,#k) { 
+// tpl [For](#i,#pl,#k) {
 //   $j = { if [$i>0] { `$i + 1`;} else { "1"; } }
-//   "!["; pvar(#nr=$j); ": "; apply[Typ[1]](#i=$j,#pl=$pl); "]: "; 
+//   "!["; pvar(#nr=$j); ": "; apply[Typ[1]](#i=$j,#pl=$pl); "]: ";
 //   apply[*[2]](#i=$j,#pl=$pl); }
 
 // // need to put brackets around PrivPred here - may contain For
-// tpl [Not](#i,#pl) { $not_s; 
-//     if [For|PrivPred] { "("; apply[*[1]](#i=$i,#pl=$pl); ")"; } 
+// tpl [Not](#i,#pl) { $not_s;
+//     if [For|PrivPred] { "("; apply[*[1]](#i=$i,#pl=$pl); ")"; }
 //     else { apply[*[1]](#i=$i,#pl=$pl); }}
-// tpl [And](#i,#pl) { "( "; 
+// tpl [And](#i,#pl) { "( ";
 //     ilist(#separ=$and_s, #elems=`*`, #i=$i,#pl=$pl); " )"; }
 
 
 // pretty printing for FOF
-#pid_Ex 		= { "-1"; } // usually NegFrmPtr
-#pid_Ex_Univ 		= { "-2"; } // usually UnivFrmPtr
-#pid_Ex_InnerNot 	= { "-3"; } // usually NegFrmPtr
-#pid_Impl 		= { "-4"; } // usually NegFrmPtr
-#pid_Impl_And 		= { "-5"; } // usually ConjFrmPtr       
-#pid_Impl_RightNot 	= { "-6"; } // usually NegFrmPtr
-#pid_Iff 		= { "-7"; } // usually ConjFrmPtr
-#pid_Or 		= { "-8"; } // usually NegFrmPtr
-#pid_Or_And 		= { "-9"; } // usually ConjFrmPtr
-#pid_Or_LeftNot 	= { "-10"; } // usually NegFrmPtr
-#pid_Or_RightNot 	= { "-11"; } // usually NegFrmPtr
+#pid_Ex                 = { "-1"; } // usually NegFrmPtr
+#pid_Ex_Univ            = { "-2"; } // usually UnivFrmPtr
+#pid_Ex_InnerNot        = { "-3"; } // usually NegFrmPtr
+#pid_Impl               = { "-4"; } // usually NegFrmPtr
+#pid_Impl_And           = { "-5"; } // usually ConjFrmPtr
+#pid_Impl_RightNot      = { "-6"; } // usually NegFrmPtr
+#pid_Iff                = { "-7"; } // usually ConjFrmPtr
+#pid_Or                 = { "-8"; } // usually NegFrmPtr
+#pid_Or_And             = { "-9"; } // usually ConjFrmPtr
+#pid_Or_LeftNot         = { "-10"; } // usually NegFrmPtr
+#pid_Or_RightNot        = { "-11"; } // usually NegFrmPtr
 
-tpl is_or(#el) { for-each [$el] { if [(@pid=$pid_Or) 
+tpl is_or(#el) { for-each [$el] { if [(@pid=$pid_Or)
         and (*[1][@pid=$pid_Or_And]) and (count(*[1]/*)=2)
-	and (*[1]/*[1][@pid=$pid_Or_LeftNot])
-	and (*[1]/*[2][@pid=$pid_Or_RightNot])]
+        and (*[1]/*[1][@pid=$pid_Or_LeftNot])
+        and (*[1]/*[2][@pid=$pid_Or_RightNot])]
  { "1"; } else { "0"; }}}
 
-tpl is_impl(#el) { for-each [$el] { if [(@pid=$pid_Impl) 
+tpl is_impl(#el) { for-each [$el] { if [(@pid=$pid_Impl)
         and (*[1][@pid=$pid_Impl_And]) and (count(*[1]/*)=2)
-	and (*[1]/*[2][@pid=$pid_Impl_RightNot])]
+        and (*[1]/*[2][@pid=$pid_Impl_RightNot])]
  { "1"; } else { "0"; }}}
 
-tpl is_impl1(#el) { for-each [$el] { if [(@pid=$pid_Impl) 
+tpl is_impl1(#el) { for-each [$el] { if [(@pid=$pid_Impl)
         and (*[1][@pid=$pid_Impl_And]) and (count(*[1]/*)>2)
-	and (*[1]/*[@pid=$pid_Impl_RightNot])]
+        and (*[1]/*[@pid=$pid_Impl_RightNot])]
  { "1"; } else { "0"; }}}
 
-tpl is_impl2(#el) { for-each [$el] { if [(@pid=$pid_Impl) 
+tpl is_impl2(#el) { for-each [$el] { if [(@pid=$pid_Impl)
         and (*[1][@pid=$pid_Impl_And]) and (count(*[1]/*)>=2)
-	and (*[1]/*[@pid=$pid_Impl_RightNot])]
+        and (*[1]/*[@pid=$pid_Impl_RightNot])]
  { "1"; } else { "0"; }}}
 
 
 tpl is_equiv(#el) { for-each [$el] {
        $e1 = { if [(@pid=$pid_Iff) and (count(*)=2)] {
-		  $i1 = { is_impl(#el=`$el/*[1]`); } 
-		  if [$i1="1"] { is_impl(#el=`*[2]`); }
-		  else { "0"; }}
-	       else { "0"; } }
-       if [$e1="1"] { 
-	  $res1 = { are_equal( #el1=`*[1]/*[1]/*[1]`, 
-			       #el2=`*[2]/*[1]/*[2]/*[1]`); }
-	  $res2 = { are_equal( #el1=`*[2]/*[1]/*[1]`, 
-			       #el2=`*[1]/*[1]/*[2]/*[1]`); }
-	  if [($res1="1") and ($res2="1")] { "1"; }
+                  $i1 = { is_impl(#el=`$el/*[1]`); }
+                  if [$i1="1"] { is_impl(#el=`*[2]`); }
+                  else { "0"; }}
+               else { "0"; } }
+       if [$e1="1"] {
+          $res1 = { are_equal( #el1=`*[1]/*[1]/*[1]`,
+                               #el2=`*[2]/*[1]/*[2]/*[1]`); }
+          $res2 = { are_equal( #el1=`*[2]/*[1]/*[1]`,
+                               #el2=`*[1]/*[1]/*[2]/*[1]`); }
+          if [($res1="1") and ($res2="1")] { "1"; }
           else { "0"; }}
        else  { $e1; }}}
 
 //  recursive equality on subnodes and attributes
-tpl are_equal(#el1,#el2) { 
+tpl are_equal(#el1,#el2) {
     if[ not(name($el1)=name($el2)) or not(count($el1/*)=count($el2/*))
-	or not(count($el1/@*)=count($el2/@*))] { "0"; }
-    else { 
-	 $s1 = { for-each [$el1/@*] { `string()`;} }
-	 $s2 = { for-each [$el2/@*] { `string()`;} }
-	 if [not($s1=$s2)] { "0"; }
-    else 
+        or not(count($el1/@*)=count($el2/@*))] { "0"; }
+    else {
+         $s1 = { for-each [$el1/@*] { `string()`;} }
+         $s2 = { for-each [$el2/@*] { `string()`;} }
+         if [not($s1=$s2)] { "0"; }
+    else
      { are_equal_many(#els1=`$el1/*`,#els2=`$el2/*`,#nr=`count($el1/*)`); }}}
 
 tpl are_equal_many(#els1,#els2,#nr) { if [$nr > 0] {
     $el1=`$els1[position()=$nr]`;
-    $el2=`$els2[position()=$nr]`; 
+    $el2=`$els2[position()=$nr]`;
     $res1 = { are_equal(#el1=$el1, #el2=$el2); }
     if [$res1="1"] { are_equal_many(#els1=$els1, #els2=$els2, #nr=`$nr - 1`);}
     else { "0"; }} else { "1"; }}
 
 
-// #i is nr of the bound variable, 1 by default 
+// #i is nr of the bound variable, 1 by default
 // empty list can be after ':' for type 'set'
 tpl [For](#i,#pl,#k,#ex) {
-  $j = { if [$i>0] { `$i + 1`;} else { "1"; } } 
-  if [$ex="1"] { 
+  $j = { if [$i>0] { `$i + 1`;} else { "1"; } }
+  if [$ex="1"] {
    $nm = { `name(*[2])`; }
    "?["; pvar(#nr=$j); ": "; apply[Typ[1]](#i=$j,#pl=$pl); "]: ";
    if [$nm = "For"] { apply[*[2]](#i=$j,#ex=$ex,#pl=$pl); }
    else { apply[Not/*[1]](#i=$j,#pl=$pl); }
   }
-  else { 
+  else {
    "!["; pvar(#nr=$j); ": "; apply[Typ[1]](#i=$j,#pl=$pl); "]: ";
    apply[*[2]](#i=$j,#pl=$pl); }
  }
 
 
 // return 1 if this is a Not-ended sequence of For-s
-tpl check_for_not(#el) { 
-    if [name($el)="Not"] { "1"; } 
+tpl check_for_not(#el) {
+    if [name($el)="Not"] { "1"; }
     else { if [name($el)="For"] { check_for_not(#el=`$el/*[2]`); }
     else { "0"; }}}
 
 // need to put brackets around PrivPred here - may contain For
-tpl [Not](#i,#pl) { 
+tpl [Not](#i,#pl) {
     $fnb = { if [For] { check_for_not(#el=`*[1]/*[2]`); } else { "0"; } }
     if [$fnb="1"]  { apply[*[1]](#i=$i,#pl=$pl,#ex="1"); }
-    else { 
-	 $i1= is_impl(#el=`.`);
-	 if [$i1="1"] { "( "; apply[*[1]/*[1]](#i=$i,#pl=$pl); $imp_s;
-			apply[*[1]/*[2]/*[1]](#i=$i,#pl=$pl); " )"; }
+    else {
+         $i1= is_impl(#el=`.`);
+         if [$i1="1"] { "( "; apply[*[1]/*[1]](#i=$i,#pl=$pl); $imp_s;
+                        apply[*[1]/*[2]/*[1]](#i=$i,#pl=$pl); " )"; }
          else {
-	      $i2= is_or(#el=`.`);
-	      if [$i2="1"] { "( "; apply[*[1]/*[1]/*[1]](#i=$i,#pl=$pl); $or_s;
-			apply[*[1]/*[2]/*[1]](#i=$i,#pl=$pl); " )"; }
-           else { 
+              $i2= is_or(#el=`.`);
+              if [$i2="1"] { "( "; apply[*[1]/*[1]/*[1]](#i=$i,#pl=$pl); $or_s;
+                        apply[*[1]/*[2]/*[1]](#i=$i,#pl=$pl); " )"; }
+           else {
              $i3= is_impl1(#el=`.`);
-	    if [($i3="1") and (*[1]/*[not(name()="Not")]) and (*[1]/Not)] { "( ( "; 
-	     ilist(#separ=$and_s, #elems=`*[1]/*[not(name()="Not")]`, #i=$i,#pl=$pl);
-	    " )"; $imp_s;
-	    "( "; ilist(#separ=$or_s, #elems=`*[1]/Not/*[1]`, #i=$i,#pl=$pl); " ) )"; }
-             else { $not_s; 
-		    if [For|PrivPred] { "("; apply[*[1]](#i=$i,#pl=$pl); ")"; } 
-		    else { apply[*[1]](#i=$i,#pl=$pl); } } } } } }
+            if [($i3="1") and (*[1]/*[not(name()="Not")]) and (*[1]/Not)] { "( ( ";
+             ilist(#separ=$and_s, #elems=`*[1]/*[not(name()="Not")]`, #i=$i,#pl=$pl);
+            " )"; $imp_s;
+            "( "; ilist(#separ=$or_s, #elems=`*[1]/Not/*[1]`, #i=$i,#pl=$pl); " ) )"; }
+             else { $not_s;
+                    if [For|PrivPred] { "("; apply[*[1]](#i=$i,#pl=$pl); ")"; }
+                    else { apply[*[1]](#i=$i,#pl=$pl); } } } } } }
 
 // try for equivalence
-tpl [And](#i,#pl) { "( "; $e1= is_equiv(#el=`.`); 
-    if [$e1="1"] { 
+tpl [And](#i,#pl) { "( "; $e1= is_equiv(#el=`.`);
+    if [$e1="1"] {
        apply[*[1]/*[1]/*[1]](#i=$i,#pl=$pl); $equiv_s;
        apply[*[1]/*[1]/*[2]/*[1]](#i=$i,#pl=$pl); }
     else { // a bit risky?
     if [(@pid=$pid_Iff) and (count(*)=2)] {
        $i1= is_impl(#el=`*[1]`);
-       if [$i1="1"] { 
-	  apply[*[1]/*[1]/*[1]](#i=$i,#pl=$pl); $equiv_s;
-	  apply[*[1]/*[1]/*[2]/*[1]](#i=$i,#pl=$pl); }
+       if [$i1="1"] {
+          apply[*[1]/*[1]/*[1]](#i=$i,#pl=$pl); $equiv_s;
+          apply[*[1]/*[1]/*[2]/*[1]](#i=$i,#pl=$pl); }
        else { $i2= is_impl(#el=`*[2]`);
-       if [$i2="1"] { 
-	  apply[*[2]/*[1]/*[2]/*[1]](#i=$i,#pl=$pl); $equiv_s;
-	  apply[*[2]/*[1]/*[1]](#i=$i,#pl=$pl); }
+       if [$i2="1"] {
+          apply[*[2]/*[1]/*[2]/*[1]](#i=$i,#pl=$pl); $equiv_s;
+          apply[*[2]/*[1]/*[1]](#i=$i,#pl=$pl); }
        else { ilist(#separ=$and_s, #elems=`*`, #i=$i,#pl=$pl); }}}
     else { ilist(#separ=$and_s, #elems=`*`, #i=$i,#pl=$pl); }}
     " )";
@@ -270,42 +270,42 @@ tpl [And](#i,#pl) { "( "; $e1= is_equiv(#el=`.`);
 
 // here we differ from Mizar and ILF - all 'V' are turned into 'sort'
 // ##GRM: Sch_Pred : "p" Number "_" Scheme_Name
-tpl [Pred](#i,#pl) { 
-      if [@kind='V']  { 
-         $srt_s; "("; 
-         apply[*[position() = last()]](#i=$i,#pl=$pl); ","; absc(#el=`.`); 
-         if [count(*)>1] { "("; 
-	    ilist(#separ=",", #elems=`*[position() < last()]`, #i=$i,#pl=$pl); 
+tpl [Pred](#i,#pl) {
+      if [@kind='V']  {
+         $srt_s; "(";
+         apply[*[position() = last()]](#i=$i,#pl=$pl); ","; absc(#el=`.`);
+         if [count(*)>1] { "(";
+            ilist(#separ=",", #elems=`*[position() < last()]`, #i=$i,#pl=$pl);
             ")"; }
          ")"; }
-      else { 
-	 if [(@kind='R') and (@absnr=1) and (@aid="HIDDEN")] {
-	    "( "; apply[*[1]](#i=$i,#pl=$pl); $eq_s; 
-	    apply[*[2]](#i=$i,#pl=$pl); " )"; }
-	 else {
+      else {
+         if [(@kind='R') and (@absnr=1) and (@aid="HIDDEN")] {
+            "( "; apply[*[1]](#i=$i,#pl=$pl); $eq_s;
+            apply[*[2]](#i=$i,#pl=$pl); " )"; }
+         else {
           if [@kind='P'] { abs_fp(#k="p",#el=`.`); }
-	  else { absc(#el=`.`); }
-          if [count(*)>0] { "("; 
-	     ilist(#separ=",", #elems=`*`, #i=$i,#pl=$pl); ")"; }
-	 } }}
+          else { absc(#el=`.`); }
+          if [count(*)>0] { "(";
+             ilist(#separ=",", #elems=`*`, #i=$i,#pl=$pl); ")"; }
+         } }}
 
 tpl [PrivPred](#i,#pl) { apply[*[position() = last()]](#i=$i,#pl=$pl); }
 // empty list can be here - then it can be replaced by 'true'
-tpl [Is](#i,#pl) { $srt_s; "("; apply[*[1]](#i=$i,#pl=$pl); ","; 
-		   apply[*[2]](#i=$i,#pl=$pl); ")"; }
+tpl [Is](#i,#pl) { $srt_s; "("; apply[*[1]](#i=$i,#pl=$pl); ",";
+                   apply[*[2]](#i=$i,#pl=$pl); ")"; }
 tpl [Verum](#i,#pl) { "$true"; }
 tpl [ErrorFrm](#i,#pl) { "errorfrm"; }
 
 // Terms
 // #p is the parenthesis count
-tpl [Var](#i,#pl) { pvar(#nr=`@nr`); } 
-tpl [LocusVar](#i,#pl) { ploci(#nr=`@nr`); } 
+tpl [Var](#i,#pl) { pvar(#nr=`@nr`); }
+tpl [LocusVar](#i,#pl) { ploci(#nr=`@nr`); }
 tpl [FreeVar](#i,#pl) { $fail; }
 tpl [Const](#i,#pl) { pconst(#nr=`@nr`,#pl=$pl); }
 tpl [InfConst](#i,#pl) { $fail; }
 tpl [Num](#i,#pl) {  `@nr`; }
 // ##GRM: Sch_Func : "f" Number "_" Scheme_Name
-tpl [Func](#i,#pl) { 
+tpl [Func](#i,#pl) {
     if [@kind='F'] { abs_fp(#k="f",#el=`.`); }
     else { absc(#el=`.`); }
     if [count(*)>0] { "("; ilist(#separ=",", #elems=`*`, #i=$i,#pl=$pl); ")"; } }
@@ -313,22 +313,22 @@ tpl [Func](#i,#pl) {
 tpl [PrivFunc](#i,#pl) { apply[*[position() = 1]](#i=$i,#pl=$pl); }
 tpl [Choice](#i,#pl) { $the_s; "("; apply[*[position() = 1]](#i=$i,#pl=$pl); ")"; }
 tpl [ErrorTrm](#i,#pl) { "errortrm"; }
-tpl [Fraenkel](#i,#pl) { 
+tpl [Fraenkel](#i,#pl) {
      $j = { if [$i>0] { $i;} else { "0"; } }
-     $frank_s; "(["; 
-     for-each [Typ] { 
+     $frank_s; "([";
+     for-each [Typ] {
        $k = `$j + position()`;
-       pvar(#nr=$k); ": "; apply[.](#i=$k,#pl=$pl); 
+       pvar(#nr=$k); ": "; apply[.](#i=$k,#pl=$pl);
        if [not(position()=last())] { ","; } }
      "],";
      $l = `$j + count(Typ)`;
-     apply[*[position() = last() - 1]](#i=$l,#pl=$pl); ","; 
+     apply[*[position() = last() - 1]](#i=$l,#pl=$pl); ",";
      apply[*[position() = last()]](#i=$l,#pl=$pl); ")";
 }
 
 // Types - the list of attributes and radix type in square brackets
 // m1_hidden is not printed; we expect 'L' instead of 'G'
-tpl [Typ](#i,#pl) { 
+tpl [Typ](#i,#pl) {
       if [@kind='errortyp'] { "errortyp"; }
       else { if [(@kind="M") or (@kind="L")] {
         $radix = { if [(@aid = "HIDDEN") and (@kind="M") and (@nr="1")]
@@ -338,14 +338,14 @@ tpl [Typ](#i,#pl) {
         else {
           if [($adjectives + $radix) > 1] { "( "; }
           if [$adjectives > 0] {
-             apply[*[1]](#i=$i,#pl=$pl); 
+             apply[*[1]](#i=$i,#pl=$pl);
              if [$radix > 0] { $and_s; } }
-          if [($radix > 0)] { 
+          if [($radix > 0)] {
              absc(#el=`.`);
-             if [count(*) > $cluster_nr ] { 
+             if [count(*) > $cluster_nr ] {
                "(";
-               ilist(#separ=",", #elems=`*[position() > $cluster_nr]`, 
-	             #i=$i, #pl=$pl); 
+               ilist(#separ=",", #elems=`*[position() > $cluster_nr]`,
+                     #i=$i, #pl=$pl);
                ")"; } }
           if [($adjectives + $radix) > 1] { " )"; }
          }
@@ -355,26 +355,26 @@ tpl [Typ](#i,#pl) {
 
 tpl [Cluster](#i,#pl) { ilist(#separ=$and_s, #elems=`*`, #i=$i,#pl=$pl); }
 tpl [Adjective](#i,#pl) { if [@value="false"] { $non_s; } absc(#el=`.`);
-    if [count(*)>0] { "("; ilist(#separ=",", #elems=`*`, #i=$i, #pl=$pl); 
-		      ")"; } }
+    if [count(*)>0] { "("; ilist(#separ=",", #elems=`*`, #i=$i, #pl=$pl);
+                      ")"; } }
 
 tpl addp(#pl) { if [string-length($pl)>0] { "_"; $pl; }}
 
 // concat number and level
 tpl propname(#n,#pl) { "e"; $n; addp(#pl=$pl); }
 tpl abspropname(#n,#pl) { propname(#n=$n,#pl=$pl); "__"; $anamelc; }
-tpl lemmaname(#n) { "l"; $n; "_"; $anamelc; } 
-tpl plname(#n,#pl) 
+tpl lemmaname(#n) { "l"; $n; "_"; $anamelc; }
+tpl plname(#n,#pl)
 {
     if [string-length($pl)>0] { propname(#n=$n, #pl=$pl); }
-    else { if [key("JT",$n)] 
+    else { if [key("JT",$n)]
     {
       for-each [key("JT",$n)] { absr(#el=`..`); }
-    } 
-    else { if [key("DT",$n)] 
+    }
+    else { if [key("DT",$n)]
     {
       for-each [key("DT",$n)] { absr(#el=`..`); }
-    } 
+    }
 
     else { lemmaname(#n=$n); }
     }}
@@ -384,10 +384,10 @@ tpl thesisname(#n,#pl) { "i"; $n; addp(#pl=$pl); }
 
 // thesis is usually justified by following thesis,
 // and some ND rule (and possibly axiom);
-// the corresponding ND item can be 
+// the corresponding ND item can be
 // %Let; | %Conclusion; | %Assume; | %Given; | %Take; | %TakeAsVar; | %Suppose; | %Case;
 // for Proofs it immediately precedes the Thesis, while
-// for Now it has to be looked up by having the same position 
+// for Now it has to be looked up by having the same position
 // among skeleton items as the current thesis has among theses
 
 // ##NOTE: this is the same for  Suppose and Case, however for
@@ -401,9 +401,9 @@ tpl [Thesis]
      $nr    = `1 + count(preceding-sibling::Thesis)`;
      $tname = { thesisname(#n = $nr, #pl = `@plevel`); }
      "fof("; $tname; ",thesis,";
-     apply(#pl=`@plevel`); 
-     ",file("; $anamelc; ","; $tname; 
-     "),[mptp_info("; $nr; ",["; `translate(@plevel,"_",",")`; 
+     apply(#pl=`@plevel`);
+     ",file("; $anamelc; ","; $tname;
+     "),[mptp_info("; $nr; ",["; `translate(@plevel,"_",",")`;
      "],thesis,position(0,0),[])"; ",";
      try_nd_inference(#el = `.`, #thes_nr = $nr);
      "]).\n";
@@ -420,8 +420,8 @@ tpl [PerCasesReasoning]
     $tname = { thesisname(#n = $nr, #pl = `@plevel`); }
     "fof("; $tname; ",thesis,";
     apply[BlockThesis/*[position() = last()]](#pl=`@plevel`);
-    ",file("; $anamelc; ","; $tname; 
-    "),[mptp_info("; $nr; ",["; `translate(@plevel,"_",",")`; 
+    ",file("; $anamelc; ","; $tname;
+    "),[mptp_info("; $nr; ",["; `translate(@plevel,"_",",")`;
     "],thesis,position(0,0),[])"; ",";
     try_nd_inference(#el = `BlockThesis/*[position() = last()]`, #thes_nr = "0");
    "]).\n";
@@ -434,9 +434,9 @@ tpl [PerCasesReasoning]
 //    $nr    = `1 + count(../../preceding-sibling::Thesis)`;
 //    $tname = { thesisname(#n = $nr, #pl = `@plevel`); }
 //    "fof(bl"; $tname; ",blockthesis,";
-//    apply(#pl=`@plevel`); 
-//    ",file("; $anamelc; ",bl"; $tname; 
-//    "),[mptp_info("; $nr; ",["; `translate(@plevel,"_",",")`; 
+//    apply(#pl=`@plevel`);
+//    ",file("; $anamelc; ",bl"; $tname;
+//    "),[mptp_info("; $nr; ",["; `translate(@plevel,"_",",")`;
 //    "],thesis,position(0,0),[])"; ",";
 // //   try_nd_inference(#el = `.`, #thes_nr = $nr);
 //    "]).\n";
@@ -444,7 +444,7 @@ tpl [PerCasesReasoning]
 
 
 // the henkin axioms will be created by MPTP (for each const. separately);
-// doing it here would mean that we either have to cheat a bit (just 
+// doing it here would mean that we either have to cheat a bit (just
 // imply previous thesis by thenext one, and call it axiom), or instantiate
 // or generalize - which is much easier to do in prolog
 tpl henkin_ax_nm(#cnm)  { "dh_"; $cnm; }
@@ -458,7 +458,7 @@ tpl get_henkin_axioms(#tpos)
    $pos = { if [not($tpos)] { `count(Typ)`; } else { $tpos; } }
    for-each [Typ[position() <= $pos]]
    {
-      $nr   = `$cnr + position() - 1`; 
+      $nr   = `$cnr + position() - 1`;
       $nm   =  { "c"; $nr; addp(#pl = $pl); }
       henkin_ax_nm(#cnm = $nm);
       if [not(position() = $pos)] { ","; }
@@ -467,9 +467,9 @@ tpl get_henkin_axioms(#tpos)
 
 
 // ###GRM:
-// Mizar_ND_Inference = "mizar_nd(" "inference(" Mizar_ND_Rule "," "[" Optional_ND_Info* "]" "," 
+// Mizar_ND_Inference = "mizar_nd(" "inference(" Mizar_ND_Rule "," "[" Optional_ND_Info* "]" ","
 //                       "[" Optional_Ref* Optional_NextThesis "]" ")" ")"
-// Mizar_ND_Rule = "let" | "consider" | "take" | "assume" | "discharge_asm" | "conclusion" 
+// Mizar_ND_Rule = "let" | "consider" | "take" | "assume" | "discharge_asm" | "conclusion"
 //                 | "trivial" | "iterative_eq" | "percases"
 // Optional_ND_Info = AssumptionList | DischargeAsmInfo | ThesisExpansions
 
@@ -489,9 +489,9 @@ tpl get_henkin_axioms(#tpos)
 
 
 // "let": Henkin_Axiom_For_Let: here it is that "for x1 p(x1)" is justified by
-// "let c1"; translating to the henkin axiom: 
+// "let c1"; translating to the henkin axiom:
 // "p(c1) => for x1 p(x1)" and the next thesis "p(c1)"
-// "consider": Henkin_Axiom_For_Consider: here "p(c1)" is justified by 
+// "consider": Henkin_Axiom_For_Consider: here "p(c1)" is justified by
 // "ex x1 st p(x1)"; translating to the axiom:
 //  "(ex x1 st p(x1)) => p(c1)" (note that having Henkin_Axiom_For_Let is enough
 // to justify Henkin_Axiom_For_Consider, and vice versa (use negated formulas))
@@ -507,31 +507,31 @@ tpl get_henkin_axioms(#tpos)
 //                | CaseThesis
 
 // #thes_nr gives a number of thesis for which this is created
-// here we come from the "previous thesis", and look for the 
+// here we come from the "previous thesis", and look for the
 // "next skeleton item" (which justifies the previous thesis)
-tpl try_nd_inference(#el,#thes_nr) 
-{ 
+tpl try_nd_inference(#el,#thes_nr)
+{
    $res =
    {
      if [name($el/..) = "BlockThesis"] // we are inside diffuse theses (also any BlockThesis/Formula allowed)
      {
          for-each [$el/../../*[
-	    (name()="Let") or (name()="Conclusion") or (name()="Assume") or (name()="Given") or 
-	    (name()="Take") or (name()="TakeAsVar") or (name()="Case") or (name()="Suppose") or 
-	    (name()="PerCasesReasoning")][$thes_nr + 1]]
-	 {
-	   do_nd(#thes_nr = $thes_nr);
-	 }
+            (name()="Let") or (name()="Conclusion") or (name()="Assume") or (name()="Given") or
+            (name()="Take") or (name()="TakeAsVar") or (name()="Case") or (name()="Suppose") or
+            (name()="PerCasesReasoning")][$thes_nr + 1]]
+         {
+           do_nd(#thes_nr = $thes_nr);
+         }
      }
      else
-     { 
+     {
          for-each [$el/following-sibling::*[
-            (name()="Let") or (name()="Conclusion") or (name()="Assume") or (name()="Given") or 
-	    (name()="Take") or (name()="TakeAsVar") or (name()="Case") or (name()="Suppose") or 
-	    (name()="PerCasesReasoning")][1]]
+            (name()="Let") or (name()="Conclusion") or (name()="Assume") or (name()="Given") or
+            (name()="Take") or (name()="TakeAsVar") or (name()="Case") or (name()="Suppose") or
+            (name()="PerCasesReasoning")][1]]
          {
-	   do_nd(#thes_nr = $thes_nr);
-	 }
+           do_nd(#thes_nr = $thes_nr);
+         }
      }
    }
 
@@ -543,11 +543,11 @@ tpl try_nd_inference(#el,#thes_nr)
    }
 }
 
-//          if this is the last thesis, then the inference is "trivial"     
+//          if this is the last thesis, then the inference is "trivial"
 // private for try_nd_inference()
 // we look for an expansion in the following thesis (only for PerCasesReasoning for
 // the expansion of the thesis following its PerCases item)
-tpl do_nd(#thes_nr,#do_th_exps) 
+tpl do_nd(#thes_nr,#do_th_exps)
 {
    "mizar_nd("; "inference(";
    $inm = `name()`;
@@ -557,81 +557,81 @@ tpl do_nd(#thes_nr,#do_th_exps)
      if [($inm = "PerCasesReasoning")]
      {
         for-each [PerCases]
-	{
-	  if [(following-sibling::*[1]/ThesisExpansions/Ref)]
-	  {
-	    for-each [following-sibling::*[1]/ThesisExpansions/Ref] 
-	    { 
+        {
+          if [(following-sibling::*[1]/ThesisExpansions/Ref)]
+          {
+            for-each [following-sibling::*[1]/ThesisExpansions/Ref]
+            {
               refname(#el=`.`,#pl="");
-	      if [not(position()=last())] { ","; }
+              if [not(position()=last())] { ","; }
             }
           }
         }
      }
      else { if [(following-sibling::*[1]/ThesisExpansions/Ref)]
      {
-       for-each [following-sibling::*[1]/ThesisExpansions/Ref] 
-       { 
+       for-each [following-sibling::*[1]/ThesisExpansions/Ref]
+       {
          refname(#el=`.`,#pl="");
-	 if [not(position()=last())] { ","; }
+         if [not(position()=last())] { ","; }
        }
      }}
    }
 
    $thexps = { if [string-length($thexps0) > 0] { $thexps0; ","; } }
 
-   $thexps1 = 
+   $thexps1 =
    {
       if [string-length($thexps0) > 0] { "thesis_expansions(["; $thexps0; "])"; }
    }
 
-   choose 
-   { 
+   choose
+   {
        when [($inm = "Let")]
        {
          "let"; ","; "["; $thexps1; "]"; ","; "[";
-	 $thexps;
+         $thexps;
          get_henkin_axioms(); ",";
          thesisname(#n = `$thes_nr + 1`, #pl = `@plevel`); "]";
        }
        when [($inm = "Take") or ($inm = "TakeAsVar")]
        {
          "take"; ","; "["; $thexps1; "]"; ","; "[";
-	 $thexps;
+         $thexps;
          thesisname(#n = `$thes_nr + 1`, #pl = `@plevel`); "]";
        }
        when [($inm = "Assume") or ($inm = "Case") or ($inm = "Suppose")]
        {
          "discharge_asm"; ","; "["; $thexps1;
-	 if [string-length($thexps1) > 0] { ","; }
+         if [string-length($thexps1) > 0] { ","; }
          // ###TODO: write this and uncomment!
 //         get_assumptions(#el = `.`); ",";
-         "discharged(["; 
-         for-each [Proposition] 
-         { 
+         "discharged([";
+         for-each [Proposition]
+         {
            plname(#n=`@propnr`, #pl=`@plevel`);
            if [not(position() = last())] { ","; }
-         } 
+         }
          "])"; "]"; ","; "[";
-	 $thexps;
+         $thexps;
          thesisname(#n = `$thes_nr + 1`, #pl = `@plevel`); "]";
        }
        when [($inm = "Given")]
        {
          "discharge_asm"; ","; "["; $thexps1;
-	 if [string-length($thexps1) > 0] { ","; }
+         if [string-length($thexps1) > 0] { ","; }
 //         get_assumptions(#el = `.`); ",";
-         "discharged(["; 
+         "discharged([";
          for-each [Proposition[1]] { plname(#n=`@propnr`, #pl=`@plevel`); }
          "])"; "]"; ","; "[";
-	 $thexps;
+         $thexps;
          thesisname(#n = `$thes_nr + 1`, #pl = `@plevel`); "]";
        }
        when [($inm = "Conclusion")]
        {
          "conclusion"; ","; "["; $thexps1;
-	 "]"; ","; "[";
-	 $thexps;
+         "]"; ","; "[";
+         $thexps;
          plname(#n=`*[1]/@propnr`, #pl=`*[1]/@plevel`); ",";
          thesisname(#n = `$thes_nr + 1`, #pl = `@plevel`); "]";
        }
@@ -642,21 +642,21 @@ tpl do_nd(#thes_nr,#do_th_exps)
 //                     the first cases' assumptions and its thesis
 // ...
 // N+PCR's newlevel: the last cases BlockThesis (i.e. implication)
-// ##NOTE: the possible ThesisExpansions are now kept at the thesis following 
-//         PerCases 
+// ##NOTE: the possible ThesisExpansions are now kept at the thesis following
+//         PerCases
        when [($inm = "PerCasesReasoning")]
        {
          "percases"; ","; "["; $thexps1; "]"; ","; "[";
-	 $thexps;
-	 for-each [CaseBlock|SupposeBlock]
-	 {
-	   thesisname(#n = `position()`, #pl = `@plevel`); ",";
-	 }
-	 for-each [PerCases/Proposition]
-	 {
-	   plname(#n=`@propnr`, #pl=`@plevel`);
-	 }
-	 "]";
+         $thexps;
+         for-each [CaseBlock|SupposeBlock]
+         {
+           thesisname(#n = `position()`, #pl = `@plevel`); ",";
+         }
+         for-each [PerCases/Proposition]
+         {
+           plname(#n=`@propnr`, #pl=`@plevel`);
+         }
+         "]";
        }
        otherwise { $fail; $inm; }
    }
@@ -671,32 +671,32 @@ tpl do_nd(#thes_nr,#do_th_exps)
 // - scheme functors and preds get empty level (i.e. are defined globally)
 // - the scheme gets empty level (i.e. one level up)
 // - the scheme's proof is raised too (i.e. one number); on that proof level
-//   exist only the premises and the thesis (this is standard), the premises are 
+//   exist only the premises and the thesis (this is standard), the premises are
 //   treated as assumptions, the thesis as a proved conclusion
-tpl [SchemeBlock] 
-{ 
+tpl [SchemeBlock]
+{
     $sname = `concat('s',@schemenr,'_',$anamelc)`;
     "fof("; $sname; ",theorem,"; "(";
-    if [SchemePremises/Proposition] 
-    { "( "; 
+    if [SchemePremises/Proposition]
+    { "( ";
        ilist( #separ=$and_s, #elems=`SchemePremises/Proposition/*`,
-	      #pl=`@newlevel`); 
-       " ) "; $imp_s; 
+              #pl=`@newlevel`);
+       " ) "; $imp_s;
     }
     apply[Proposition/*](#pl=`@newlevel`); ")";
-    ",file("; $anamelc; ","; $sname; "),[mptp_info("; 
-    `@schemenr`; ",[],"; "scheme,position("; `@line`; ","; 
-    `@col`; "),["; `@schemenr`; "])"; 
+    ",file("; $anamelc; ","; $sname; "),[mptp_info(";
+    `@schemenr`; ",[],"; "scheme,position("; `@line`; ",";
+    `@col`; "),["; `@schemenr`; "])";
     // only Proof and SkippedProof
     try_inference( #el=`*[position() = (last() - 1)]`,#pl=`@newlevel`,#nl=`@newlevel`); ",";
 
 // the ND stuff
-    "mizar_nd("; "inference("; "discharge_asm"; ","; "["; 
+    "mizar_nd("; "inference("; "discharge_asm"; ","; "[";
 // ###TODO: write this and uncomment!
 //         get_assumptions(#el = `.`); ",";
-    "discharged(["; 
-    for-each [SchemePremises/Proposition] 
-    { 
+    "discharged([";
+    for-each [SchemePremises/Proposition]
+    {
       plname(#n=`@propnr`, #pl=`@plevel`);
       if [not(position() = last())] { ","; }
     }
@@ -704,61 +704,61 @@ tpl [SchemeBlock]
     plname(#n=`Proposition/@propnr`, #pl=`Proposition/@plevel`);
     "]"; "))";
 
-    "]).\n"; 
+    "]).\n";
 }
 
 // SchemePremises implies SchemeThesis
-tpl [Scheme] 
-{ 
+tpl [Scheme]
+{
     $sname = lc(#s=`concat('s',@nr,'_',@aid)`);
     "fof("; $sname; ",theorem,"; "(";
-    if [count(*)>2] { "( "; 
+    if [count(*)>2] { "( ";
        ilist( #separ=$and_s, #elems=`*[position() > 2]`);
-	      " ) "; $imp_s; }
+              " ) "; $imp_s; }
     apply[*[position()=2]]; ")";
-    ",file("; lc(#s=`@aid`); ","; $sname; "),[mptp_info("; 
-    `@nr`; ",[],"; "scheme,position(0,0),[0])]).\n"; 
+    ",file("; lc(#s=`@aid`); ","; $sname; "),[mptp_info(";
+    `@nr`; ",[],"; "scheme,position(0,0),[0])]).\n";
 }
 
 
-tpl [JustifiedTheorem/Proposition] 
-{ 
+tpl [JustifiedTheorem/Proposition]
+{
     "fof("; absr(#el=`..`); ",theorem,";
     apply(#pl=`@plevel`);
-    ",file("; $anamelc; ","; absr(#el=`..`); "),[mptp_info("; 
-    `../@nr`; ",[],"; "theorem,position("; `@line`; ","; 
-    `@col`; "),["; if [@nr] { `@nr`;} else { "0";} 
+    ",file("; $anamelc; ","; absr(#el=`..`); "),[mptp_info(";
+    `../@nr`; ",[],"; "theorem,position("; `@line`; ",";
+    `@col`; "),["; if [@nr] { `@nr`;} else { "0";}
     add_mizar_item();
-    "])"; 
+    "])";
     try_inference(#el=`../*[2]`,#pl=`@plevel`, #prnr=`@propnr`);
-    "]).\n"; 
+    "]).\n";
 }
 
-tpl [Theorem] 
-{ 
+tpl [Theorem]
+{
     "fof("; absr(#el=`.`); ",";
     $kword = { if [@kind="T"] { "theorem"; } else {
        if [@kind="D"] { "definition"; } else { $fail; } } }
     $kword; ",";
     apply; ",file("; lc(#s=`@aid`); ",";
-    absr(#el=`.`); "),[mptp_info("; `@nr`; ",[],"; $kword; 
-    ",position(0,0),[0])]).\n"; 
+    absr(#el=`.`); "),[mptp_info("; `@nr`; ",[],"; $kword;
+    ",position(0,0),[0])]).\n";
 }
 
 
-// ##GRM: Mptp_Info : "mptp_info(" 
+// ##GRM: Mptp_Info : "mptp_info("
 //           Item_Number "," Level "," Item_Kind ","
 //           Position "," "[" Item_Arguments "]" ")" .
-tpl [DefTheorem/Proposition] 
-{ 
+tpl [DefTheorem/Proposition]
+{
    "fof("; absr(#el=`..`); ",definition,";
     apply(#pl=`@plevel`);
-    ",file("; $anamelc; ","; absr(#el=`..`); "),[mptp_info("; 
-    `../@nr`; ",[],"; "definition,position("; `@line`; ","; 
-    `@col`; "),["; 
-    if [@nr] { `@nr`;} else { "0";} 
+    ",file("; $anamelc; ","; absr(#el=`..`); "),[mptp_info(";
+    `../@nr`; ",[],"; "definition,position("; `@line`; ",";
+    `@col`; "),[";
+    if [@nr] { `@nr`;} else { "0";}
     add_mizar_item();
-    "]"; ")]).\n"; 
+    "]"; ")]).\n";
 }
 
 // add the name of the mizar item which introduced the current proposition
@@ -774,13 +774,13 @@ tpl [DefTheorem/Proposition]
 // and IterStep (never makes it here) gets iterstep
 //
 // ##GRM: Mizar_Item: "mizar_item(" Mizar_Item_Name ")" .
-// ##GRM: Mizar_Item_Name: 
+// ##GRM: Mizar_Item_Name:
 // ##GRM:       "assume" | "case" | "conclusion" | "percases" | "suppose"
 // ##GRM:       | "consider_definition" | "consider_justification" | "reconsider"
 // ##GRM:       | "deftheorem" | "justifiedtheorem" | "schemethesis" | "schemepremise"
-// ##GRM:       | "coherence" | "compatibility" | "consistency" | "correctness" 
+// ##GRM:       | "coherence" | "compatibility" | "consistency" | "correctness"
 // ##GRM:       | "existence" | "uniqueness" | "unknowncorrcond"
-// ##GRM:       | "unexpectedprop" | "symmetry" | "reflexivity" | "irreflexivity" 
+// ##GRM:       | "unexpectedprop" | "symmetry" | "reflexivity" | "irreflexivity"
 // ##GRM:       | "associativity" | "transitivity" | "commutativity" | "connectedness"
 // ##GRM:       | "antisymmetry" | "idempotence" | "involutiveness" | "projectivity" | "abstractness"
 // ##GRM:       | "auxiliary_lemma" | "iterstep" .
@@ -789,27 +789,27 @@ tpl add_mizar_item
 // temporarily commented to compile
   ",mizar_item(";
   $parent_nm = `name(..)`;
-  choose 
-  { 
+  choose
+  {
      when [$parent_nm = "SchemeBlock"] { "schemethesis"; }
      when [$parent_nm = "SchemePremises"] { "schemepremise"; }
-     when [$parent_nm = "JustifiedProperty"] 
-     { 
+     when [$parent_nm = "JustifiedProperty"]
+     {
        lc(#s = `name(preceding-sibling::*[1])`);
      }
      when [$parent_nm = "Consider"]
-     { 
-       if [preceding-sibling::Typ] { "consider_definition"; } 
+     {
+       if [preceding-sibling::Typ] { "consider_definition"; }
        else { "consider_justification"; }
      }
      when [$parent_nm = "Given"]
      {
        // "given" is intentionally exported as an "assume" followed by a
        // "consider" - it is just a macro (like e.g. "hereby")
-       if [preceding-sibling::Typ] { "consider_definition"; } 
+       if [preceding-sibling::Typ] { "consider_definition"; }
        else { "assume"; }
      }
-     when [($parent_nm = "Proof") or ($parent_nm = "Now") or 
+     when [($parent_nm = "Proof") or ($parent_nm = "Now") or
            ($parent_nm = "Article") or (contains($parent_nm, "Block"))]
      {
        "auxiliary_lemma";
@@ -829,7 +829,7 @@ tpl dumproptable()
 // <xsl:document href="{$anamelc}.propnames" format="text">
    for-each [//Proposition|//IterEquality|//Now]
    {
-    if [@nr>0] 
+    if [@nr>0]
     {
        $pname = plname(#n=`@propnr`, #pl=`@plevel`);
        $nm = { get_vid_name(#vid = `@vid`); }
@@ -841,12 +841,12 @@ tpl dumproptable()
  }
 }
 
-tpl [Proposition] 
-{ 
+tpl [Proposition]
+{
     $pname = plname(#n=`@propnr`, #pl=`@plevel`);
 
     $consider_kind =
-    { 
+    {
       if [((name(..) = "Consider") or (name(..) = "Given"))]
       {
         if [preceding-sibling::Typ] { "1"; } else { "2"; }
@@ -854,34 +854,34 @@ tpl [Proposition]
       else { "0"; }
     }
 
-    "fof(";  $pname; ","; 
-    if [following-sibling::*[1][name() = "By" or name() = "From" or name() = "Proof"]] 
-    { 
+    "fof(";  $pname; ",";
+    if [following-sibling::*[1][name() = "By" or name() = "From" or name() = "Proof"]]
+    {
       $derived_lemma;
-    } 
+    }
     else { if [$consider_kind = 1] { $derived_lemma; } // derived in ND-sense
     else
     {
-      "assumption"; 
+      "assumption";
     }}
     ",";
-    apply(#pl=`@plevel`); ",file("; $anamelc; 
-    ","; $pname; "),[mptp_info("; `@propnr`; ",["; 
-    `translate(@plevel,"_",",")`; "],proposition,position("; `@line`; ","; 
-    `@col`; "),["; if [@nr] { `@nr`;} else { "0";} 
+    apply(#pl=`@plevel`); ",file("; $anamelc;
+    ","; $pname; "),[mptp_info("; `@propnr`; ",[";
+    `translate(@plevel,"_",",")`; "],proposition,position("; `@line`; ",";
+    `@col`; "),["; if [@nr] { `@nr`;} else { "0";}
     add_mizar_item();
     if [$consider_kind = 2] // keep a list of all considered constants here for easy lookup
     {
         ","; "considered_constants([";
-        $cnr = `../@constnr`; $pl=`@plevel`; 
-	for-each [../Typ] 
-	{
-	  $pos1 = `position()`; 
-	  $nr   = `$cnr + $pos1 - 1`; 
-	  "c"; $nr; addp(#pl=$pl);
-	  if [not(position()=last())] { ","; }
+        $cnr = `../@constnr`; $pl=`@plevel`;
+        for-each [../Typ]
+        {
+          $pos1 = `position()`;
+          $nr   = `$cnr + $pos1 - 1`;
+          "c"; $nr; addp(#pl=$pl);
+          if [not(position()=last())] { ","; }
         }
-	"])";
+        "])";
     }
     "])";
     try_inference(#el=`following-sibling::*[1]`,#pl=`@plevel`,#prnr=`@propnr`);
@@ -893,95 +893,95 @@ tpl [Proposition]
       for-each [../Proposition[1]] { plname(#n=`@propnr`, #pl=`@plevel`); }
       "]))";
     }
-    "]).\n"; 
+    "]).\n";
 }
 
-tpl [Now] 
-{ 
+tpl [Now]
+{
    $pname = plname(#n=`@propnr`, #pl=`@plevel`);
    "fof(";  $pname; ","; $derived_lemma; ",";
-   apply[BlockThesis/*[position() = last()]](#pl=`@plevel`); ",file("; $anamelc; 
-   ","; $pname; "),[mptp_info("; `@propnr`; ",["; 
-   `translate(@plevel,"_",",")`; "],proposition,position("; `@line`; ","; 
-   `@col`; "),["; 
-   if [@nr] { `@nr`;} else { "0";} 
+   apply[BlockThesis/*[position() = last()]](#pl=`@plevel`); ",file("; $anamelc;
+   ","; $pname; "),[mptp_info("; `@propnr`; ",[";
+   `translate(@plevel,"_",",")`; "],proposition,position("; `@line`; ",";
+   `@col`; "),[";
+   if [@nr] { `@nr`;} else { "0";}
    add_mizar_item();
-   "]),"; 
+   "]),";
    proofinfer(#el=`.`,#pl=`@plevel`,#prnr=`@propnr`); ",";
    try_nd_inference(#el = `BlockThesis/*[position() = last()]`, #thes_nr = "0");
-   "]).\n"; 
+   "]).\n";
 }
 
-tpl [IterEquality] 
-{ 
+tpl [IterEquality]
+{
    $pname = plname(#n=`@propnr`, #pl=`@plevel`);
    "fof(";  $pname; ","; $derived_lemma; ",";
-   "( "; apply[*[1]](#pl=`@plevel`); $eq_s; 
+   "( "; apply[*[1]](#pl=`@plevel`); $eq_s;
    apply[IterStep[position() = last()]/*[1]](#pl=`@plevel`); " )";
-   ",file("; $anamelc; 
-   ","; $pname; "),[mptp_info("; `@propnr`; ",["; 
-   `translate(@plevel,"_",",")`; "],proposition,position("; `@line`; ","; 
-   `@col`; "),["; if [@nr] { `@nr`;} else { "0";} 
+   ",file("; $anamelc;
+   ","; $pname; "),[mptp_info("; `@propnr`; ",[";
+   `translate(@plevel,"_",",")`; "],proposition,position("; `@line`; ",";
+   `@col`; "),["; if [@nr] { `@nr`;} else { "0";}
    add_mizar_item();
-   "]),"; 
+   "]),";
    proofinfer(#el=`.`,#pl=`@plevel`,#prnr=`@propnr`); ",";
    "mizar_nd("; "inference("; "iterative_eq"; ","; "[]"; ","; "[";
-   for-each [IterStep] 
-   { 
+   for-each [IterStep]
+   {
       plname(#n=`@propnr`, #pl=`@plevel`);
       if [not(position() = last())] { ","; }
    }
    "]"; "))";
-   "]).\n"; 
-   apply[IterStep]; 
+   "]).\n";
+   apply[IterStep];
 }
 
 // ##NOTE: not sure if IterStep should be treated as just auxiliary_lemma, or
 //          as a special kind of skeleton item, which changes the thesis
-//          to equality with the next term. So I'll better use iterstep to 
+//          to equality with the next term. So I'll better use iterstep to
 //          preserve the info for now.
 // ##SOLUTION: currently the IterEquality is justified by mizar_proof, and also
 //             by "mizar_nd(iterative_eq,...", which just contains all the internal
 //             Iterstep equalities.
-tpl [IterStep] 
-{ 
+tpl [IterStep]
+{
    $pname = plname(#n=`@propnr`, #pl=`@plevel`);
-   "fof(";  $pname; ","; $derived_lemma; ","; "( "; 
-   if [name(preceding-sibling::*[1])="IterStep"] 
+   "fof(";  $pname; ","; $derived_lemma; ","; "( ";
+   if [name(preceding-sibling::*[1])="IterStep"]
    {
-      apply[preceding-sibling::*[1]/*[1]](#pl=`@plevel`); 
+      apply[preceding-sibling::*[1]/*[1]](#pl=`@plevel`);
    }
-   else 
-   { 
-      apply[preceding-sibling::*[1]](#pl=`@plevel`); 
+   else
+   {
+      apply[preceding-sibling::*[1]](#pl=`@plevel`);
    }
    $eq_s; apply[*[1]](#pl=`@plevel`); " )";
-   ",file("; $anamelc; 
-   ","; $pname; "),[mptp_info("; `@propnr`; ",["; 
+   ",file("; $anamelc;
+   ","; $pname; "),[mptp_info("; `@propnr`; ",[";
    `translate(@plevel,"_",",")`; "],proposition,position("; `*[2]/@line`; ",";
-   `*[2]/@col`; "),["; if [@nr] { `@nr`;} else { "0";} 
+   `*[2]/@col`; "),["; if [@nr] { `@nr`;} else { "0";}
    ",mizar_item(iterstep)";
-   "])"; 
+   "])";
    try_inference(#el=`*[2]`,#pl=`@plevel`,#prnr=`@propnr`);
-   "]).\n"; 
+   "]).\n";
 }
 
 // #nl is only passsed to proofinfer when dealing with schemes;
 // it is also used to prevent trying ND for schemes
-tpl try_inference(#el,#pl,#prnr,#nl) 
-{ 
-  for-each [$el] 
+tpl try_inference(#el,#pl,#prnr,#nl)
+{
+  for-each [$el]
   {
     if [name() = "By"] { ",";
        byinfer(#el=`.`,#pl=$pl,#prnr=$prnr); }
     else { if [name() = "From"] { ",";
        frominfer(#el=`.`,#pl=$pl,#prnr=$prnr); }
     else { if [name() = "Proof"] { ",";
-       proofinfer(#el=`.`,#pl=$pl,#prnr=$prnr,#nl=$nl); 
-       if [not($nl)] 
+       proofinfer(#el=`.`,#pl=$pl,#prnr=$prnr,#nl=$nl);
+       if [not($nl)]
        {
          ",";
-	 try_nd_inference(#el = `BlockThesis/*[position() = last()]`, #thes_nr = "0");
+         try_nd_inference(#el = `BlockThesis/*[position() = last()]`, #thes_nr = "0");
        }
     }
     else { if [name() = "SkippedProof"] { ",";
@@ -996,42 +996,42 @@ tpl skippedinfer(#el,#pl,#prnr) { "inference(mizar_skipped_proof,[],[])"; }
 // assumes By
 tpl byinfer(#el,#pl,#prnr) { for-each [$el] {
     "inference(mizar_by,[";
-    "position("; `@line`; ","; `@col`; ")],"; 
+    "position("; `@line`; ","; `@col`; ")],";
     "["; refs(#el=`.`,#pl=$pl,#prnr=$prnr); "])"; }}
 
 // handles Refs for From, (possibly linked) By and ThesisExpansions
 // ignores possible ThesisExpansions/Pair - each has a Ref added to it
-tpl refs(#el,#pl,#prnr) 
-{  
-  for-each [$el] 
+tpl refs(#el,#pl,#prnr)
+{
+  for-each [$el]
   {
-    if [@linked] 
-    { 
+    if [@linked]
+    {
        if [name(..)="IterStep"] {
-	  plname(#n=`../../@propnr - 1`,#pl=`../../@plevel`); } 
+          plname(#n=`../../@propnr - 1`,#pl=`../../@plevel`); }
        else { if [$prnr>1] {
-	  plname(#n=`$prnr - 1`,#pl=$pl); } else { $fail; } }
-      if [Ref|PolyEval] { ","; } 
+          plname(#n=`$prnr - 1`,#pl=$pl); } else { $fail; } }
+      if [Ref|PolyEval] { ","; }
     }
-    else { if [name()="From"] 
-    { 
-	 sch_instname(#el=`.`, #pl=$pl, #prnr=$prnr); 
-	 if [Ref|PolyEval] { ","; }
+    else { if [name()="From"]
+    {
+         sch_instname(#el=`.`, #pl=$pl, #prnr=$prnr);
+         if [Ref|PolyEval] { ","; }
     }}
 
-    for-each [Ref] 
-    { 
-       refname(#el=`.`,#pl=$pl); 
-       if [not(position()=last())] { ","; } 
+    for-each [Ref]
+    {
+       refname(#el=`.`,#pl=$pl);
+       if [not(position()=last())] { ","; }
     }
-    
+
     if [PolyEval]
     {
        if[Ref] { ","; }
-       for-each [PolyEval] 
-       { 
-          polyeval_name(#el=`.`,#pl=$pl); 
-	  if [not(position()=last())] { ","; } 
+       for-each [PolyEval]
+       {
+          polyeval_name(#el=`.`,#pl=$pl);
+          if [not(position()=last())] { ","; }
        }
     }
   }
@@ -1039,10 +1039,10 @@ tpl refs(#el,#pl,#prnr)
 
 
 tpl [FuncInstance](#pl) { $k = `@kind`;
-    sch_fpname(#k="f",#nr=`@instnr`,#schnr=`@instschemenr`, #aid=`@instaid`); 
+    sch_fpname(#k="f",#nr=`@instnr`,#schnr=`@instschemenr`, #aid=`@instaid`);
     "/";
     // instantiated to other functor
-    if [$k] { choose { 
+    if [$k] { choose {
        when [$k="K"] { absc(#el=`.`); }
        when [$k="F"] { abs_fp(#k="f",#el=`.`); }
        when [$k="H"] { "("; priv_def(#k="pf",#nr=`@nr`,#pl=$pl); ")";}
@@ -1052,30 +1052,30 @@ tpl [FuncInstance](#pl) { $k = `@kind`;
     else { if [*[1]] { "([] : "; apply[*[1]](#pl=$pl); ")"; } else { $fail; } } }
 
 tpl [PredInstance](#pl) { $k = `@kind`;
-    sch_fpname(#k="p",#nr=`@instnr`,#schnr=`@instschemenr`, #aid=`@instaid`); 
+    sch_fpname(#k="p",#nr=`@instnr`,#schnr=`@instschemenr`, #aid=`@instaid`);
     "/";
-    choose { 
-	     when [$k="R"] { absc(#el=`.`); }
-	     when [$k="P"] { abs_fp(#k="p",#el=`.`); }
-	     when [$k="S"] { "("; priv_def(#k="pp",#nr=`@nr`,#pl=$pl); ")";}
-	     otherwise { $fail; }
+    choose {
+             when [$k="R"] { absc(#el=`.`); }
+             when [$k="P"] { abs_fp(#k="p",#el=`.`); }
+             when [$k="S"] { "("; priv_def(#k="pp",#nr=`@nr`,#pl=$pl); ")";}
+             otherwise { $fail; }
     }}
 
 tpl [SchemeInstantiation](#pl) { "[";
-    for-each [FuncInstance | PredInstance] { apply[.](#pl=$pl); 
-	     if [not(position()=last())] { ","; } }
+    for-each [FuncInstance | PredInstance] { apply[.](#pl=$pl);
+             if [not(position()=last())] { ","; } }
     "]"; }
 
 // assumes From, introduces a unique name for this scheme instance
-// ##GRM: Scheme_Inference : 
-//          "inference(mizar_from,[scheme_instance(" 
+// ##GRM: Scheme_Inference :
+//          "inference(mizar_from,[scheme_instance("
 //          Scheme_Instance_Name "," Scheme_Name "," Proposition_Name
-//          "," Aid "," Scheme_Instantiation ")],[" 
-//          Scheme_Instance_Name [ "," References ] "])" .   
+//          "," Aid "," Scheme_Instantiation ")],["
+//          Scheme_Instance_Name [ "," References ] "])" .
 tpl frominfer(#el,#pl,#prnr) { for-each [$el] {
     "inference(mizar_from,[";
-    "position("; `@line`; ","; `@col`; "),"; 
-    "scheme_instance("; 
+    "position("; `@line`; ","; `@col`; "),";
+    "scheme_instance(";
     sch_instname(#el=`.`, #pl=$pl, #prnr=$prnr); ",";
     absr(#el=`.`); ","; plname(#n=$prnr,#pl=$pl); ","; $anamelc; ",";
     apply[SchemeInstantiation](#pl=$pl); ")],[";
@@ -1083,48 +1083,48 @@ tpl frominfer(#el,#pl,#prnr) { for-each [$el] {
 }}
 
 
-// ###TODO: finish the description!! 
+// ###TODO: finish the description!!
 // assumes Proof, Now or IterEquality,
 // selects all references (no matter what their level is) used for
-// justifying anything inside the proof (so e.g. assumption, which 
-// is never used to justify anything willnot be listed). This is a 
-// bit arbitrary choice, because in computing background theory for 
-// a given proof, this is not sufficient for getting a complete 
+// justifying anything inside the proof (so e.g. assumption, which
+// is never used to justify anything willnot be listed). This is a
+// bit arbitrary choice, because in computing background theory for
+// a given proof, this is not sufficient for getting a complete
 // symbol set (all formulas inside the proof have to be collected anyway).
-// Another options would be to encode just the Mizar ND proof's 
+// Another options would be to encode just the Mizar ND proof's
 // last inference (e.g. "universal intro", if the proof starts with "let"),
 // or to encode only the formulas on the child level.
-// ##GRM: Proof_Inference : 
-//          "inference(mizar_proof,[proof_level(" Level ")], 
-//          [ References ] ")" .   
+// ##GRM: Proof_Inference :
+//          "inference(mizar_proof,[proof_level(" Level ")],
+//          [ References ] ")" .
 // seems that #pl and #prnr are no longer used, only #nl is used to possibly
 // override #el's own @newlevel (used for schemes)
-tpl proofinfer(#el,#pl,#prnr,#nl) 
-{ 
-  for-each [$el] 
+tpl proofinfer(#el,#pl,#prnr,#nl)
+{
+  for-each [$el]
   {
-    "inference(mizar_proof,[proof_level(["; 
+    "inference(mizar_proof,[proof_level([";
     if [$nl] { `translate($nl,"_",",")`; }
     else { if [@newlevel] { `translate(@newlevel,"_",",")`; }
     else { $fail; }}
-     "])],["; 
-    for-each [.//By[((name(preceding-sibling::*[1])="Proposition") 
-	              or (name(..)="IterStep"))
-	            and ((@linked="true") or (count(Ref)>0))] 
-	     | .//From[((name(preceding-sibling::*[1])="Proposition") 
-	                 or (name(..)="IterStep"))]
-             | .//ThesisExpansions[count(Ref)>0]] 
-    { 
+     "])],[";
+    for-each [.//By[((name(preceding-sibling::*[1])="Proposition")
+                      or (name(..)="IterStep"))
+                    and ((@linked="true") or (count(Ref)>0))]
+             | .//From[((name(preceding-sibling::*[1])="Proposition")
+                         or (name(..)="IterStep"))]
+             | .//ThesisExpansions[count(Ref)>0]]
+    {
       if [name()="ThesisExpansions"] { refs( #el=`.`); }
-      else { if [name(..)="IterStep"] {  
-	     refs( #el=`.`,#pl=`../@plevel`,#prnr=`../@propnr`); }
-        else 
-	{
-	      refs( #el=`.`,#pl=`preceding-sibling::*[1]/@plevel`,
-		    #prnr=`preceding-sibling::*[1]/@propnr`); 
+      else { if [name(..)="IterStep"] {
+             refs( #el=`.`,#pl=`../@plevel`,#prnr=`../@propnr`); }
+        else
+        {
+              refs( #el=`.`,#pl=`preceding-sibling::*[1]/@plevel`,
+                    #prnr=`preceding-sibling::*[1]/@propnr`);
         }
       }
-      if [not(position()=last())] { ","; } 
+      if [not(position()=last())] { ","; }
     }
     "])";
   }
@@ -1132,28 +1132,28 @@ tpl proofinfer(#el,#pl,#prnr,#nl)
 
 
 // create name and info for a scheme instance
-tpl sch_instname(#el,#pl,#prnr) { for-each [$el] { absr(#el=`.`); 
+tpl sch_instname(#el,#pl,#prnr) { for-each [$el] { absr(#el=`.`);
     "__"; abspropname(#n=$prnr,#pl=$pl); }}
 
 // uncomment apply[Proposition] if not used explicit descent
 // constant arising from "Given" are treated as if they came from "Consider"
 // Let typing is treated as an assumption, the rest of typings are derived,
 // in case of Consider (and thus also Given) by an ND argument
-tpl [Let|Given|TakeAsVar|Consider|Set] 
-{ 
-  $cnr = `@constnr`; $pl=`@plevel`; 
+tpl [Let|Given|TakeAsVar|Consider|Set]
+{
+  $cnr = `@constnr`; $pl=`@plevel`;
   $rnm = { if [name() = "Given"] { "consider"; } else { lc(#s=`name()`); } }
-  for-each [Typ] 
+  for-each [Typ]
   {
-      $pos1 = `position()`; 
-      $nr   = `$cnr + $pos1 - 1`; 
+      $pos1 = `position()`;
+      $nr   = `$cnr + $pos1 - 1`;
       $nm   =  { "c"; $nr; addp(#pl=$pl); }
       $levl = { ",["; `translate($pl,"_",",")`; "],";}
-      "fof(dt_";  $nm; ","; 
+      "fof(dt_";  $nm; ",";
       if [$rnm = "let"] { "assumption"; } else { $derived_lemma; }
       ","; $srt_s; "("; $nm; ",";
       apply[.](#pl=$pl); ")"; ",file("; $anamelc; ","; $nm;
-      "),[mptp_info("; $nr; $levl; "constant,position(0,0),["; $rnm; 
+      "),[mptp_info("; $nr; $levl; "constant,position(0,0),["; $rnm;
       ",type])";
       if [($rnm = "takeasvar") or ($rnm = "set")]
       {
@@ -1163,18 +1163,18 @@ tpl [Let|Given|TakeAsVar|Consider|Set]
       {
         ","; "mizar_nd("; "inference(";
         "consider"; ","; "[]"; ","; "[";
-	for-each [..] { get_henkin_axioms(#tpos = $pos1); } ",";
-	for-each [../Proposition[1]] { plname(#n=`@propnr`, #pl=`@plevel`); }
-	"]))";
+        for-each [..] { get_henkin_axioms(#tpos = $pos1); } ",";
+        for-each [../Proposition[1]] { plname(#n=`@propnr`, #pl=`@plevel`); }
+        "]))";
       }}
-      "]).\n"; 
-      if [($rnm = "takeasvar") or ($rnm = "set")] 
+      "]).\n";
+      if [($rnm = "takeasvar") or ($rnm = "set")]
       {
-	 "fof(de_";  $nm; ",definition,"; "( "; $nm; $eq_s; 
-	 apply[../*[not(name() = "Typ")]](#pl=$pl); " )";
-	 ",file("; $anamelc; ","; $nm; "),[mptp_info("; $nr; $levl;
-	 "constant,position(0,0),["; $rnm; ",equality])]).\n"; 
-      } 
+         "fof(de_";  $nm; ",definition,"; "( "; $nm; $eq_s;
+         apply[../*[not(name() = "Typ")]](#pl=$pl); " )";
+         ",file("; $anamelc; ","; $nm; "),[mptp_info("; $nr; $levl;
+         "constant,position(0,0),["; $rnm; ",equality])]).\n";
+      }
   }
 //    apply[Proposition];
 }
@@ -1183,32 +1183,32 @@ tpl [Let|Given|TakeAsVar|Consider|Set]
 // hopefully a compatible way for both new and old.
 // The typing is justified by the proposition and the equality def.
 // That should be OK for problem creation using mizar_by - the type
-// statement will be deleted from the axioms, and the rest of BG are just 
+// statement will be deleted from the axioms, and the rest of BG are just
 // general theorems, nothing specific about the constant.
 // The proposition is generated before the types and equalities, otherwise in MizAR
 // the article_position is wrong, resulting in bad .allowed_local info
-tpl [Reconsider] 
-{ 
+tpl [Reconsider]
+{
 
-  $cnr     = `@constnr`; 
-  $pl      = `@plevel`; 
+  $cnr     = `@constnr`;
+  $pl      = `@plevel`;
   apply[Proposition](#pl=$pl);
   $prop_nm = plname(#n=`Proposition/@propnr`, #pl=`Proposition/@plevel`);
   for-each [Var|LocusVar|Const|InfConst|Num|Func|PrivFunc|Fraenkel|
-	      QuaTrm|It|Choice|ErrorTrm] 
+              QuaTrm|It|Choice|ErrorTrm]
   {
-      $nr   = `$cnr + position() - 1`; 
+      $nr   = `$cnr + position() - 1`;
       $nm   =  { "c"; $nr; addp(#pl=$pl); }
       $levl = { ",["; `translate($pl,"_",",")`; "],";}
       "fof(dt_";  $nm; ","; $derived_lemma; ","; $srt_s; "("; $nm; ",";
       apply[../Typ[position() = 1]](#pl=$pl); ")"; ",file("; $anamelc; ","; $nm;
-      "),[mptp_info("; $nr; $levl; 
+      "),[mptp_info("; $nr; $levl;
       "constant,position(0,0),[reconsider,type]),";
       "inference(mizar_by,[reconsider],[de_"; $nm; ","; $prop_nm; "])";
       "]).\n";
 
-      "fof(de_";  $nm; ",definition,"; "( "; $nm; $eq_s; 
-      apply[.](#pl=$pl); " )"; ",file("; $anamelc; ","; $nm; "),[mptp_info("; 
+      "fof(de_";  $nm; ",definition,"; "( "; $nm; $eq_s;
+      apply[.](#pl=$pl); " )"; ",file("; $anamelc; ","; $nm; "),[mptp_info(";
       $nr; $levl; "constant,position(0,0),[reconsider,equality])]).\n";
   }
 }
@@ -1216,60 +1216,60 @@ tpl [Reconsider]
 // The argument types of scheme functors are forgotten by Mizar
 // so we do not use them either and use $true.
 // The proof level is just [], to be compatible with scheme
-// proof level. The scheme to which this belongs is remembered 
+// proof level. The scheme to which this belongs is remembered
 // instead in the Item_Arguments.
-tpl [SchemeFuncDecl] 
-{ 
-    $pl   = `@plevel`; 
+tpl [SchemeFuncDecl]
+{
+    $pl   = `@plevel`;
     $schnr= `../@schemenr`;
 //  $levl = { ",["; `translate($pl,"_",",")`; "],"; }
-    $levl = { ",[],"; }  
+    $levl = { ",[],"; }
     $sname = `concat('s',$schnr,'_',$anamelc)`;
 //  $nm   =  { "f"; `@nr`; addp(#pl=$pl); }
     $nm   = { sch_fpname(#k="f",#nr=`@nr`,#schnr=`../@schemenr`,#aid=$aname); }
     $l    = `count(ArgTypes/Typ)`;
 
-    "fof(dt_";  $nm; ",axiom,"; 
-    if [$l > 0] 
-    { 
-       "!["; 
-       for-each [ArgTypes/Typ] 
-       { 
-          ploci(#nr=`position()`); 
-	  " : $true"; 
-	  if [not(position()=last())] { ","; } 
+    "fof(dt_";  $nm; ",axiom,";
+    if [$l > 0]
+    {
+       "![";
+       for-each [ArgTypes/Typ]
+       {
+          ploci(#nr=`position()`);
+          " : $true";
+          if [not(position()=last())] { ","; }
        }
-       "]: "; 
+       "]: ";
     }
 
     $srt_s; "("; $nm;
-    if [$l > 0] 
-    { 
-       "("; arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; 
+    if [$l > 0]
+    {
+       "("; arglist(#separ=",",#elems=`ArgTypes/Typ`); ")";
     }
     ","; apply[Typ](#pl=$pl); ")";
     ",file("; $anamelc; ","; $nm; "),[mptp_info("; `@nr`; $levl;
-    "functor,position(0,0),[scheme,type,"; $sname; "])]).\n"; 
+    "functor,position(0,0),[scheme,type,"; $sname; "])]).\n";
 }
 
 
 // "M" | "L" | "V" | "R" | "K" | "U" | "G"
 // ###TODO: add the inference, do the properties
-tpl [Constructor] 
-{ 
-    $lkind = { lc(#s=`@kind`); } 
+tpl [Constructor]
+{
+    $lkind = { lc(#s=`@kind`); }
 // the type hierarchy formula for "M" | "L" | "K" | "U" | "G"
-    if [(@kind='M') or (@kind='L') or (@kind='K') or 
-        (@kind='U') or (@kind='G')] 
+    if [(@kind='M') or (@kind='L') or (@kind='K') or
+        (@kind='U') or (@kind='G')]
     {
       "fof(dt_";  absc1(#el=`.`); ","; $derived_lemma; ",";
       apply[ArgTypes];
       $l = `1 + count(ArgTypes/Typ)`;
-      if [(@kind='M') or (@kind='L')] 
+      if [(@kind='M') or (@kind='L')]
       {
-        "!["; ploci(#nr=$l); " : "; "$true"; "]: ("; 
-        $srt_s; "("; ploci(#nr=$l); ","; absc1(#el=`.`); 
-        if [$l > 1] { "("; 
+        "!["; ploci(#nr=$l); " : "; "$true"; "]: (";
+        $srt_s; "("; ploci(#nr=$l); ","; absc1(#el=`.`);
+        if [$l > 1] { "(";
            arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; }
         ")"; $imp_s;
         if [count(Typ) = 0] { $srt_s; "("; ploci(#nr=$l); ",$true)"; }
@@ -1281,295 +1281,295 @@ tpl [Constructor]
         }
         if [count(Typ) > 1] { ")"; }
         ")";
-      }  
-      else  { if [(@kind='K') or (@kind='U') or (@kind='G')] 
+      }
+      else  { if [(@kind='K') or (@kind='U') or (@kind='G')]
       {
         $srt_s; "("; absc1(#el=`.`);
-        if [$l > 1] { "("; 
+        if [$l > 1] { "(";
            arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; }
-	",";
+        ",";
         apply[Typ]; ")";
       }}
-      
+
       ",file("; lc(#s=`@aid`); ",";
-      absc1(#el=`.`); "),[mptp_info("; `@nr`; ",[],"; $lkind; 
-      ",position(0,0),[ctype])]).\n"; 
+      absc1(#el=`.`); "),[mptp_info("; `@nr`; ",[],"; $lkind;
+      ",position(0,0),[ctype])]).\n";
     }
     apply[Properties](#el=`.`);
     if [@kind='G'] { free_prop(#el=`.`); }
-    if [(@kind='M') or (@kind='L')] {	 existence(#el=`.`); }
+    if [(@kind='M') or (@kind='L')] {    existence(#el=`.`); }
     if [@redefnr > 0] { redefinition(#el=`.`); }
 }
 
-tpl existence(#el) 
-{ 
-  for-each [$el] 
+tpl existence(#el)
+{
+  for-each [$el]
   {
-      $lkind = { lc(#s=`@kind`); } 
+      $lkind = { lc(#s=`@kind`); }
       "fof(existence_"; absc1(#el=`.`); ","; $derived_lemma; ",";
-      apply[ArgTypes]; 
+      apply[ArgTypes];
       $l = `1 + count(ArgTypes/Typ)`;
-      "? ["; ploci(#nr=$l); " : "; "$true"; "]: "; 
-      $srt_s; "("; ploci(#nr=$l); ","; absc1(#el=`.`); 
-      if [$l > 1] 
-      { 
-        "("; arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; 
+      "? ["; ploci(#nr=$l); " : "; "$true"; "]: ";
+      $srt_s; "("; ploci(#nr=$l); ","; absc1(#el=`.`);
+      if [$l > 1]
+      {
+        "("; arglist(#separ=",",#elems=`ArgTypes/Typ`); ")";
       }
       ")";
       ",file("; lc(#s=`@aid`); ",";
-      absc1(#el=`.`); "),[mptp_info("; `@nr`; ",[],"; $lkind; 
-      ",position(0,0),[existence])]).\n"; 
+      absc1(#el=`.`); "),[mptp_info("; `@nr`; ",[],"; $lkind;
+      ",position(0,0),[existence])]).\n";
   }
 }
 
 
-// ##GRM: Redef_Info : "redefinition(" Redefined_Constr_Nr "," 
-//           Redefined_Constr_Kind "," Redefined_Constr_Aid "," 
+// ##GRM: Redef_Info : "redefinition(" Redefined_Constr_Nr ","
+//           Redefined_Constr_Kind "," Redefined_Constr_Aid ","
 //           Redefined_Constr_Name ")" .
-tpl redefinition(#el) 
-{ 
+tpl redefinition(#el)
+{
     $lkind  = { lc(#s=`$el/@kind`); }
     $redaid = { lc(#s=`$el/@redefaid`); }
     $absn   = absc1(#el=$el); $n = `$el/@nr`;
     $f      = { lc(#s=`$el/@aid`); }
     $s      = `@superfluous`;
-    for-each [$el] 
+    for-each [$el]
     {
       "fof(redefinition_"; $absn; ",definition,";
-      apply[ArgTypes]; 
+      apply[ArgTypes];
       $l0 = `count(ArgTypes/Typ)`;
-      if [(@kind = 'K') or (@kind = 'R')] 
-      { 
-        "( "; absc1(#el=`.`); 
-	if [$l0 > 0] { "("; arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; }
-	if [@kind = 'K'] { $eq_s; } else { $equiv_s; }
-
-	if [(@kind='R') and (@absredefnr=1) and (@redefaid="HIDDEN")] {
-	    "( "; ploci(#nr=`$l0 - 1`); $eq_s; ploci(#nr=$l0); " )"; }
-        else { 
-	     absredef(#el=`.`); 
-	     if [$l0 > $s] { "("; 
-		arglist(#separ=",",#elems=`ArgTypes/Typ[position() > $s]`,#s=$s); 
-		")";
-             }
-	} ")";
-      } else { if [(@kind = 'V') or (@kind = 'M')] 
+      if [(@kind = 'K') or (@kind = 'R')]
       {
-	 $l = { if [@kind = 'V'] { $l0; } else { `$l0 + 1`; } }
-	 if [@kind = 'M'] 
-	 { 
-	    "!["; ploci(#nr=`$l`); ": "; 
-	    // This is too strong, the original type can hardly get
-	    // the redefinition's result type
-	    // apply[Typ]; 
-	    "$true"; "]: "; 
+        "( "; absc1(#el=`.`);
+        if [$l0 > 0] { "("; arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; }
+        if [@kind = 'K'] { $eq_s; } else { $equiv_s; }
+
+        if [(@kind='R') and (@absredefnr=1) and (@redefaid="HIDDEN")] {
+            "( "; ploci(#nr=`$l0 - 1`); $eq_s; ploci(#nr=$l0); " )"; }
+        else {
+             absredef(#el=`.`);
+             if [$l0 > $s] { "(";
+                arglist(#separ=",",#elems=`ArgTypes/Typ[position() > $s]`,#s=$s);
+                ")";
+             }
+        } ")";
+      } else { if [(@kind = 'V') or (@kind = 'M')]
+      {
+         $l = { if [@kind = 'V'] { $l0; } else { `$l0 + 1`; } }
+         if [@kind = 'M']
+         {
+            "!["; ploci(#nr=`$l`); ": ";
+            // This is too strong, the original type can hardly get
+            // the redefinition's result type
+            // apply[Typ];
+            "$true"; "]: ";
          }
-	 "( "; $srt_s; "("; ploci(#nr=$l); ","; absc1(#el=`.`);
-	 if [$l>1] 
-	 { 
+         "( "; $srt_s; "("; ploci(#nr=$l); ","; absc1(#el=`.`);
+         if [$l>1]
+         {
             "("; arglist(#separ=",",#elems=`ArgTypes/Typ[position() < $l]`);
-            ")"; 
-	 }
-	 ")"; $equiv_s; $srt_s; "("; ploci(#nr=$l); ","; 
-	 absredef(#el=`.`); 
-	 if [($l - $s) > 1] 
-	 { 
-	    "("; 
-	    arglist(#separ=",",#elems=`ArgTypes/Typ[(position() > $s) 
-                                  and (position() < $l)]`, #s=$s); ")"; 
-	 } 
-	 "))"; 
+            ")";
+         }
+         ")"; $equiv_s; $srt_s; "("; ploci(#nr=$l); ",";
+         absredef(#el=`.`);
+         if [($l - $s) > 1]
+         {
+            "(";
+            arglist(#separ=",",#elems=`ArgTypes/Typ[(position() > $s)
+                                  and (position() < $l)]`, #s=$s); ")";
+         }
+         "))";
       }}
-      ",file("; $f; ","; $absn; "),[mptp_info("; $n; ",[],"; $lkind; 
-      ",position(0,0),[redefinition("; `@absredefnr`; ","; $lkind; 
+      ",file("; $f; ","; $absn; "),[mptp_info("; $n; ",[],"; $lkind;
+      ",position(0,0),[redefinition("; `@absredefnr`; ","; $lkind;
       ","; $redaid; ","; absredef(#el=`.`); ")])]).\n"; }
 }
 
 // free property - this is rather definition than theorem
 // g(x1,x2) = g(x3,x4) implies (x1 = x2 and x3 = x4)
-tpl free_prop(#el) 
-{ 
+tpl free_prop(#el)
+{
     $lkind = { lc(#s=`$el/@kind`); }
     $absn  = absc1(#el=$el); $n = `$el/@nr`;
     $f     = { lc(#s=`$el/@aid`); }
 
-    for-each [$el] 
+    for-each [$el]
     {
       "fof(free_"; $absn; ",definition,";
-      apply[ArgTypes]; 
+      apply[ArgTypes];
       $s=`count(ArgTypes/Typ)`;
-      "!["; 
-      for-each [ArgTypes/Typ] 
-      { 
-          ploci(#nr=`position() + $s`); " : $true"; 
-          if [not(position()=last())] { ","; } 
+      "![";
+      for-each [ArgTypes/Typ]
+      {
+          ploci(#nr=`position() + $s`); " : $true";
+          if [not(position()=last())] { ","; }
       }
       "]: ";
-      "(( "; absc1(#el=`.`); "("; 
-      arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; $eq_s; 
-      absc1(#el=`.`); "("; 
+      "(( "; absc1(#el=`.`); "(";
+      arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; $eq_s;
+      absc1(#el=`.`); "(";
       arglist(#separ=",",#elems=`ArgTypes/Typ`,#s=$s); "))"; $imp_s; "( ";
-      for-each [ArgTypes/Typ] 
-      { 
-	  $p=`position()`;
-	  "( "; ploci(#nr=$p); $eq_s;  ploci(#nr=`$p+$s`); ")";
-	  if [not($p=last())] { $and_s; }
+      for-each [ArgTypes/Typ]
+      {
+          $p=`position()`;
+          "( "; ploci(#nr=$p); $eq_s;  ploci(#nr=`$p+$s`); ")";
+          if [not($p=last())] { $and_s; }
       }
       "))";
-      ",file("; $f; ","; $absn; "),[mptp_info("; $n; ",[],"; 
-      $lkind; ",position(0,0),[property(free)])]).\n"; 
+      ",file("; $f; ","; $absn; "),[mptp_info("; $n; ",[],";
+      $lkind; ",position(0,0),[property(free)])]).\n";
     }
 }
 
-tpl [Properties](#el) 
-{ 
-    $a1    = `@propertyarg1`; 
+tpl [Properties](#el)
+{
+    $a1    = `@propertyarg1`;
     $a2    = `@propertyarg2`;
     $lkind = { lc(#s=`$el/@kind`); }
     $absn  = absc1(#el=$el); $n = `$el/@nr`;
     $f     = { lc(#s=`$el/@aid`); }
 
-    for-each [*] 
+    for-each [*]
     {
       $nm = { lc(#s=`name()`); }
       "fof(";  $nm; "_"; $absn; ",theorem,";
       apply[.](#el=$el,#arg1=$a1,#arg2=$a2);
-      ",file("; $f; ","; $absn; "),[mptp_info("; $n; ",[],"; 
-      $lkind; ",position(0,0),[property("; $nm; ")])]).\n"; 
+      ",file("; $f; ","; $absn; "),[mptp_info("; $n; ",[],";
+      $lkind; ",position(0,0),[property("; $nm; ")])]).\n";
     }
 }
 
 
-tpl [UnexpectedProp](#el,#arg1,#arg2) { "$true"; } 
+tpl [UnexpectedProp](#el,#arg1,#arg2) { "$true"; }
 
-tpl symmetry(#el,#arg1,#arg2,#anti) 
-{ 
-  for-each [$el] 
+tpl symmetry(#el,#arg1,#arg2,#anti)
+{
+  for-each [$el]
   {
-    apply[ArgTypes]; "( "; absc1(#el=`.`); "("; 
+    apply[ArgTypes]; "( "; absc1(#el=`.`); "(";
     arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; $imp_s;
-    if [$anti=1] { $not_s; } absc1(#el=`.`); "("; 
-    switchedargs(#nr="1",#nr1=$arg1,#nr2=$arg2,#lim=`count(ArgTypes/Typ)`); 
-    "))"; 
+    if [$anti=1] { $not_s; } absc1(#el=`.`); "(";
+    switchedargs(#nr="1",#nr1=$arg1,#nr2=$arg2,#lim=`count(ArgTypes/Typ)`);
+    "))";
   }
 }
 
-tpl [Symmetry](#el,#arg1,#arg2) { symmetry(#el=$el,#arg1=$arg1,#arg2=$arg2); } 
-tpl [Antisymmetry](#el,#arg1,#arg2) { 
-    symmetry(#el=$el,#arg1=$arg1,#arg2=$arg2,#anti="1"); } 
+tpl [Symmetry](#el,#arg1,#arg2) { symmetry(#el=$el,#arg1=$arg1,#arg2=$arg2); }
+tpl [Antisymmetry](#el,#arg1,#arg2) {
+    symmetry(#el=$el,#arg1=$arg1,#arg2=$arg2,#anti="1"); }
 
-tpl reflexivity(#el,#arg1,#arg2,#anti) 
-{ 
-  for-each [$el] 
+tpl reflexivity(#el,#arg1,#arg2,#anti)
+{
+  for-each [$el]
   {
-    apply[ArgTypes]; 
-    if [$anti=1] { $not_s; } 
-    absc1(#el=`.`); "("; 
+    apply[ArgTypes];
+    if [$anti=1] { $not_s; }
+    absc1(#el=`.`); "(";
     switchedargs(#nr="1",#nr1=$arg1,#nr2=$arg2,
-                 #lim=`count(ArgTypes/Typ)`,#same="1"); 
-    ")"; 
+                 #lim=`count(ArgTypes/Typ)`,#same="1");
+    ")";
   }
 }
 
-tpl [Reflexivity](#el,#arg1,#arg2) { 
+tpl [Reflexivity](#el,#arg1,#arg2) {
     reflexivity(#el=$el,#arg1=$arg1,#arg2=$arg2); }
-tpl [Irreflexivity](#el,#arg1,#arg2) { 
+tpl [Irreflexivity](#el,#arg1,#arg2) {
     reflexivity(#el=$el,#arg1=$arg1,#arg2=$arg2,#anti="1"); }
 
-tpl [Connectedness](#el,#arg1,#arg2) 
-{ 
-  for-each [$el] 
+tpl [Connectedness](#el,#arg1,#arg2)
+{
+  for-each [$el]
   {
-    apply[ArgTypes]; "( "; absc1(#el=`.`); "("; 
+    apply[ArgTypes]; "( "; absc1(#el=`.`); "(";
     arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; $or_s;
-    absc1(#el=`.`); "("; 
-    switchedargs(#nr="1",#nr1=$arg1,#nr2=$arg2,#lim=`count(ArgTypes/Typ)`); 
-    "))"; 
+    absc1(#el=`.`); "(";
+    switchedargs(#nr="1",#nr1=$arg1,#nr2=$arg2,#lim=`count(ArgTypes/Typ)`);
+    "))";
   }
 }
 
-tpl [Commutativity](#el,#arg1,#arg2) 
-{ 
-  for-each [$el] 
+tpl [Commutativity](#el,#arg1,#arg2)
+{
+  for-each [$el]
   {
-    apply[ArgTypes]; "( "; absc1(#el=`.`); "("; 
+    apply[ArgTypes]; "( "; absc1(#el=`.`); "(";
     arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; $eq_s;
-    absc1(#el=`.`); "("; 
-    switchedargs(#nr="1",#nr1=$arg1,#nr2=$arg2,#lim=`count(ArgTypes/Typ)`); 
-    "))"; 
+    absc1(#el=`.`); "(";
+    switchedargs(#nr="1",#nr1=$arg1,#nr2=$arg2,#lim=`count(ArgTypes/Typ)`);
+    "))";
   }
 }
 
-tpl [Idempotence](#el,#arg1,#arg2) 
-{ 
-  for-each [$el] 
+tpl [Idempotence](#el,#arg1,#arg2)
+{
+  for-each [$el]
   {
-    apply[ArgTypes]; 
-    "("; absc1(#el=`.`); "("; 
+    apply[ArgTypes];
+    "("; absc1(#el=`.`); "(";
     switchedargs(#nr="1",#nr1=$arg1,#nr2=$arg2,
-                 #lim=`count(ArgTypes/Typ)`,#same="1"); ")"; $eq_s; 
+                 #lim=`count(ArgTypes/Typ)`,#same="1"); ")"; $eq_s;
     ploci(#nr=$arg1); ")";
-  } 
-}
-
-tpl [Involutiveness](#el,#arg1,#arg2) 
-{ 
-  for-each [$el] 
-  {
-    apply[ArgTypes]; 
-    "("; absc1(#el=`.`); "(";
-    $trm = { absc1(#el=`.`); "("; 
-             arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; }
-    argsinsert(#nr="1",#nr1=$arg1,#arg=$trm,#lim=`count(ArgTypes/Typ)`);
-    ")"; $eq_s; ploci(#nr=$arg1); ")"; 
   }
 }
 
-tpl [Projectivity](#el,#arg1,#arg2) 
-{ 
-  for-each [$el] 
+tpl [Involutiveness](#el,#arg1,#arg2)
+{
+  for-each [$el]
   {
-    apply[ArgTypes]; 
+    apply[ArgTypes];
     "("; absc1(#el=`.`); "(";
-    $trm = { absc1(#el=`.`); "("; 
+    $trm = { absc1(#el=`.`); "(";
              arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; }
     argsinsert(#nr="1",#nr1=$arg1,#arg=$trm,#lim=`count(ArgTypes/Typ)`);
-    ")"; $eq_s; $trm; ")"; 
+    ")"; $eq_s; ploci(#nr=$arg1); ")";
+  }
+}
+
+tpl [Projectivity](#el,#arg1,#arg2)
+{
+  for-each [$el]
+  {
+    apply[ArgTypes];
+    "("; absc1(#el=`.`); "(";
+    $trm = { absc1(#el=`.`); "(";
+             arglist(#separ=",",#elems=`ArgTypes/Typ`); ")"; }
+    argsinsert(#nr="1",#nr1=$arg1,#arg=$trm,#lim=`count(ArgTypes/Typ)`);
+    ")"; $eq_s; $trm; ")";
   }
 }
 
 // This needs fixing for structures "over" - then the
 // functor has more args than just the fields! - seems fixed now
-tpl [Abstractness](#el,#arg1,#arg2) 
-{ 
-  for-each [$el] 
+tpl [Abstractness](#el,#arg1,#arg2)
+{
+  for-each [$el]
   {
     apply[ArgTypes];
     $l = `count(ArgTypes/Typ)`;
     $lasttyp = `ArgTypes/Typ[position() = last()]`;
     "(";  $srt_s; "("; ploci(#nr=$l); ","; absc1(#el=`.`);
-    if [$l > 1] 
-    { 
+    if [$l > 1]
+    {
      "("; arglist(#separ=",",#elems=`ArgTypes/Typ[position() < last()]`); ")";
     }
     ")"; $imp_s; "("; ploci(#nr=$l); $eq_s;
-    if [key('G',$lasttyp/@absnr)] 
-    {  
-       for-each [key('G',$lasttyp/@absnr)] 
-       {  
-         absc1(#el=`.`); "("; 
-	 // print the "over" args first
-	 if [$l > 1] { ft_list(#f="1",#t=`$l - 1`,#sep=",",#l="1"); ","; }
-	 for-each [Fields/Field] 
-	 {
-	     absc(#el=`.`); "("; 
-	     // the selector might have been defined earlier, without some
-	     // hidden args - $f is the difference in arities
-	     $f=`1 + $l - @arity`;
-	     ft_list(#f=$f,#t=$l,#sep=",",#l="1"); ")";
-	     if [not(position()=last())] { ","; }
-	 } 
-	 ")"; 
+    if [key('G',$lasttyp/@absnr)]
+    {
+       for-each [key('G',$lasttyp/@absnr)]
+       {
+         absc1(#el=`.`); "(";
+         // print the "over" args first
+         if [$l > 1] { ft_list(#f="1",#t=`$l - 1`,#sep=",",#l="1"); ","; }
+         for-each [Fields/Field]
+         {
+             absc(#el=`.`); "(";
+             // the selector might have been defined earlier, without some
+             // hidden args - $f is the difference in arities
+             $f=`1 + $l - @arity`;
+             ft_list(#f=$f,#t=$l,#sep=",",#l="1"); ")";
+             if [not(position()=last())] { ","; }
+         }
+         ")";
        }
     }
     else { $fail; }
@@ -1584,78 +1584,78 @@ tpl [Abstractness](#el,#arg1,#arg2)
 //     $l = `count(ArgTypes/Typ)`;
 //     $lasttyp = `ArgTypes/Typ[position() = last()]`;
 //     "(";  $srt_s; "("; ploci(#nr=$l); ","; absc1(#el=`.`);
-//     if [$l > 1] { 
+//     if [$l > 1] {
 //      "("; arglist(#separ=",",#elems=`ArgTypes/Typ[position() < last()]`); ")";
 //     }
 //     ")"; $imp_s; "("; ploci(#nr=$l); $eq_s;
-//     if [key('L',$lasttyp/@absnr)] {  
-//        for-each [key('L',$lasttyp/@absnr)] {  
+//     if [key('L',$lasttyp/@absnr)] {
+//        for-each [key('L',$lasttyp/@absnr)] {
 //          "g"; `@nr`; "_"; lc(#s=`@aid`);
-// 	 "("; 
+//       "(";
 
 //     absref(#elems=`key($k,$nr)`,#r=$r); }
 
- 
-//     "("; 
 
-// $srt_s; "("; 
-//          apply[*[position() = last()]](#i=$i,#pl=$pl); ","; absc(#el=`.`); 
-//          if [count(*)>1] { 
-//             "("; ilist(#separ=",", #elems=`*[position() < last()]`, #i=$i,#pl=$pl); 
+//     "(";
+
+// $srt_s; "(";
+//          apply[*[position() = last()]](#i=$i,#pl=$pl); ","; absc(#el=`.`);
+//          if [count(*)>1] {
+//             "("; ilist(#separ=",", #elems=`*[position() < last()]`, #i=$i,#pl=$pl);
 //             ")"; }
 //          ")"; }
 
 
 
-tpl [CCluster] 
-{ 
+tpl [CCluster]
+{
   if [ErrorCluster] { } else {
-  if [(name(..) = "Presentation")] { } 
-  else 
+  if [(name(..) = "Presentation")] { }
+  else
   {
     $pres = { if[Presentation] { "1"; } else { "0"; } }
     "fof("; absk(#el=`.`,#kind="cc"); ",theorem,";
     $l = `1 + count(ArgTypes/Typ)`;
     apply[ArgTypes];
-    "!["; ploci(#nr=$l); " : "; apply[Typ]; "]: ("; 
+    "!["; ploci(#nr=$l); " : "; apply[Typ]; "]: (";
     $ante = { `count(*[$pres + 2]/*)`; }
     $succ = { `count(*[$pres + 4]/*)`; }
     $srt_s; "("; ploci(#nr=$l); ",";
     if [$ante = 0] { "$true"; } else {
-    if [$ante = 1] { apply[*[$pres + 2]]; } 
+    if [$ante = 1] { apply[*[$pres + 2]]; }
     else { "( "; apply[*[$pres + 2]]; " )"; } }
     ")"; $imp_s; $srt_s; "("; ploci(#nr=$l); ",";
     if [$succ = 0] { "$true"; } else {
-    if [$succ = 1] { apply[*[$pres + 4]]; } 
+    if [$succ = 1] { apply[*[$pres + 4]]; }
     else { "( "; apply[*[$pres + 4]]; " )"; } }
     "))"; ",file("; lc(#s=`@aid`); ",";
-    absk(#el=`.`,#kind="cc"); "),[mptp_info("; `@nr`; 
-    ",[],ccluster,position(0,0),["; 
-    if [$mml="0"] 
-    { 
-       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),"; 
+    absk(#el=`.`,#kind="cc"); "),[mptp_info("; `@nr`;
+    ",[],ccluster,position(0,0),[";
+    if [$mml="0"]
+    {
+       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),";
        cluster_correctness_conditions(#el=`../*[position() = last()]`);
     }
-    "])]).\n"; 
+    "])]).\n";
    }
 }}
 
-// sufficient proof refs can be collected from its coherence 
-// (correctness) proof (the corr_conds are therefore written here, 
+// sufficient proof refs can be collected from its coherence
+// (correctness) proof (the corr_conds are therefore written here,
 // with the proposition given as argument)
-// generalization of the local consts is however needed for small-step 
+// generalization of the local consts is however needed for small-step
 // proof export, and the local consts can be re-used for other clusters
 // inside this block; so then their henkin axiom will generally be a conjunction
 // ##GRM: Cluster_Info: "proof_level(" Level ")" "," ( Correctness_Info | By_Inference ) .
 // ##GRM: Correctness_Info: "correctness_conditions(" "[" Correctness_Proposition+ "]" ")" .
 // ##GRM: Correctness_Proposition: Correctness_Condition_Name "(" Proposition_Ref ")" .
-// ##GRM: Correctness_Condition_Name: "unknowncorrcond" | "coherence" | "compatibility" | 
+// ##GRM: Correctness_Condition_Name: "unknowncorrcond" | "coherence" | "compatibility" |
 // ##GRM:                             "consistency" | "existence" | "uniqueness" | "correctness" .
-tpl [FCluster] 
-{ 
+tpl [FCluster]
+{
   if [ErrorCluster] { } else {
-  if [(name(..) = "Presentation")] { } 
-  else 
+  if [(name(..) = "Presentation")] { }
+  else
   {
     $pres = { if[Presentation] { "1"; } else { "0"; } }
     "fof("; absk(#el=`.`,#kind="fc"); ",theorem,";
@@ -1663,17 +1663,17 @@ tpl [FCluster]
     $succ = { `count(Cluster[1]/*)`; }
     $srt_s; "("; apply[*[$pres + 2]];  ",";
     if [$succ = 0] { "$true"; } else {
-    if [$succ = 1] { apply[Cluster[1]]; } 
+    if [$succ = 1] { apply[Cluster[1]]; }
     else { "( "; apply[Cluster[1]]; " )"; } }
     ")"; ",file("; lc(#s=`@aid`); ",";
-    absk(#el=`.`,#kind="fc"); "),[mptp_info("; `@nr`; 
+    absk(#el=`.`,#kind="fc"); "),[mptp_info("; `@nr`;
     ",[],fcluster,position(0,0),[";
-    if [$mml="0"] 
-    { 
-       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),"; 
+    if [$mml="0"]
+    {
+       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),";
        cluster_correctness_conditions(#el=`../*[position() > 1]`);
     }
-    "])]).\n"; 
+    "])]).\n";
   }
 }}
 
@@ -1698,76 +1698,76 @@ tpl cluster_correctness_conditions(#el)
   }
 }
 
-// ##NOTE: We need to deal with the RCluster coming from structurel 
+// ##NOTE: We need to deal with the RCluster coming from structurel
 // definitions (attribute "strict") specially, since the existence
 //  is never proved in Mizar. The current choice is to forge the justification
-//  by the type declaration of the appropriate 
+//  by the type declaration of the appropriate
 // aggregate functor (which is defined to be "strict").
-tpl [RCluster] 
-{ 
+tpl [RCluster]
+{
   if [ErrorCluster] { } else {
-  if [(name(..) = "Presentation")] { } 
+  if [(name(..) = "Presentation")] { }
   else
   {
     "fof("; absk(#el=`.`,#kind="rc"); ",theorem,";
     $l = `1 + count(ArgTypes/Typ)`;
     apply[ArgTypes];
-    "?["; ploci(#nr=$l); " : "; apply[Typ]; "]: "; 
+    "?["; ploci(#nr=$l); " : "; apply[Typ]; "]: ";
     $succ = { `count(Cluster[1]/*)`; }
     $srt_s; "("; ploci(#nr=$l); ",";
     if [$succ = 0] { "$true"; } else {
-    if [$succ = 1] { apply[Cluster[1]]; } 
+    if [$succ = 1] { apply[Cluster[1]]; }
     else { "( "; apply[Cluster[1]]; " )"; } }
     ")"; ",file("; lc(#s=`@aid`); ",";
-    absk(#el=`.`,#kind="rc"); "),[mptp_info("; `@nr`; 
+    absk(#el=`.`,#kind="rc"); "),[mptp_info("; `@nr`;
     ",[],rcluster,position(0,0),[";
-    if [$mml="0"] 
-    { 
-       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),"; 
+    if [$mml="0"]
+    {
+       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),";
        // forge the correctness of structural "strict" registrations
-       if [name(../..) = "Definition"] 
+       if [name(../..) = "Definition"]
        {
-	 if [not(../../Constructor[@kind = "G"])] { $fail; }
-	 else
-	 {
-	    "inference(mizar_by,[strict],[dt_"; 
-	    absc1(#el=`../../Constructor[@kind = "G"]`);
-	    "])";
-	 }
+         if [not(../../Constructor[@kind = "G"])] { $fail; }
+         else
+         {
+            "inference(mizar_by,[strict],[dt_";
+            absc1(#el=`../../Constructor[@kind = "G"]`);
+            "])";
+         }
        }
-       else 
-       { 
+       else
+       {
          cluster_correctness_conditions(#el=`../*[position() = last()]`);
        }
     }
-    "])]).\n"; 
+    "])]).\n";
   }
 }}
 
 // the newer version of Identify
 // sufficient proof refs done as for clusters
 // ##GRM: Identify_Name : "ie" Number "_" Aid .
-tpl [Identify] 
-{ 
-  if [ErrorIdentify] { } 
-  else 
+tpl [Identify]
+{
+  if [ErrorIdentify] { }
+  else
   {
     "fof("; absk(#el=`.`,#kind="ie"); ",theorem,";
-    if [Typ] 
-    {  
-       "!["; for-each [Typ] { 
-          ploci(#nr=`position()`); " : "; apply[.]; 
+    if [Typ]
+    {
+       "!["; for-each [Typ] {
+          ploci(#nr=`position()`); " : "; apply[.];
           if [not(position()=last())] { ","; } }
-       "]: "; 
-    } 
+       "]: ";
+    }
     "(";
     if [EqArgs/Pair]
     {
        "(";
-       for-each [EqArgs/Pair] 
-       { 
-	  "( "; ploci(#nr=`@x`); $eq_s; ploci(#nr=`@y`); " )"; 
-          if [not(position()=last())] { $and_s; } 
+       for-each [EqArgs/Pair]
+       {
+          "( "; ploci(#nr=`@x`); $eq_s; ploci(#nr=`@y`); " )";
+          if [not(position()=last())] { $and_s; }
        }
        ")"; $imp_s;
     }
@@ -1778,32 +1778,32 @@ tpl [Identify]
     apply[Func[2]];
     "))";
     ",file("; lc(#s=`@aid`); ",";
-    absk(#el=`.`,#kind="ie"); "),[mptp_info("; `@nr`; 
+    absk(#el=`.`,#kind="ie"); "),[mptp_info("; `@nr`;
     ",[],identifyexp,position(0,0),[";
-    if [$mml="0"] 
-    { 
-       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),"; 
+    if [$mml="0"]
+    {
+       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),";
        cluster_correctness_conditions(#el=`../*[position() > 1]`);
     }
-    "])]).\n"; 
+    "])]).\n";
   }
 }
 
 // sufficient proof refs done as for clusters
 // ##GRM: IdentifyExp_Name : "ie" Number "_" Aid .
-tpl [IdentifyWithExp] 
-{ 
-  if [ErrorIdentify] { } 
-  else 
+tpl [IdentifyWithExp]
+{
+  if [ErrorIdentify] { }
+  else
   {
     "fof("; absk(#el=`.`,#kind="ie"); ",theorem,";
-    if [Typ] 
-    {  
-       "!["; for-each [Typ] { 
-          ploci(#nr=`position()`); " : "; apply[.]; 
+    if [Typ]
+    {
+       "!["; for-each [Typ] {
+          ploci(#nr=`position()`); " : "; apply[.];
           if [not(position()=last())] { ","; } }
-       "]: "; 
-    } 
+       "]: ";
+    }
     "(";
     apply[Func[1]];
     $eq_s;
@@ -1811,21 +1811,21 @@ tpl [IdentifyWithExp]
     apply[*[position() = last()]];
     ")";
     ",file("; lc(#s=`@aid`); ",";
-    absk(#el=`.`,#kind="ie"); "),[mptp_info("; `@nr`; 
+    absk(#el=`.`,#kind="ie"); "),[mptp_info("; `@nr`;
     ",[],identifyexp,position(0,0),[";
-    if [$mml="0"] 
-    { 
-       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),"; 
+    if [$mml="0"]
+    {
+       "proof_level(["; `translate(../@newlevel,"_",",")`; "]),";
        cluster_correctness_conditions(#el=`../*[position() > 1]`);
     }
-    "])]).\n"; 
+    "])]).\n";
   }
 }
 
 
 tpl [ArgTypes] { if [Typ] {
-       "!["; for-each [Typ] { 
-          ploci(#nr=`position()`); " : "; apply[.]; 
+       "!["; for-each [Typ] {
+          ploci(#nr=`position()`); " : "; apply[.];
           if [not(position()=last())] { ","; } }
        "]: "; } }
 
@@ -1864,81 +1864,81 @@ tpl absk(#el,#kind) { for-each [$el] {
 
 // List utilities
 
-tpl list(#separ,#elems) { 
+tpl list(#separ,#elems) {
  for-each [$elems] {
   apply[.]; if [not(position()=last())] { $separ; } }
 }
 
 // List utility with additional arg
-tpl ilist(#separ,#elems,#i,#pl) { 
+tpl ilist(#separ,#elems,#i,#pl) {
  for-each [$elems] {
   apply[.](#i=$i,#pl=$pl); if [not(position()=last())] { $separ; } }
 }
 
 // argument list
-tpl arglist(#separ,#elems,#s) { 
+tpl arglist(#separ,#elems,#s) {
  for-each [$elems] {
-  if [$s > 0] { ploci(#nr=`position() + $s`);} else {ploci(#nr=`position()`);} 
+  if [$s > 0] { ploci(#nr=`position() + $s`);} else {ploci(#nr=`position()`);}
   if [not(position()=last())] { $separ; } }
 }
 
 // add numbers starting at #j+1 between #sep1 and #sep2 - now with constants
-tpl jlist(#j,#sep1,#sep2,#elems) { 
+tpl jlist(#j,#sep1,#sep2,#elems) {
 for-each [$elems] {
-  apply[.]; if [not(position()=last())] 
+  apply[.]; if [not(position()=last())]
   {  $sep1; pconst(#nr=`$j+position()`); $sep2; } }}
 
 // from-to list of variables starting numbering at $f ending at $t
 // $l ouiputs loci vars
 tpl ft_list(#f,#t,#sep,#l) {
   if [$f = $t] {  if [$l=1] { ploci(#nr=$f); } else { pvar(#nr=$f); } }
-  else { if [$f < $t] { 
-       if [$l=1] { ploci(#nr=$f); } else { pvar(#nr=$f); } $sep; 
+  else { if [$f < $t] {
+       if [$l=1] { ploci(#nr=$f); } else { pvar(#nr=$f); } $sep;
             ft_list(#f=`$f+1`,#t=$t,#sep=$sep,#l=$l); } }}
 
 // $same is used for reflexivity
 tpl switchedargs(#nr,#nr1,#nr2,#lim,#same) {
     if [$nr = $nr2] { ploci(#nr=$nr1); } else {
-    if [$nr = $nr1] { 
-     if [$same=1] { ploci(#nr=$nr1); } else {  ploci(#nr=$nr2); } } 
+    if [$nr = $nr1] {
+     if [$same=1] { ploci(#nr=$nr1); } else {  ploci(#nr=$nr2); } }
     else { ploci(#nr=$nr); }}
-    if [$nr < $lim] { ","; 
+    if [$nr < $lim] { ",";
      switchedargs(#nr=`$nr+1`,#nr1=$nr1,#nr2=$nr2,#lim=$lim,#same=$same); } }
 
 // $same is used for reflexivity
 tpl argsinsert(#nr,#nr1,#arg,#lim) {
     if [$nr = $nr1] { $arg; } else { ploci(#nr=$nr); }
-    if [$nr < $lim] { ","; 
-     argsinsert(#nr=`$nr+1`,#nr1=$nr1,#arg=$arg,#lim=$lim); } } 
+    if [$nr < $lim] { ",";
+     argsinsert(#nr=`$nr+1`,#nr1=$nr1,#arg=$arg,#lim=$lim); } }
 
 // find the constant with #nr on level #pl or higher,
 // rpint @constnr "_" $pl
 tpl absconst(#nr,#pl) {
-    if [key("C",$pl)[@nr=$nr]] 
-    { 
-       `key("C",$pl)[@nr=$nr]/@constnr`; 
-       addp(#pl=$pl); 
+    if [key("C",$pl)[@nr=$nr]]
+    {
+       `key("C",$pl)[@nr=$nr]/@constnr`;
+       addp(#pl=$pl);
     }
-    else { if [key("C",$pl)[@nr < $nr]] 
-    { 
-       for-each [key("C",$pl)[@nr < $nr]] 
-       { 
-          if [position() = last()] 
-	  {
-	      $n1 = getcnr(#el=`.`); 
-	      $lastnr = `@nr + $n1 - 1`;
-	      if [$lastnr >= $nr] { `@constnr + ($nr - @nr)`; addp(#pl=$pl); }
-	      else { $fail;}
+    else { if [key("C",$pl)[@nr < $nr]]
+    {
+       for-each [key("C",$pl)[@nr < $nr]]
+       {
+          if [position() = last()]
+          {
+              $n1 = getcnr(#el=`.`);
+              $lastnr = `@nr + $n1 - 1`;
+              if [$lastnr >= $nr] { `@constnr + ($nr - @nr)`; addp(#pl=$pl); }
+              else { $fail;}
           }
        }
     }
-    else { if [string-length($pl)>0] 
-    { 
-       $ss = `exsl-str:tokenize($pl,'_')[position() < last()]`; 
+    else { if [string-length($pl)>0]
+    {
+       $ss = `exsl-str:tokenize($pl,'_')[position() < last()]`;
        $pl1= mjoin(#el=$ss,#s="_");
-//	 "bb"; $pl1; "bb";
-       absconst(#nr=$nr,#pl=$pl1); 
-    } 
+//       "bb"; $pl1; "bb";
+       absconst(#nr=$nr,#pl=$pl1);
+    }
     else { $fail;}}
  }}
 
@@ -1949,7 +1949,7 @@ tpl mjoin(#el,#s) {
 // this asssumes Let | Given | TakeAsVar | Consider | Set | Reconsider
 tpl getcnr(#el) { for-each [$el] {
     if [(name() = "Reconsider")] { `count(Var|LocusVar|Const|InfConst|
-		  Num|Func|PrivFunc|Fraenkel|QuaTrm|It|Choice|ErrorTrm)`; }
+                  Num|Func|PrivFunc|Fraenkel|QuaTrm|It|Choice|ErrorTrm)`; }
     else { `count(Typ)`; } }}
 
 
@@ -1957,9 +1957,9 @@ tpl refname(#el,#pl) { for-each [$el] {
     if [(@kind = "T") or (@kind = "D")] { absr(#el=$el); }
     else { privname(#nr=`@nr`,#pl=$pl); } }}
 
-tpl polyeval_name(#el,#pl) 
-{ 
-    for-each [$el] 
+tpl polyeval_name(#el,#pl)
+{
+    for-each [$el]
     {
        `Requirement/@reqname`; "__";
        absc(#el=`Requirement`); "__";
@@ -1967,8 +1967,8 @@ tpl polyeval_name(#el,#pl)
        for-each[*[position() > 1]]
        {
           if[(name() = "RationalNr") or (name() = "ComplexNr")] {  apply[.]; }
-	  else { `name()`; $fail; }
-	  if [not(position()=last())] { "_"; }
+          else { `name()`; $fail; }
+          if [not(position()=last())] { "_"; }
        }
     }
 }
@@ -1979,7 +1979,7 @@ tpl encode_minus_bad (#n) { if[$n < 0] { "m";  `0 - $n`; } else { $n; } }
 
 tpl encode_minus(#n) { if[$n < 0] { `translate($n,"-","m")`; } else { $n; } }
 
-tpl [RationalNr] 
+tpl [RationalNr]
 {
    "r";
    if[@denominator = "1"] {  encode_minus(#n=`@numerator`); }
@@ -1989,80 +1989,80 @@ tpl [RationalNr]
 tpl [ComplexNr] {"c"; apply;}
 
 
-tpl top_propname(#el) 
-{ 
-  for-each [$el/..] 
+tpl top_propname(#el)
+{
+  for-each [$el/..]
   {
-    if [(name() = "DefTheorem") or (name() = "JustifiedTheorem")] 
+    if [(name() = "DefTheorem") or (name() = "JustifiedTheorem")]
        { absr(#el=`.`); }
-    else 
-    { 
+    else
+    {
        $k1 = `concat($el/@nr,":")`;
-       lemmaname(#n=`key("E",$k1)/@propnr`); 
-    } 
+       lemmaname(#n=`key("E",$k1)/@propnr`);
+    }
   }
 }
 
 // name of private reference - name of the proposition
 // this differs from `plname` in that the #pl is not the
 // proof level to print, but the proof level used to start the
-// search for the reference 
-tpl privname(#nr,#pl) 
+// search for the reference
+tpl privname(#nr,#pl)
 {
    $k1 = `concat($nr,":",$pl)`;
-   if [key("E",$k1)] 
-   { 
-	 if [not(string-length($pl)>0)] { top_propname(#el=`key("E",$k1)`); }
-	 else { propname(#n=`key("E",$k1)/@propnr`,#pl=$pl); } 
+   if [key("E",$k1)]
+   {
+         if [not(string-length($pl)>0)] { top_propname(#el=`key("E",$k1)`); }
+         else { propname(#n=`key("E",$k1)/@propnr`,#pl=$pl); }
    }
-   else { if [string-length($pl)>0] 
-   { 
-	 $ss = `exsl-str:tokenize($pl,'_')[position() < last()]`; 
-	 $pl1= mjoin(#el=$ss,#s="_");
-	 privname(#nr=$nr,#pl=$pl1); 
-   } 
+   else { if [string-length($pl)>0]
+   {
+         $ss = `exsl-str:tokenize($pl,'_')[position() < last()]`;
+         $pl1= mjoin(#el=$ss,#s="_");
+         privname(#nr=$nr,#pl=$pl1);
+   }
    else { $fail;}
    }
 }
 
 // name of scheme functor (#k='f') or predicate (#k='p')
-tpl sch_fpname(#k,#nr,#schnr,#aid) 
+tpl sch_fpname(#k,#nr,#schnr,#aid)
 {
-    if [$k and $nr and $aid and $schnr] 
+    if [$k and $nr and $aid and $schnr]
     {
-       lc(#s=`concat($k,$nr,'_s',$schnr,'_',$aid)`); 
+       lc(#s=`concat($k,$nr,'_s',$schnr,'_',$aid)`);
     }
-    else 
-    { 
-       lc(#s=$k); `@nr`;  $fail; 
+    else
+    {
+       lc(#s=$k); `@nr`;  $fail;
     }
 }
 
 // name of scheme functor (#k='f') or predicate (#k='p')
-tpl abs_fp(#k,#el) { for-each [$el] { 
+tpl abs_fp(#k,#el) { for-each [$el] {
     sch_fpname(#k=$k,#nr=`@nr`,#schnr=`@schemenr`,#aid=`@aid`); }}
 
-// definition of private functor (#k='pf') or predicate (#k='pp'); 
+// definition of private functor (#k='pf') or predicate (#k='pp');
 // either a term with LocusVars or a formula with LocusVars
 // the list of arguments is printed first, to know their order
-tpl priv_def(#k,#nr,#pl) 
+tpl priv_def(#k,#nr,#pl)
 {
       $k1 = `concat($nr,":",$pl)`;
-      if [key($k,$k1)] { 
-	 for-each [key($k,$k1)] { 
-		  "["; arglist(#separ=",",#elems=`ArgTypes/Typ`); "] : ";
-		  apply[*[position() = 2]](#pl=`@plevel`); }}
-      else { if [string-length($pl)>0] { 
-	 $ss = `exsl-str:tokenize($pl,'_')[position() < last()]`; 
-	 $pl1= mjoin(#el=$ss,#s="_");
-	 priv_def(#k=$k,#nr=$nr,#pl=$pl1); } else { $fail;}}
+      if [key($k,$k1)] {
+         for-each [key($k,$k1)] {
+                  "["; arglist(#separ=",",#elems=`ArgTypes/Typ`); "] : ";
+                  apply[*[position() = 2]](#pl=`@plevel`); }}
+      else { if [string-length($pl)>0] {
+         $ss = `exsl-str:tokenize($pl,'_')[position() < last()]`;
+         $pl1= mjoin(#el=$ss,#s="_");
+         priv_def(#k=$k,#nr=$nr,#pl=$pl1); } else { $fail;}}
 }
 
 
 // hack for .bex1 file, it's the same as Typ, but uses upper cluster
 // instead of lower cluster; maybe the lower cluster should be fixed
 // to a more proper value in iocorrel.pas
-tpl [ByExplanations](#i,#pl) { for-each [Typ] { if[position() = 2] { "non"; } "zerotyp("; $anamelc; ","; 
+tpl [ByExplanations](#i,#pl) { for-each [Typ] { if[position() = 2] { "non"; } "zerotyp("; $anamelc; ",";
 
       if [@kind='errortyp'] { "errortyp"; }
       else { if [(@kind="M") or (@kind="L")] {
@@ -2073,14 +2073,14 @@ tpl [ByExplanations](#i,#pl) { for-each [Typ] { if[position() = 2] { "non"; } "z
         else {
           if [($adjectives + $radix) > 1] { "( "; }
           if [$adjectives > 0] {
-             apply[*[2]](#i=$i,#pl=$pl); 
+             apply[*[2]](#i=$i,#pl=$pl);
              if [$radix > 0] { $and_s; } }
-          if [($radix > 0)] { 
+          if [($radix > 0)] {
              absc(#el=`.`);
-             if [count(*) > $cluster_nr ] { 
+             if [count(*) > $cluster_nr ] {
                "(";
-               ilist(#separ=",", #elems=`*[position() > $cluster_nr]`, 
-	             #i=$i, #pl=$pl); 
+               ilist(#separ=",", #elems=`*[position() > $cluster_nr]`,
+                     #i=$i, #pl=$pl);
                ")"; } }
           if [($adjectives + $radix) > 1] { " )"; }
          }
@@ -2091,11 +2091,11 @@ tpl [ByExplanations](#i,#pl) { for-each [Typ] { if[position() = 2] { "non"; } "z
 
 
 tpl [/] { if [$mml="0"] { apply[//Constructor|//Proposition[not(name(..)="Reconsider")]|//Now|//IterEquality|
-	     //Let|//Given|//TakeAsVar|//Consider|//Set|
-	     //Reconsider|//SchemeFuncDecl|//SchemeBlock|
-	     //CCluster|//FCluster|//RCluster|//IdentifyWithExp|//Identify|//Thesis|//PerCasesReasoning|/ByExplanations]; 
+             //Let|//Given|//TakeAsVar|//Consider|//Set|
+             //Reconsider|//SchemeFuncDecl|//SchemeBlock|
+             //CCluster|//FCluster|//RCluster|//IdentifyWithExp|//Identify|//Thesis|//PerCasesReasoning|/ByExplanations];
            dumproptable(); }
-	  else { apply; } }
+          else { apply; } }
 
 
 
@@ -2103,4 +2103,4 @@ tpl [/] { if [$mml="0"] { apply[//Constructor|//Proposition[not(name(..)="Recons
 
 
 
- 
+
