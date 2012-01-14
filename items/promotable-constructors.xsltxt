@@ -6,9 +6,9 @@ output method="text";
 
 // This stylesheet operates on .atr files output by the mizar
 // accommodator. The result is a listing of the constructors in the
-// .atr file, in the format:
+// .atr file, in the mizar-items format:
 //
-// <article ID>:<kind>:<nr>:<relnr>
+// <article ID>:<kind>constructor:<nr>
 //
 // The stylesheet lists those constructors that are "promotable",
 // which means that they are not already maximally general, e.g., if
@@ -124,12 +124,12 @@ tpl [Constructor[@kind = "R" and ArgTypes]] mode="promotable" {
   }
 }
 
-tpl [Constructor[not(@aid and @kind and @nr and @relnr)]] mode="print" {
-  msg terminate="yes" "We require that every Constructor item have an aid, kind, nr, and relnr attribute.";
+tpl [Constructor[not(@aid and @kind and @nr)]] mode="print" {
+  msg terminate="yes" "We require that every Constructor item have an aid, kind, and nr attribute.";
 }
 
-tpl [Constructor[@aid and @kind and @nr and @relnr]] mode="print" {
-  `@aid`; ":"; `@kind`; ":"; `@nr`; ":"; `@relnr`; "\n";
+tpl [Constructor[@aid and @kind and @nr]] mode="print" {
+  `@aid`; ":"; `@kind`; "constructor"; ":"; `@nr`; "\n";
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ tpl [Constructor[@kind = "R" and ArgTypes]] mode="unpromotable" {
 }
 
 tpl [Constructor[not(@aid and @kind and @nr)]] mode="print" {
-  msg terminate="yes" "We require that every Constructor item have an aid, kind, nr, and relnr attribute.";
+  msg terminate="yes" "We require that every Constructor item have an aid, kind, and nr attribute.";
 }
 
 tpl [Constructor[@aid and @kind and @nr]] mode="print" {
