@@ -1,6 +1,20 @@
 #!/usr/bin/perl -w
 
 use strict;
+
+# Confirm that essential programs are available.
+
+my @tptp_programs = ('tptp4X', 'GetSymbols');
+
+foreach my $program (@tptp_programs) {
+  my $which_status = system ("which $program > /dev/null 2>&1");
+  my $which_exit_code = $which_status >> 8;
+
+  if ($which_exit_code != 0) {
+    die 'Error: the required program ', $program, ' does not appear to be available.';
+  }
+}
+
 use File::Copy qw(copy);
 use File::Basename qw(basename dirname);
 use Getopt::Long;
@@ -15,8 +29,6 @@ GetOptions ("db=s"     => \$db,
             "verbose"  => \$verbose);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
-pod2usage(1) if (! defined $db);
-
 pod2usage(1) if (scalar @ARGV != 1);
 
 sub strip_extension {
@@ -59,6 +71,96 @@ if ($tptp_short_name !~ /[a-zA-Z0-9_]{1,8}/) {
   die 'Error: the name that we will use for the Mizar article, \'', $tptp_short_name, '\', is unacceptabl as the name of a Mizar article.', "\n", 'Valid names for Mizar articles are alphanumeric characters and the underscore \'_\'.';
 }
 
+######################################################################
+## Sanity checking: the input TPTP theory file is coherent
+######################################################################
+
+# Can TPTP4X handle the file at all?
+
+my $tptp4X_check_status = system ("tptp4X -N -V -c -x -umachine $tptp_file > /dev/null 2>&1");
+my $tptp4X_check_exit_code = $tptp4X_check_status >> 8;
+
+if ($tptp4X_check_exit_code != 0) {
+  die 'Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'is not a well-formed TPTP file.';
+}
+
+if ($verbose) {
+  print 'Sanity Check: The given TPTP file is valid according to TPTP4X.', "\n";
+}
+
+# Load all symbols
+my $GetSymbols_result = `GetSymbols -all $tptp_file 2>/dev/null`;
+chomp $GetSymbols_result;
+if ($GetSymbols_result =~ /\A symbols \( all, \[ (.*) \], \[ (.*) \] \) [.] \z/mx) {
+  (my $GetSymbols_functions, my $GetSymbols_predicates) = ($1, $2);
+  my @function_infos = split (/,/, $GetSymbols_functions);
+  my @predicate_infos = split (/,/, $GetSymbols_predicates);
+
+  # Confirm that no function occurs with two different arities
+  my %function_arity_table = ();
+  foreach my $function_info (@function_infos) {
+    if ($function_info =~ /\A (.+) \/ ([0-9]+) \/ [1-9][0-9]* \z/mx) {
+      (my $name, my $arity) = ($1, $2);
+      if (defined $function_arity_table{$name}) {
+	my $earlier_arity = $function_arity_table{$name};
+	if ($arity != $earlier_arity) {
+	  die 'Error: the function named \'', $name, '\' occurs at least once with arity ', $earlier_arity, ' and once with arity ', $arity, '.';
+	}
+      } else {
+	$function_arity_table{$name} = $arity;
+      }
+    } else {
+      die 'Error: unable to make sense of the function symbol info string \'', $function_info, '\' coming from the GetSymbols utility.';
+    }
+  }
+
+  if ($verbose) {
+    print 'Sanity Check: In the the given TPTP file, no function symbol occurs with different arities.', "\n";
+  }
+
+  # Confirm that no predicate occurs with two different arities
+  my %predicate_arity_table = ();
+  foreach my $predicate_info (@predicate_infos) {
+    if ($predicate_info =~ /\A (.+) \/ ([0-9]+) \/ [1-9][0-9]* \z/mx ) {
+      (my $name, my $arity) = ($1, $2);
+      if (defined $predicate_arity_table{$name}) {
+	my $earlier_arity = $predicate_arity_table{$name};
+	if ($arity != $earlier_arity) {
+	  die 'Error: the predicate named \'', $name, '\' occurs at least once with arity ', $earlier_arity, ' and once with arity ', $arity, '.';
+	}
+      } else {
+	$predicate_arity_table{$name} = $arity;
+      }
+    } else {
+      die 'Error: unable to make sense of the predicate symbol info string \'', $predicate_info, '\' coming from the GetSymbols utility.';
+    }
+  }
+
+  if ($verbose) {
+    print 'Sanity Check: In the the given TPTP file, no predicate symbol occurs with different arities.', "\n";
+  }
+
+  # Confirm that no function occurs also as a predicate
+  foreach my $symbol (keys %function_arity_table) {
+    if (defined $predicate_arity_table{$symbol}) {
+      die 'Error: the symbol \'', $symbol, '\' occurs both as a function and as a predicate in the given TPTP theory.';
+    }
+  }
+
+  foreach my $symbol (keys %predicate_arity_table) {
+    if (defined $function_arity_table{$symbol}) {
+      die 'Error: the symbol \'', $symbol, '\' occurs both as a function and as a predicate in the given TPTP theory.';
+    }
+  }
+
+  if ($verbose) {
+    print 'Sanity Check: In the given TPTP file, no symbol occurs both as a function and as a predicate.', "\n";
+  }
+
+} else {
+  die 'Error: Unable to make sense of the GetSymbols output', "\n", "\n", '  ', $GetSymbols_result, "\n";
+}
+
 if (defined $db) {
   if (-e $db) {
     die 'Error: the specified directory', "\n", "\n", '  ', $db, "\n", "\n", 'in which we are to save our work already exists.', "\n", 'Please use a different name';
@@ -68,23 +170,19 @@ if (defined $db) {
   }
 } else {
   if (-e $tptp_short_name) {
-    die 'Error: we are to save our work in the directory \'', $tptp_short_name, '\' inferred from the name of the supplied TPTP theory.  But there is already a file or directory by that name in the current working directory.  Use the --db option to specify a destination, or move the current file or directory out of the way.';
+    die 'Error: we are to save our work in the directory \'', $tptp_short_name, '\' inferred from the name of the supplied TPTP theory.', "\n", 'But there is already a file or directory by that name in the current working directory.', "\n", 'Use the --db option to specify a destination, or move the current file or directory out of the way.';
   }
   mkdir $tptp_short_name
     or die 'Error: unable to make the directory \'', $tptp_short_name, '\' in the current working directory.';
   $db = $tptp_short_name;
 }
 
+
+######################################################################
+## Creating the environment and the text
+######################################################################
+
 my $tptp_dirname = dirname ($tptp_file);
-
-# Check that tptp4X is available
-
-my $which_tptp4X_status = system ("which tptp4X > /dev/null 2>&1");
-my $which_tptp4X_exit_code = $which_tptp4X_status >> 8;
-
-if ($which_tptp4X_exit_code != 0) {
-  die 'Error: the tptp4X program is required, but does not appear to be available.';
-}
 
 my @subdirs = ('text', 'prel', 'dict');
 
@@ -101,15 +199,6 @@ foreach my $stylesheet (@stylesheets) {
   if (! -r $stylesheet_path) {
     die 'Error: the required stylsheet ', $stylesheet, ' under', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'is not readable.';
   }
-}
-
-# Sanity check: the supplied TPTP file is well-formed according to tptp4X
-
-my $tptp4X_check_status = system ("tptp4X -N -V -c -x -umachine $tptp_file > /dev/null 2>&1");
-my $tptp4X_check_exit_code = $tptp4X_check_status >> 8;
-
-if ($tptp4X_check_exit_code != 0) {
-  die 'Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'is not a well-formed TPTP file.';
 }
 
 # XMLize the TPTP file and save it under a temporary file
