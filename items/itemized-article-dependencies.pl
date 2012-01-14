@@ -4,6 +4,21 @@ use strict;
 use File::Basename qw(basename);
 use Getopt::Long;
 use Pod::Usage;
+use File::Temp qw(tempfile);
+
+sub tmpfile_path {
+  # File::Temp's tempfile function returns a list of two values.  We
+  # want the second (the path of the temprary file) and don't care
+  # about the first (a filehandle for the temporary file).  See
+  # http://search.cpan.org/~tjenness/File-Temp-0.22/Temp.pm for more
+  (undef, my $path) = eval { tempfile (); };
+  my $tempfile_err = $@;
+  if (defined $path) {
+    return $path;
+  } else {
+    die 'Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err;
+  }
+}
 
 my $stylesheet_home = undef;
 my $script_home = undef;
@@ -80,9 +95,10 @@ foreach my $script (keys %script_paths) {
 }
 
 my $map_ckb_script = $script_paths{'map-ckbs.pl'};
-my @item_to_fragment_lines = `$map_ckb_script $article_dir`;
+my $map_ckb_err_file = tmpfile_path ();
+my @item_to_fragment_lines = `$map_ckb_script $article_dir 2> $map_ckb_err_file`;
 
-my ($item_to_fragment_exit_code, $item_to_fragment_message) = ($? >> 8, $!);
+my $item_to_fragment_exit_code = $? >> 8;
 if ($item_to_fragment_exit_code != 0) {
   if (-z $map_ckb_err_file) {
     die 'Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, the map-ckb script did not produce any error output.)';
