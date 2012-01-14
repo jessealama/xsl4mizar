@@ -17,16 +17,12 @@ pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 pod2usage(1) unless defined $db;
 
+pod2usage(1) if (scalar @ARGV != 1);
+
 if (-e $db) {
-  print 'Error: the specified directory', "\n", "\n", '  ', $db, "\n", "\n", 'in which we are to save our work already exists.', "\n", 'Please use a different name', "\n";
-  exit 1;
+  die 'Error: the specified directory', "\n", "\n", '  ', $db, "\n", "\n", 'in which we are to save our work already exists.', "\n", 'Please use a different name';
 } else {
   mkdir $db;
-}
-
-unless (scalar @ARGV == 1) {
-  pod2usage(1);
-  exit 1;
 }
 
 my $tptp_file = $ARGV[0];
