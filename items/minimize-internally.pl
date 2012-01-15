@@ -7,7 +7,7 @@ use XML::LibXML;
 use POSIX qw(floor ceil);
 use Getopt::Long;
 use Pod::Usage;
-use Carp qw(croak carp);
+use Carp qw(croak);
 
 my $debug = 0;
 my $paranoid = 0;
@@ -64,12 +64,11 @@ sub write_element_table {
   my @elements = @{shift ()};
   my %table = %{shift ()};
   my $path = shift;
-  my $root_element_name = shift;
   my $new_doc = XML::LibXML::Document->createDocument ();
-  my $root = $new_doc->createElement ($root_element_name);
+  my $root = $new_doc->createElement ('Article');
 
   if ($debug) {
-    carp 'There are ', scalar @elements, ' available; we will now print just ', scalar (keys %table), ' of them now to ', $path;
+    print STDERR ('There are ', scalar @elements, ' elements available; we will now print just ', scalar (keys %table), ' of them now to ', $path, "\n");
   }
 
   $root->setAttribute ('aid', $aid);
@@ -93,11 +92,10 @@ sub verify {
     return 1;
   } else {
     if ($debug) {
-      carp 'Verifier failed.';
       if (-z $article_err) {
-	carp '  (Empty err file.)', "\n";
+	print STDERR ('Verifier failed. (Empty err file.)', "\n");
       } else {
-	carp '  Contents of the err file:', "\n";
+	print STDERR ('Verifier failed.  Contents of the err file:', "\n");
 	system ("cat $article_err");
       }
     }
@@ -141,7 +139,6 @@ sub minimize {
   my @elements = @{shift ()};
   my %table = %{shift ()};
   my $path = shift;
-  my $root_element_name = shift;
   my $begin = shift;
   my $end = shift;
 
@@ -156,7 +153,7 @@ sub minimize {
     delete $table{$begin};
     my $element = $elements[$begin];
     my $element_name = $element->nodeName ();
-    write_element_table (\@elements, \%table, $path, $root_element_name);
+    write_element_table (\@elements, \%table, $path);
     my $deletable = verify ();
     if ($deletable == 1) {
       if ($verbose) {
@@ -167,7 +164,7 @@ sub minimize {
 	print 'We cannot dump element #', $begin, ' (', $element_name, ')', "\n";
       }
       $table{$begin} = 0;
-      write_element_table (\@elements, \%table, $path, $root_element_name);
+      write_element_table (\@elements, \%table, $path);
     }
     return \%table;
   } elsif ($begin + 1 == $end) {
@@ -178,7 +175,7 @@ sub minimize {
     my $end_element_name = $end_element->nodeName ();
 
     delete $table{$end};
-    write_element_table (\@elements, \%table, $path, $root_element_name);
+    write_element_table (\@elements, \%table, $path);
     my $end_deletable = verify ();
     if ($end_deletable == 1) {
       if ($verbose) {
@@ -189,11 +186,11 @@ sub minimize {
 	print 'We cannot dump element #', $end, ' (', $end_element_name, ')', "\n";
       }
       $table{$end} = 0;
-      write_element_table (\@elements, \%table, $path, $root_element_name);
+      write_element_table (\@elements, \%table, $path);
     }
 
     delete $table{$begin};
-    write_element_table (\@elements, \%table, $path, $root_element_name);
+    write_element_table (\@elements, \%table, $path);
     my $begin_deletable = verify ();
 
     if ($begin_deletable == 1) {
@@ -205,7 +202,7 @@ sub minimize {
 	print 'We cannot dump element #', $begin, ' (', $begin_element_name, ')', "\n";
       }
       $table{$begin} = 0;
-      write_element_table (\@elements, \%table, $path, $root_element_name);
+      write_element_table (\@elements, \%table, $path);
     }
 
     return \%table;
@@ -221,25 +218,25 @@ sub minimize {
     }
 
     # Write this to disk
-    write_element_table (\@elements, \%table, $path, $root_element_name);
+    write_element_table (\@elements, \%table, $path);
 
     # Check that deleting the lower half is safe
     my $upper_half_safe = verify ();
     if ($upper_half_safe == 1) {
       # sleep 3;
-      return (minimize (\@elements, \%table, $path, $root_element_name, $begin, $begin + $half_segment_length));
+      return (minimize (\@elements, \%table, $path, $begin, $begin + $half_segment_length));
     } else {
       # Restore the upper half
       foreach my $i ($begin + $half_segment_length + 1 .. $end) {
         $table{$i} = 0;
       }
-      write_element_table (\@elements, \%table, $path, $root_element_name);
+      write_element_table (\@elements, \%table, $path);
       # Minimize just the upper half
       # sleep 3;
       my %table_for_upper_half
-        = %{minimize (\@elements, \%table, $path, $root_element_name, $begin + $half_segment_length + 1, $end)};
+        = %{minimize (\@elements, \%table, $path, $begin + $half_segment_length + 1, $end)};
       # sleep 3;
-      return (minimize (\@elements, \%table_for_upper_half, $path, $root_element_name, $begin, $begin + $half_segment_length));
+      return (minimize (\@elements, \%table_for_upper_half, $path, $begin, $begin + $half_segment_length));
     }
   }
 }
@@ -262,18 +259,31 @@ foreach my $i (0 .. scalar @elements - 1) {
 (my $final_element) = $xml_doc->findnodes ('Article/*[position() = last()]');
 my $final_element_name = $final_element->nodeName ();
 
+my %final_needed_table;
+
 if ($final_element_name eq 'By'
     || $final_element_name eq 'From'
     || $final_element_name eq 'Proof'
     || $final_element_name eq 'SkippedProof') {
-  minimize (\@elements, \%needed, $article_xml, 'Article', 0, scalar @elements - 3);
-} elsif ($final_element_name eq 'Now'
-	 || $final_element_name eq 'Consider'
-	 || $final_element_name eq 'Reconsider'
-	 || $final_element_name eq 'IterEquality') {
-  minimize (\@elements, \%needed, $article_xml, 'Article', 0, scalar @elements - 2);
+  %final_needed_table = %{minimize (\@elements,
+				    \%needed,
+				    $article_xml,
+				    0, scalar @elements - 3)};
+  #                                    ^^^^^^^^^^^^^^^^^^^^
+  #
+  # We want to minimize not the final element, but the penultimate
+  # element (for which the current element is the justification).
+  # Thus we want to fix the final element as well as the one that
+  # precedes it.
 } else {
-  croak ('Error: unable to minimize an article whose final element is a(n) ', $final_element_name, ' node.');
+  %final_needed_table = %{minimize (\@elements,
+				    \%needed,
+				    $article_xml,
+				    0, scalar @elements - 2)};
+  #                                    ^^^^^^^^^^^^^^^^^^^^
+  #
+  # For all other kinds of elements, we want to preserve only the
+  # final element.
 }
 
 # Check that the article is verifiable in the new minimized environment
