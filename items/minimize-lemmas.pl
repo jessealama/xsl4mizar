@@ -125,22 +125,6 @@ my $rewrite_aid_stylesheet = path_for_stylesheet ('rewrite-aid');
 my $brutalize_script = path_for_script ('minimal.pl');
 my $brutalize_internally_script = path_for_script ('minimize-internally.pl');
 
-if (! -e $brutalize_internally_script) {
-  croak ('Error: the minimization script could not be found at the expected location (', $brutalize_internally_script, ').');
-}
-
-if (! -f $brutalize_internally_script) {
-  croak ('Error: the minimization script at ', $brutalize_internally_script, ' is not a file.');
-}
-
-if (! -r $brutalize_internally_script) {
-  croak ('Error: the minimization script at ', $brutalize_internally_script, ' is not readable.');
-}
-
-if (! -x $brutalize_internally_script) {
-  croak ('Error: the minimization script at ', $brutalize_internally_script, ' is not executable.');
-}
-
 my $article = $ARGV[0];
 my $article_basename = basename ($article, '.miz');
 my $article_dirname = dirname ($article);
