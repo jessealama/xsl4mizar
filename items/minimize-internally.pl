@@ -7,8 +7,9 @@ use XML::LibXML;
 use POSIX qw(floor ceil);
 use Getopt::Long;
 use Pod::Usage;
-use Carp qw(croak);
+use Carp qw(croak carp);
 
+my $debug = 0;
 my $paranoid = 0;
 my $verbose = 0;
 my $man = 0;
@@ -20,6 +21,7 @@ GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
 	   'paranoid' => \$paranoid,
+	   'debug' => \$debug,
 	   'checker-only' => \$checker_only,
 	   'confirm-only' => \$confirm_only)
   or pod2usage(2);
@@ -54,8 +56,10 @@ sub write_element_table {
   my $new_doc = XML::LibXML::Document->createDocument ();
   my $root = $new_doc->createElement ($root_element_name);
 
-  # DEBUG
-  # warn 'There are ', scalar @elements, ' available; we will now print just ', scalar (keys %table), ' of them now to ', $path;
+  if ($debug) {
+    carp 'There are ', scalar @elements, ' available; we will now print just ', scalar (keys %table), ' of them now to ', $path;
+  }
+
   $root->setAttribute ('aid', $aid);
   $root->appendText ("\n");
   foreach my $i (0 .. scalar @elements - 1) {
@@ -76,15 +80,16 @@ sub verify {
   if ($verifier_exit_code == 0 && -z $article_err) {
     return 1;
   } else {
-    # DEBUG
-    # print 'Verifier failed.';
-    # if (-z $article_err) {
-    #   print '  (Empty err file.)', "\n";
-    # } else {
-    #   print '  Contents of the err file:', "\n";
-    #   system ("cat $article_err");
-    # }
-      return 0;
+    if ($debug) {
+      carp 'Verifier failed.';
+      if (-z $article_err) {
+	carp '  (Empty err file.)', "\n";
+      } else {
+	carp '  Contents of the err file:', "\n";
+	system ("cat $article_err");
+      }
+    }
+    return 0;
   }
 }
 
@@ -127,8 +132,11 @@ sub minimize {
   my $root_element_name = shift;
   my $begin = shift;
   my $end = shift;
-  # DEBUG
-  # print 'begin = ', $begin, ' and end = ', $end, "\n";
+
+  if ($debug) {
+    print 'begin = ', $begin, ' and end = ', $end, "\n";
+  }
+
   if ($end < $begin) {
     return \%table;
   } elsif ($end == $begin) {
