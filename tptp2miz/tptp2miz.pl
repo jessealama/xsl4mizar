@@ -88,6 +88,10 @@ if ($verbose) {
 
 # Load all symbols
 my $GetSymbols_result = `GetSymbols -all $tptp_file 2>/dev/null`;
+my $GetSymbols_exit_code = $? >> 8;
+if ($GetSymbols_exit_code != 0) {
+  die 'Error: GetSymbols did not exit cleanly when extracting the symbols from ', $tptp_file, '.';
+}
 chomp $GetSymbols_result;
 if ($GetSymbols_result =~ /\A symbols \( all, \[ (.*) \], \[ (.*) \] \) [.] \z/mx) {
   (my $GetSymbols_functions, my $GetSymbols_predicates) = ($1, $2);
