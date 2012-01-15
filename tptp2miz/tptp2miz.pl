@@ -1,5 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
 use strict;
 use File::Copy qw(copy);
 use File::Basename qw(basename dirname);
