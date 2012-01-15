@@ -30,7 +30,7 @@ GetOptions('help|?' => \$help,
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
-pod2usage(1) unless (scalar @ARGV == 1);
+pod2usage(1) if (scalar @ARGV != 1);
 
 my %stylesheet_paths =
   ('truncate' => "${stylesheet_home}/truncate.xsl",
@@ -41,41 +41,9 @@ my %stylesheet_paths =
    'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
    'rewrite-aid' => "${stylesheet_home}/rewrite-aid.xsl");
 
-my %script_paths = ();
-
-sub ensure_sensible_commandline_arguments {
-
-  unless (-e $stylesheet_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
-  }
-
-  unless (-d $stylesheet_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
-  }
-
-  foreach my $stylesheet (keys %stylesheet_paths) {
-    my $stylesheet_path = path_for_stylesheet ($stylesheet);
-    unless (-e $stylesheet_path) {
-      croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').');
-    }
-    unless (-r $stylesheet_path) {
-      croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.');
-    }
-  }
-
-  unless (-e $script_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts does not exist.');
-  }
-
-  unless (-d $script_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts is not actually a directory.');
-  }
-
-return;
-
-}
-
-ensure_sensible_commandline_arguments ();
+my %script_paths =
+  ('minimal.pl' => "${script_home}/minimal.pl",
+   'minimize-internally.pl' => "${script_home}/minimize-internally.pl");
 
 sub path_for_stylesheet {
   my $sheet = shift;
@@ -86,6 +54,65 @@ sub path_for_stylesheet {
   }
 }
 
+sub path_for_script {
+  my $script = shift;
+  if (defined $script_paths{$script}) {
+    return $script_paths{$script};
+  } else {
+    croak ('Error: We were asked for the path of the ', $script, ' script, but it could not be found.');
+  }
+}
+
+sub ensure_sensible_commandline_arguments {
+
+  if (! -e $stylesheet_home) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
+  }
+
+  if (! -d $stylesheet_home) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
+  }
+
+  foreach my $stylesheet (keys %stylesheet_paths) {
+    my $stylesheet_path = path_for_stylesheet ($stylesheet);
+    if (! -e $stylesheet_path) {
+      croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').');
+    }
+    if (! -r $stylesheet_path) {
+      croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.');
+    }
+  }
+
+  if (! -e $script_home) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts does not exist.');
+  }
+
+  if (! -d $script_home) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts is not actually a directory.');
+  }
+
+  foreach my $script (keys %script_paths) {
+    my $script_path = path_for_script ($script);
+    if (! -e $script_path) {
+      croak ('Error: the ', $script, ' script could not be found at the expected location (', $script_path, ').');
+    }
+    if (! -f $script_path) {
+      croak ('Error: the ', $script, ' script at ', $script_path, ' is not a file.');
+    }
+    if (! -r $script_path) {
+      croak ('Error: the ', $script, ' script at ', $script_path, ' is not readable.');
+    }
+    if (! -x $script_path) {
+      croak ('Error: the ', $script, ' script at ', $script_path, ' is not executable.');
+    }
+  }
+
+return;
+
+}
+
+ensure_sensible_commandline_arguments ();
+
 my $absrefs_stylesheet = path_for_stylesheet ('absrefs');
 my $truncate_stylesheet = path_for_stylesheet ('truncate');
 my $toplevel_propositions_stylesheet = path_for_stylesheet ('toplevel-propositions');
@@ -95,24 +122,8 @@ my $lemma_deps_stylesheet = path_for_stylesheet ('lemma-deps');
 my $external_deps_stylesheet = path_for_stylesheet ('dependencies');
 my $rewrite_aid_stylesheet = path_for_stylesheet ('rewrite-aid');
 
-my $brutalize_script = "${script_home}/minimal.pl";
-my $brutalize_internally_script = "${script_home}/minimize-internally.pl";
-
-if (! -e $brutalize_script) {
-  croak ('Error: the minimization script could not be found at the expected location (', $brutalize_script, ').');
-}
-
-if (! -f $brutalize_script) {
-  croak ('Error: the minimization script at ', $brutalize_script, ' is not a file.');
-}
-
-if (! -r $brutalize_script) {
-  croak ('Error: the minimization script at ', $brutalize_script, ' is not readable.');
-}
-
-if (! -x $brutalize_script) {
-  croak ('Error: the minimization script at ', $brutalize_script, ' is not executable.');
-}
+my $brutalize_script = path_for_script ('minimal.pl');
+my $brutalize_internally_script = path_for_script ('minimize-internally.pl');
 
 if (! -e $brutalize_internally_script) {
   croak ('Error: the minimization script could not be found at the expected location (', $brutalize_internally_script, ').');
