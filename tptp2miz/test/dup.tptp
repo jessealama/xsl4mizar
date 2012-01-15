@@ -1,0 +1,5 @@
+% A TPTP file in which a symbol, 'c', appears as both a constant and as
+% a unary predicate.
+
+fof(one,axiom,c=c).
+fof(two,axiom, (! [X] : (c(x) <=> c(x)))).
