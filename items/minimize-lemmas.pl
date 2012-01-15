@@ -43,19 +43,35 @@ unless (-d $stylesheet_home) {
   die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.';
 }
 
-my $absrefs_stylesheet = "${stylesheet_home}/addabsrefs.xsl";
-my $truncate_stylesheet = "${stylesheet_home}/truncate.xsl";
-my $toplevel_propositions_stylesheet = "${stylesheet_home}/toplevel-propositions.xsl";
-my $skip_non_ultimate_proofs_stylesheet = "${stylesheet_home}/skip-non-ultimate-proofs.xsl";
-my $inferred_constructors_stylesheet = "${stylesheet_home}/inferred-constructors.xsl";
-my $lemma_deps_stylesheet = "${stylesheet_home}/lemma-deps.xsl";
-my $external_deps_stylesheet = "${stylesheet_home}/dependencies.xsl";
-my $rewrite_aid_stylesheet = "${stylesheet_home}/rewrite-aid.xsl";
+my %stylesheet_paths =
+  ('truncate' => "${stylesheet_home}/truncate.xsl",
+   'toplevel-propositions' => "${stylesheet_home}/toplevel-propositions.xsl",
+   'skip-non-ultimate-proofs' => "${stylesheet_home}/skip-non-ultimate-proofs.xsl",
+   'lemma-deps' => "${stylesheet_home}/lemma-deps.xsl",
+   'dependencies' => "${stylesheet_home}/dependencies.xsl",
+   'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
+   'rewrite-aid' => "${stylesheet_home}/rewrite-aid.xsl");
 
-my @stylesheets = ('truncate', 'toplevel-propositions', 'skip-non-ultimate-proofs', 'lemma-deps', 'dependencies', 'inferred-constructors', 'rewrite-aid');
+sub path_for_stylesheet {
+  my $sheet = shift;
+  if (defined $stylesheet_paths{$sheet}) {
+    return $stylesheet_paths{$sheet};
+  } else {
+    croak ('Error: We were asked for the path of the ', $sheet, ' stylesheet, but it could not be found.');
+  }
+}
 
-foreach my $stylesheet (@stylesheets) {
-  my $stylesheet_path = "${stylesheet_home}/${stylesheet}.xsl";
+my $absrefs_stylesheet = path_for_stylesheet ('absrefs');
+my $truncate_stylesheet = path_for_stylesheet ('truncate');
+my $toplevel_propositions_stylesheet = path_for_stylesheet ('toplevel-propositions');
+my $skip_non_ultimate_proofs_stylesheet = path_for_stylesheet ('skip-non-ultimate-proofs');
+my $inferred_constructors_stylesheet = path_for_stylesheet ('inferred-constructors');
+my $lemma_deps_stylesheet = path_for_stylesheet ('lemma-deps');
+my $external_deps_stylesheet = path_for_stylesheet ('dependencies');
+my $rewrite_aid_stylesheet = path_for_stylesheet ('rewrite-aid');
+
+foreach my $stylesheet (keys %stylesheet_paths) {
+  my $stylesheet_path = path_for_stylesheet ($stylesheet);
   unless (-e $stylesheet_path) {
     die 'Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').';
   }
