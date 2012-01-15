@@ -198,6 +198,11 @@ foreach my $stylesheet (@stylesheets) {
   }
 }
 
+# Save a copy of the input TPTP file
+my $tptp_file_in_miz_db = "${db}/${tptp_basename}";
+copy ($tptp_file, $tptp_file_in_miz_db)
+  or die 'Error: unable to copy the given TPTP file to the new Mizar db (', $db, '): ', $!;
+
 # XMLize the TPTP file and save it under a temporary file
 
 my $tptp_xml = "${db}/${tptp_basename}.xml";
