@@ -7,6 +7,7 @@ use XML::LibXML;
 use POSIX qw(floor ceil);
 use Getopt::Long;
 use Pod::Usage;
+use Carp qw(croak);
 
 my $paranoid = 0;
 my $verbose = 0;
@@ -39,7 +40,7 @@ my $xml_parser = XML::LibXML->new (suppress_errors => 1,
 my $xml_doc = undef;
 
 if (! defined eval { $xml_doc = $xml_parser->parse_file ($article_xml) } ) {
-  die 'Error: the .eno file of ', $article_basename, ' is not well-formed XML.', "\n";
+  croak 'Error: the .eno file of ', $article_basename, ' is not well-formed XML.', "\n";
 }
 
 (my $article_node) = $xml_doc->findnodes ('Article');
@@ -252,7 +253,7 @@ if ($final_element_name eq 'By'
 	 || $final_element_name eq 'IterEquality') {
   minimize (\@elements, \%needed, $article_xml, 'Article', 0, scalar @elements - 2);
 } else {
-  die "Don't know how to minimize an article whose final element is a $final_element_name node.";
+  croak ('Error: unable to minimize an article whose final element is a(n) ', $final_element_name, ' node.');
 }
 
 # Check that the article is verifiable in the new minimized environment
