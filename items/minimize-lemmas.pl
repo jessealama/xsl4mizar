@@ -7,7 +7,7 @@ use Getopt::Long;
 use Pod::Usage;
 use Cwd qw(cwd);
 use File::Copy qw(copy move);
-use Carp qw(croak carp);
+use Carp qw(croak);
 
 my $paranoid = 0;
 my $verbose = 0;
