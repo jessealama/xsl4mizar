@@ -41,6 +41,18 @@ my $xml_parser = XML::LibXML->new (suppress_errors => 1,
 				   suppress_warnings => 1);
 my $xml_doc = undef;
 
+if (! -e $article_xml) {
+  croak ('Error: the .xml file for ', $article_basename, ' does not exist.');
+}
+
+if (! -f $article_xml) {
+  croak ('Error: the .xml file for ', $article_basename, ' does not exist.');
+}
+
+if (! -r $article_xml) {
+  croak ('Error: the .xml file for ', $article_basename, ' is unreadable.');
+}
+
 if (! defined eval { $xml_doc = $xml_parser->parse_file ($article_xml) } ) {
   croak 'Error: the .xml file of ', $article_basename, ' is not well-formed XML.', "\n";
 }
