@@ -6,6 +6,7 @@ use File::Copy qw(copy);
 use File::Basename qw(basename dirname);
 use Getopt::Long;
 use Pod::Usage;
+use Carp qw(croak carp);
 
 my $help = 0;
 my $man = 0;
@@ -29,13 +30,13 @@ foreach my $program (@tptp_programs) {
   my $which_exit_code = $which_status >> 8;
 
   if ($which_exit_code != 0) {
-    die 'Error: the required program ', $program, ' does not appear to be available.';
+    croak ('Error: the required program ', $program, ' does not appear to be available.');
   }
 }
 
 sub strip_extension {
   my $path = shift;
-  if ($path =~ /(.+)[.][^.]+$/) {
+  if ($path =~ / (.+) [.][^.]+ \z /x) {
     return $1;
   } else {
     return $path;
@@ -45,28 +46,28 @@ sub strip_extension {
 my $tptp_file = $ARGV[0];
 
 if (! -e $tptp_file) {
-  die 'Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'does not exist.';
+  croak ('Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'does not exist.');
 }
 
 if (! -r $tptp_file) {
-  die 'Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'is not readable.';
+  croak ('Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'is not readable.');
 }
 
 my $tptp_basename = basename ($tptp_file);
 my $tptp_sans_extension = strip_extension ($tptp_basename);
 
 if (length $tptp_sans_extension == 0) {
-  die 'Error: after stipping the extension of the supplied TPTP theory file, we are left with just the empty string, which is an unacceptable name for a Mizar article.';
+  croak 'Error: after stipping the extension of the supplied TPTP theory file, we are left with just the empty string, which is an unacceptable name for a Mizar article.';
 }
 
 my $tptp_short_name = substr $tptp_basename,0,8;
 
 if (length $tptp_sans_extension > 8) {
-  print STDERR ('Warning: the length of the basename of the supplied file, even when its extension is stripped, exceeds 8 characters.', "\n", 'Since Mizar articles are requires to have names at most 8 characters long, we have truncated the name to \'', $tptp_short_name, '\'.', "\n");
+  carp ('Warning: the length of the basename of the supplied file, even when its extension is stripped, exceeds 8 characters.', "\n", 'Since Mizar articles are requires to have names at most 8 characters long, we have truncated the name to \'', $tptp_short_name, '\'.', "\n");
 }
 
-if ($tptp_short_name !~ /[a-zA-Z0-9_]{1,8}/) {
-  die 'Error: the name that we will use for the Mizar article, \'', $tptp_short_name, '\', is unacceptabl as the name of a Mizar article.', "\n", 'Valid names for Mizar articles are alphanumeric characters and the underscore \'_\'.';
+if ($tptp_short_name !~ / \A [a-zA-Z0-9_]{1,8} \z /x) {
+  croak ('Error: the name that we will use for the Mizar article, \'', $tptp_short_name, '\', is unacceptabl as the name of a Mizar article.', "\n", 'Valid names for Mizar articles are alphanumeric characters and the underscore \'_\'.');
 }
 
 ######################################################################
@@ -79,7 +80,7 @@ my $tptp4X_check_status = system ("tptp4X -N -V -c -x -umachine $tptp_file > /de
 my $tptp4X_check_exit_code = $tptp4X_check_status >> 8;
 
 if ($tptp4X_check_exit_code != 0) {
-  die 'Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'is not a well-formed TPTP file.';
+  croak ('Error: the supplied TPTP file,', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'is not a well-formed TPTP file.');
 }
 
 if ($verbose) {
@@ -90,13 +91,13 @@ if ($verbose) {
 my $GetSymbols_result = `GetSymbols -all $tptp_file 2>/dev/null`;
 my $GetSymbols_exit_code = $? >> 8;
 if ($GetSymbols_exit_code != 0) {
-  die 'Error: GetSymbols did not exit cleanly when extracting the symbols from ', $tptp_file, '.';
+  croak ('Error: GetSymbols did not exit cleanly when extracting the symbols from ', $tptp_file, '.');
 }
 chomp $GetSymbols_result;
 if ($GetSymbols_result =~ /\A symbols \( all, \[ (.*) \], \[ (.*) \] \) [.] \z/mx) {
   (my $GetSymbols_functions, my $GetSymbols_predicates) = ($1, $2);
-  my @function_infos = split (/,/, $GetSymbols_functions);
-  my @predicate_infos = split (/,/, $GetSymbols_predicates);
+  my @function_infos = split (/[,]/x, $GetSymbols_functions);
+  my @predicate_infos = split (/[,]/x, $GetSymbols_predicates);
 
   # Confirm that no function occurs with two different arities
   my %function_arity_table = ();
@@ -106,13 +107,13 @@ if ($GetSymbols_result =~ /\A symbols \( all, \[ (.*) \], \[ (.*) \] \) [.] \z/m
       if (defined $function_arity_table{$name}) {
 	my $earlier_arity = $function_arity_table{$name};
 	if ($arity != $earlier_arity) {
-	  die 'Error: the function named \'', $name, '\' occurs at least once with arity ', $earlier_arity, ' and once with arity ', $arity, '.';
+	  croak ('Error: the function named \'', $name, '\' occurs at least once with arity ', $earlier_arity, ' and once with arity ', $arity, '.');
 	}
       } else {
 	$function_arity_table{$name} = $arity;
       }
     } else {
-      die 'Error: unable to make sense of the function symbol info string \'', $function_info, '\' coming from the GetSymbols utility.';
+      croak ('Error: unable to make sense of the function symbol info string \'', $function_info, '\' coming from the GetSymbols utility.');
     }
   }
 
@@ -128,13 +129,13 @@ if ($GetSymbols_result =~ /\A symbols \( all, \[ (.*) \], \[ (.*) \] \) [.] \z/m
       if (defined $predicate_arity_table{$name}) {
 	my $earlier_arity = $predicate_arity_table{$name};
 	if ($arity != $earlier_arity) {
-	  die 'Error: the predicate named \'', $name, '\' occurs at least once with arity ', $earlier_arity, ' and once with arity ', $arity, '.';
+	  croak ('Error: the predicate named \'', $name, '\' occurs at least once with arity ', $earlier_arity, ' and once with arity ', $arity, '.');
 	}
       } else {
 	$predicate_arity_table{$name} = $arity;
       }
     } else {
-      die 'Error: unable to make sense of the predicate symbol info string \'', $predicate_info, '\' coming from the GetSymbols utility.';
+      croak ('Error: unable to make sense of the predicate symbol info string \'', $predicate_info, '\' coming from the GetSymbols utility.');
     }
   }
 
@@ -145,13 +146,13 @@ if ($GetSymbols_result =~ /\A symbols \( all, \[ (.*) \], \[ (.*) \] \) [.] \z/m
   # Confirm that no function occurs also as a predicate
   foreach my $symbol (keys %function_arity_table) {
     if (defined $predicate_arity_table{$symbol}) {
-      die 'Error: the symbol \'', $symbol, '\' occurs both as a function and as a predicate in the given TPTP theory.';
+      croak ('Error: the symbol \'', $symbol, '\' occurs both as a function and as a predicate in the given TPTP theory.');
     }
   }
 
   foreach my $symbol (keys %predicate_arity_table) {
     if (defined $function_arity_table{$symbol}) {
-      die 'Error: the symbol \'', $symbol, '\' occurs both as a function and as a predicate in the given TPTP theory.';
+      croak ('Error: the symbol \'', $symbol, '\' occurs both as a function and as a predicate in the given TPTP theory.');
     }
   }
 
@@ -160,22 +161,22 @@ if ($GetSymbols_result =~ /\A symbols \( all, \[ (.*) \], \[ (.*) \] \) [.] \z/m
   }
 
 } else {
-  die 'Error: Unable to make sense of the GetSymbols output', "\n", "\n", '  ', $GetSymbols_result, "\n";
+  croak ('Error: Unable to make sense of the GetSymbols output', "\n", "\n", '  ', $GetSymbols_result);
 }
 
 if (defined $db) {
   if (-e $db) {
-    die 'Error: the specified directory', "\n", "\n", '  ', $db, "\n", "\n", 'in which we are to save our work already exists.', "\n", 'Please use a different name';
+    croak ('Error: the specified directory', "\n", "\n", '  ', $db, "\n", "\n", 'in which we are to save our work already exists.', "\n", 'Please use a different name');
   } else {
     mkdir $db
-      or die 'Error: unable to make a directory at ', $db;
+      or croak ('Error: unable to make a directory at ', $db, '.');
   }
 } else {
   if (-e $tptp_short_name) {
-    die 'Error: we are to save our work in the directory \'', $tptp_short_name, '\' inferred from the name of the supplied TPTP theory.', "\n", 'But there is already a file or directory by that name in the current working directory.', "\n", 'Use the --db option to specify a destination, or move the current file or directory out of the way.';
+    croak ('Error: we are to save our work in the directory \'', $tptp_short_name, '\' inferred from the name of the supplied TPTP theory.', "\n", 'But there is already a file or directory by that name in the current working directory.', "\n", 'Use the --db option to specify a destination, or move the current file or directory out of the way.');
   }
   mkdir $tptp_short_name
-    or die 'Error: unable to make the directory \'', $tptp_short_name, '\' in the current working directory.';
+    or croak ('Error: unable to make the directory \'', $tptp_short_name, '\' in the current working directory.');
   $db = $tptp_short_name;
 }
 
@@ -196,17 +197,17 @@ my @stylesheets = ('tptp2dco.xsl', 'tptp2dno.xsl', 'tptp2voc.xsl');
 foreach my $stylesheet (@stylesheets) {
   my $stylesheet_path = "${stylesheet_home}/${stylesheet}";
   if (! -e $stylesheet_path) {
-    die 'Error: the required stylsheet ', $stylesheet, ' could not be found in the directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'where we expect to find it.';
+    croak ('Error: the required stylsheet ', $stylesheet, ' could not be found in the directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'where we expect to find it.');
   }
   if (! -r $stylesheet_path) {
-    die 'Error: the required stylsheet ', $stylesheet, ' under', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'is not readable.';
+    croak ('Error: the required stylsheet ', $stylesheet, ' under', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'is not readable.');
   }
 }
 
 # Save a copy of the input TPTP file
 my $tptp_file_in_miz_db = "${db}/${tptp_basename}";
 copy ($tptp_file, $tptp_file_in_miz_db)
-  or die 'Error: unable to copy the given TPTP file to the new Mizar db (', $db, '): ', $!;
+  or croak ('Error: unable to copy the given TPTP file to the new Mizar db (', $db, '): ', $!);
 
 # XMLize the TPTP file and save it under a temporary file
 
@@ -215,31 +216,31 @@ my $tptp4X_xmlize_status
   = system ("tptp4X -N -V -c -x -fxml $tptp_file > $tptp_xml 2> /dev/null");
 my $tptp4X_xmlize_exit_code = $tptp4X_xmlize_status >> 8;
 if ($tptp4X_xmlize_exit_code != 0) {
-  die 'Error: tptp4X did not exit cleanly when XMLizing the TPTP file at', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'Its exit code was ', $tptp4X_xmlize_exit_code, '.';
+  croak ('Error: tptp4X did not exit cleanly when XMLizing the TPTP file at', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'Its exit code was ', $tptp4X_xmlize_exit_code, '.');
 }
 
 # Sanity check: tptp4X generated a readable XML file
 
 if (! -e $tptp_xml) {
-  die 'Error: tptp4X did not generate an XML version of the TPTP file at ', "\n", "\n", $tptp_file;
+  croak ('Error: tptp4X did not generate an XML version of the TPTP file at ', "\n", "\n", $tptp_file);
 }
 
 if (! -r $tptp_xml) {
-  die 'Error: the XML reformatting of', "\n", "\n", $tptp_file, "\n", "\n", 'generated by tptp4X is not readable.';
+  croak ('Error: the XML reformatting of', "\n", "\n", $tptp_file, "\n", "\n", 'generated by tptp4X is not readable.');
 }
 
 my $xmllint_status = system ("xmllint --noout $tptp_xml > /dev/null 2>&1");
 my $xmllint_exit_code = $xmllint_status >> 8;
 
 if ($xmllint_exit_code != 0) {
-  die 'Error: tptp4X failed to generate a valid XML document corresponding to the TPTP file at', "\n", "\n", '  ', $tptp_file;
+  croak ('Error: tptp4X failed to generate a valid XML document corresponding to the TPTP file at', "\n", "\n", '  ', $tptp_file);
 }
 
 # Make the required subdirectories
 
 foreach my $dir (@subdirs) {
   mkdir "${db}/${dir}"
-    or die 'Error: unable to make the directory \'', $dir, '\' in the Mizar db directory (', $db, ').';
+    or croak ('Error: unable to make the directory \'', $dir, '\' in the Mizar db directory (', $db, ').');
 }
 
 # Make the vocabulary
@@ -247,20 +248,20 @@ my $voc_file = "${db}/dict/${tptp_short_name}.voc";
 my $tptp2voc_xsltproc_status = system ("xsltproc $tptp2voc_stylesheet $tptp_xml > $voc_file");
 my $tptp2voc_xsltproc_exit_code = $tptp2voc_xsltproc_status >> 8;
 if ($tptp2voc_xsltproc_exit_code != 0) {
-  die 'Error: xsltproc did not exit cleanly when making the vocabulary (.voc) file for', "\n", "\n", '  ', $tptp_file;
+  croak ('Error: xsltproc did not exit cleanly when making the vocabulary (.voc) file for', "\n", "\n", '  ', $tptp_file);
 }
 
 # Make the environment
 foreach my $extension ('dno', 'dco') {
   my $stylesheet = "${stylesheet_home}/tptp2${extension}.xsl";
   if (! -e $stylesheet) {
-    die 'Error: the required stylesheet for generating the .', $extension, ' file does not exist at the expected location (', $stylesheet, ').';
+    croak ('Error: the required stylesheet for generating the .', $extension, ' file does not exist at the expected location (', $stylesheet, ').');
   }
   my $output_file = "${db}/prel/${tptp_short_name}.${extension}";
   my $xsltproc_status = system ("xsltproc --stringparam article '$tptp_short_name' $stylesheet $tptp_xml > $output_file 2>/dev/null");
   my $xsltproc_exit_code = $xsltproc_status >> 8;
   if ($xsltproc_exit_code != 0) {
-    die 'Error: xsltproc did not exit cleanly when generating the .', $extension, ' file for', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'The exit code was ', $xsltproc_exit_code;
+    croak ('Error: xsltproc did not exit cleanly when generating the .', $extension, ' file for', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'The exit code was ', $xsltproc_exit_code);
   }
 }
 
@@ -269,7 +270,7 @@ my $miz_file = "${db}/text/${tptp_short_name}.miz";
 my $xsltproc_status = system ("xsltproc --stringparam article '$tptp_short_name' $tptp2miz_stylesheet $tptp_xml > $miz_file 2>/dev/null");
 my $xsltproc_exit_code = $xsltproc_status >> 8;
 if ($xsltproc_exit_code != 0) {
-  die 'Error: xsltproc did not exit cleanly when generating the .miz file for', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'The exit code was ', $xsltproc_exit_code;
+  croak ('Error: xsltproc did not exit cleanly when generating the .miz file for', "\n", "\n", '  ', $tptp_file, "\n", "\n", 'The exit code was ', $xsltproc_exit_code);
 }
 
 __END__
