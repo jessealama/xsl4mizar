@@ -1,20 +1,6 @@
 #!/usr/bin/perl -w
 
 use strict;
-
-# Confirm that essential programs are available.
-
-my @tptp_programs = ('tptp4X', 'GetSymbols');
-
-foreach my $program (@tptp_programs) {
-  my $which_status = system ("which $program > /dev/null 2>&1");
-  my $which_exit_code = $which_status >> 8;
-
-  if ($which_exit_code != 0) {
-    die 'Error: the required program ', $program, ' does not appear to be available.';
-  }
-}
-
 use File::Copy qw(copy);
 use File::Basename qw(basename dirname);
 use Getopt::Long;
@@ -32,6 +18,19 @@ GetOptions ("db=s"     => \$db,
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 pod2usage(1) if (scalar @ARGV != 1);
+
+# Confirm that essential programs are available.
+
+my @tptp_programs = ('tptp4X', 'GetSymbols');
+
+foreach my $program (@tptp_programs) {
+  my $which_status = system ("which $program > /dev/null 2>&1");
+  my $which_exit_code = $which_status >> 8;
+
+  if ($which_exit_code != 0) {
+    die 'Error: the required program ', $program, ' does not appear to be available.';
+  }
+}
 
 sub strip_extension {
   my $path = shift;
