@@ -302,8 +302,10 @@ if ($paranoid == 1) {
 }
 
 # Print the indices of the deleteable elements
-foreach my $i (sort keys %needed) {
-  print $i, "\n";
+foreach my $i (0 .. scalar @elements - 1) {
+  if (! defined $final_needed_table{$i}) {
+    print $i + 1, "\n";
+  }
 }
 
 __END__
