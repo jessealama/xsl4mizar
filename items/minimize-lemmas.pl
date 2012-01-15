@@ -3,7 +3,6 @@
 use strict;
 use File::Basename qw(basename dirname);
 use XML::LibXML;
-use POSIX qw(floor ceil);
 use Getopt::Long;
 use Pod::Usage;
 use Cwd qw(cwd);
