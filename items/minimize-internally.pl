@@ -279,6 +279,11 @@ if ($paranoid == 1) {
 
 }
 
+# Print the indices of the deleteable elements
+foreach my $i (sort keys %needed) {
+  print $i, "\n";
+}
+
 __END__
 
 =cut
