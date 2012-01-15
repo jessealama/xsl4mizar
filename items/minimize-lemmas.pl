@@ -32,19 +32,6 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 pod2usage(1) unless (scalar @ARGV == 1);
 
-######################################################################
-## Ensure validity of commandline arguments
-######################################################################
-
-unless (-e $stylesheet_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
-}
-
-unless (-d $stylesheet_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
-}
-
-
 my %stylesheet_paths =
   ('truncate' => "${stylesheet_home}/truncate.xsl",
    'toplevel-propositions' => "${stylesheet_home}/toplevel-propositions.xsl",
@@ -53,6 +40,42 @@ my %stylesheet_paths =
    'dependencies' => "${stylesheet_home}/dependencies.xsl",
    'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
    'rewrite-aid' => "${stylesheet_home}/rewrite-aid.xsl");
+
+my %script_paths = ();
+
+sub ensure_sensible_commandline_arguments {
+
+  unless (-e $stylesheet_home) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
+  }
+
+  unless (-d $stylesheet_home) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
+  }
+
+  foreach my $stylesheet (keys %stylesheet_paths) {
+    my $stylesheet_path = path_for_stylesheet ($stylesheet);
+    unless (-e $stylesheet_path) {
+      croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').');
+    }
+    unless (-r $stylesheet_path) {
+      croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.');
+    }
+  }
+
+  unless (-e $script_home) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts does not exist.');
+  }
+
+  unless (-d $script_home) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts is not actually a directory.');
+  }
+
+return;
+
+}
+
+ensure_sensible_commandline_arguments ();
 
 sub path_for_stylesheet {
   my $sheet = shift;
@@ -71,24 +94,6 @@ my $inferred_constructors_stylesheet = path_for_stylesheet ('inferred-constructo
 my $lemma_deps_stylesheet = path_for_stylesheet ('lemma-deps');
 my $external_deps_stylesheet = path_for_stylesheet ('dependencies');
 my $rewrite_aid_stylesheet = path_for_stylesheet ('rewrite-aid');
-
-foreach my $stylesheet (keys %stylesheet_paths) {
-  my $stylesheet_path = path_for_stylesheet ($stylesheet);
-  unless (-e $stylesheet_path) {
-    croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').');
-  }
-  unless (-r $stylesheet_path) {
-    croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.');
-  }
-}
-
-unless (-e $script_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts does not exist.');
-}
-
-unless (-d $script_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts is not actually a directory.');
-}
 
 my $brutalize_script = "${script_home}/minimal.pl";
 my $brutalize_internally_script = "${script_home}/minimize-internally.pl";
