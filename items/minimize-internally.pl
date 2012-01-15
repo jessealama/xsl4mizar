@@ -38,10 +38,7 @@ my $xml_parser = XML::LibXML->new (suppress_errors => 1,
 				   suppress_warnings => 1);
 my $xml_doc = undef;
 
-eval {
-  $xml_doc = $xml_parser->parse_file ($article_xml);
-};
-if ($@) {
+if (! defined eval { $xml_doc = $xml_parser->parse_file ($article_xml) } ) {
   die 'Error: the .eno file of ', $article_basename, ' is not well-formed XML.', "\n";
 }
 
