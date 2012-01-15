@@ -63,52 +63,116 @@ sub path_for_script {
   }
 }
 
+sub ensure_directory {
+  my $directory_path = shift;
+
+  if (! -e $directory_path) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $directory_path, "\n", "\n", 'does not exist.');
+  }
+
+  if (! -d $directory_path) {
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $directory_path, "\n", "\n", 'is not actually a directory.');
+  }
+
+  return 1;
+}
+
 sub ensure_sensible_commandline_arguments {
 
-  if (! -e $stylesheet_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
-  }
-
-  if (! -d $stylesheet_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
-  }
+  ensure_directory ($stylesheet_home);
 
   foreach my $stylesheet (keys %stylesheet_paths) {
     my $stylesheet_path = path_for_stylesheet ($stylesheet);
-    if (! -e $stylesheet_path) {
-      croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').');
-    }
-    if (! -r $stylesheet_path) {
-      croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.');
-    }
+    ensure_readable_file ($stylesheet_path);
   }
 
-  if (! -e $script_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts does not exist.');
-  }
-
-  if (! -d $script_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for scripts is not actually a directory.');
-  }
+  ensure_directory ($script_home);
 
   foreach my $script (keys %script_paths) {
     my $script_path = path_for_script ($script);
-    if (! -e $script_path) {
-      croak ('Error: the ', $script, ' script could not be found at the expected location (', $script_path, ').');
-    }
-    if (! -f $script_path) {
-      croak ('Error: the ', $script, ' script at ', $script_path, ' is not a file.');
-    }
-    if (! -r $script_path) {
-      croak ('Error: the ', $script, ' script at ', $script_path, ' is not readable.');
-    }
-    if (! -x $script_path) {
-      croak ('Error: the ', $script, ' script at ', $script_path, ' is not executable.');
-    }
+    ensure_executable_file ($script_path);
   }
 
-return;
+  return 1;
 
+}
+
+sub ensure_readable_file {
+  my $file = shift;
+
+  if (! -e $file) {
+    croak ('Error: ', $file, ' does not exist.');
+  }
+  if (! -f $file) {
+    croak ('Error: ', $file, ' is not a file.');
+  }
+
+  if (! -r $file) {
+    croak ('Error: ', $file, ' is unreadable.');
+  }
+
+  return 1;
+}
+
+sub ensure_executable_file {
+  my $path = shift;
+  ensure_readable_file ($path);
+  if (! -x $path) {
+    croak ('Error: ', $path, ' should be executable, but it is not.');
+  }
+  return 1;
+}
+
+sub run_mizar_tool {
+  my $tool = shift;
+  my $article = shift;
+  my $article_basename = basename ($article, '.miz');
+  my $article_dirname = dirname ($article);
+  my $article_miz = "${article_dirname}/${article_basename}.miz";
+  my $article_err = "${article_dirname}/${article_basename}.err";
+  my $tool_status = system ("$tool -l -q $article_miz > /dev/null 2>&1");
+  my $tool_exit_code = $tool_status >> 8;
+  if ($tool_exit_code != 0 || ! -z $article_err) {
+    croak ('Error: The Mizar tool ', $tool, ' did not exit cleanly when run on ', $article, ', or produced a non-empty .err file.');
+  } else {
+    return 1;
+  }
+}
+
+sub apply_stylesheet {
+  my $stylesheet = shift;
+  my $document = shift;
+  my $result_path = shift;
+  my $error_path = shift;
+
+  my $xsltproc_invocation
+    = defined $result_path
+      ? (defined $error_path
+	 ? "xsltproc $stylesheet $document > $result_path 2> $error_path"
+	 : "xsltproc $stylesheet $document > $result_path 2> /dev/null")
+      : (defined $error_path
+	 ? "xsltproc $stylesheet $document > /dev/null 2> $error_path"
+	 : "xsltproc $stylesheet $document > /dev/null 2> /dev/null");
+
+  my $xsltproc_status = system ($xsltproc_invocation);
+  my $xsltproc_exit_code = $xsltproc_status >> 8;
+
+  if ($xsltproc_exit_code != 0) {
+    if (defined $result_path) {
+      if (defined $error_path) {
+	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output and standard error streams were saved to', "\n", "\n", '  ', $result_path, "\n", "\n", 'and', "\n", "\n", '  ', $error_path, ' ,', "\n", "\n", 'respectively.');
+      } else {
+	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output was saved to', "\n", "\n", '  ', $result_path, "\n", "\n", 'but the standard error output was not saved.');
+      }
+    } else {
+      if (defined $error_path) {
+	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output was not saved, but the standard error streams were saved to', "\n", "\n", '  ', $error_path, ' .');
+      } else {
+	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output and standard error streams were not saved.');
+      }
+    }
+  }
+  return 1;
 }
 
 ensure_sensible_commandline_arguments ();
@@ -133,10 +197,9 @@ my $article_sans_extension = "${article_dirname}/${article_basename}";
 if (defined $target_directory) {
   if (-e $target_directory) {
     croak ('Error: the supplied target directory, ', $target_directory, ' already exists.  Please move it out of the way.');
-  } else {
-    mkdir $target_directory
-      or croak ('Error: unable to make the directory \'', $target_directory, '\'.');
   }
+  mkdir $target_directory
+    or croak ('Error: unable to make the directory \'', $target_directory, '\'.');
 } else {
   my $cwd = cwd ();
   $target_directory = "${cwd}/${article_basename}";
@@ -147,21 +210,10 @@ if (defined $target_directory) {
     or croak ('Error: unable to make the directory \'', $article_basename, '\' in the current working directory.');
 }
 
-# Copy the article
-
 my $article_miz = "${article_dirname}/${article_basename}.miz";
+ensure_readable_file ($article_miz);
 
-if (! -e $article_miz) {
-  croak ('Error: ', $article_miz, ' does not exist.');
-}
-
-if (! -f $article_miz) {
-  croak ('Error: ', $article_miz, ' is not a file.');
-}
-
-if (! -r $article_miz) {
-  croak ('Error: ', $article_miz, ' is unreadable.');
-}
+# Copy the article
 
 my $article_err_in_target_dir = "${target_directory}/${article_basename}.err";
 my $article_miz_in_target_dir = "${target_directory}/${article_basename}.miz";
@@ -171,26 +223,18 @@ copy ($article_miz, $article_miz_in_target_dir)
 
 chdir $target_directory;
 
-my $accom_status = system ("accom -l -q $article_miz_in_target_dir > /dev/null 2>&1");
-my $accom_exit_code = $accom_status >> 8;
-if ($accom_exit_code != 0) {
+if (! defined eval { run_mizar_tool ('accom', $article_miz_in_target_dir) } ) {
   croak ('Error: unable to accommodate ', $article_basename, ' in the target directory (', $target_directory, ').');
 }
 
-my $verifier_status = system ("verifier -l -q $article_miz_in_target_dir > /dev/null 2>&1");
-my $verifier_exit_code = $verifier_status >> 8;
-if ($verifier_exit_code != 0) {
+if (! defined eval { run_mizar_tool ('verifier', $article_miz_in_target_dir) } ) {
   croak ('Error: unable to verify ', $article_basename, ' in the target directory (', $target_directory, ').');
-}
-
-if (! -z $article_err_in_target_dir) {
-  croak ('Error: verifier produced a non-empty error file for ', $article_basename, ' in the target directory (', $target_directory, ').');
 }
 
 my $article_xml_in_target_dir = "${target_directory}/${article_basename}.xml";
 my $article_absolute_xml_in_target_dir = "${target_directory}/${article_basename}.xml1";
 
-if (! -e $article_xml_in_target_dir) {
+if (! defined { ensure_readable_file ($article_xml_in_target_dir) } ) {
   croak ('Error: verifier did not produce a semantic XML representation of ', $article_basename, '.');
 }
 
@@ -198,10 +242,10 @@ foreach my $extension ('xml', 'eno', 'dfs', 'ecl', 'eid', 'epr', 'erd', 'esh', '
   my $source_xml_file = "${target_directory}/${article_basename}.${extension}";
   my $target_xml_file = "${target_directory}/${article_basename}.${extension}1";
   if (-e $source_xml_file) {
-    my $xsltproc_absrefs_status = system ("xsltproc --output $target_xml_file $absrefs_stylesheet $source_xml_file 2>/dev/null");
-    my $xsltproc_absrefs_exit_code = $xsltproc_absrefs_status >> 8;
-    if ($xsltproc_absrefs_exit_code != 0) {
-      croak ('Error: xsltproc did not exit cleanly when computing the absolute form of ', $article_basename, '.', $extension, '; its exit code was ', $xsltproc_absrefs_exit_code, '.');
+    if (! defined eval { apply_stylesheet ($absrefs_stylesheet,
+					   $source_xml_file,
+					   $target_xml_file) } ) {
+      croak ($@);
     }
   }
 }
