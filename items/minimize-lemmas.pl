@@ -76,6 +76,19 @@ sub ensure_directory {
   return 1;
 }
 
+sub ensure_sensible_mizar_environment {
+  my $mizfiles = $ENV{'MIZFILES'};
+  if (! defined $mizfiles) {
+    croak ('Error: the MIZFILES environment variable is unset.');
+  }
+  if (! -e $mizfiles) {
+    croak ('Error: the value of the MIZFILES environment variable, ', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'does not exist.');
+  }
+  if (! -d $mizfiles) {
+    croak ('Error: the value of the MIZFILES environment variable, ', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'is not a directory.');
+  }
+}
+
 sub ensure_sensible_commandline_arguments {
 
   ensure_directory ($stylesheet_home);
@@ -175,6 +188,7 @@ sub apply_stylesheet {
 }
 
 ensure_sensible_commandline_arguments ();
+ensure_sensible_mizar_environment ();
 
 my $absrefs_stylesheet = path_for_stylesheet ('absrefs');
 my $truncate_stylesheet = path_for_stylesheet ('truncate');
