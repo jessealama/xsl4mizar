@@ -316,6 +316,10 @@ Say what environment file we're minimizing, and for each environment
 file, say how many environment "items" are present there and how many
 we really need.
 
+=item B<--debug>
+
+Print copious amounts of debugging information.
+
 =item B<--paranoid>
 
 Before minimizing, check that the article is verifiable.  If it is,
