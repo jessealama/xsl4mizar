@@ -42,7 +42,7 @@ my $xml_parser = XML::LibXML->new (suppress_errors => 1,
 my $xml_doc = undef;
 
 if (! defined eval { $xml_doc = $xml_parser->parse_file ($article_xml) } ) {
-  croak 'Error: the .eno file of ', $article_basename, ' is not well-formed XML.', "\n";
+  croak 'Error: the .xml file of ', $article_basename, ' is not well-formed XML.', "\n";
 }
 
 (my $article_node) = $xml_doc->findnodes ('Article');
