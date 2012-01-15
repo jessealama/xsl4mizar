@@ -511,7 +511,6 @@ foreach my $lemma (keys %element_for_proposition) {
   print "\n";
 }
 
-
 __END__
 
 =cut
@@ -523,11 +522,6 @@ minimize-lemmas.pl - Minimize the article-internal context of the lemmas of a Mi
 =head1 SYNOPSIS
 
 minimize-lemmas.pl [options] mizar-article
-
-Options:
-  -help                       Brief help message
-  -man                        Full documentation
-  -verbose                    Say what we're doing
 
 =head1 OPTIONS
 
