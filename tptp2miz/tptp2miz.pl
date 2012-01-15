@@ -234,7 +234,7 @@ if ($xmllint_exit_code != 0) {
 
 foreach my $dir (@subdirs) {
   mkdir "${db}/${dir}"
-    or die 'Error: unable to make the directory \'', $dir, '\' in the current working directory.';
+    or die 'Error: unable to make the directory \'', $dir, '\' in the Mizar db directory (', $db, ').';
 }
 
 # Make the vocabulary
