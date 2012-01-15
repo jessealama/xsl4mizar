@@ -155,6 +155,10 @@ if (! -e $article_miz) {
   croak ('Error: ', $article_miz, ' does not exist.');
 }
 
+if (! -f $article_miz) {
+  croak ('Error: ', $article_miz, ' is not a file.');
+}
+
 if (! -r $article_miz) {
   croak ('Error: ', $article_miz, ' is unreadable.');
 }
