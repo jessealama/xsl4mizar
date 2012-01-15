@@ -370,4 +370,8 @@ verifiability.
 B<minimize.pl> will construct, in a brute-force manner, the smallest
 environment with respect to which the given article is verifiable.
 
+At the end of internal minimization, we will print the indices
+(starting from 1, not 0) of the elements that were deletable, one line
+for each number.  The numbers will be sorted in numeric order.
+
 =cut
