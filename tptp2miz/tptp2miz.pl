@@ -228,7 +228,8 @@ if ($xmllint_exit_code != 0) {
 # Make the required subdirectories
 
 foreach my $dir (@subdirs) {
-  mkdir "${db}/${dir}";
+  mkdir "${db}/${dir}"
+    or die 'Error: unable to make the directory \'', $dir, '\' in the current working directory.';
 }
 
 # Make the vocabulary
