@@ -1,106 +1,5 @@
 #!/usr/bin/perl -w
 
-=cut
-
-=head1 minimize-itemized-article.pl
-
-minimize-itemized-article.pl - Minimize the fragments of an "itemized" mizar article
-
-=head1 SYNOPSIS
-
-minimize-itemized-article.pl [options] itemized-mizar-article-directory
-
-Options:
-
-  -help                       Brief help message
-
-  -man                        Full documentation
-
-  -verbose                    Say what we're doing
-
-  -minimize-whole-article     Minimize the whole article and use its minimal environment in minimizing its fragments
-
-  -paranoid                   Check that the minimized fragments are verifiable
-
-  -script-home                Directory in which to look for auxiliary scripts
-
-  -stylesheet-home            Directory in which to look for needed stylesheets
-
-  -nice                       Use nice when minimizing the article's fragments
-
-  -jobs                       Specify the number of jobs to run in parallel
-
-  -workdir                    Do the minimization in a specified directory
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<--help>
-
-Prints a brief help message and exits.
-
-=item B<--man>
-
-Prints the manual page and exits.
-
-=item B<--verbose>
-
-Say what environment file we're minimizing, and for each environment
-file, say how many environment "items" are present there and how many
-we really need.
-
-=item B<--minimize-whole-article>
-
-Before minimizing the environment of each of the items from an
-article, minimize the whole article and use its minimal environment as
-a basis for each of the article's item's environment.
-
-Such minimization may an expensive up-front cost, but it can save time
-in the long run, depending on the size of the original article's
-environment and how expensive it is to verify it.
-
-=item B<--paranoid>
-
-Call the verifier on each of the itemized articles.
-
-=item B<--script-home=DIR>
-
-The directory in which we will look for any needed scripts.
-
-=item B<--stylesheet-home=DIR>
-
-The directory in which we will look for any needed stylesheets.
-
-=item B<--nice>
-
-Use nice when minimizing the original article's fragments.
-
-=item B<--jobs=NUM-JOBS>
-
-Run NUM-JOBS fragment minimization jobs in parallel.  By default, all
-available processors will be used.
-
-=item B<--workdir=DIR>
-
-Do the minimization in DIR (e.g., a ramdisk).  This means that before
-anything else, the directory to be minimized will be copied to DIR.
-Upon normal completion, the original direcory will be deleted and the
-contents of the newly minimized directory will be moved into the
-original directory.  If something goes wrong during the minimization,
-the original directory will not be deleted, and the itemized article
-subdirectory of DIR will be deleted.
-
-=back
-
-=head1 DESCRIPTION
-
-B<minimize-itemized-article.pl> will construct, for each fragment of
-an itemized mizar article, the smallest environment with respect to
-which the given article is verifiable.
-
-=cut
-
 use strict;
 use File::Basename qw(basename dirname);
 use File::Copy qw(copy move);
@@ -460,3 +359,106 @@ if (defined $workdir) {
 }
 
 exit 0;
+
+__END__
+
+=pod
+
+=head1 minimize-itemized-article.pl
+
+minimize-itemized-article.pl - Minimize the fragments of an "itemized" mizar article
+
+=head1 SYNOPSIS
+
+minimize-itemized-article.pl [options] itemized-mizar-article-directory
+
+Options:
+
+  -help                       Brief help message
+
+  -man                        Full documentation
+
+  -verbose                    Say what we're doing
+
+  -minimize-whole-article     Minimize the whole article and use its minimal environment in minimizing its fragments
+
+  -paranoid                   Check that the minimized fragments are verifiable
+
+  -script-home                Directory in which to look for auxiliary scripts
+
+  -stylesheet-home            Directory in which to look for needed stylesheets
+
+  -nice                       Use nice when minimizing the article's fragments
+
+  -jobs                       Specify the number of jobs to run in parallel
+
+  -workdir                    Do the minimization in a specified directory
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--verbose>
+
+Say what environment file we're minimizing, and for each environment
+file, say how many environment "items" are present there and how many
+we really need.
+
+=item B<--minimize-whole-article>
+
+Before minimizing the environment of each of the items from an
+article, minimize the whole article and use its minimal environment as
+a basis for each of the article's item's environment.
+
+Such minimization may an expensive up-front cost, but it can save time
+in the long run, depending on the size of the original article's
+environment and how expensive it is to verify it.
+
+=item B<--paranoid>
+
+Call the verifier on each of the itemized articles.
+
+=item B<--script-home=DIR>
+
+The directory in which we will look for any needed scripts.
+
+=item B<--stylesheet-home=DIR>
+
+The directory in which we will look for any needed stylesheets.
+
+=item B<--nice>
+
+Use nice when minimizing the original article's fragments.
+
+=item B<--jobs=NUM-JOBS>
+
+Run NUM-JOBS fragment minimization jobs in parallel.  By default, all
+available processors will be used.
+
+=item B<--workdir=DIR>
+
+Do the minimization in DIR (e.g., a ramdisk).  This means that before
+anything else, the directory to be minimized will be copied to DIR.
+Upon normal completion, the original direcory will be deleted and the
+contents of the newly minimized directory will be moved into the
+original directory.  If something goes wrong during the minimization,
+the original directory will not be deleted, and the itemized article
+subdirectory of DIR will be deleted.
+
+=back
+
+=head1 DESCRIPTION
+
+B<minimize-itemized-article.pl> will construct, for each fragment of
+an itemized mizar article, the smallest environment with respect to
+which the given article is verifiable.
+
+=cut
