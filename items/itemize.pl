@@ -66,14 +66,6 @@ foreach my $program (@mizar_programs) {
   }
 }
 
-# Check that xsltproc is available
-my $which_xsltproc_status = system ('which xsltproc > /dev/null 2>&1');
-my $which_xsltproc_exit_code = $which_xsltproc_status >> 8;
-if ($which_xsltproc_exit_code != 0) {
-  print 'Error: the xsltproc program is not available.', "\n";
-  exit 1;
-}
-
 my $article = $ARGV[0];
 my $article_basename = basename ($article, '.miz');
 my $article_dirname = dirname ($article);
