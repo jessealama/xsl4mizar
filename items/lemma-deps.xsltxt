@@ -18,7 +18,7 @@ tpl [Article[@aid]] {
 
 tpl [*] (#aid) mode="find-deps" {
   $n = `local-name (.)`;
-  $message = `concat ("Error: we can't begine extracting dependency information because we don't know the propnr attribute of the current element (which is a ", $n, " node).")`;
+  $message = `concat ("Error: we can't begin extracting dependency information because we don't know the propnr attribute of the current element (which is a ", $n, " node).")`;
   msg terminate="yes" $message;
 }
 
