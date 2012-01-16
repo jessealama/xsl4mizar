@@ -33,6 +33,9 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 pod2usage(1) if (scalar @ARGV != 1);
 
+my %empty_table = (); # used for an empty table of stylesheet
+                      # parameters and values
+
 my %stylesheet_paths =
   ('truncate' => "${stylesheet_home}/truncate.xsl",
    'toplevel-propositions' => "${stylesheet_home}/toplevel-propositions.xsl",
