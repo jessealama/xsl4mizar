@@ -5,7 +5,10 @@
 use strict;
 use warnings;
 use Getopt::Long;
-use Pod::Usage;
+use File::Basename qw(basename dirname);
+use XML::LibXML;
+use Cwd qw(cwd);
+use File::Copy qw(copy);
 
 my $paranoid = 0;
 my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
@@ -70,13 +73,6 @@ if ($which_xsltproc_exit_code != 0) {
   print 'Error: the xsltproc program is not available.', "\n";
   exit 1;
 }
-
-use File::Basename qw(basename dirname);
-use XML::LibXML;
-use Getopt::Long;
-use Pod::Usage;
-use Cwd qw(cwd);
-use File::Copy qw(copy);
 
 my $article = $ARGV[0];
 my $article_basename = basename ($article, '.miz');
