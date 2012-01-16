@@ -1,5 +1,7 @@
 package Xsltproc;
 
+our @EXPORT = qw(apply_stylesheet);
+
 sub apply_stylesheet {
   my $stylesheet = shift;
   my %parameters = %{shift ()};
