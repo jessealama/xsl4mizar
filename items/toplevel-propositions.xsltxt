@@ -26,9 +26,9 @@ tpl [Article[@aid]] {
   for-each [Reconsider] {
     apply [.];
   }
-  // for-each [DefinitionBlock] {
-  //   apply [.];
-  // }
+  for-each [DefinitionBlock] {
+    apply [.];
+  }
 }
 
 tpl [Proposition[not(@propnr)]] {
