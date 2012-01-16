@@ -130,7 +130,7 @@ if (! -e $article_absolute_xml) {
   }
 
   my $absrefs_stylesheet = $stylesheet_paths{'absrefs'};
-  my $xsltproc_status = system ("xsltproc --output $article_absolute_xml $absrefs_stylesheet $article_xml 2>/dev/null | sort -u | uniq");
+  my $xsltproc_status = system ("xsltproc $article_absolute_xml $absrefs_stylesheet $article_xml > $article_absolute_xml 2>/dev/null");
 
   # Skip checking the exit code of xsltproc; we can be safe even when
   # it is non-zero, owing to errors like 'Missing .fex' and 'Missing
