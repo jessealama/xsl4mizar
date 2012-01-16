@@ -37,7 +37,9 @@ my %empty_table = (); # used for an empty table of stylesheet
                       # parameters and values
 
 my %stylesheet_paths =
-  ('truncate' => "${stylesheet_home}/truncate.xsl",
+  ('absrefs' => "${stylesheet_home}/addabsrefs.xsl",
+   'delete-elements' => "${stylesheet_home}/delete-elements.xsl",
+   'truncate' => "${stylesheet_home}/truncate.xsl",
    'toplevel-propositions' => "${stylesheet_home}/toplevel-propositions.xsl",
    'skip-non-ultimate-proofs' => "${stylesheet_home}/skip-non-ultimate-proofs.xsl",
    'lemma-deps' => "${stylesheet_home}/lemma-deps.xsl",
