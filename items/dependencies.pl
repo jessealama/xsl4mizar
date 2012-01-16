@@ -5,6 +5,7 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage;
 use File::Basename qw(basename dirname);
+use Carp qw(croak);
 
 use Xsltproc qw(apply_stylesheet);
 
@@ -24,18 +25,18 @@ pod2usage(1) unless (scalar @ARGV == 1);
 
 if (defined $stylesheet_home) {
   if (! -e $stylesheet_home) {
-    die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
   }
   if (! -d $stylesheet_home) {
-    die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
   }
 } else {
   $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
   if (! -e $stylesheet_home) {
-    die 'Error: the default directory in which we look for stylesheets', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'does not exist.  Consider using the --stylesheet-home option.', "\n";
+    croak ('Error: the default directory in which we look for stylesheets', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'does not exist.  Consider using the --stylesheet-home option.');
   }
   if (! -d $stylesheet_home) {
-    die 'Error: the default directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --stylesheet-home option.', "\n";
+    croak ('Error: the default directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --stylesheet-home option.');
   }
 }
 
@@ -54,31 +55,31 @@ my %stylesheet_paths = ('absrefs' => "${stylesheet_home}/addabsrefs.xsl",
 foreach my $stylesheet (keys %stylesheet_paths) {
   my $stylesheet_path = $stylesheet_paths{$stylesheet};
   if (! -e $stylesheet_path) {
-    die 'Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').';
+    croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').');
   }
   if (! -r $stylesheet_path) {
-    die 'Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.';
+    croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.');
   }
 }
 
 sub ensure_sensible_mizar_environment {
   # MIZFILES is set and refers to an existing directory
   if (! defined $ENV{'MIZFILES'}) {
-    die 'Error: we were asked to ensure a sensible Mizar environment, but the MIZFILES environment variable appears not to be set.';
+    croak ('Error: we were asked to ensure a sensible Mizar environment, but the MIZFILES environment variable appears not to be set.');
   }
   my $mizfiles = $ENV{'MIZFILES'};
   if (! -e $mizfiles) {
-    die 'Error: we were asked to ensure a sensible Mizar environment, but the value of the MIZFILES environment variable,', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'does not exist.';
+    croak ('Error: we were asked to ensure a sensible Mizar environment, but the value of the MIZFILES environment variable,', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'does not exist.');
   }
   if (! -d $mizfiles) {
-    die 'Error: we were asked to ensure a sensible Mizar environment, but the value of the MIZFILES environment variable,', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'is not a directory.';
+    croak ('Error: we were asked to ensure a sensible Mizar environment, but the value of the MIZFILES environment variable,', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'is not a directory.');
   }
   my @mizar_tools = ('accom', 'verifier');
   foreach my $tool (@mizar_tools) {
     my $which_status = system ("which $tool > /dev/null 2>&1");
     my $which_exit_code = $which_status >> 8;
     if ($which_exit_code != 0) {
-      die 'Error: we were asked to ensure a sensible Mizar environment, but the needed Mizar tool ', $tool, ' could not be found (or is not executable).';
+      croak ('Error: we were asked to ensure a sensible Mizar environment, but the needed Mizar tool ', $tool, ' could not be found (or is not executable).');
     }
   }
   return 1;
@@ -115,10 +116,10 @@ if (! -e $article_xml) {
   ensure_sensible_mizar_environment ();
   if (accom ($article_miz)) {
     if (! verifier ($article_miz)) {
-      die 'Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to verify the article.';
+      croak ('Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to verify the article.');
     }
   } else {
-    die 'Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to accommodate the article.';
+    croak ('Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to accommodate the article.')
   }
 }
 
@@ -139,7 +140,7 @@ if (! -e $article_absolute_xml) {
     if ($verbose) {
       print "\n";
     }
-    die 'Error: we failed to generate the absolute form of the XML for ', $article_basename, '.', "\n";
+    croak ('Error: we failed to generate the absolute form of the XML for ', $article_basename, '.');
     exit 1;
   }
 
@@ -154,7 +155,7 @@ chomp @non_constructor_deps;
 
 # Sanity check: the stylsheet didn't produce any junk output
 if (grep (/^$/, @non_constructor_deps)) {
-  die 'Error: the dependencies stylesheet generated some junk output (a blank line).';
+  croak ('Error: the dependencies stylesheet generated some junk output (a blank line).');
 }
 
 # Constructors are a special case
@@ -165,7 +166,7 @@ chomp @constructor_deps;
 
 # Sanity check: the stylesheet didn't produce any junk output
 if (grep (/^$/, @constructor_deps)) {
-  die 'Error: the inferred-constructors stylesheet generated some junk output.';
+  croak ('Error: the inferred-constructors stylesheet generated some junk output.');
 }
 
 foreach my $dep (@constructor_deps, @non_constructor_deps) {
