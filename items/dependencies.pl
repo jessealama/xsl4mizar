@@ -6,6 +6,8 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Basename qw(basename dirname);
 
+use Xsltproc qw(apply_stylesheet);
+
 my $stylesheet_home = undef;
 my $verbose = 0;
 my $man = 0;
