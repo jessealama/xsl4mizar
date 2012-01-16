@@ -871,13 +871,6 @@ minimal.pl - Minimize the environment of a mizar article
 
 minimize.pl [options] mizar-article
 
-Options:
-  -help                       Brief help message
-  -man                        Full documentation
-  -verbose                    Say what we're doing
-  -paranoid                   Check that the article is verifiable before and after we're done minimizing
-  -confirm-only               Don't minimize; simply check that the environment really is minimal
-
 =head1 OPTIONS
 
 =over 8
