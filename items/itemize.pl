@@ -180,7 +180,7 @@ sub run_mizar_tool {
   my $article_err_file = "${article_base}.err";
   my $tool_status = system ("$tool -l -q $article_file > /dev/null 2>&1");
   my $tool_exit_code = $tool_status >> 8;
-  unless ($tool_exit_code == 0 && -z $article_err_file) {
+  if ($tool_exit_code != 0 && -s $article_err_file) {
     if ($verbose) {
       print 'Error: the ', $tool, ' Mizar tool did not exit cleanly when applied to ', $article_file, ' (or the .err file is non-empty).', "\n";
     }
