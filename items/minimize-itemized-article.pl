@@ -53,6 +53,10 @@ if (scalar @ARGV != 1) {
 
 my $article_dir = $ARGV[0];
 
+if (! -d $article_dir) {
+  die 'Error: the supplied itemized-article directory ', $article_dir, ' does not exist.';
+}
+
 unless (-d $article_dir) {
   print 'Error: the supplied itemized-article directory ', $article_dir, ' is not actually directory.', "\n";
   exit 1;
