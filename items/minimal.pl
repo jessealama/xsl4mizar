@@ -169,7 +169,7 @@ sub prune_theorems {
 
   if (-e $article_eth) {
     if ($verbose == 1) {
-      print 'Minimizing eth...';
+      print 'Minimizing eth quickly...';
     }
     my $eth_doc = undef;
     eval {
@@ -255,7 +255,7 @@ sub prune_schemes {
   }
   if (-e $article_esh) {
     if ($verbose == 1) {
-      print 'Minimizing esh...';
+      print 'Minimizing esh quickly...';
     }
     my $esh_doc = undef;
     eval {
