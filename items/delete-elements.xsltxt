@@ -1,47 +1,41 @@
 stylesheet 1.0;
-output method=xml;
+output method=xml indent="yes";
 
 // Comma-delimited list of positive natural numbers representing
 // indices of elements of the root element that are to be omitted.
 
 #to-delete = { ""; }
 
-tpl die(#message) {
-  if [@line and @col] {
-    $line = `@line`;
-    $col = `@col`;
-    $final_message = `concat ($message, " (line ", $line, ", column ", $col, ")")`;
-    msg terminate="yes" $final_message;
-  } else {
-    $final_message = `concat ($message, " (unable to determine line and column information)")`;
-    msg terminate="yes" $final_message;
-  }
-}
-
 tpl [/] {
-  copy {
-    for-each [@*] { copy-of `.`; }
-    apply [*];
-  }
+  apply [*] mode="root";
 }
 
-tpl [/*] {
-  copy {
+tpl [*] mode="root" {
+  $n = `name (.)`;
+  <$n {
     for-each [@*] { copy-of `.`; }
-    enumerate-elements (#elements = `*`,
-                        #index = "1");
-  }
-}
-
-tpl enumerate-elements (#elements, #index) {
-  if [$elements] {
-    $element = `$elements[1]`;
-    $token = `concat (",", $index, ",")`;
-    if [not(contains ($to-delete, $token))] {
-      copy-of `$element`;
+    for-each [*] {
+      apply [.] mode="toplevel";
     }
-    "\n";
-    enumerate-elements (#elements = `$elements[position () > 1]`,
-                        #index = `$index + 1`);
+  }
+}
+
+tpl [*] mode="copy" {
+  $n = `name (.)`;
+  <$n {
+    for-each [@*] { copy-of `.`; }
+    for-each [*] {
+      apply [.] mode="copy";
+    }
+  }
+}
+
+tpl [*] mode="toplevel" {
+  $pos = `count (preceding-sibling::*) + 1`;
+  $token = `concat (",", $pos, ",")`;
+  if [contains ($to-delete, $token)] {
+    // ignore
+  } else {
+    apply [.] mode="copy";
   }
 }
