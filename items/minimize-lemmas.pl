@@ -160,18 +160,25 @@ sub run_mizar_tool {
 
 sub apply_stylesheet {
   my $stylesheet = shift;
+  my %parameters = %{shift ()};
   my $document = shift;
   my $result_path = shift;
   my $error_path = shift;
 
+  my $params = '';
+  foreach my $parameter (keys %parameters) {
+    my $value = $parameters{$parameter};
+    $params .= "--stringparam '${parameter}' '${value}' ";
+  }
+
   my $xsltproc_invocation
     = defined $result_path
       ? (defined $error_path
-	 ? "xsltproc $stylesheet $document > $result_path 2> $error_path"
-	 : "xsltproc $stylesheet $document > $result_path 2> /dev/null")
+	 ? "xsltproc $params $stylesheet $document > $result_path 2> $error_path"
+	 : "xsltproc $params $stylesheet $document > $result_path 2> /dev/null")
       : (defined $error_path
-	 ? "xsltproc $stylesheet $document > /dev/null 2> $error_path"
-	 : "xsltproc $stylesheet $document > /dev/null 2> /dev/null");
+	 ? "xsltproc $params $stylesheet $document > /dev/null 2> $error_path"
+	 : "xsltproc $params $stylesheet $document > /dev/null 2> /dev/null");
 
   my $xsltproc_status = system ($xsltproc_invocation);
   my $xsltproc_exit_code = $xsltproc_status >> 8;
@@ -179,15 +186,15 @@ sub apply_stylesheet {
   if ($xsltproc_exit_code != 0) {
     if (defined $result_path) {
       if (defined $error_path) {
-	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output and standard error streams were saved to', "\n", "\n", '  ', $result_path, "\n", "\n", 'and', "\n", "\n", '  ', $error_path, ' ,', "\n", "\n", 'respectively.');
+	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'with the parameters', "\n", "\n", '  ', $params, "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output and standard error streams were saved to', "\n", "\n", '  ', $result_path, "\n", "\n", 'and', "\n", "\n", '  ', $error_path, ' ,', "\n", "\n", 'respectively.');
       } else {
-	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output was saved to', "\n", "\n", '  ', $result_path, "\n", "\n", 'but the standard error output was not saved.');
+	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'with the parameters', "\n", "\n", '  ', $params, "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output was saved to', "\n", "\n", '  ', $result_path, "\n", "\n", 'but the standard error output was not saved.');
       }
     } else {
       if (defined $error_path) {
-	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output was not saved, but the standard error streams were saved to', "\n", "\n", '  ', $error_path, ' .');
+	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'with the parameters', "\n", "\n", '  ', $params, "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output was not saved, but the standard error streams were saved to', "\n", "\n", '  ', $error_path, ' .');
       } else {
-	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output and standard error streams were not saved.');
+	croak ('Error: xsltproc did not exit cleanly applying the stylesheet at ', "\n", "\n", '  ', $stylesheet, "\n", "\n", 'to the document at', "\n", "\n", '  ', $document, ' with the parameters', "\n", "\n", '  ', $params, ' .', "\n", "\n", 'Its exit code was ', $xsltproc_exit_code, '.  The standard output and standard error streams were not saved.');
       }
     }
   }
@@ -205,6 +212,7 @@ my $inferred_constructors_stylesheet = path_for_stylesheet ('inferred-constructo
 my $lemma_deps_stylesheet = path_for_stylesheet ('lemma-deps');
 my $external_deps_stylesheet = path_for_stylesheet ('dependencies');
 my $rewrite_aid_stylesheet = path_for_stylesheet ('rewrite-aid');
+my $delete_elements_stylesheet = path_for_stylesheet ('delete-elements');
 
 my $brutalize_script = path_for_script ('minimal.pl');
 my $brutalize_internally_script = path_for_script ('minimize-internally.pl');
@@ -224,7 +232,7 @@ if (defined $target_directory) {
   my $cwd = cwd ();
   $target_directory = "${cwd}/${article_basename}";
   if (-e $target_directory) {
-    croak ('Error: since the target-directory option was not used, we are to save our wok in \'', $article_basename, '\'; but there is already a directory by that name in the current working directory.  Please move it out of the way.');
+    croak ('Error: since the --target-directory option was not used, we are to save our wok in \'', $article_basename, '\';', "\n", 'but there is already a directory by that name in the current working directory.', "\n", 'Please move it out of the way.');
   }
   mkdir $target_directory
     or croak ('Error: unable to make the directory \'', $article_basename, '\' in the current working directory.');
@@ -254,15 +262,16 @@ if (! defined eval { run_mizar_tool ('verifier', $article_miz_in_target_dir) } )
 my $article_xml_in_target_dir = "${target_directory}/${article_basename}.xml";
 my $article_absolute_xml_in_target_dir = "${target_directory}/${article_basename}.xml1";
 
-if (! defined { ensure_readable_file ($article_xml_in_target_dir) } ) {
+if (! defined eval { ensure_readable_file ($article_xml_in_target_dir) } ) {
   croak ('Error: verifier did not produce a semantic XML representation of ', $article_basename, '.');
 }
 
-foreach my $extension ('xml', 'eno', 'dfs', 'ecl', 'eid', 'epr', 'erd', 'esh', 'eth') {
+foreach my $extension ('xml') {
   my $source_xml_file = "${target_directory}/${article_basename}.${extension}";
   my $target_xml_file = "${target_directory}/${article_basename}.${extension}1";
   if (-e $source_xml_file) {
     if (! defined eval { apply_stylesheet ($absrefs_stylesheet,
+					   \%empty_table,
 					   $source_xml_file,
 					   $target_xml_file) } ) {
       croak ($@);
@@ -388,6 +397,21 @@ if ($paranoid) {
   }
 }
 
+# Absolutize the fragments
+foreach my $lemma (keys %element_for_proposition) {
+  foreach my $extension ('xml') {
+    my $source_xml_file = "${lemma}.${extension}";
+    my $target_xml_file = "${lemma}.${extension}1";
+    if (-e $source_xml_file) {
+      my $xsltproc_absrefs_status = system ("xsltproc --output $target_xml_file $absrefs_stylesheet $source_xml_file 2>/dev/null");
+      my $xsltproc_absrefs_exit_code = $xsltproc_absrefs_status >> 8;
+      if ($xsltproc_absrefs_exit_code != 0) {
+	croak ('Error: xsltproc did not exit cleanly when computing the absolute form of ', $article_basename, '.', $extension, '.');
+      }
+    }
+  }
+}
+
 # Minimize the article "internally": delete as many of the toplevel
 # nodes preceding the final node as possible
 if ($verbose) {
@@ -436,42 +460,56 @@ if ($verbose) {
   print 'done.', "\n";
 }
 
-# Absolutize the fragments
-foreach my $lemma (keys %element_for_proposition) {
-  foreach my $extension ('xml', 'eno', 'dfs', 'ecl', 'eid', 'epr', 'erd', 'esh', 'eth') {
-    my $source_xml_file = "${lemma}.${extension}";
-    my $target_xml_file = "${lemma}.${extension}1";
-    if (-e $source_xml_file) {
-      my $xsltproc_absrefs_status = system ("xsltproc --output $target_xml_file $absrefs_stylesheet $source_xml_file 2>/dev/null");
-      my $xsltproc_absrefs_exit_code = $xsltproc_absrefs_status >> 8;
-      if ($xsltproc_absrefs_exit_code != 0) {
-	croak ('Error: xsltproc did not exit cleanly when computing the absolute form of ', $article_basename, '.', $extension, '.');
-      }
-    }
-  }
-}
-
 my %deps_for_lemmas = ();
 
 if ($verbose) {
   print 'Gathering article-internal dependencies...';
 }
 
+# Using the information about which toplevel elements are deletable,
+# delete such elements from each lemma's absolutized XML
+foreach my $lemma (keys %element_for_proposition) {
+  my $lemma_xml = "${lemma}.xml";
+  my $lemma_abs_xml = "${lemma}.xml1";
+  my $lemma_deletable_indices = "${lemma}.deletable-indices";
+  if (! -e $lemma_deletable_indices) {
+    croak ('Error: we expected to find the deletable-indices for lemma ', $lemma, ' at', "\n", "\n", '  ', $lemma_deletable_indices, "\n", "\n", 'but there is no file there.');
+  }
+  my @deletable_indices = `cat $lemma_deletable_indices 2>/dev/null`;
+  chomp @deletable_indices;
+  my $deletable_indices_token_string = join (',', @deletable_indices);
+  # ensure the token string starts and ends with a comma
+  $deletable_indices_token_string = ',' . $deletable_indices_token_string . ',';
+
+  if ($debug) {
+    warn 'Deletable indices: ', $deletable_indices_token_string;
+  }
+
+  my $trimmed_abs_xml = "${lemma}.xml1.trimmed";
+  my $trimmed_abs_xml_errors = "${lemma}.xml1.trimmed.errors";
+  my %trim_params = ('to-delete', $deletable_indices_token_string);
+  apply_stylesheet ($delete_elements_stylesheet,
+		    \%trim_params,
+		    $lemma_abs_xml,
+		    $trimmed_abs_xml,
+		    $trimmed_abs_xml_errors);
+}
+
 # Gather the article-internal dependencies
 foreach my $lemma (keys %element_for_proposition) {
   my $lemma_mptp_name = "${lemma}_${article_basename}";
   my $lemma_xml = "${lemma}.xml";
-  my $lemma_abs_xml = "${lemma}.xml1";
+  my $lemma_abs_xml_trimmed = "${lemma}.xml1.trimmed";
   my $lemma_deps_file = "${lemma}.deps.internal";
   my $lemma_deps_file_errors = "${lemma}.deps.internal.errors";
   my $lemma_deps_file_tmp = "${lemma}.deps.internal.tmp";
-  my $xsltproc_lemma_deps_status = system ("xsltproc $lemma_deps_stylesheet $lemma_abs_xml > $lemma_deps_file_tmp 2> $lemma_deps_file_errors");
+  my $xsltproc_lemma_deps_status = system ("xsltproc $lemma_deps_stylesheet $lemma_abs_xml_trimmed > $lemma_deps_file_tmp 2> $lemma_deps_file_errors");
   my $xsltproc_lemma_deps_exit_code = $xsltproc_lemma_deps_status >> 8;
   if ($xsltproc_lemma_deps_status != 0) {
     if ($verbose) {
       print "\n";
     }
-    croak ('Error: xsltproc did not exit cleanly applying the lemma-dependencies stylesheet to ', $lemma, '.');
+    croak ('Error: xsltproc did not exit cleanly applying the lemma-dependencies stylesheet to ', $lemma, '.', "\n", 'Consult', "\n", "\n", '  ', $lemma_deps_file_errors, "\n", "\n", 'to see what went wrong.');
   }
   my $tr_status = system ("tr -s '\n' < $lemma_deps_file_tmp > $lemma_deps_file");
   my $tr_exit_code = $tr_status >> 8;
@@ -543,10 +581,10 @@ if ($verbose) {
 
 # Gather the envrionment (article-external) dependencies
 foreach my $lemma (keys %element_for_proposition) {
-  my $lemma_abs_xml = "${lemma}.xml1";
+  my $lemma_abs_xml_trimmed = "${lemma}.xml1.trimmed";
   my $lemma_deps_file = "${lemma}.deps.external";
   my $lemma_deps_file_errors = "${lemma}.deps.external.errors";
-  my $xsltproc_lemma_deps_status = system ("xsltproc $external_deps_stylesheet $lemma_abs_xml > $lemma_deps_file 2> $lemma_deps_file_errors");
+  my $xsltproc_lemma_deps_status = system ("xsltproc $external_deps_stylesheet $lemma_abs_xml_trimmed > $lemma_deps_file 2> $lemma_deps_file_errors");
   my $xsltproc_lemma_deps_exit_code = $xsltproc_lemma_deps_status >> 8;
   if ($xsltproc_lemma_deps_status != 0) {
     if ($verbose) {
