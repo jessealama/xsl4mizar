@@ -878,7 +878,7 @@ minimize.pl [options] mizar-article
 
 =item B<--help>
 
-Print a brief help message and exits.
+Prints a brief help message and exits.
 
 =item B<--man>
 
