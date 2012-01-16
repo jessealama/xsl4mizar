@@ -6,6 +6,7 @@ use File::Basename qw(basename);
 use Getopt::Long;
 use Pod::Usage;
 use File::Temp qw(tempfile);
+use Carp qw(croak);
 
 sub tmpfile_path {
   # File::Temp's tempfile function returns a list of two values.  We
@@ -17,7 +18,7 @@ sub tmpfile_path {
   if (defined $path) {
     return $path;
   } else {
-    die 'Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err;
+    croak ('Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err);
   }
 }
 
@@ -39,42 +40,42 @@ pod2usage(1) if (scalar @ARGV != 1);
 
 if (defined $stylesheet_home) {
   if (! -e $stylesheet_home) {
-    die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
   }
   if (! -d $stylesheet_home) {
-    die 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
   }
 } else {
   $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
   if (! -e $stylesheet_home) {
-    die 'Error: the default directory in which we look for stylesheets', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'does not exist.  Consider using the --stylesheet-home option.', "\n";
+    croak ('Error: the default directory in which we look for stylesheets', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'does not exist.  Consider using the --stylesheet-home option.');
   }
   if (! -d $stylesheet_home) {
-    die 'Error: the default directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --stylesheet-home option.', "\n";
+    croak ('Error: the default directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --stylesheet-home option.');
   }
 }
 
 if (defined $script_home) {
   if (! -e $script_home) {
-    die 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary scripts does not exist.', "\n";
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary scripts does not exist.');
   }
   if (! -d $script_home) {
-    die 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary is not actually a directory.', "\n";
+    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary is not actually a directory.');
   }
 } else {
   $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
   if (! -e $script_home) {
-    die 'Error: the default directory in which we look for needed auxiliary scripts', "\n", "\n", '  ', $script_home, "\n", "\n", 'does not exist.  Consider using the --script-home option.', "\n";
+    croak ('Error: the default directory in which we look for needed auxiliary scripts', "\n", "\n", '  ', $script_home, "\n", "\n", 'does not exist.  Consider using the --script-home option.');
   }
   if (! -d $script_home) {
-    die 'Error: the default directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --script-home option.', "\n";
+    croak ('Error: the default directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --script-home option.');
   }
 }
 
 my $article_dir = $ARGV[0];
 
 unless (-d $article_dir) {
-  die 'Error: ', $article_dir, ' is not a directory.', "\n";
+  croak ('Error: ', $article_dir, ' is not a directory.');
 }
 
 my $article_basename = basename ($article_dir);
@@ -85,13 +86,13 @@ my %script_paths = ('map-ckbs.pl' => "${script_home}/map-ckbs.pl",
 foreach my $script (keys %script_paths) {
   my $script_path = $script_paths{$script};
   if (! -e $script_path) {
-    die 'Error: the needed auxiliary script', "\n", "\n", '  ', $script, "\n", "\n", 'does not exist at the expected location', "\n", "\n", '  ', $script_path, "\n";
+    croak ('Error: the needed auxiliary script', "\n", "\n", '  ', $script, "\n", "\n", 'does not exist at the expected location', "\n", "\n", '  ', $script_path);
   }
   if (! -r $script_path) {
-    die 'Error: the needed auxiliary script', "\n", "\n", '  ', $script, "\n", "\n", 'at', "\n", "\n", '  ', $script_path, "\n", "\n", 'is unreadable.';
+    croak ('Error: the needed auxiliary script', "\n", "\n", '  ', $script, "\n", "\n", 'at', "\n", "\n", '  ', $script_path, "\n", "\n", 'is unreadable.');
   }
   if (! -x $script_path) {
-    die 'Error: the needed auxiliary script', "\n", "\n", '  ', $script, 'at', "\n", "\n", '  ', $script_path, 'is not executable.';
+    croak ('Error: the needed auxiliary script', "\n", "\n", '  ', $script, 'at', "\n", "\n", '  ', $script_path, 'is not executable.');
   }
 }
 
@@ -102,15 +103,15 @@ my @item_to_fragment_lines = `$map_ckb_script $article_dir 2> $map_ckb_err_file`
 my $item_to_fragment_exit_code = $? >> 8;
 if ($item_to_fragment_exit_code != 0) {
   if (-z $map_ckb_err_file) {
-    die 'Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, the map-ckb script did not produce any error output.)';
+    croak ('Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, the map-ckb script did not produce any error output.)');
   } elsif (! -r $map_ckb_err_file) {
-    die 'Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, we are unable to read the error output file of the map-ckb script.)';
+    croak ('Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, we are unable to read the error output file of the map-ckb script.)');
   } else {
     print STDERR ('Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", 'Here is the error output produced by the map-ckb script:', "\n");
     print '----------------------------------------------------------------------', "\n";
     system ('cat', $map_ckb_err_file);
     print '----------------------------------------------------------------------', "\n";
-    die;
+    croak;
   }
 }
 
@@ -149,14 +150,14 @@ sub resolve_item {
     (my $item_fragment_num, my $item_kind) = ($1, $2);
     unless (defined $item_fragment_num && defined $item_kind) {
       print "\n";
-      die 'Error: we could not extract the fragment number and item kind from the string "', $item, '"';
+      croak ('Error: we could not extract the fragment number and item kind from the string "', $item, '"');
     }
     my $item_fragment = "${article_basename}:fragment:${item_fragment_num}";
     if (defined $fragment_to_item_table{$item_fragment}) {
       my @generated_items = @{$fragment_to_item_table{$item_fragment}};
       if (scalar @generated_items == 0) {
         print "\n";
-        die 'Error: somehow the entry in the fragment-to-item table for ', $item_fragment, ' is an empty list.', "\n";
+        croak ('Error: somehow the entry in the fragment-to-item table for ', $item_fragment, ' is an empty list.');
       }
       if (scalar @generated_items == 1) {
         # Easy: the dependent fragment generated exactly one item;
@@ -169,7 +170,7 @@ sub resolve_item {
         my @candidate_items = grep (/:${item_kind}:/, @generated_items);
         if (scalar @candidate_items == 0) {
           print "\n";
-          die 'Error: there are no candidate matches for ', $item_fragment, ' in the fragment-to-item table.', "\n";
+          croak ('Error: there are no candidate matches for ', $item_fragment, ' in the fragment-to-item table.');
         }
         if (scalar @candidate_items > 1) {
           print "\n";
@@ -177,13 +178,13 @@ sub resolve_item {
           foreach my $candidate (@candidate_items) {
             print STDERR ('* ', $candidate, "\n");
           }
-          die 'We require that there be exactly one.';
+          croak ('We require that there be exactly one.');
         }
 
         $resolved = $candidate_items[0];
       }
     } else {
-      die 'Error: the fragment-to-item table does not contain ', $item, '.', "\n";
+      croak ('Error: the fragment-to-item table does not contain ', $item, '.');
     }
   } else {
     $resolved = $item;
@@ -197,18 +198,18 @@ foreach my $item (keys %item_to_fragment_table) {
   $fragment =~ m/^${article_basename}:fragment:([0-9]+)$/;
   my $fragment_number = $1;
   unless (defined $fragment_number) {
-    die 'Error: we could not extract the article fragment number from the text', "\n", '  ', $fragment;
+    croak ('Error: we could not extract the article fragment number from the text', "\n", '  ', $fragment);
   }
   my $fragment_miz = "${article_dir}/text/ckb${fragment_number}.miz";
   unless (-e $fragment_miz) {
-    die 'Error: the .miz file for fragment ', $fragment_number, ' of ', $article_basename, ' does not exist at the expected location (', $fragment_miz, ').';
+    croak ('Error: the .miz file for fragment ', $fragment_number, ' of ', $article_basename, ' does not exist at the expected location (', $fragment_miz, ').');
   }
   my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} --script-home=${script_home} $fragment_miz 2> /dev/null`;
   (my $dependencies_exit_code, my $dependencies_message) = ($? >> 8, $!);
   if ($dependencies_exit_code != 0) {
     print STDERR ('Error: something went wrong when calling the dependencies script on fragment ', $fragment_number, ' of ', $article_basename, ';', "\n");
     print STDERR ('The exit code was ', $dependencies_exit_code, ' and the message was:', "\n");
-    die $dependencies_message, "\n";
+    croak ($dependencies_message);
   }
 
   print $item;
@@ -219,7 +220,7 @@ foreach my $item (keys %item_to_fragment_table) {
 
       unless (defined $resolved_dep) {
         print "\n";
-        die 'Error: we were unable to resolve the item ', $dep, '.';
+        croak ('Error: we were unable to resolve the item ', $dep, '.');
       }
 
       # Special case: if we are computing the dependencies of a
