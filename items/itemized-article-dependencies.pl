@@ -7,8 +7,6 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Temp qw(tempfile);
 
-use Xsltproc;
-
 sub tmpfile_path {
   # File::Temp's tempfile function returns a list of two values.  We
   # want the second (the path of the temprary file) and don't care
