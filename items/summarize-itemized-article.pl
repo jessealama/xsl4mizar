@@ -139,7 +139,7 @@ generate items.  The result will be a list of 0 or more lines of the form
 
 =over 4
 
-<number> ==> <item-1>,<item-2>,...,<item-N>
+<number> ==> <item-1> <item-2> ... <item-N>
 
 =back
 
