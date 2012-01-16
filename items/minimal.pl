@@ -10,6 +10,7 @@ use Pod::Usage;
 
 my $paranoid = 0;
 my $verbose = 0;
+my $debug = 0;
 my $man = 0;
 my $help = 0;
 my $confirm_only = 0;
@@ -20,6 +21,7 @@ my $fast_schemes = 0;
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
+	   'debug' => \$debug,
 	   'paranoid' => \$paranoid,
 	   'fast-schemes' => \$fast_schemes,
 	   'fast-theorems' => \$fast_theorems,
@@ -122,9 +124,10 @@ sub verify {
   if ($verifier_exit_code == 0 && -z $article_err) {
     return 1;
   } else {
-    # DEBUG
-    # print 'Verifier failed.  Contents of the err file:', "\n";
-    # system ("cat $article_err");
+    if ($debug) {
+      print 'Verifier failed.  Contents of the err file:', "\n";
+      system ("cat $article_err");
+    }
     return 0;
   }
 }
@@ -886,6 +889,10 @@ Prints the manual page and exits.
 Say what environment file we're minimizing, and for each environment
 file, say how many environment "items" are present there and how many
 we really need.
+
+=item B<--debug>
+
+Be very verbose about what is going on, for debugging purposes.
 
 =item B<--paranoid>
 
