@@ -484,6 +484,8 @@ foreach my $i (1 .. scalar @fragments) {
       print 'Warning: accom did not exit cleanly when applied to fragment number ', $i, ' of ', $article_basename, '.', "\n";
     }
   }
+
+  print 'done.', "\n";
 }
 
 __END__
