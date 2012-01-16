@@ -269,29 +269,29 @@ if ($verbose == 1) {
   if ($nice == 1) {
     if (defined $num_jobs) {
       if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --paranoid --verbose {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --fast-theorems --fast-schemes --paranoid --verbose {}";
       } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --verbose {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --fast-theorems --fast-schemes --verbose {}";
       }
     } else {
       if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --paranoid --verbose {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --paranoid --verbose --fast-theorems --fast-schemes  {}";
       } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --verbose {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --fast-theorems --fast-schemes  --verbose {}";
       }
     }
   } else {
     if (defined $num_jobs) {
       if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --paranoid --verbose {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes  --paranoid --verbose {}";
       } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --verbose {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes  --verbose {}";
       }
     } else {
       if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --paranoid --verbose {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --paranoid --verbose --fast-theorems --fast-schemes {}";
       } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --verbose {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --verbose --fast-theorems --fast-schemes  {}";
       }
     }
   }
@@ -299,29 +299,29 @@ if ($verbose == 1) {
   if ($nice == 1) {
     if (defined $num_jobs) {
       if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} --paranoid {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} --paranoid --fast-theorems --fast-schemes {}";
       } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} --fast-theorems --fast-schemes {}";
       }
     } else {
       if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} --paranoid {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} --fast-theorems --fast-schemes --paranoid {}";
       } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} --fast-theorems --fast-schemes  {}";
       }
     }
   } else {
     if (defined $num_jobs) {
       if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} --paranoid {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes --paranoid {}";
       } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes {}";
       }
     } else {
       if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} --paranoid {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} --fast-theorems --fast-schemes --paranoid {}";
       } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} {}";
+	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} --fast-theorems --fast-schemes {}";
       }
     }
   }
