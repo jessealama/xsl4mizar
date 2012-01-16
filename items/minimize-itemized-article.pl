@@ -166,29 +166,29 @@ if ($minimize_whole_article == 1) {
   if ($verbose == 1) {
     if ($nice == 1) {
       if ($paranoid == 1) {
-	$minimize_call = "nice $minimize_script --verbose --paranoid $real_itemized_article_miz";
+	$minimize_call = "nice $minimize_script --fast-theorems --fast-schemes --verbose --paranoid $real_itemized_article_miz";
       } else {
-	$minimize_call = "nice $minimize_script --verbose $real_itemized_article_miz";
+	$minimize_call = "nice $minimize_script --fast-theorems --fast-schemes --verbose $real_itemized_article_miz";
       }
     } else {
       if ($paranoid == 1) {
-	$minimize_call = "$minimize_script --verbose --paranoid $real_itemized_article_miz";
+	$minimize_call = "$minimize_script --fast-theorems --fast-schemes --verbose --paranoid $real_itemized_article_miz";
       } else {
-	$minimize_call = "$minimize_script --verbose $real_itemized_article_miz";
+	$minimize_call = "$minimize_script --fast-theorems --fast-schemes --verbose $real_itemized_article_miz";
       }
     }
   } else {
     if ($nice == 1) {
       if ($paranoid == 1) {
-	$minimize_call = "nice $minimize_script $real_itemized_article_miz";
+	$minimize_call = "nice $minimize_script --fast-theorems --fast-schemes $real_itemized_article_miz";
       } else {
-	$minimize_call = "nice $minimize_script --paranoid $real_itemized_article_miz";
+	$minimize_call = "nice $minimize_script --paranoid --fast-theorems --fast-schemes $real_itemized_article_miz";
       }
     } else {
       if ($paranoid == 1) {
-	$minimize_call = "$minimize_script --verbose $real_itemized_article_miz";
+	$minimize_call = "$minimize_script --verbose --fast-theorems --fast-schemes $real_itemized_article_miz";
       } else {
-	$minimize_call = "$minimize_script $real_itemized_article_miz";
+	$minimize_call = "$minimize_script --fast-theorems --fast-schemes $real_itemized_article_miz";
       }
     }
   }
