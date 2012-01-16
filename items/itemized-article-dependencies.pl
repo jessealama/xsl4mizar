@@ -204,9 +204,11 @@ foreach my $item (keys %item_to_fragment_table) {
   unless (-e $fragment_miz) {
     croak ('Error: the .miz file for fragment ', $fragment_number, ' of ', $article_basename, ' does not exist at the expected location (', $fragment_miz, ').');
   }
-  my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} --script-home=${script_home} $fragment_miz 2> /dev/null`;
-  (my $dependencies_exit_code, my $dependencies_message) = ($? >> 8, $!);
+  my $dependencies_err = tmpfile_path ();
+  my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} $fragment_miz 2> $dependencies_err`;
+  my $dependencies_exit_code = $? >> 8;
   if ($dependencies_exit_code != 0) {
+    my $dependencies_message = `cat $dependencies_err`;
     print STDERR ('Error: something went wrong when calling the dependencies script on fragment ', $fragment_number, ' of ', $article_basename, ';', "\n");
     print STDERR ('The exit code was ', $dependencies_exit_code, ' and the message was:', "\n");
     croak ($dependencies_message);
