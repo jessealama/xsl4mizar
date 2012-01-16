@@ -6,8 +6,7 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Basename qw(basename dirname);
 use Carp qw(croak);
-
-use Xsltproc qw(apply_stylesheet);
+use XML::LibXML;
 
 my $stylesheet_home = undef;
 my $verbose = 0;
@@ -48,9 +47,14 @@ my $article_miz = "${article_dirname}/${article_basename}.miz";
 my $article_xml = "${article_dirname}/${article_basename}.xml";
 my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
-my %stylesheet_paths = ('absrefs' => "${stylesheet_home}/addabsrefs.xsl",
-			'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
-			'dependencies' => "${stylesheet_home}/dependencies.xsl");
+if (! -e $article_miz) {
+  croak ('Error: ', $article_miz, ' does not exist.');
+}
+
+my %stylesheet_paths =
+  ('absrefs' => "${stylesheet_home}/addabsrefs.xsl",
+   'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
+   'dependencies' => "${stylesheet_home}/dependencies.xsl");
 
 foreach my $stylesheet (keys %stylesheet_paths) {
   my $stylesheet_path = $stylesheet_paths{$stylesheet};
@@ -109,6 +113,9 @@ sub verifier {
   return (run_mizar_tool ('verifier -s -l -q'));
 }
 
+my $xml_parser = XML::LibXML->new (suppress_warnings =>1,
+				   suppress_errors => 1);
+
 if (! -e $article_xml) {
   if ($verbose) {
     print 'The semantic XML for ', $article_basename, ' does not exist.  Generating...';
@@ -130,22 +137,20 @@ if (! -e $article_absolute_xml) {
   }
 
   my $absrefs_stylesheet = $stylesheet_paths{'absrefs'};
-  my $xsltproc_status = system ("xsltproc $article_absolute_xml $absrefs_stylesheet $article_xml > $article_absolute_xml 2>/dev/null");
-
-  # Skip checking the exit code of xsltproc; we can be safe even when
-  # it is non-zero, owing to errors like 'Missing .fex' and 'Missing
-  # .bex'.  But we will check that the $article_absolute_xml exists.
-
-  if (! -e $article_absolute_xml) {
-    if ($verbose) {
-      print "\n";
-    }
-    croak ('Error: we failed to generate the absolute form of the XML for ', $article_basename, '.');
-    exit 1;
+  my $xsltproc_status = system ("xsltproc $absrefs_stylesheet $article_xml > $article_absolute_xml 2>/dev/null");
+  my $xsltproc_exit_code = $xsltproc_status >> 8;
+  if ($xsltproc_exit_code != 0) {
+    croak ('Error: xsltproc did not exit cleanly when applying the absolutizer stylesheet to ', $article_xml, '.  Its exit code was ', $xsltproc_exit_code, '.');
   }
+
 
   if ($verbose) {
     print 'done.', "\n";
+  }
+} else {
+  # Let's check that the XML is valid
+  if (! defined eval { $xml_parser->parse_file ($article_absolute_xml) } ) {
+    croak ('Error: ', $article_absolute_xml, ' is not a well-formed XML file.');
   }
 }
 
