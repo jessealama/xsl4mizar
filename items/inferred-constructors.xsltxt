@@ -4,6 +4,19 @@ stylesheet 1.0;
 
 output method="text";
 
+//////////////////////////////////////////////////////////////////////
+// Stylesheet parameters
+//////////////////////////////////////////////////////////////////////
+
+// The directory in which to look for the given article's environment.
+// If unset, we will look in whatever direcory the XSLT processor is
+// working in.
+#article-directory = { ""; }
+
+//////////////////////////////////////////////////////////////////////
+// Utilities
+//////////////////////////////////////////////////////////////////////
+
 $lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
 $ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
@@ -31,37 +44,43 @@ tpl [Article[@aid]] {
 
   // inspect the .eno
   $eno = `concat ($aid-lc, ".eno")`;
-  for-each [document ($eno, /)] {
+  $full-eno = `concat ($article-directory, $eno)`;
+  for-each [document ($full-eno, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .dfs
   $dfs = `concat ($aid-lc, ".dfs")`;
-  for-each [document ($dfs, /)] {
+  $full-dfs = `concat ($article-directory, $dfs)`;
+  for-each [document ($full-dfs, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .ecl
   $ecl = `concat ($aid-lc, ".ecl")`;
-  for-each [document ($ecl, /)] {
+  $full-ecl = `concat ($article-directory, $ecl)`;
+  for-each [document ($full-ecl, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .eid
   $eid = `concat ($aid-lc, ".eid")`;
-  for-each [document ($eid, /)] {
+  $full-eid = `concat ($article-directory, $eid)`;
+  for-each [document ($full-eid, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .epr
   $epr = `concat ($aid-lc, ".epr")`;
-  for-each [document ($epr, /)] {
+  $full-epr = `concat ($article-directory, $epr)`;
+  for-each [document ($full-epr, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .erd
   $erd = `concat ($aid-lc, ".erd")`;
-  for-each [document ($erd, /)] {
+  $full-erd = `concat ($article-directory, $erd)`;
+  for-each [document ($full-erd, /)] {
     print-everything (#except = $aid);
   }
 
