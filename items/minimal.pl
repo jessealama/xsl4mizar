@@ -800,21 +800,6 @@ unless ($confirm_only == 1) {
   foreach my $extension_to_minimize (@extensions_to_minimize) {
     minimize_extension ($extension_to_minimize);
   }
-
-  # Check that the article is verifiable in the new minimized environment
-
-  if ($paranoid == 1) {
-    my $verifier_ok = verify ();
-    if ($verifier_ok == 0) {
-      print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
-      exit 1;
-    }
-
-    if ($verbose == 1) {
-      print 'Paranoia: We have confirmed that, after minimization, ', $article_basename, ' is verifiable.', "\n";
-    }
-
-  }
 }
 
 if ($paranoid == 1 or $confirm_only == 1) {
@@ -859,6 +844,21 @@ if ($paranoid == 1 or $confirm_only == 1) {
   }
 
 }
+
+  # Check that the article is verifiable in the new minimized environment
+
+  if ($paranoid == 1) {
+    my $verifier_ok = verify ();
+    if ($verifier_ok == 0) {
+      print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
+      exit 1;
+    }
+
+    if ($verbose == 1) {
+      print 'Paranoia: We have confirmed that, after minimization, ', $article_basename, ' is verifiable.', "\n";
+    }
+
+  }
 
 __END__
 
