@@ -371,7 +371,11 @@ foreach my $i (1 .. scalar @fragments) {
 chdir $target_directory
   or (print ('Error: unable to change directory to ', $target_directory, '.', "\n") && exit 1);
 
+print 'Constructing the environment, verifying, and exporting ', scalar @fragments, ' fragments...', "\n";
+
 foreach my $i (1 .. scalar @fragments) {
+
+  print 'Fragment ', $i, '...';
 
   my $fragment = $fragments[$i - 1];
 
