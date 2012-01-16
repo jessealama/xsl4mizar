@@ -11,6 +11,7 @@ use Carp qw(croak);
 
 my $paranoid = 0;
 my $verbose = 0;
+my $debug = 0;
 my $man = 0;
 my $help = 0;
 my $confirm_only = 0;
@@ -21,6 +22,7 @@ my $target_directory = undef;
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
+	   'debug' => \$debug,
 	   'paranoid' => \$paranoid,
 	   'stylesheet-home=s' => \$stylesheet_home,
 	   'script-home=s' => \$script_home,
