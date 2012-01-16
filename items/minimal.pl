@@ -235,10 +235,7 @@ sub prune_theorems {
 # Ugh: This is nearly identical to the previous subroutine definition.
 sub prune_schemes {
   my $refx_doc = undef;
-  eval {
-    $refx_doc = $xml_parser->parse_file ($article_refx);
-  };
-  if ($@) {
+  if (! defined eval { $refx_doc = $xml_parser->parse_file ($article_refx) } ) {
     print 'Error: the .refx file of ', $article_basename, ' is not well-formed XML.', "\n";
     exit 1;
   }
