@@ -12,8 +12,8 @@ my $article = $ARGV[0];
 
 my $article_dirname = dirname ($article);
 my $article_basename = basename ($article, '.miz');
-my $article_xml = "${article_basename}.xml";
-my $article_absolute_xml = "${article_basename}.xml1";
+my $article_xml = "${article_dirname}/${article_basename}.xml";
+my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
 my $absrefs_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/addabsrefs.xsl';
 
@@ -25,6 +25,22 @@ unless (-e $absrefs_stylesheet) {
 unless (-r $absrefs_stylesheet) {
   print 'Error: the addabsrefs stylesheet at ', $absrefs_stylesheet, ' is unreadable.', "\n";
   exit 1;
+}
+
+if (! -e $article_absolute_xml) {
+  if (! -e $article_xml) {
+    die 'Error: the necessary absolute form of the semantic XML for ', $article_basename, ' could not be found at the expected location (', $article_absolute_xml, '), so we tried to create it;', "\n", 'but we are unable to do so, since the semantic XML form of ', $article_basename, ' also does not exist at the expected location (', $article_xml, ').';
+  } else {
+    my $xsltproc_status = system ("xsltproc $absrefs_stylesheet $article_xml > $article_absolute_xml 2> /dev/null");
+    my $xsltproc_exit_code = $xsltproc_status >> 8;
+    if ($xsltproc_exit_code != 0) {
+      die 'Error: the needed absolute form of the XML for ', $article_basename, ' was missing, so we tried to create it;', "\n", 'but xsltproc did not exit cleanly applying the absolutizer stylesheet to ', $article_xml, '.';
+    }
+  }
+}
+
+if (! -r $article_absolute_xml) {
+  die 'Error: the absolute form of ', $article_basename, ' at ', $article_absolute_xml, ' is unreadable.';
 }
 
 my $inferred_constructors_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/items/inferred-constructors.xsl';
@@ -47,6 +63,6 @@ unless (-r $article_xml) {
   exit 1;
 }
 
-my @inferred_constructors = `xsltproc --stringparam article-directory '${article_dirname}' $inferred_constructors_stylesheet $article_absolute_xml 2>/dev/null | sort -u | uniq`;
+my @inferred_constructors = `xsltproc --stringparam 'article-directory' '${article_dirname}' $inferred_constructors_stylesheet $article_absolute_xml | sort -u | uniq`;
 
 print @inferred_constructors;
