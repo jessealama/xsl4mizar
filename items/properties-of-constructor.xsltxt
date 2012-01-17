@@ -27,13 +27,13 @@ tpl uppercaes (#string) { `translate($string, $lcletters, $ucletters)`; }
 tpl [/] {
   choose {
     when [$aid = ""] {
-      msg terminate="yes" "Error: please supply a value for the value of the aid attribute of the constructor to target.";
+      msg terminate="yes" "Error: please supply a value for aid attribute of the constructor to target.";
     }
     when [$nr = ""] {
-      msg terminate="yes" "Error: please supply a value for the value of the nr attribute of the constructor to target.";
+      msg terminate="yes" "Error: please supply a value for the nr attribute of the constructor to target.";
     }
     when [$kind = ""] {
-      msg terminate="yes" "Error: please supply a value for the value of the kind attribute of the constructor to target.";
+      msg terminate="yes" "Error: please supply a value for the kind attribute of the constructor to target.";
     }
     when [Constructors] {
       $kind-lc = lowercase (#string = $kind);
