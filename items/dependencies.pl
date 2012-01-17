@@ -200,11 +200,7 @@ if (-e $article_absolute_xml) {
   if ($verbose) {
     print 'done.', "\n";
   }
-} else {
-  # Let's check that the XML is valid
-  if (! defined eval { $xml_parser->parse_file ($article_absolute_xml) } ) {
-    croak ('Error: ', $article_absolute_xml, ' is not a well-formed XML file.');
-  }
+
 }
 
 my $dependencies_stylesheet = $stylesheet_paths{'dependencies'};
