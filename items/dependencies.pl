@@ -9,6 +9,7 @@ use Carp qw(croak);
 use XML::LibXML;
 
 my $stylesheet_home = undef;
+my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $verbose = 0;
 my $man = 0;
 my $help = 0;
@@ -16,7 +17,8 @@ my $help = 0;
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
-	   'stylesheet-home=s' => \$stylesheet_home)
+	   'stylesheet-home=s' => \$stylesheet_home,
+	   'script-home=s' => \$script_home)
   or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -44,6 +46,7 @@ my $article = $ARGV[0];
 my $article_basename = basename ($article, '.miz');
 my $article_dirname = dirname ($article);
 my $article_miz = "${article_dirname}/${article_basename}.miz";
+my $article_atr = "${article_dirname}/${article_basename}.atr";
 my $article_xml = "${article_dirname}/${article_basename}.xml";
 my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
@@ -54,7 +57,8 @@ if (! -e $article_miz) {
 my %stylesheet_paths =
   ('absrefs' => "${stylesheet_home}/addabsrefs.xsl",
    'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
-   'dependencies' => "${stylesheet_home}/dependencies.xsl");
+   'dependencies' => "${stylesheet_home}/dependencies.xsl",
+   'properties-of-constructor' => "${stylesheet_home}/properties-of-constructor.xsl");
 
 foreach my $stylesheet (keys %stylesheet_paths) {
   my $stylesheet_path = $stylesheet_paths{$stylesheet};
@@ -64,6 +68,16 @@ foreach my $stylesheet (keys %stylesheet_paths) {
   if (! -r $stylesheet_path) {
     croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.');
   }
+}
+
+if (! -e $script_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts does not exist.', "\n";
+  exit 1;
+}
+
+if (! -d $script_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts is not actually a directory.', "\n";
+  exit 1;
 }
 
 sub ensure_sensible_mizar_environment {
@@ -176,6 +190,24 @@ if (grep (/^$/, @constructor_deps)) {
 
 foreach my $dep (@constructor_deps, @non_constructor_deps) {
   print $dep, "\n";
+}
+
+# Print constructor property dependencies
+
+my $properties_of_constructor_stylesheet = $stylesheet_paths{'properties-of-constructor'};
+
+foreach my $constructor (@constructor_deps) {
+  if ($constructor =~ /\A ([a-z0-9_]+) : (.) constructor : ([0-9]+) \z/x) {
+    (my $aid, my $kind, my $nr) = ($1, $2, $3);
+    my @properties = `xsltproc --stringparam 'kind' '${kind}' --stringparam 'nr' '${nr}' --stringparam 'aid' '${aid}' $properties_of_constructor_stylesheet $article_atr`;
+    chomp @properties;
+    foreach my $property (@properties) {
+      my $property_lc = lc $property;
+      print $constructor, '/', $property_lc, "\n";
+    }
+  } else {
+    croak ('Error: unable to make sense of the constructor \'', $constructor, '\'.');
+  }
 }
 
 __END__
