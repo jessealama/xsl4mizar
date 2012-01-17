@@ -130,6 +130,10 @@ if ($debug) {
   print STDERR ('We are about to treat ', scalar @inferred_constructors, '.', "\n");
 }
 
+my %needed_constructor_properties = ();
+
+# Let's do it
+
 foreach my $constructor (@inferred_constructors) {
   if ($constructor =~ /\A ([a-z0-9_]+) : (.) constructor : ([0-9]+) \z/x) {
     (my $aid, my $kind, my $nr) = ($1, $2, $3);
@@ -139,6 +143,7 @@ foreach my $constructor (@inferred_constructors) {
     }
     chomp @properties;
     foreach my $property (@properties) {
+      my $property_lc = lc $property;
       my $xsltproc_status = system ("xsltproc --stringparam 'kind' '${kind}' --stringparam 'nr' '${nr}' --stringparam 'aid' '${aid}' --stringparam 'property' '${property}' $strip_property_stylesheet $article_atr > $article_atr_tmp");
       my $xsltproc_exit_code = $xsltproc_status >> 8;
       if ($xsltproc_exit_code != 0) {
@@ -151,6 +156,7 @@ foreach my $constructor (@inferred_constructors) {
 	if ($verbose) {
 	  print 'We can remove property ', $property, ' of ', $constructor, "\n";
 	}
+	$needed_constructor_properties{"${constructor}/${property_lc}"} = 0;
       } else {
 	if ($verbose) {
 	  print 'We cannot remove property ', $property, ' of ', $constructor, "\n";
@@ -172,6 +178,10 @@ foreach my $constructor (@inferred_constructors) {
   } else {
     croak ('Error: unable to make sense of the constructor \'', $constructor, '\'.', "\n");
   }
+}
+
+foreach my $constructor_property (keys %needed_constructor_properties) {
+  print $constructor_property, "\n";
 }
 
 __END__
