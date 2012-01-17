@@ -5,6 +5,7 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage;
 use File::Basename qw(basename dirname);
+use File::Temp qw(tempfile);
 use Carp qw(croak);
 use XML::LibXML;
 
@@ -13,6 +14,20 @@ my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $verbose = 0;
 my $man = 0;
 my $help = 0;
+
+sub tmpfile_path {
+  # File::Temp's tempfile function returns a list of two values.  We
+  # want the second (the path of the temprary file) and don't care
+  # about the first (a filehandle for the temporary file).  See
+  # http://search.cpan.org/~tjenness/File-Temp-0.22/Temp.pm for more
+  (undef, my $path) = eval { tempfile (); };
+  my $tempfile_err = $@;
+  if (defined $path) {
+    return $path;
+  } else {
+    croak ('Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err);
+  }
+}
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
@@ -151,12 +166,20 @@ if (! -e $article_absolute_xml) {
   }
 
   my $absrefs_stylesheet = $stylesheet_paths{'absrefs'};
-  my $xsltproc_status = system ("xsltproc $absrefs_stylesheet $article_xml > $article_absolute_xml 2>/dev/null");
+  my $absrefs_errors_path = tmpfile_path ();
+  my $xsltproc_status = system ("xsltproc --output $article_absolute_xml $absrefs_stylesheet $article_xml 2> $absrefs_errors_path");
   my $xsltproc_exit_code = $xsltproc_status >> 8;
+
   if ($xsltproc_exit_code != 0) {
-    croak ('Error: xsltproc did not exit cleanly when applying the absolutizer stylesheet to ', $article_xml, '.  Its exit code was ', $xsltproc_exit_code, '.');
+    if (-e $absrefs_errors_path) {
+      my @absrefs_errors = `cat $absrefs_errors_path 2> /dev/null`;
+      croak ('Error: xsltproc did not exit cleanly when applying the absolutizer stylesheet to ', $article_xml, '.  Its exit code was ', $xsltproc_exit_code, '; here are the errors that were printed:', "\n", @absrefs_errors, "\n");
+    } else {
+      croak ('Error: xsltproc did not exit cleanly when applying the absolutizer stylesheet to ', $article_xml, '.  Its exit code was ', $xsltproc_exit_code, '.');
+    }
   }
 
+  ensure_valid_xml_file ($article_absolute_xml);
 
   if ($verbose) {
     print 'done.', "\n";
