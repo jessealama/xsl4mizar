@@ -7,6 +7,7 @@ use XML::LibXML;
 use POSIX qw(floor ceil);
 use Getopt::Long;
 use Pod::Usage;
+use Carp qw(croak);
 
 my $paranoid = 0;
 my $verbose = 0;
