@@ -20,8 +20,8 @@ output method="text";
 $lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
 $ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
-tpl lc (#s) { `translate($s, $ucletters, $lcletters)`; }
-tpl uc (#s) { `translate($s, $lcletters, $ucletters)`; }
+tpl lowercase (#string) { `translate($string, $ucletters, $lcletters)`; }
+tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
 
 //////////////////////////////////////////////////////////////////////
 // Document templates
@@ -40,7 +40,7 @@ tpl [Article[not(@aid)]] {
 }
 
 tpl [Article[@aid]] {
-  $aid-lc = lc (#s = `@aid`);
+  $aid-lc = lowercase (#string = `@aid`);
 
   // deftheorems
   for-each [descendant::Ref[@kind = "D" and @absnr and @aid]] {
@@ -100,12 +100,12 @@ tpl [Ref[not(@aid) or not(@absnr)]] {
 }
 
 tpl [Ref[@kind = "T" and @aid and @absnr]] {
-  $aid-lc = lc (#s = `@aid`);
+  $aid-lc = lowercase (#string = `@aid`);
   $aid-lc; ":"; "theorem"; ":"; `@absnr`;
 }
 
 tpl [Ref[@kind = "D" and @aid and @absnr]] {
-  $aid-lc = lc (#s = `@aid`);
+  $aid-lc = lowercase (#string = `@aid`);
   $aid-lc; ":"; "deftheorem"; ":"; `@absnr`;
 }
 
@@ -116,7 +116,7 @@ tpl [Schemes] {
 }
 
 tpl [Scheme[@aid and @nr]] {
-   $aid-lc = lc (#s = `@aid`);
+   $aid-lc = lowercase (#string = `@aid`);
    $aid-lc; ":"; "scheme"; ":"; `@nr`;
 }
 
@@ -127,8 +127,8 @@ tpl [Definientia] {
 }
 
 tpl [Definiens[@aid and @constrkind and @defnr]] {
-  $aid-lc = lc (#s = `@aid`);
-  $kind-lc = lc (#s = `@constrkind`);
+  $aid-lc = lowercase (#string = `@aid`);
+  $kind-lc = lowercase (#string = `@constrkind`);
   $aid-lc; ":"; $kind-lc; "definiens"; ":"; `@defnr`;
 }
 
@@ -147,7 +147,7 @@ tpl [CCluster[not(@nr)]] {
 }
 
 tpl [CCluster[@aid and @nr]] {
-  $aid-lc = lc (#s = `@aid`);
+  $aid-lc = lowercase (#string = `@aid`);
   $aid-lc; ":"; "ccluster"; ":"; `@nr`;
 }
 
@@ -160,7 +160,7 @@ tpl [FCluster[not(@nr)]] {
 }
 
 tpl [FCluster[@aid and @nr]] {
-  $aid-lc = lc (#s = `@aid`);
+  $aid-lc = lowercase (#string = `@aid`);
   $aid-lc; ":"; "fcluster"; ":"; `@nr`;
 }
 
@@ -173,7 +173,7 @@ tpl [RCluster[not(@nr)]] {
 }
 
 tpl [RCluster[@aid and @nr]] {
-  $aid-lc = lc (#s = `@aid`);
+  $aid-lc = lowercase (#string = `@aid`);
   $aid-lc; ":"; "rcluster"; ":"; `@nr`;
 }
 
