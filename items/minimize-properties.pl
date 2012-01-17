@@ -64,7 +64,7 @@ if (! -d $stylesheet_home) {
 
 my %stylesheet_paths =
   ('properties-of-constructor' => "${stylesheet_home}/properties-of-constructor.xsl",
-   'strip-property' => "${stylesheet_home}/strip-properties.xsl");
+   'strip-property' => "${stylesheet_home}/strip-property.xsl");
 
 sub path_of_stylesheet {
   my $stylesheet_name = shift;
