@@ -40,7 +40,7 @@ if (defined $num_jobs) {
 }
 
 if (defined $workdir) {
-  unless (-d $workdir) {
+  if (! -d $workdir) {
     print 'Error: the specified work directory', "\n", "\n", '  ', $workdir, "\n", "\n", 'is not actually a directory.', "\n";
     exit 1;
   }
@@ -57,14 +57,14 @@ if (! -d $article_dir) {
   die 'Error: the supplied itemized-article directory ', $article_dir, ' does not exist.';
 }
 
-unless (-d $article_dir) {
+if (! -d $article_dir) {
   print 'Error: the supplied itemized-article directory ', $article_dir, ' is not actually directory.', "\n";
   exit 1;
 }
 
 my $article_text_dir = "${article_dir}/text";
 
-unless (-d $article_text_dir) {
+if (! -d $article_text_dir) {
   print 'Error: there is no text subdirectory of ', $article_dir, ', so it is not an itemized article directory.', "\n";
   exit 1;
 }
@@ -85,12 +85,12 @@ if (scalar @miz_candidates > 1) {
 my $itemized_article_miz = $miz_candidates[0];
 my $itemized_article_basename = basename ($itemized_article_miz, '.miz');
 
-unless (-e $itemized_article_miz) {
+if (! -e $itemized_article_miz) {
   print 'Error: there is no article by the name \'', $itemized_article_basename, '\' under ', $article_dir, '.', "\n";
   exit 1;
 }
 
-unless (-r $itemized_article_miz) {
+if (! -r $itemized_article_miz) {
   print 'Error: the itemized article at ', $itemized_article_miz, ' is unreadable.', "\n";
   exit 1;
 }
@@ -107,34 +107,38 @@ if (! -d $script_home) {
 
 my $minimize_script = "${script_home}/minimal.pl";
 
-unless (-e $minimize_script) {
+if (! -e $minimize_script) {
   print 'Error: the minimization script does not exist at the expected location (', $minimize_script, ').', "\n";
   exit 1;
 }
 
-unless (-r $minimize_script) {
+if (! -r $minimize_script) {
   print 'Error: the minimization script at ', $minimize_script, ' is unreadable.', "\n";
   exit 1;
 }
 
-unless (-x $minimize_script) {
+if (! -x $minimize_script) {
   print 'Error: the minimization script at ', $minimize_script, ' is not executable.', "\n";
   exit 1;
 }
 
-unless (-d $stylesheet_home) {
+if (! -e $stylesheet_home) {
+  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n");
+}
+
+if (! -d $stylesheet_home) {
   print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
   exit 1;
 }
 
 my $prefer_environment_stylesheet = "${stylesheet_home}/prefer-environment.xsl";
 
-unless (-e $prefer_environment_stylesheet) {
+if (! -e $prefer_environment_stylesheet) {
   print 'Error: the prefer-environment stylesheet does not exist at the expected location (', $prefer_environment_stylesheet, ').', "\n";
   exit 1;
 }
 
-unless (-r $prefer_environment_stylesheet) {
+if (! -r $prefer_environment_stylesheet) {
   print 'Error: the prefer-environment stylesheet at ', $prefer_environment_stylesheet, ' is unreadable.', "\n";
   exit 1;
 }
