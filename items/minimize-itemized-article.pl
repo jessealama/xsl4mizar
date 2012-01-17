@@ -381,28 +381,6 @@ minimize-itemized-article.pl - Minimize the fragments of an "itemized" mizar art
 
 minimize-itemized-article.pl [options] itemized-mizar-article-directory
 
-Options:
-
-  -help                       Brief help message
-
-  -man                        Full documentation
-
-  -verbose                    Say what we're doing
-
-  -minimize-whole-article     Minimize the whole article and use its minimal environment in minimizing its fragments
-
-  -paranoid                   Check that the minimized fragments are verifiable
-
-  -script-home                Directory in which to look for auxiliary scripts
-
-  -stylesheet-home            Directory in which to look for needed stylesheets
-
-  -nice                       Use nice when minimizing the article's fragments
-
-  -jobs                       Specify the number of jobs to run in parallel
-
-  -workdir                    Do the minimization in a specified directory
-
 =head1 OPTIONS
 
 =over 8
