@@ -108,14 +108,7 @@ if (! -x $inferred_constructors_script) {
   croak ('Error: the inferred-constructors script at', "\n", "\n", '  ', $inferred_constructors_script, 'is not executable.',"\n");
 }
 
-my @inferred_constructors = `$inferred_constructors_script --stylesheet-home=${stylesheet_home} $article_miz 2> /dev/null`;
-my $inferred_constructors_status = $?;
-my $inferred_constructors_exit_code = $inferred_constructors_status >> 8;
-
-if ($inferred_constructors_exit_code != 0) {
-  croak ('Error: the inferred-constructors script did not exit cleanly when applied to ', $article_miz, '.', "\n");
-}
-
+my @inferred_constructors = `$inferred_constructors_script --stylesheet-home=${stylesheet_home} $article_miz`;
 chomp @inferred_constructors;
 
 # Make a copy of the atr
@@ -133,12 +126,20 @@ if (! defined eval { $atr_doc = $xml_parser->parse_file ($article_atr) } ) {
   croak ('Error: the .atr file for ', $article_basename, ' at', "\n", "\n", '  ', $article_atr, "\n", "\n", 'is not a well-formed XML file.', "\n");
 }
 
+if ($debug) {
+  print STDERR ('We are about to treat ', scalar @inferred_constructors, '.', "\n");
+}
+
 foreach my $constructor (@inferred_constructors) {
   if ($constructor =~ /\A ([a-z0-9_]+) : (.) constructor : ([0-9]+) \z/x) {
     (my $aid, my $kind, my $nr) = ($1, $2, $3);
     my @properties = `xsltproc --stringparam 'kind' '${kind}' --stringparam 'nr' '${nr}' --stringparam 'aid' '${aid}' $properties_of_constructor_stylesheet $article_atr`;
+    if ($debug) {
+      print STDERR ($constructor, ' has ', scalar @properties, ' properties.', "\n");
+    }
+    chomp @properties;
     foreach my $property (@properties) {
-      my $xsltproc_status = system ("xsltproc --stringparam 'kind' '${kind}' --stringparam 'nr' '${nr}' --stringparam 'aid' '${aid}' --stringparam 'property' '${property}' $article_atr > $article_atr_tmp");
+      my $xsltproc_status = system ("xsltproc --stringparam 'kind' '${kind}' --stringparam 'nr' '${nr}' --stringparam 'aid' '${aid}' --stringparam 'property' '${property}' $strip_property_stylesheet $article_atr > $article_atr_tmp");
       my $xsltproc_exit_code = $xsltproc_status >> 8;
       if ($xsltproc_exit_code != 0) {
 	croak ('Error: xsltproc did not exit clearly when applying the strip-property stylesheet to ', $article_atr, '.  Its exit code was ', $xsltproc_exit_code, '.');
@@ -153,6 +154,16 @@ foreach my $constructor (@inferred_constructors) {
       } else {
 	if ($verbose) {
 	  print 'We cannot remove property ', $property, ' of ', $constructor, "\n";
+	}
+	if ($debug) {
+	  if (-z $article_err) {
+	    print STDERR ('(empty .err file.)', "\n");
+	  } else {
+	    print STDERR ('Contents of the .err file:', "\n");
+	    print STDERR ('======================================================================', "\n");
+	    system ("cat $article_err");
+	    print STDERR ('======================================================================', "\n");
+	  }
 	}
 	copy ($article_atr_orig, $article_atr)
 	  or croak ('Error: we are unable to restore the original article .atr from ', $article_atr_orig, '.', "\n");
