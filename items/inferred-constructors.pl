@@ -2,11 +2,22 @@
 
 use strict;
 use File::Basename qw(dirname basename);
+use Getopt::Long;
+use Pod::Usage;
 
-unless (scalar @ARGV == 1) {
-  print 'Usage: inferred-constructors.pl ARTICLE', "\n";
-  exit 1;
-}
+my $help = 0;
+my $man = 0;
+my $verbose = 0;
+my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+
+GetOptions('help|?' => \$help,
+           'man' => \$man,
+           'verbose'  => \$verbose,
+	   'stylesheet-home=s' => \$stylesheet_home)
+  or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+pod2usage(1) unless (scalar @ARGV == 1);
 
 my $article = $ARGV[0];
 
@@ -15,7 +26,7 @@ my $article_basename = basename ($article, '.miz');
 my $article_xml = "${article_dirname}/${article_basename}.xml";
 my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
-my $absrefs_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/addabsrefs.xsl';
+my $absrefs_stylesheet = "${stylesheet_home}/addabsrefs.xsl";
 
 unless (-e $absrefs_stylesheet) {
   print 'Error: the addabsrefs stylesheet does not exist at the expected location (', $absrefs_stylesheet, ').', "\n";
