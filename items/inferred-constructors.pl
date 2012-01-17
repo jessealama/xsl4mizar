@@ -75,19 +75,16 @@ if (! -r $article_absolute_xml) {
   die 'Error: the absolute form of ', $article_basename, ' at ', $article_absolute_xml, ' is unreadable.';
 }
 
+ensure_valid_xml_file ($article_absolute_xml);
+
 my $inferred_constructors_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/items/inferred-constructors.xsl';
 
-unless (-e $inferred_constructors_stylesheet) {
+if (! -e $inferred_constructors_stylesheet) {
   print 'Error: the inferred-constructors stylesheet does not exist at the expected location (', $inferred_constructors_stylesheet, ').', "\n";
 }
 
-unless (-r $inferred_constructors_stylesheet) {
+if (! -r $inferred_constructors_stylesheet) {
   print 'Error: the inferred-constructors stylesheet at ', $inferred_constructors_stylesheet, ' is unreadable.', "\n";
-}
-
-unless (-e $article_xml) {
-  print 'Error: the XML for ', $article_basename, ' does not exist at the expected location (', $article_xml, ').', "\n";
-  exit 1;
 }
 
 unless (-r $article_xml) {
