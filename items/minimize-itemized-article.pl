@@ -95,7 +95,12 @@ unless (-r $itemized_article_miz) {
   exit 1;
 }
 
-unless (-d $script_home) {
+if (! -e $script_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts does not exist.', "\n";
+  exit 1;
+}
+
+if (! -d $script_home) {
   print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts is not actually a directory.', "\n";
   exit 1;
 }
