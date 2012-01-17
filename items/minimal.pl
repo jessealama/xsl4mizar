@@ -16,6 +16,7 @@ my $man = 0;
 my $help = 0;
 my $confirm_only = 0;
 my $checker_only = 0;
+my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $fast_theorems = 0;
 my $fast_schemes = 0;
 
@@ -25,6 +26,7 @@ GetOptions('help|?' => \$help,
 	   'debug' => \$debug,
 	   'paranoid' => \$paranoid,
 	   'fast-schemes' => \$fast_schemes,
+	   'script-home' => \$script_home,
 	   'fast-theorems' => \$fast_theorems,
 	   'checker-only' => \$checker_only,
 	   'confirm-only' => \$confirm_only)
@@ -33,6 +35,34 @@ pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 pod2usage(1) unless (scalar @ARGV == 1);
+
+if (! -e $script_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts does not exist.', "\n";
+  exit 1;
+}
+
+if (! -d $script_home) {
+  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts is not actually a directory.', "\n";
+  exit 1;
+}
+
+my $minimize_properties_script = "${script_home}/minimize-properties.pl";
+
+if (! -e $minimize_properties_script) {
+  croak ('Error: the property minimization script does not exist at the expected location (', $minimize_properties_script, ').', "\n");
+}
+
+if (! -r $minimize_properties_script) {
+  croak ('Error: the property minimization script at ', $minimize_properties_script, ' is unreadable.', "\n");
+}
+
+if (! -f $minimize_properties_script) {
+  croak ('Error: the property minimization script does not exist at the expected location (', $minimize_properties_script, ').', "\n");
+}
+
+if (! -x $minimize_properties_script) {
+  croak ('Error: the property minimization script at ', $minimize_properties_script, ' is not executable.', "\n");
+}
 
 my $article = $ARGV[0];
 my $article_basename = basename ($article, '.miz');
@@ -801,6 +831,12 @@ unless ($confirm_only == 1) {
   foreach my $extension_to_minimize (@extensions_to_minimize) {
     minimize_extension ($extension_to_minimize);
   }
+}
+
+my $minimize_properties_status = system ("$minimize_properties_script $article_miz > /dev/null 2> /dev/null");
+my $minimize_properties_exit_code = $minimize_properties_status >> 8;
+if ($minimize_properties_exit_code != 0) {
+  croak ('Error: the property minimization script did not exit cleanly; its exit code was ', $minimize_properties_exit_code, '.');
 }
 
 if ($paranoid == 1 or $confirm_only == 1) {
