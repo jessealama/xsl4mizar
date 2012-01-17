@@ -46,23 +46,6 @@ unless (-r $article_xml) {
   exit 1;
 }
 
-my @extensions = ('xml', 'eno', 'dfs', 'ecl', 'eid', 'epr', 'erd', 'esh', 'eth');
-
-foreach my $extension (@extensions) {
-  my $file = "${article_basename}.${extension}";
-  my $absolutized_file = "${article_basename}.${extension}1";
-
-  if (-e $file) {
-    unless (-e $absolutized_file) {
-      my $xsltproc_status = system ("xsltproc --output $absolutized_file $absrefs_stylesheet $file 2>/dev/null");
-      my $xsltproc_exit_code = $xsltproc_status >> 8;
-      if ($xsltproc_exit_code != 0) {
-        print 'Warning: xsltproc did not exist cleanly when computing the absolutized form of ', $file, "\n";
-      }
-    }
-  }
-}
-
 my @inferred_constructors = `xsltproc $inferred_constructors_stylesheet $article_absolute_xml 2>/dev/null | sort -u | uniq`;
 
 print @inferred_constructors;
