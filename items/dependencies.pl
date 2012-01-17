@@ -145,7 +145,18 @@ sub verifier {
 my $xml_parser = XML::LibXML->new (suppress_warnings =>1,
 				   suppress_errors => 1);
 
-if (! -e $article_xml) {
+sub ensure_valid_xml_file {
+  my $xml_path = shift;
+  if (defined eval { $xml_parser->parse_file ($xml_path) }) {
+    return 1;
+  } else {
+    croak ('Error: ', $xml_path, ' is not a well-formed XML file.');
+  }
+}
+
+if (-e $article_xml) {
+  ensure_valid_xml_file ($article_xml);
+} else {
   if ($verbose) {
     print 'The semantic XML for ', $article_basename, ' does not exist.  Generating...';
   }
@@ -157,9 +168,12 @@ if (! -e $article_xml) {
   } else {
     croak ('Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to accommodate the article.')
   }
+  ensure_valid_xml_file ($article_xml);
 }
 
-if (! -e $article_absolute_xml) {
+if (-e $article_absolute_xml) {
+  ensure_valid_xml_file ($article_absolute_xml);
+} else {
 
   if ($verbose) {
     print 'The absolute form of the XML for ', $article_basename, ' does not exist.  Generating...';
