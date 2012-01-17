@@ -12,12 +12,14 @@ use File::Copy qw(copy move);
 my $help = 0;
 my $man = 0;
 my $verbose = 0;
+my $debug = 0;
 my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
+	   'debug' => \$debug,
 	   'stylesheet-home=s' => \$stylesheet_home)
   or pod2usage(2);
 pod2usage(1) if $help;
