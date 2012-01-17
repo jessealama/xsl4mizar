@@ -669,6 +669,16 @@ incoherent state.
 There are some opportunities for parallelization of the itemization
 process, but at the moment we are not exploiting these.
 
+=head1 SEE ALSO
+
+=over 8
+
+=item F<itemized-article-dependencies.pl>
+
+=item L<http://mizar.org/>
+
+=back
+
 =head1 INCOMPATIBILITIES
 
 None known.
