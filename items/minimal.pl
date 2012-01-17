@@ -203,7 +203,7 @@ sub prune_theorems {
 
   if (-e $article_eth) {
     if ($verbose == 1) {
-      print 'Minimizing eth quickly...';
+      print 'Minimizing eth of ', $article_basename, ' quickly...';
     }
     my $eth_doc = undef;
     eval {
@@ -256,7 +256,7 @@ sub prune_theorems {
     $new_eth_doc->toFile ($article_eth);
 
     if ($verbose == 1) {
-      print 'done.  The initial environment contained ', scalar @theorem_nodes, ' elements, but we actually need only ', $num_needed, "\n";
+      print 'done.  The initial environment of ', $article_basename, ' contained ', scalar @theorem_nodes, ' elements, but we actually need only ', $num_needed, "\n";
     }
 
   } else {
@@ -286,7 +286,7 @@ sub prune_schemes {
   }
   if (-e $article_esh) {
     if ($verbose == 1) {
-      print 'Minimizing esh quickly...';
+      print 'Minimizing esh of ', $article_basename, ' quickly...';
     }
     my $esh_doc = undef;
     eval {
@@ -328,7 +328,7 @@ sub prune_schemes {
     $new_esh_doc->toFile ($article_esh);
 
     if ($verbose == 1) {
-      print 'done.  The initial environment contained ', scalar @scheme_nodes, ' elements, but we actually need only ', $num_needed, "\n";
+      print 'done.  The initial environment of ', $article_basename, ' contained ', scalar @scheme_nodes, ' elements, but we actually need only ', $num_needed, "\n";
     }
 
   } else {
@@ -388,11 +388,11 @@ sub minimize {
     my $deletable = verify ();
     if ($deletable == 1) {
       if ($verbose) {
-	print 'We can dump element #', $begin, "\n";
+	print 'We can dump ', $root_element_name, ' element #', $begin, "\n";
       }
     } else {
       if ($verbose) {
-	print 'We cannot dump element #', $begin, "\n";
+	print 'We cannot dump ', $root_element_name, ' element #', $begin, "\n";
       }
       $table{$begin} = 0;
       write_element_table (\@elements, \%table, $path, $root_element_name);
@@ -406,11 +406,11 @@ sub minimize {
 
     if ($begin_deletable == 1) {
       if ($verbose) {
-	print 'We can dump element #', $begin, "\n";
+	print 'We can dump ', $root_element_name, ' element #', $begin, "\n";
       }
     } else {
       if ($verbose) {
-	print 'We cannot dump element #', $begin, "\n";
+	print 'We cannot dump ', $root_element_name, ' element #', $begin, "\n";
       }
       $table{$begin} = 0;
       write_element_table (\@elements, \%table, $path, $root_element_name);
@@ -421,11 +421,11 @@ sub minimize {
     my $end_deletable = verify ();
     if ($end_deletable == 1) {
       if ($verbose) {
-	print 'We can dump element #', $end, "\n";
+	print 'We can dump ', $root_element_name, ' element #', $end, "\n";
       }
     } else {
       if ($verbose) {
-	print 'We cannot dump element #', $end, "\n";
+	print 'We cannot dump ', $root_element_name, ' element #', $end, "\n";
       }
       $table{$end} = 0;
       write_element_table (\@elements, \%table, $path, $root_element_name);
@@ -494,11 +494,11 @@ sub minimize_by_article {
     my $deletable = verify ();
     if ($deletable == 1) {
       if ($verbose == 1) {
-	print 'We can dump all elements from article ', $article, "\n";
+	print 'We can dump all ', $root_element_name, ' elements from ', $article, "\n";
       }
     } else {
       if ($verbose == 1) {
-	print 'We cannot dump all elements from article ', $article, "\n";
+	print 'We cannot dump all ', $root_element_name, ' elements from ', $article, "\n";
       }
       # Restore all elements from $article
       foreach my $i (0 .. scalar @elements - 1) {
@@ -527,11 +527,11 @@ sub minimize_by_article {
 
     if ($begin_deletable == 1) {
       if ($verbose == 1) {
-	print 'We can dump all elements from the article ', $begin_article, "\n";
+	print 'We can dump all ', $root_element_name, ' elements from ', $begin_article, "\n";
       }
     } else {
       if ($verbose == 1) {
-	print 'We cannot dump all elements from article ', $begin_article, "\n";
+	print 'We cannot dump all ', $root_element_name, ' elements from article ', $begin_article, "\n";
       }
 
       foreach my $i (0 .. scalar @elements - 1) {
@@ -560,11 +560,11 @@ sub minimize_by_article {
     my $end_deletable = verify ();
     if ($end_deletable == 1) {
       if ($verbose == 1) {
-	print 'We can dump all elements from the article ', $end_article, "\n";
+	print 'We can dump all ', $root_element_name, ' elements from the article ', $end_article, "\n";
       }
     } else {
       if ($verbose == 1) {
-	print 'We cannot dump all elements from the article ', $end_article, "\n";
+	print 'We cannot dump all ', $root_element_name, ' elements from the article ', $end_article, "\n";
       }
 
       foreach my $i (0 .. scalar @elements - 1) {
@@ -606,7 +606,7 @@ sub minimize_by_article {
       if ($verbose == 1) {
 	foreach my $i ($begin .. $begin + $half_segment_length) {
 	  my $article = $articles[$i];
-	  print 'We can dump all elements from the article ', $article, "\n";
+	  print 'We can dump all ', $root_element_name, ' elements from ', $article, "\n";
 	}
       }
       return (minimize_by_article (\@elements, \@articles, \%table, $path, $root_element_name, $begin + $half_segment_length + 1, $end));
@@ -666,7 +666,7 @@ sub minimize_extension {
       }
 
       if ($verbose == 1) {
-        print 'Minimizing ', $extension_to_minimize, '...';
+        print 'Minimizing ', $extension_to_minimize, ' of ', $article_basename, '...';
       }
 
       # Try to remove whole articles, i.e., remove all imported items
@@ -699,7 +699,7 @@ sub minimize_extension {
       my $num_elements_post_whole_article_deletion = scalar keys %minimized_by_article_table;
 
       if ($verbose == 1) {
-	print 'Done eliminating whole articles.  We started with ', $num_initial_elements, ' elements, but thanks to entire-article deletion, we have reduced this to ', $num_elements_post_whole_article_deletion, '.', "\n";
+	print 'Done eliminating whole articles from the .', $extension_to_minimize, ' file for ', $article_basename, '.  We started with ', $num_initial_elements, ' elements, but thanks to entire-article deletion, we have reduced this to ', $num_elements_post_whole_article_deletion, '.', "\n";
       }
 
       my %minimized_table
