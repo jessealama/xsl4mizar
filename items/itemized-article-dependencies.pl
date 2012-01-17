@@ -162,6 +162,7 @@ sub resolve_item {
         print "\n";
         croak ('Error: somehow the entry in the fragment-to-item table for ', $item_fragment, ' is an empty list.');
       }
+
       if (scalar @generated_items == 1) {
         # Easy: the dependent fragment generated exactly one item;
         # $item depends on it
