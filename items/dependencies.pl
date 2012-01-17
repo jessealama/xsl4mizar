@@ -12,6 +12,7 @@ use XML::LibXML;
 my $stylesheet_home = undef;
 my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $verbose = 0;
+my $debug = 0;
 my $man = 0;
 my $help = 0;
 
@@ -32,6 +33,7 @@ sub tmpfile_path {
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
+	   'debug' => \$debug,
 	   'stylesheet-home=s' => \$stylesheet_home,
 	   'script-home=s' => \$script_home)
   or pod2usage(2);
@@ -236,8 +238,14 @@ my $properties_of_constructor_stylesheet = $stylesheet_paths{'properties-of-cons
 foreach my $constructor (@constructor_deps) {
   if ($constructor =~ /\A ([a-z0-9_]+) : (.) constructor : ([0-9]+) \z/x) {
     (my $aid, my $kind, my $nr) = ($1, $2, $3);
-    my @properties = `xsltproc --stringparam 'kind' '${kind}' --stringparam 'nr' '${nr}' --stringparam 'aid' '${aid}' $properties_of_constructor_stylesheet $article_atr`;
+    if ($debug) {
+      print STDERR ('Looking for properties of the inferred constructor ', $constructor, '...', "\n");
+    }
+    my @properties = `xsltproc --stringparam kind '${kind}' --stringparam nr '${nr}' --stringparam aid '${aid}' $properties_of_constructor_stylesheet $article_atr`;
     chomp @properties;
+    if ($debug) {
+      print STDERR ('We found ', scalar @properties, ' properties for ', $constructor, '.', "\n");
+    }
     foreach my $property (@properties) {
       my $property_lc = lc $property;
       print $constructor, '/', $property_lc, "\n";
@@ -268,6 +276,14 @@ Prints a brief help message and exits.
 =item B<--man>
 
 Prints the manual page and exits.
+
+=item B<--verbose>
+
+Say what we're doing as we're doing it.
+
+=item B<--debug>
+
+Print copious amounts of information for debugging purposes.
 
 =back
 
