@@ -87,6 +87,8 @@ foreach my $stylesheet (keys %stylesheet_paths) {
 
 my $properties_of_constructor_stylesheet
   = path_of_stylesheet ('properties-of-constructor');
+my $strip_property_stylesheet
+  = path_of_stylesheet ('strip-property');
 
 my $inferred_constructors_script = "${script_home}/inferred-constructors.pl";
 
