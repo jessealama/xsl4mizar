@@ -38,7 +38,7 @@ if (! -d $prel_subdir) {
 
 my $xml_parser = XML::LibXML->new();
 
-# Constructors
+# Constructors and constructor properties
 
 my @dcos = `find $prel_subdir -name "*.dco" -exec basename {} .dco ';' | sed -e 's/ckb//' | sort --numeric-sort`;
 chomp @dcos;
@@ -75,6 +75,16 @@ foreach my $i (1 .. scalar @dcos) {
     $constructors{$kind} = 2;
   }
   print $article_basename, ':', $kind_lc, 'constructor', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
+
+  # Properties
+  if ($constructor->exists ('Properties')) {
+    my @property_nodes = $constructor->findnodes ('Properties/*');
+    foreach my $property_node (@property_nodes) {
+      my $property_name = $property_node->nodeName ();
+      my $property_name_lc = lc $property_name;
+      print $article_basename, ':', $kind_lc, 'constructor', ':', $num, '/', $property_name_lc, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
+    }
+  }
 }
 
 # Definientia
