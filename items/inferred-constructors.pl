@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use File::Basename qw(basename);
+use File::Basename qw(dirname basename);
 
 unless (scalar @ARGV == 1) {
   print 'Usage: inferred-constructors.pl ARTICLE', "\n";
@@ -10,6 +10,7 @@ unless (scalar @ARGV == 1) {
 
 my $article = $ARGV[0];
 
+my $article_dirname = dirname ($article);
 my $article_basename = basename ($article, '.miz');
 my $article_xml = "${article_basename}.xml";
 my $article_absolute_xml = "${article_basename}.xml1";
@@ -46,6 +47,6 @@ unless (-r $article_xml) {
   exit 1;
 }
 
-my @inferred_constructors = `xsltproc $inferred_constructors_stylesheet $article_absolute_xml 2>/dev/null | sort -u | uniq`;
+my @inferred_constructors = `xsltproc --stringparam article-directory '${article_dirname}' $inferred_constructors_stylesheet $article_absolute_xml 2>/dev/null | sort -u | uniq`;
 
 print @inferred_constructors;
