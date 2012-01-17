@@ -30,9 +30,9 @@ my $article = $ARGV[0];
 
 my $article_basename = basename ($article, '.miz');
 my $article_dirname = dirname ($article);
-my $article_miz = "${article_dirname}/${article}.miz";
-my $article_err = "${article_dirname}/${article}.err";
-my $article_atr = "${article_dirname}/${article}.atr";
+my $article_miz = "${article_dirname}/${article_basename}.miz";
+my $article_err = "${article_dirname}/${article_basename}.err";
+my $article_atr = "${article_dirname}/${article_basename}.atr";
 
 if (! -e $article_atr) {
   croak ('Error: the .atr file for ', $article_basename, ' could not be found at the expected location', "\n", "\n", '  ', $article_atr, "\n");
