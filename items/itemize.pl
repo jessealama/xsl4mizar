@@ -9,6 +9,7 @@ use File::Basename qw(basename dirname);
 use XML::LibXML;
 use Cwd qw(cwd);
 use File::Copy qw(copy);
+use Carp qw(croak);
 
 my $paranoid = 0;
 my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
