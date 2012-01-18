@@ -30,20 +30,17 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 pod2usage(1) unless (scalar @ARGV == 1);
 
 unless (defined $ENV{"MIZFILES"}) {
-  print 'Error: the MIZFILES environment variable is not set.';
-  exit 1;
+  croak ('Error: the MIZFILES environment variable is not set.');
 }
 
 my $mizfiles = $ENV{"MIZFILES"};
 
 unless (-e $mizfiles) {
-  print 'Error: the value of the MIZFILES environment variable, ', $mizfiles, ' is invalid because there is no file or directory there.', "\n";
-  exit 1;
+  croak ('Error: the value of the MIZFILES environment variable, ', $mizfiles, ' is invalid because there is no file or directory there.', "\n");
 }
 
 unless (-d $mizfiles) {
-  print 'Error: the value of the MIZFILES environment variable, ', $mizfiles, ' is invalid because it is not a directory.', "\n";
-  exit 1;
+  croak ('Error: the value of the MIZFILES environment variable, ', $mizfiles, ' is invalid because it is not a directory.', "\n");
 }
 
 # Look for the required programs
@@ -62,8 +59,7 @@ foreach my $program (@mizar_programs) {
   my $which_status = system ("which $program > /dev/null 2>&1");
   my $which_exit_code = $which_status >> 8;
   if ($which_exit_code != 0) {
-    print 'Error: the required program ', $program, ' cannot be found (or is not executable)', "\n";
-    exit 1;
+    croak ('Error: the required program ', $program, ' cannot be found (or is not executable)', "\n");
   }
 }
 
@@ -76,27 +72,23 @@ my $article_err = "${article_dirname}/${article_basename}.err";
 my $article_evl = "${article_dirname}/${article_basename}.evl";
 
 unless (-e $article_miz) {
-  print 'Error: there is no Mizar article at ', $article_miz, "\n";
-  exit 1;
+  croak ('Error: there is no Mizar article at ', $article_miz, "\n");
 }
 
 if (-d $article_miz) {
-  print 'Error: the supplied Mizar article ', $article_miz, ' is actually a directory.', "\n";
+  croak ('Error: the supplied Mizar article ', $article_miz, ' is actually a directory.', "\n");
 }
 
 unless (-r $article_miz) {
-  print 'Error: the Mizar article at ', $article_miz, ' is unreadable.', "\n";
-  exit 1;
+  croak ('Error: the Mizar article at ', $article_miz, ' is unreadable.', "\n");
 }
 
 unless (-e $stylesheet_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n";
-  exit 1;
+  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n");
 }
 
 unless (-d $stylesheet_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
-  exit 1;
+  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n");
 }
 
 my $split_stylesheet = "${stylesheet_home}/split.xsl";
@@ -109,32 +101,28 @@ my @stylesheets = ('split', 'itemize', 'wsm', 'extend-evl');
 foreach my $stylesheet (@stylesheets) {
   my $stylesheet_path = "${stylesheet_home}/${stylesheet}.xsl";
   unless (-e $stylesheet_path) {
-    print 'Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').', "\n";
-    exit 1;
+    croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').', "\n");
   }
   unless (-r $stylesheet_path) {
-    print 'Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.', "\n";
-    exit 1;
+    croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.', "\n");
   }
 }
 
 if (defined $target_directory) {
   if (-e $target_directory) {
-    print 'Error: the supplied target directory, ', $target_directory, ' already exists.  Please move it out of the way.', "\n";
-    exit 1;
+    croak ('Error: the supplied target directory, ', $target_directory, ' already exists.  Please move it out of the way.', "\n");
   } else {
     mkdir $target_directory
-      or (print ('Error: unable to make the directory \'', $target_directory, '\'.', "\n") && exit 1);
+      or croak ('Error: unable to make the directory \'', $target_directory, '\'.', "\n");
   }
 } else {
   my $cwd = cwd ();
   $target_directory = "${cwd}/${article_basename}";
   if (-e $target_directory) {
-    print 'Error: since the target-directory option was not used, we are to save our wok in \'', $article_basename, '\'; but there is already a directory by that name in the current working directory.  Please move it out of the way.', "\n";
-    exit 1;
+    croak ('Error: since the target-directory option was not used, we are to save our wok in \'', $article_basename, '\'; but there is already a directory by that name in the current working directory.  Please move it out of the way.', "\n");
   }
   mkdir $target_directory
-    or (print ('Error: unable to make the directory \'', $article_basename, '\' in the current working directory.', "\n") && exit 1);
+    or croak ('Error: unable to make the directory \'', $article_basename, '\' in the current working directory.', "\n");
 }
 
 # Populate the directory with what we'll eventually need
@@ -142,11 +130,10 @@ if (defined $target_directory) {
 foreach my $subdir_basename ('dict', 'prel', 'text') {
   my $subdir = "${target_directory}/${subdir_basename}";
   if (-e $subdir) {
-    print 'Error: there is already a \'', $subdir_basename, '\' subdirectory of the target directory ', $target_directory, '.', "\n";
-    exit 1;
+    croak ('Error: there is already a \'', $subdir_basename, '\' subdirectory of the target directory ', $target_directory, '.', "\n");
   }
   mkdir $subdir
-    or (print ('Error: unable to make the \'', $subdir_basename, '\' subdirectory of ', $target_directory, '.', "\n") && exit 1);
+    or croak ('Error: unable to make the \'', $subdir_basename, '\' subdirectory of ', $target_directory, '.', "\n");
 }
 
 my $target_dict_subdir = "${target_directory}/dict";
@@ -160,9 +147,9 @@ my $article_miz_orig_in_target_dir = "${target_directory}/${article_basename}.mi
 my $article_err_in_target_dir = "${target_directory}/${article_basename}.err";
 
 copy ($article_miz, $article_miz_in_target_dir)
-  or (print ('Error: unable to copy the article at ', $article_miz, ' to ', $article_miz_in_target_dir, '.', "\n") && exit 1);
+  or croak ('Error: unable to copy the article at ', $article_miz, ' to ', $article_miz_in_target_dir, '.', "\n");
 copy ($article_miz, $article_miz_orig_in_target_dir)
-  or (print ('Error: unable to copy the article at ', $article_miz, ' to ', $article_miz_orig_in_target_dir, '.', "\n") && exit 1);
+  or croak ('Error: unable to copy the article at ', $article_miz, ' to ', $article_miz_orig_in_target_dir, '.', "\n");
 
 # Transform the new miz
 
@@ -188,49 +175,42 @@ my $article_tpr_in_target_dir = "${target_directory}/${article_basename}.tpr";
 
 my $accom_ok = run_mizar_tool ('accom', $article_miz_in_target_dir);
 if ($accom_ok == 0) {
-  print 'Error: the initial article did not could not be accom\'d.';
-  exit 1;
+  croak ('Error: the initial article did not could not be accom\'d.');
 }
 
 my $verifier_ok = run_mizar_tool ('verifier', $article_miz_in_target_dir);
 if ($verifier_ok == 0) {
-  print 'Error: the initial article could not be verified.';
-  exit 1;
+  croak ('Error: the initial article could not be verified.');
 }
 
 my $wsmparser_ok = run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
 if ($wsmparser_ok == 0) {
-  print 'Error: wsmparser failed on the initial article.';
-  exit 1;
+  croak ('Error: wsmparser failed on the initial article.');
 }
 
 my $msmprocessor_ok = run_mizar_tool ('msmprocessor', $article_miz_in_target_dir);
 if ($msmprocessor_ok == 0) {
-  print 'Error: msmprocessor failed on the initial article.';
-  exit 1;
+  croak ('Error: msmprocessor failed on the initial article.');
 }
 
 my $msplit_ok = run_mizar_tool ('msplit', $article_miz_in_target_dir);
 if ($msplit_ok == 0) {
-  print 'Error: msplit failed on the initial article.';
-  exit 1;
+  croak ('Error: msplit failed on the initial article.');
 }
 
 print 'Rewrite text proper...' if $verbose;
 copy ($article_msm_in_target_dir, $article_tpr_in_target_dir)
-  or (print ('Error: we are unable to copy ', $article_msm_in_target_dir, ' to ', $article_tpr_in_target_dir, '.', "\n") && exit 1);
+  or croak ('Error: we are unable to copy ', $article_msm_in_target_dir, ' to ', $article_tpr_in_target_dir, '.', "\n");
 print 'done.', "\n" if $verbose;
 
 my $mglue_ok = run_mizar_tool ('mglue', $article_miz_in_target_dir);
 if ($mglue_ok == 0) {
-  print 'Error: mglue failed on the initial article.';
-  exit 1;
+  croak ('Error: mglue failed on the initial article.');
 }
 
 $wsmparser_ok = run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
 if ($wsmparser_ok == 0) {
-  print 'Error: wsmparser failed on the WSMified article.';
-  exit 1;
+  croak ('Error: wsmparser failed on the WSMified article.');
 }
 
 my $article_wsx_in_target_dir = "${target_directory}/${article_basename}.wsx";
@@ -238,8 +218,7 @@ my $article_split_wsx_in_target_dir = "${article_wsx_in_target_dir}.split";
 my $article_itemized_wsx_in_target_dir = "${article_split_wsx_in_target_dir}.itemized";
 
 unless (-e $article_wsx_in_target_dir) {
-  print 'Error: the .wsx file for ', $article_basename, ' in ', $target_directory, ' does not exist.', "\n";
-  exit 1;
+  croak ('Error: the .wsx file for ', $article_basename, ' in ', $target_directory, ' does not exist.', "\n");
 }
 
 print 'Split...' if $verbose;
@@ -249,20 +228,17 @@ print 'done.', "\n" if $verbose;
 my $xsltproc_split_exit_code = $xsltproc_split_status >> 8;
 
 if ($xsltproc_split_exit_code != 0) {
-  print 'Error: xsltproc did not exit cleanly when applying the split stylesheet at ', $split_stylesheet, ' to ', $article_wsx_in_target_dir, '.', "\n";
-  exit 1;
+  croak ('Error: xsltproc did not exit cleanly when applying the split stylesheet at ', $split_stylesheet, ' to ', $article_wsx_in_target_dir, '.', "\n");
 }
 
 # sanity check
 
 unless (-e $article_split_wsx_in_target_dir) {
-  print 'Error: the split form of the .wsx file for ', $article_basename, ' in ', $target_directory, ' does not exist at the expected location (', $article_split_wsx_in_target_dir, ').', "\n";
-  exit 1;
+  croak ('Error: the split form of the .wsx file for ', $article_basename, ' in ', $target_directory, ' does not exist at the expected location (', $article_split_wsx_in_target_dir, ').', "\n");
 }
 
 unless (-r $article_split_wsx_in_target_dir) {
-  print 'Error: the split form of the .wsx file for ', $article_basename, ' in ', $target_directory, ' at ', $article_split_wsx_in_target_dir, ' is unreadable.', "\n";
-  exit 1;
+  croak ('Error: the split form of the .wsx file for ', $article_basename, ' in ', $target_directory, ' at ', $article_split_wsx_in_target_dir, ' is unreadable.', "\n");
 }
 
 print 'Itemize...' if $verbose;
@@ -271,20 +247,17 @@ print 'done.', "\n" if $verbose;
 
 my $xsltproc_itemize_exit_code = $xsltproc_itemize_status >> 8;
 if ($xsltproc_itemize_exit_code != 0) {
-  print 'Error: xsltproc did not exit cleanly when applying the itemize stylesheet at ', $itemize_stylesheet, ' to ', $article_split_wsx_in_target_dir, '.', "\n";
-  exit 1;
+  croak ('Error: xsltproc did not exit cleanly when applying the itemize stylesheet at ', $itemize_stylesheet, ' to ', $article_split_wsx_in_target_dir, '.', "\n");
 }
 
 # Load the article's environment
 
 unless (-e $article_evl_in_target_dir) {
-  print 'Error: the .evl file for ', $article_basename, ' does not exist.', "\n";
-  exit 1;
+  croak ('Error: the .evl file for ', $article_basename, ' does not exist.', "\n");
 }
 
 unless (-r $article_evl_in_target_dir) {
-  print 'Error: the .evl file for ', $article_basename, ' is unreadable.', "\n";
-  exit 1;
+  croak ('Error: the .evl file for ', $article_basename, ' is unreadable.', "\n");
 }
 
 my $xml_parser = XML::LibXML->new (suppress_warnings => 1,
@@ -292,8 +265,7 @@ my $xml_parser = XML::LibXML->new (suppress_warnings => 1,
 
 my $article_evl_doc = undef;
 unless ($article_evl_doc = eval { $xml_parser->parse_file ($article_evl_in_target_dir)  } ) {
-  print 'Error: ', $article_evl_in_target_dir, ' is not well-formed XML.', "\n";
-  exit 1;
+  croak ('Error: ', $article_evl_in_target_dir, ' is not well-formed XML.', "\n");
 }
 
 sub ident_name {
@@ -325,8 +297,7 @@ my @constructors = map { ident_name($_) } @constructors_nodes;
 my $itemized_article_doc = undef;
 
 unless ($itemized_article_doc = eval { $xml_parser->parse_file ($article_itemized_wsx_in_target_dir) } ) {
-  print 'Error: the XML in ', $article_itemized_wsx_in_target_dir, ' is not well-formed.', "\n";
-  exit 1;
+  croak ('Error: the XML in ', $article_itemized_wsx_in_target_dir, ' is not well-formed.', "\n");
 }
 
 sub list_as_token_string {
@@ -346,8 +317,7 @@ sub fragment_number {
     my $fragment_number = $1;
     return $fragment_number;
   } else {
-    print 'Error: we could not extract the fragment number from the path \'', $fragment_path, '\'.', "\n";
-    exit 1;
+    croak ('Error: we could not extract the fragment number from the path \'', $fragment_path, '\'.', "\n");
   }
 }
 
@@ -370,7 +340,7 @@ foreach my $i (1 .. scalar @fragments) {
 }
 
 chdir $target_directory
-  or (print ('Error: unable to change directory to ', $target_directory, '.', "\n") && exit 1);
+  or croak ('Error: unable to change directory to ', $target_directory, '.', "\n");
 
 print 'Constructing the environment, verifying, and exporting ', scalar @fragments, ' fragments...', "\n";
 
@@ -387,10 +357,10 @@ foreach my $i (1 .. scalar @fragments) {
   # Extend the evl of the initial article by inspecting the contents
   # of the prel subdirectory
   opendir (PREL_DIR, $target_prel_subdir)
-    or (print ('Error: unable to open the directory at ', $target_prel_subdir, '.', "\n") && exit 1);
+    or croak ('Error: unable to open the directory at ', $target_prel_subdir, '.', "\n");
   my @prel_files = readdir (PREL_DIR);
   closedir PREL_DIR
-    or (print ('Error: unable to close the directory filehandle for ', $target_prel_subdir, '.', "\n") && exit 1);
+    or croak ('Error: unable to close the directory filehandle for ', $target_prel_subdir, '.', "\n");
 
   my @new_notations = ();
   my @new_registrations = ();
@@ -445,8 +415,7 @@ foreach my $i (1 .. scalar @fragments) {
     = system ("xsltproc --output $fragment_evl --stringparam notations '$all_notations_token_string' --stringparam definitions '$all_definitions_token_string' --stringparam theorems '$all_theorems_token_string' --stringparam registrations '$all_registrations_token_string' --stringparam constructors '$all_constructors_token_string' --stringparam schemes '$all_schemes_token_string' $extend_evl_stylesheet $article_evl_in_target_dir 2>/dev/null");
   my $xsltproc_extend_evl_exit_code = $xsltproc_extend_evl_status >> 8;
   if ($xsltproc_extend_evl_exit_code != 0) {
-    print 'Error: xsltproc did not exit cleanly when applying the extend-evl stylesheet to ', $article_evl_in_target_dir, '.', "\n";
-    exit 1;
+    croak ('Error: xsltproc did not exit cleanly when applying the extend-evl stylesheet to ', $article_evl_in_target_dir, '.', "\n");
   }
 
   # Now render the fragment's XML as a mizar article
@@ -454,8 +423,7 @@ foreach my $i (1 .. scalar @fragments) {
     = system ("xsltproc --output $fragment_miz --stringparam evl '$fragment_evl' $wsm_stylesheet $fragment_path 2>/dev/null");
   my $xsltproc_wsm_exit_code = $xsltproc_wsm_status >> 8;
   if ($xsltproc_wsm_exit_code != 0) {
-    print 'Error: xsltproc did not exit cleanly when applying the WSM stylesheet to ', $fragment_path, '.', "\n";
-    exit 1;
+    croak ('Error: xsltproc did not exit cleanly when applying the WSM stylesheet to ', $fragment_path, '.', "\n");
   }
 
   # Now export and transfer the fragment
