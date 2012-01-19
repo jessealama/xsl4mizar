@@ -1,14 +1,55 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 use File::Basename qw(basename dirname);
 use File::Copy qw(copy move);
 use File::Copy::Recursive qw(dircopy dirmove);
 use Getopt::Long;
 use Pod::Usage;
 use File::Temp qw(tempdir);
+use Carp qw(croak);
+
+sub ensure_directory {
+  my $dir = shift;
+  if (! -e $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist.';
+  }
+
+  if (! -d $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist (as a directory).';
+  }
+  return 1;
+}
+
+sub ensure_readable_file {
+  my $file = shift;
+
+  if (! -e $file) {
+    croak ('Error: ', $file, ' does not exist.');
+  }
+  if (! -f $file) {
+    croak ('Error: ', $file, ' is not a file.');
+  }
+
+  if (! -r $file) {
+    croak ('Error: ', $file, ' is unreadable.');
+  }
+
+  return 1;
+}
+
+sub ensure_executable_file {
+  my $path = shift;
+  ensure_readable_file ($path);
+  if (! -x $path) {
+    croak ('Error: ', $path, ' should be executable, but it is not.');
+  }
+  return 1;
+}
 
 my $verbose = 0;
+my $debug = 0;
 my $man = 0;
 my $help = 0;
 my $paranoid = 0;
@@ -22,6 +63,7 @@ my $workdir = undef;
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
+	   'debug' => \$debug,
            'minimize-whole-article' => \$minimize_whole_article,
 	   'script-home=s' => \$script_home,
 	   'stylesheet-home=s' => \$stylesheet_home,
@@ -40,10 +82,7 @@ if (defined $num_jobs) {
 }
 
 if (defined $workdir) {
-  if (! -d $workdir) {
-    print 'Error: the specified work directory', "\n", "\n", '  ', $workdir, "\n", "\n", 'is not actually a directory.', "\n";
-    exit 1;
-  }
+  ensure_directory ($workdir);
 }
 
 if (scalar @ARGV != 1) {
@@ -52,28 +91,16 @@ if (scalar @ARGV != 1) {
 }
 
 my $article_dir = $ARGV[0];
-
-if (! -d $article_dir) {
-  die 'Error: the supplied itemized-article directory ', $article_dir, ' does not exist.';
-}
-
-if (! -d $article_dir) {
-  print 'Error: the supplied itemized-article directory ', $article_dir, ' is not actually directory.', "\n";
-  exit 1;
-}
-
 my $article_text_dir = "${article_dir}/text";
 
-if (! -d $article_text_dir) {
-  print 'Error: there is no text subdirectory of ', $article_dir, ', so it is not an itemized article directory.', "\n";
-  exit 1;
-}
+ensure_directory ($article_dir);
+ensure_directory ($article_text_dir);
 
 my @miz_candidates = `find $article_dir -maxdepth 1 -mindepth 1 -type f -name "*.miz"`;
 chomp @miz_candidates;
 
 if (scalar @miz_candidates == 0) {
-  print 'Error: we did not find any .miz files under $article_dir.', "\n";
+  print 'Error: we did not find any .miz files under ', $article_dir, '.', "\n";
   exit 1;
 }
 
@@ -85,63 +112,22 @@ if (scalar @miz_candidates > 1) {
 my $itemized_article_miz = $miz_candidates[0];
 my $itemized_article_basename = basename ($itemized_article_miz, '.miz');
 
-if (! -e $itemized_article_miz) {
-  print 'Error: there is no article by the name \'', $itemized_article_basename, '\' under ', $article_dir, '.', "\n";
-  exit 1;
-}
-
-if (! -r $itemized_article_miz) {
-  print 'Error: the itemized article at ', $itemized_article_miz, ' is unreadable.', "\n";
-  exit 1;
-}
-
-if (! -e $script_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts does not exist.', "\n";
-  exit 1;
-}
-
-if (! -d $script_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts is not actually a directory.', "\n";
-  exit 1;
-}
+ensure_readable_file ($itemized_article_miz);
+ensure_directory ($script_home);
 
 my $minimize_script = "${script_home}/minimal.pl";
+my $minimize_internally_script = "${script_home}/minimize-internally.pl";
 
-if (! -e $minimize_script) {
-  print 'Error: the minimization script does not exist at the expected location (', $minimize_script, ').', "\n";
-  exit 1;
-}
+ensure_readable_file ($minimize_script);
+ensure_executable_file ($minimize_script);
+ensure_readable_file ($minimize_internally_script);
+ensure_executable_file ($minimize_internally_script);
 
-if (! -r $minimize_script) {
-  print 'Error: the minimization script at ', $minimize_script, ' is unreadable.', "\n";
-  exit 1;
-}
-
-if (! -x $minimize_script) {
-  print 'Error: the minimization script at ', $minimize_script, ' is not executable.', "\n";
-  exit 1;
-}
-
-if (! -e $stylesheet_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n");
-}
-
-if (! -d $stylesheet_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n";
-  exit 1;
-}
+ensure_directory ($stylesheet_home);
 
 my $prefer_environment_stylesheet = "${stylesheet_home}/prefer-environment.xsl";
 
-if (! -e $prefer_environment_stylesheet) {
-  print 'Error: the prefer-environment stylesheet does not exist at the expected location (', $prefer_environment_stylesheet, ').', "\n";
-  exit 1;
-}
-
-if (! -r $prefer_environment_stylesheet) {
-  print 'Error: the prefer-environment stylesheet at ', $prefer_environment_stylesheet, ' is unreadable.', "\n";
-  exit 1;
-}
+ensure_readable_file ($prefer_environment_stylesheet);
 
 my $real_workdir = undef;
 if (defined $workdir) {
@@ -154,12 +140,12 @@ if (defined $workdir) {
   dircopy ($article_dir, $real_workdir)
     or (print 'Error: something went wrong copying', "\n", "\n", '  ', $article_dir, "\n", "\n", 'to', "\n", "\n", '  ', $real_workdir, "\n", "\n", $!, "\n" && exit 1);
 } else {
-  $real_workdir = $article_dir;
+  $real_workdir = File::Spec->rel2abs ($article_dir);
 }
 
 my $real_text_dir = "${real_workdir}/text";
 
-my @fragments = `find $real_text_dir -name "ckb*.miz"`;
+my @fragments = `find $real_text_dir -type f -name "ckb*.miz" | grep 'ckb[1-9][0-9]*.miz'`;
 chomp @fragments;
 
 if (scalar @fragments == 0) {
@@ -169,179 +155,78 @@ if (scalar @fragments == 0) {
 
 my $real_itemized_article_miz = "${real_workdir}/${itemized_article_basename}.miz";
 
-if ($minimize_whole_article == 1) {
-
-  if ($verbose == 1) {
-    print 'Minimizing the itemized article...', "\n";
-  }
-
-  my $minimize_call = undef;
-  if ($verbose == 1) {
-    if ($nice == 1) {
-      if ($paranoid == 1) {
-	$minimize_call = "nice $minimize_script --fast-theorems --fast-schemes --verbose --paranoid $real_itemized_article_miz";
-      } else {
-	$minimize_call = "nice $minimize_script --fast-theorems --fast-schemes --verbose $real_itemized_article_miz";
-      }
-    } else {
-      if ($paranoid == 1) {
-	$minimize_call = "$minimize_script --fast-theorems --fast-schemes --verbose --paranoid $real_itemized_article_miz";
-      } else {
-	$minimize_call = "$minimize_script --fast-theorems --fast-schemes --verbose $real_itemized_article_miz";
-      }
-    }
-  } else {
-    if ($nice == 1) {
-      if ($paranoid == 1) {
-	$minimize_call = "nice $minimize_script --fast-theorems --fast-schemes $real_itemized_article_miz";
-      } else {
-	$minimize_call = "nice $minimize_script --paranoid --fast-theorems --fast-schemes $real_itemized_article_miz";
-      }
-    } else {
-      if ($paranoid == 1) {
-	$minimize_call = "$minimize_script --verbose --fast-theorems --fast-schemes $real_itemized_article_miz";
-      } else {
-	$minimize_call = "$minimize_script --fast-theorems --fast-schemes $real_itemized_article_miz";
-      }
-    }
-  }
-
-  my $minimize_status = system ($minimize_call);
-  my $minimize_exit_code = $minimize_status >> 8;
-
-  if ($minimize_exit_code != 0) {
-    print 'Error: minimization of the itemized article ', $real_itemized_article_miz, ' did not exit cleanly.', "\n";
-    exit 1;
-  }
-
-  if ($paranoid == 1) {
-    my $verifier_status = system ("verifier -q -s -l $itemized_article_miz > /dev/null 2>&1");
-    my $verifier_exit_code = $verifier_status >> 8;
-    if ($verifier_exit_code != 0) {
-      print 'Error: the minimized whole article is not verifiable!', "\n";
-      exit 1;
-    }
-  }
-
-  if ($verbose == 1) {
-    print 'Done minimizing the itemized article.', "\n";
-  }
-
-  my @extensions = ('eno', 'erd', 'epr', 'dfs', 'eid', 'ecl');
-
-  if ($verbose == 1) {
-    print 'Rewriting each fragment\'s environment to use the minimized article\'s environment...';
-  }
-
-  foreach my $fragment (@fragments) {
-    my $fragment_basename = basename ($fragment);
-    foreach my $extension (@extensions) {
-      my $fragment_with_extension = "${real_text_dir}/${fragment_basename}.${extension}";
-      my $fragment_with_extension_orig = "${real_text_dir}/${fragment_basename}.${extension}.orig";
-      my $fragment_with_extension_tmp = "${real_text_dir}/${fragment_basename}.${extension}.tmp";
-      my $article_with_extension = "${real_workdir}/${itemized_article_basename}.${extension}";
-      if (-e $article_with_extension && -e $fragment_with_extension) {
-        copy ($fragment_with_extension, $fragment_with_extension_orig);
-
-        my $xsltproc_status = system ("xsltproc --output $fragment_with_extension_tmp --stringparam original-environment '$article_with_extension' $fragment_with_extension_tmp");
-        my $xsltproc_exit_code = $xsltproc_status >> 8;
-        if ($xsltproc_exit_code != 0) {
-          print 'Error: xsltproc did not exit cleanly when rewriting the .', $extension, ' file for ', $fragment, '.', "\n";
-          exit 1;
-        }
-
-        move ($fragment_with_extension_tmp, $fragment_with_extension);
-
-        if ($paranoid == 1) {
-          # Sanity check: the fragment with the new environment is verifiable
-          my $verifier_status = system ("verifier -q -s -l $fragment > /dev/null 2>&1");
-          my $verifier_exit_code = $verifier_status >> 8;
-          if ($verifier_exit_code != 0) {
-            print 'Error: we are unable to verify ', $fragment, ' with its new environment.', "\n";
-            exit 1;
-          }
-        }
-
-      }
-    }
-  }
-
-  if ($verbose == 1) {
-    print 'done.', "\n";
-  }
-
-}
-
 my $parallel_call = undef;
 
-if ($verbose == 1) {
-  if ($nice == 1) {
-    if (defined $num_jobs) {
-      if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --fast-theorems --fast-schemes --paranoid --verbose {}";
-      } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs nice ${minimize_script} --fast-theorems --fast-schemes --verbose {}";
-      }
+if ($nice == 1) {
+  if (defined $num_jobs) {
+    if ($paranoid == 1) {
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | grep 'ckb[1-9][0-9]*.miz' | parallel --jobs $num_jobs nice ${minimize_script} --fast-theorems --fast-schemes --paranoid --verbose {}";
     } else {
-      if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --paranoid --verbose --fast-theorems --fast-schemes  {}";
-      } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 nice ${minimize_script} --fast-theorems --fast-schemes  --verbose {}";
-      }
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | grep 'ckb[1-9][0-9]*.miz' | parallel --jobs $num_jobs nice ${minimize_script} --fast-theorems --fast-schemes --verbose {}";
     }
   } else {
-    if (defined $num_jobs) {
-      if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes  --paranoid --verbose {}";
-      } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes  --verbose {}";
-      }
+    if ($paranoid == 1) {
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | grep 'ckb[1-9][0-9]*.miz' | parallel --jobs +0 nice ${minimize_script} --paranoid --verbose --fast-theorems --fast-schemes  {}";
     } else {
-      if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --paranoid --verbose --fast-theorems --fast-schemes {}";
-      } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --eta --jobs +0 ${minimize_script} --verbose --fast-theorems --fast-schemes  {}";
-      }
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | grep 'ckb[1-9][0-9]*.miz' | parallel --jobs +0 nice ${minimize_script} --fast-theorems --fast-schemes  --verbose {}";
     }
   }
 } else {
-  if ($nice == 1) {
-    if (defined $num_jobs) {
-      if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} --paranoid --fast-theorems --fast-schemes {}";
-      } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs nice ${minimize_script} --fast-theorems --fast-schemes {}";
-      }
+  if (defined $num_jobs) {
+    if ($paranoid == 1) {
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | grep 'ckb[1-9][0-9]*.miz' | parallel --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes  --paranoid --verbose {}";
     } else {
-      if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} --fast-theorems --fast-schemes --paranoid {}";
-      } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 nice ${minimize_script} --fast-theorems --fast-schemes  {}";
-      }
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | grep 'ckb[1-9][0-9]*.miz' | parallel --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes  --verbose {}";
     }
   } else {
-    if (defined $num_jobs) {
-      if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes --paranoid {}";
-      } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs $num_jobs ${minimize_script} --fast-theorems --fast-schemes {}";
-      }
+    if ($paranoid == 1) {
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | grep 'ckb[1-9][0-9]*.miz' | parallel --jobs +0 ${minimize_script} --paranoid --verbose --fast-theorems --fast-schemes {}";
     } else {
-      if ($paranoid == 1) {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} --fast-theorems --fast-schemes --paranoid {}";
-      } else {
-	$parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | parallel --jobs +0 ${minimize_script} --fast-theorems --fast-schemes {}";
-      }
+      $parallel_call = "find ${real_text_dir} -name 'ckb*.miz' | grep 'ckb[1-9][0-9]*.miz' | parallel --jobs +0 ${minimize_script} --verbose --fast-theorems --fast-schemes  {}";
     }
   }
 }
+
+chdir $real_workdir
+  or croak ('Error: cannot change directory to ', $real_workdir, '.', "\n");
 
 my $parallel_minimize_status = system ($parallel_call);
 my $parallel_minimize_exit_code = $parallel_minimize_status >> 8;
 
 if ($parallel_minimize_exit_code != 0) {
-  print 'Error: parallel did not exit cleanly when minimizing the fragments of ', $itemized_article_basename, ' under ', $real_text_dir, '.', "\n";
-  exit 1;
+  croak ('Error: parallel did not exit cleanly when minimizing the fragments of ', $itemized_article_basename, ' under ', $real_text_dir, '.', "\n", 'Its exit code was ', $parallel_minimize_exit_code, '.', "\n");
+}
+
+# Now check for conditions and constructor properties
+
+my @properties_and_conditions = `find ${real_text_dir} -maxdepth 1 -mindepth 1 -type f -name "ckb*.miz" | grep --invert-match 'ckb[1-9][0-9]*.miz'`;
+chomp @properties_and_conditions;
+
+if ($debug) {
+  print {*STDERR} 'There are ', scalar @properties_and_conditions, ' properties/conditions:', join ("\n", @properties_and_conditions), "\n";
+
+}
+
+# First, internally minimize
+
+foreach my $p_or_c (@properties_and_conditions) {
+  warn 'Internally minimizing ', $p_or_c, '...';
+  my $minimize_internally_status = system ("$minimize_internally_script $p_or_c");
+  my $minimize_internally_exit_code = $minimize_internally_status >> 8;
+  if ($minimize_internally_status != 0) {
+    croak ('Error: the internal minimization script did not exit cleanly when working with ', $p_or_c, '.', "\n");
+  }
+}
+
+# Now minimize the envionment of the property and correctness condition guys
+
+foreach my $p_or_c (@properties_and_conditions) {
+  warn 'Externally minimizing ', $p_or_c, '...';
+  my $minimize_status = system ("$minimize_script --checker-only --paranoid --verbose $p_or_c");
+  my $minimize_exit_code = $minimize_status >> 8;
+  if ($minimize_status != 0) {
+    croak ('Error: the minimization script did not exit cleanly when working with ', $p_or_c, '.', "\n");
+  }
 }
 
 if ($paranoid == 1) {

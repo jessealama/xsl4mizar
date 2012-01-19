@@ -18,7 +18,7 @@ $lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
 $ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
 
 tpl lowercase (#string) { `translate($string, $ucletters, $lcletters)`; }
-tpl uppercaes (#string) { `translate($string, $lcletters, $ucletters)`; }
+tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
 
 //////////////////////////////////////////////////////////////////////
 // Document templates
@@ -74,11 +74,16 @@ tpl [Constructor[@aid and @nr and @kind]] (#target-kind, #target-aid, #target-nr
   $this-kind = lowercase (#string = `@kind`);
   if [$this-kind = $target-kind and $this-nr = $target-nr and $this-aid = $target-aid] {
     apply [Properties];
+    if [$this-kind = "k"] {
+      "existence"; "\n";
+      "uniqueness"; "\n";
+    }
   }
 }
 
 tpl [Properties] {
   for-each [*] {
-    `name (.)`; "\n";
+    $name-lc = lowercase (#string = `name (.)`);
+    $name-lc; "\n";
   }
 }

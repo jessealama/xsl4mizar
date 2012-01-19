@@ -6,6 +6,8 @@ use File::Basename qw(dirname basename);
 use Getopt::Long;
 use Pod::Usage;
 use XML::LibXML;
+use File::Spec qw();
+use Carp qw(croak);
 
 my $xml_parser = XML::LibXML->new (suppress_warnings => 1,
 				   suppress_errors => 1);
@@ -36,6 +38,7 @@ pod2usage(1) unless (scalar @ARGV == 1);
 my $article = $ARGV[0];
 
 my $article_dirname = dirname ($article);
+my $article_dirname_absolute = File::Spec->rel2abs ($article_dirname);
 my $article_basename = basename ($article, '.miz');
 my $article_xml = "${article_dirname}/${article_basename}.xml";
 my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
@@ -60,21 +63,20 @@ if  (! -r $article_xml) {
   croak ('Error: the semantic XML for ', $article_basename, ' at (', $article_xml, ') is unreadable.', "\n");
 }
 
-ensure_valid_xml_file ($article_xml);
-
-if (! -e $article_absolute_xml) {
-  my $xsltproc_status = system ("xsltproc $absrefs_stylesheet $article_xml > $article_absolute_xml 2> /dev/null");
-  my $xsltproc_exit_code = $xsltproc_status >> 8;
-  if ($xsltproc_exit_code != 0) {
-    die 'Error: the needed absolute form of the XML for ', $article_basename, ' was missing, so we tried to create it;', "\n", 'but xsltproc did not exit cleanly applying the absolutizer stylesheet to ', $article_xml, '.';
+# We need to first ensure that we have the absolute form of everything relevant
+foreach my $extension ('xml', 'eno', 'dfs', 'ecl', 'eid', 'epr', 'erd', 'eth', 'esh') {
+  my $xml_file = "${article_dirname}/${article_basename}.${extension}";
+  my $absolutized_xml_file = "${article_dirname}/${article_basename}.${extension}1";
+  if (-e $xml_file && ! -e $absolutized_xml_file) {
+    my $xsltproc_status = system ("xsltproc $absrefs_stylesheet $xml_file > $absolutized_xml_file 2> /dev/null");
+    my $xsltproc_exit_code = $xsltproc_status >> 8;
+    if ($xsltproc_exit_code != 0) {
+      croak ('Error: xsltproc did not exit cleanly applying the absolutizer stylesheet to ', $xml_file, '.', "\n");
+    }
   }
-  ensure_valid_xml_file ($article_absolute_xml);
 }
 
-if (! -r $article_absolute_xml) {
-  die 'Error: the absolute form of ', $article_basename, ' at ', $article_absolute_xml, ' is unreadable.';
-}
-
+ensure_valid_xml_file ($article_xml);
 ensure_valid_xml_file ($article_absolute_xml);
 
 my $inferred_constructors_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/items/inferred-constructors.xsl';
@@ -92,6 +94,6 @@ unless (-r $article_xml) {
   exit 1;
 }
 
-my @inferred_constructors = `xsltproc --stringparam 'article-directory' '${article_dirname}' $inferred_constructors_stylesheet $article_absolute_xml | sort -u | uniq`;
+my @inferred_constructors = `xsltproc --stringparam 'article-directory' '${article_dirname_absolute}/' $inferred_constructors_stylesheet $article_absolute_xml | sort -u | uniq`;
 
 print @inferred_constructors;

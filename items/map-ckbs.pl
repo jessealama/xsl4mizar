@@ -5,6 +5,19 @@ use File::Basename qw(basename);
 use XML::LibXML;
 use Getopt::Long;
 use Pod::Usage;
+use Carp qw(croak);
+
+sub ensure_directory {
+  my $dir = shift;
+  if (! -e $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist.';
+  }
+
+  if (! -d $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist (as a directory).';
+  }
+  return 1;
+}
 
 my $help = 0;
 my $man = 0;
@@ -20,21 +33,15 @@ pod2usage(1) if (scalar @ARGV != 1);
 
 my $article_dir = $ARGV[0];
 
-if (! -d $article_dir) {
-  die 'Error: ', $article_dir, ' is not a directory.', "\n";
-}
-
-my $article_basename = basename ($article_dir);
+ensure_directory ($article_dir);
 
 my $prel_subdir = "${article_dir}/prel";
+my $text_subdir = "${article_dir}/text";
 
-if (! -e $prel_subdir) {
-  die 'Error: the prel subdirecory of ', $article_dir, ' does not exist.';
-}
+ensure_directory ($prel_subdir);
+ensure_directory ($text_subdir);
 
-if (! -d $prel_subdir) {
-  die 'Error: the prel subdirectory of ', $article_dir, ' does not exist (as a directory).';
-}
+my $article_basename = basename ($article_dir);
 
 my $xml_parser = XML::LibXML->new();
 
@@ -44,6 +51,7 @@ my @dcos = `find $prel_subdir -name "*.dco" -exec basename {} .dco ';' | sed -e 
 chomp @dcos;
 
 my %constructors = ();
+my %fragments_to_constructors = ();
 
 foreach my $i (1 .. scalar @dcos) {
   my $dco = $dcos[$i - 1];
@@ -56,34 +64,26 @@ foreach my $i (1 .. scalar @dcos) {
   if (scalar @constructors == 0) {
     print STDERR ('Error: we found no Constructor nodes in ', $dco_path, '.');
   }
-  if (scalar @constructors > 1) {
-    print STDERR ('Error: we found multiple Constructor nodes in ', $dco_path, '.');
-  }
-  my $constructor = $constructors[0];
-  if (! $constructor->exists ('@kind')) {
-    print STDERR ('Error: we failed to extract a kind attribute from a Constructor XML element in ', $dco_path, '.', "\n");
-    next;
-  }
-  my $kind = $constructor->findvalue ('@kind');
-  my $kind_lc = lc $kind;
-  my $num;
-  if (defined $constructors{$kind}) {
-    $num = $constructors{$kind};
-    $constructors{$kind} = $num + 1;
-  } else {
-    $num = 1;
-    $constructors{$kind} = 2;
-  }
-  print $article_basename, ':', $kind_lc, 'constructor', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
-
-  # Properties
-  if ($constructor->exists ('Properties')) {
-    my @property_nodes = $constructor->findnodes ('Properties/*');
-    foreach my $property_node (@property_nodes) {
-      my $property_name = $property_node->nodeName ();
-      my $property_name_lc = lc $property_name;
-      print $article_basename, ':', $kind_lc, 'constructor', ':', $num, '/', $property_name_lc, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
+  foreach my $constructor (@constructors) {
+    if (! $constructor->exists ('@kind')) {
+      print STDERR ('Error: we failed to extract a kind attribute from a Constructor XML element in ', $dco_path, '.', "\n");
+      next;
     }
+    my $kind = $constructor->findvalue ('@kind');
+    my $kind_lc = lc $kind;
+    my $num;
+    if (defined $constructors{$kind}) {
+      $num = $constructors{$kind};
+      $constructors{$kind} = $num + 1;
+    } else {
+      $num = 1;
+      $constructors{$kind} = 2;
+    }
+    my $constructor_key = "${article_basename}:${kind_lc}constructor:${num}";
+    my $fragment_number = $dco;
+    print $article_basename, ':', $kind_lc, 'constructor', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
+
+    $fragments_to_constructors{$fragment_number} = $constructor_key;
   }
 }
 
@@ -93,6 +93,7 @@ my @defs = `find $prel_subdir -name "*.def" -exec basename {} .def ';' | sed -e 
 chomp @defs;
 
 my %definiens = ();
+my %fragments_to_definientia = ();
 
 foreach my $i (1 .. scalar @defs) {
   my $def = $defs[$i - 1];
@@ -124,7 +125,56 @@ foreach my $i (1 .. scalar @defs) {
     $num = 1;
     $definiens{$constrkind} = 2;
   }
+
   print $article_basename, ':', $constrkind_lc, 'definiens', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $def, "\n";
+
+  my $definiens_key = "${article_basename}:${constrkind_lc}definiens:${num}";
+  $fragments_to_definientia{$def} = $definiens_key;
+}
+
+# Constructor properties and definition correctness conditions
+
+my %conditions
+  = ('ex' => 'existence',
+     'un' => 'uniqueness',
+     'ch' => 'coherence',
+     'cr' => 'correctness',
+     'ab' => 'abstractness',
+     're' => 'reflexivity',
+     'ir' => 'irreflexivity',
+     'sy' => 'symmetry',
+     'as' => 'asymmetry',
+     'cn' => 'connectedness',
+     'in' => 'involutiveness',
+     'pr' => 'projectivity',
+     'id' => 'idempotence',
+     'cm' => 'commutativity',
+     'cp' => 'compatibility');
+
+my @properties_and_conditions = `find ${text_subdir} -maxdepth 1 -mindepth 1 -type f -name "ckb[1-9][0-9]*[a-z][a-z].miz" -exec basename {} .miz ';'`;
+chomp @properties_and_conditions;
+
+foreach my $p_or_c_file (@properties_and_conditions) {
+  if ($p_or_c_file =~ / \A ckb ([1-9][0-9]*) ([a-z]{2}) \z/x) {
+    (my $fragment_number, my $condition_code) = ($1, $2);
+    my $resolved_condition = $conditions{$condition_code};
+    if (defined $resolved_condition) {
+
+      if (defined $fragments_to_constructors{$fragment_number}) {
+	my $constructor = $fragments_to_constructors{$fragment_number};
+	print $constructor, '[', $resolved_condition, ']', ' => ', $article_basename, ':', 'fragment', ':', $fragment_number, "\n";
+      } elsif (defined $fragments_to_definientia{$fragment_number}) {
+	my $definiens = $fragments_to_definientia{$fragment_number};
+	print $definiens, '[', $resolved_condition, ']', ' => ', $article_basename, ':', 'fragment', ':', $fragment_number, "\n";
+      } else {
+	croak ('Error: unable to determine the constructor generated by fragment ', $fragment_number, '.', "\n");
+      }
+    } else {
+      croak ('Error: unable to make sense of the condition code \'', $condition_code, '\'.', "\n");
+    }
+  } else {
+    croak ('Error: unable to make sense of the condition-or-property file \'', $p_or_c_file, '\'.', "\n");
+  }
 }
 
 # Deftheorems

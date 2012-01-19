@@ -8,6 +8,8 @@ use POSIX qw(floor ceil);
 use Getopt::Long;
 use Pod::Usage;
 use Carp qw(croak);
+use File::Spec qw();
+use File::Temp qw(tempfile);
 
 my $paranoid = 0;
 my $verbose = 0;
@@ -19,6 +21,49 @@ my $checker_only = 0;
 my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $fast_theorems = 0;
 my $fast_schemes = 0;
+
+sub ensure_directory {
+  my $dir = shift;
+  if (! -e $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist.';
+  }
+
+  if (! -d $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist (as a directory).';
+  }
+  return 1;
+}
+
+sub ensure_readable_file {
+  my $file = shift;
+
+  if (! -e $file) {
+    croak ('Error: ', $file, ' does not exist.');
+  }
+  if (! -f $file) {
+    croak ('Error: ', $file, ' is not a file.');
+  }
+
+  if (! -r $file) {
+    croak ('Error: ', $file, ' is unreadable.');
+  }
+
+  return 1;
+}
+
+sub tmpfile_path {
+  # File::Temp's tempfile function returns a list of two values.  We
+  # want the second (the path of the temprary file) and don't care
+  # about the first (a filehandle for the temporary file).  See
+  # http://search.cpan.org/~tjenness/File-Temp-0.22/Temp.pm for more
+  (undef, my $path) = eval { tempfile (); };
+  my $tempfile_err = $@;
+  if (defined $path) {
+    return $path;
+  } else {
+    croak ('Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err);
+  }
+}
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
@@ -36,32 +81,22 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 pod2usage(1) unless (scalar @ARGV == 1);
 
-if (! -e $script_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts does not exist.', "\n";
-  exit 1;
-}
-
-if (! -d $script_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts is not actually a directory.', "\n";
-  exit 1;
-}
+ensure_directory ($script_home);
 
 my $minimize_properties_script = "${script_home}/minimize-properties.pl";
 
-if (! -e $minimize_properties_script) {
-  croak ('Error: the property minimization script does not exist at the expected location (', $minimize_properties_script, ').', "\n");
-}
-
-if (! -r $minimize_properties_script) {
-  croak ('Error: the property minimization script at ', $minimize_properties_script, ' is unreadable.', "\n");
-}
-
-if (! -f $minimize_properties_script) {
-  croak ('Error: the property minimization script does not exist at the expected location (', $minimize_properties_script, ').', "\n");
-}
+ensure_readable_file ($minimize_properties_script);
 
 if (! -x $minimize_properties_script) {
   croak ('Error: the property minimization script at ', $minimize_properties_script, ' is not executable.', "\n");
+}
+
+my $minimize_abstractness_script = "${script_home}/minimize-abstractness.pl";
+
+ensure_readable_file ($minimize_abstractness_script);
+
+if (! -x $minimize_abstractness_script) {
+  croak ('Error: the abstractness minimization script at ', $minimize_abstractness_script, ' is not executable.', "\n");
 }
 
 my $article = $ARGV[0];
@@ -74,18 +109,11 @@ my $article_eno = "${article_dirname}/${article_basename}.eno";
 my $article_refx = "${article_dirname}/${article_basename}.refx";
 my $article_esh = "${article_dirname}/${article_basename}.esh";
 my $article_eth = "${article_dirname}/${article_basename}.eth";
+my $article_xml = "${article_dirname}/${article_basename}.xml";
 
 foreach my $extension ('miz', 'refx', 'eno') {
   my $article_with_extension = "${article_sans_extension}.${extension}";
-
-  unless (-e $article_with_extension) {
-    print 'Error: the .', $extension, ' file for the supplied article ', "\n", "\n", '  ', $article_basename, "\n", "\n", 'does not exist at the expected location', "\n", "\n", '  ', $article_with_extension, "\n";
-    exit 1;
-  }
-  unless (-r $article_with_extension) {
-    print 'Error: the .', $extension, ' file for the supplied article ', $article, ' is not readable.', "\n";
-    exit 1;
-  }
+  ensure_readable_file ($article_with_extension);
 }
 
 my @extensions_to_minimize = ('eno', 'erd', 'epr', 'dfs', 'eid', 'ecl');
@@ -784,6 +812,9 @@ sub confirm_minimality_of_extension {
       }
     }
 
+    # Return the XML, etc. to its initial state
+    verify ();
+
     return \@removable;
 
   } else {
@@ -833,13 +864,71 @@ unless ($confirm_only == 1) {
   }
 }
 
-my $minimize_properties_status = system ("$minimize_properties_script $article_miz > /dev/null 2> /dev/null");
+# Restore
+my $verifier_ok_before_properties = verify ();
+if ($verifier_ok_before_properties == 0) {
+  print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing constructor properties.', "\n";
+  exit 1;
+}
+
+my $minimize_properties_output = tmpfile_path ();
+my $minimize_properties_errors = tmpfile_path ();
+my $minimize_properties_call = undef;
+
+if ($checker_only) {
+  $minimize_properties_call = "$minimize_properties_script --checker-only $article_miz > $minimize_properties_output 2> $minimize_properties_errors";
+} else {
+  $minimize_properties_call = "$minimize_properties_script $article_miz > $minimize_properties_output 2> $minimize_properties_errors"
+}
+
+my $minimize_properties_status = system ($minimize_properties_call);
 my $minimize_properties_exit_code = $minimize_properties_status >> 8;
 if ($minimize_properties_exit_code != 0) {
-  croak ('Error: the property minimization script did not exit cleanly; its exit code was ', $minimize_properties_exit_code, '.');
+  if (-e $minimize_properties_errors && -r $minimize_properties_errors) {
+    my @minimize_properties_errors = `cat $minimize_properties_errors`;
+    croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_properties_exit_code, '.  Here are the errors it emitted:', "\n", @minimize_properties_errors);
+  } else {
+    croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_properties_exit_code, '.');
+  }
+}
+
+# We are pretty close to the end.  But there might be spurious
+# dependencies on abstractness properties.  Dump as many as we can.
+
+# Restore
+my $verifier_ok_before_abstractness = verify ();
+if ($verifier_ok_before_abstractness == 0) {
+  print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing abstractness properties.', "\n";
+  exit 1;
+}
+
+my $minimize_abstractness_output = tmpfile_path ();
+my $minimize_abstractness_errors = tmpfile_path ();
+my $minimize_abstractness_call = undef;
+
+if ($checker_only) {
+  $minimize_abstractness_call = "$minimize_abstractness_script --checker-only $article_miz > $minimize_abstractness_output 2> $minimize_abstractness_errors";
+} else {
+  $minimize_abstractness_call = "$minimize_abstractness_script $article_miz > $minimize_abstractness_output 2> $minimize_abstractness_errors"
+}
+
+my $minimize_abstractness_status = system ($minimize_abstractness_call);
+my $minimize_abstractness_exit_code = $minimize_abstractness_status >> 8;
+if ($minimize_abstractness_exit_code != 0) {
+  if (-e $minimize_abstractness_errors && -r $minimize_abstractness_errors) {
+    my @minimize_abstractness_errors = `cat $minimize_abstractness_errors`;
+    croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_abstractness_exit_code, '.  Here are the errors it emitted:', "\n", @minimize_abstractness_errors);
+  } else {
+    croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_abstractness_exit_code, '.');
+  }
 }
 
 if ($paranoid == 1 or $confirm_only == 1) {
+
+  # Check that the XML is valid
+  if (! defined eval { $xml_parser->parse_file ($article_xml) } ) {
+    croak ('Error: before confirming the minimality of the environment, we are left with an invalid XML file at ', $article_xml, '.', "\n");
+  }
 
   if ($verbose == 1) {
     print 'Confirming minimality...', "\n";
@@ -880,21 +969,17 @@ if ($paranoid == 1 or $confirm_only == 1) {
     exit 1;
   }
 
+  # Check that the XML is valid
+  if (! defined eval { $xml_parser->parse_file ($article_xml) } ) {
+    croak ('Error: after confirming the minimality of the environment, we are left with an invalid XML file at ', $article_xml, '.', "\n");
+  }
+
 }
 
-# Check that the article is verifiable in the new minimized environment
-
-if ($paranoid == 1) {
-  my $verifier_ok = verify ();
-  if ($verifier_ok == 0) {
-    print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
-    exit 1;
-  }
-
-  if ($verbose == 1) {
-    print 'Paranoia: We have confirmed that, after minimization, ', $article_basename, ' is verifiable.', "\n";
-  }
-
+my $verifier_ok = verify ();
+if ($verifier_ok == 0) {
+  print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
+  exit 1;
 }
 
 __END__

@@ -1,0 +1,117 @@
+stylesheet "1.0";
+
+output method="text";
+
+tpl [/] {
+  if [Article] {
+    apply [Article];
+  } else {
+    msg terminate="yes" "Error: the required Article document element is missing.";
+  }
+}
+
+tpl [Article] {
+  $num-definition-blocks = `count (DefinitionBlock)`;
+  if [$num-definition-blocks > 1] {
+    msg terminate="yes" "Error: we require that there be at most one definition block in the article.";
+  } else {
+    for-each [DefinitionBlock] {
+      apply [.];
+    }
+  }
+}
+
+tpl [DefinitionBlock] {
+
+  $num-definitions = `count (Definition)`;
+  if [$num-definitions > 1] {
+    msg terminate="yes" "Error: we are unable to process a definition block that contains multiple definitions.";
+  }
+
+  apply [Definition];
+
+  for-each [Correctness/Coherence] {
+    apply [.]; "\n";
+  }
+}
+
+tpl [Definition] {
+  for-each [Existence | Uniqueness | Compatibility ] {
+    apply [.]; "\n";
+  }
+  for-each [Constructor/Properties/Abstractness] {
+    apply [.];
+  }
+  for-each [JustifiedProperty/Reflexivity
+  	    | JustifiedProperty/Irreflexivity
+	    | JustifiedProperty/Symmetry
+	    | JustifiedProperty/Antisymmetry
+	    | JustifiedProperty/Connectedness
+	    | JustifiedProperty/Involutiveness
+	    | JustifiedProperty/Projectivity
+	    | JustifiedProperty/Idempotence
+	    | JustifiedProperty/Commutativity] {
+    apply [.]; "\n";
+  }
+}
+
+tpl [Abstractness] {
+  "abstractness";
+}
+
+tpl [Coherence] {
+  "coherence";
+}
+
+tpl [Existence] {
+  "existence";
+}
+
+tpl [Uniqueness] {
+  "uniqueness";
+}
+
+tpl [Compatibility] {
+  "compatibility";
+}
+
+tpl [Reflexivity] {
+  "reflexivity";
+}
+
+tpl [Irreflexivity] {
+  "irreflexivity";
+}
+
+tpl [Symmetry] {
+  "symmetry";
+}
+
+// bug in the XML
+tpl [Antisymmetry] {
+  "asymmetry";
+}
+
+tpl [Asymmetry] {
+  "asymmetry";
+}
+
+tpl [Connectedness] {
+  "connectedness";
+}
+
+tpl [Involutiveness] {
+  "involutiveness";
+}
+
+tpl [Projectivity] {
+  "projectivity";
+}
+
+tpl [Idempotence] {
+  "idempotence";
+}
+
+tpl [Commutativity] {
+  "commutativity";
+}

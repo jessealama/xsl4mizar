@@ -5,15 +5,48 @@
 use strict;
 use warnings;
 use Getopt::Long;
+use File::Temp qw(tempfile);
 use File::Basename qw(basename dirname);
 use XML::LibXML;
 use Cwd qw(cwd);
-use File::Copy qw(copy);
+use File::Copy qw(copy move);
 use Carp qw(croak);
+
+sub tmpfile_path {
+  # File::Temp's tempfile function returns a list of two values.  We
+  # want the second (the path of the temprary file) and don't care
+  # about the first (a filehandle for the temporary file).  See
+  # http://search.cpan.org/~tjenness/File-Temp-0.22/Temp.pm for more
+  (undef, my $path) = eval { tempfile (); };
+  my $tempfile_err = $@;
+  if (defined $path) {
+    return $path;
+  } else {
+    croak ('Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err);
+  }
+}
+
+sub ensure_readable_file {
+  my $file = shift;
+
+  if (! -e $file) {
+    croak ('Error: ', $file, ' does not exist.');
+  }
+  if (! -f $file) {
+    croak ('Error: ', $file, ' is not a file.');
+  }
+
+  if (! -r $file) {
+    croak ('Error: ', $file, ' is unreadable.');
+  }
+
+  return 1;
+}
 
 my $paranoid = 0;
 my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $verbose = 0;
+my $debug = 0;
 my $man = 0;
 my $help = 0;
 my $target_directory = undef;
@@ -21,6 +54,7 @@ my $target_directory = undef;
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
+	   'debug' => \$debug,
 	   'paranoid' => \$paranoid,
 	   'stylesheet-home=s' => \$stylesheet_home,
 	   'target-directory=s' => \$target_directory)
@@ -95,8 +129,10 @@ my $split_stylesheet = "${stylesheet_home}/split.xsl";
 my $itemize_stylesheet = "${stylesheet_home}/itemize.xsl";
 my $wsm_stylesheet = "${stylesheet_home}/wsm.xsl";
 my $extend_evl_stylesheet = "${stylesheet_home}/extend-evl.xsl";
+my $conditions_and_properties_stylesheet = "${stylesheet_home}/conditions-and-properties.xsl";
+my $trim_properties_and_conditions_stylesheet = "${stylesheet_home}/trim-properties-and-conditions.xsl";
 
-my @stylesheets = ('split', 'itemize', 'wsm', 'extend-evl');
+my @stylesheets = ('split', 'itemize', 'wsm', 'extend-evl', 'conditions-and-properties', 'trim-properties-and-conditions');
 
 foreach my $stylesheet (@stylesheets) {
   my $stylesheet_path = "${stylesheet_home}/${stylesheet}.xsl";
@@ -173,45 +209,61 @@ my $article_evl_in_target_dir = "${target_directory}/${article_basename}.evl";
 my $article_msm_in_target_dir = "${target_directory}/${article_basename}.msm";
 my $article_tpr_in_target_dir = "${target_directory}/${article_basename}.tpr";
 
+print 'Rewriting text: ';
+
 my $accom_ok = run_mizar_tool ('accom', $article_miz_in_target_dir);
 if ($accom_ok == 0) {
   croak ('Error: the initial article did not could not be accom\'d.');
 }
+
+print '.';
 
 my $verifier_ok = run_mizar_tool ('verifier', $article_miz_in_target_dir);
 if ($verifier_ok == 0) {
   croak ('Error: the initial article could not be verified.');
 }
 
+print '.';
+
 my $wsmparser_ok = run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
 if ($wsmparser_ok == 0) {
   croak ('Error: wsmparser failed on the initial article.');
 }
+
+print '.';
 
 my $msmprocessor_ok = run_mizar_tool ('msmprocessor', $article_miz_in_target_dir);
 if ($msmprocessor_ok == 0) {
   croak ('Error: msmprocessor failed on the initial article.');
 }
 
+print '.';
+
 my $msplit_ok = run_mizar_tool ('msplit', $article_miz_in_target_dir);
 if ($msplit_ok == 0) {
   croak ('Error: msplit failed on the initial article.');
 }
 
-print 'Rewrite text proper...' if $verbose;
+print '.';
+
 copy ($article_msm_in_target_dir, $article_tpr_in_target_dir)
   or croak ('Error: we are unable to copy ', $article_msm_in_target_dir, ' to ', $article_tpr_in_target_dir, '.', "\n");
-print 'done.', "\n" if $verbose;
+
+print '.';
 
 my $mglue_ok = run_mizar_tool ('mglue', $article_miz_in_target_dir);
 if ($mglue_ok == 0) {
   croak ('Error: mglue failed on the initial article.');
 }
 
+print '.';
+
 $wsmparser_ok = run_mizar_tool ('wsmparser', $article_miz_in_target_dir);
 if ($wsmparser_ok == 0) {
   croak ('Error: wsmparser failed on the WSMified article.');
 }
+
+print 'done.', "\n";
 
 my $article_wsx_in_target_dir = "${target_directory}/${article_basename}.wsx";
 my $article_split_wsx_in_target_dir = "${article_wsx_in_target_dir}.split";
@@ -221,7 +273,7 @@ unless (-e $article_wsx_in_target_dir) {
   croak ('Error: the .wsx file for ', $article_basename, ' in ', $target_directory, ' does not exist.', "\n");
 }
 
-print 'Split...' if $verbose;
+print 'Split: ' if $verbose;
 my $xsltproc_split_status = system ("xsltproc --output $article_split_wsx_in_target_dir $split_stylesheet $article_wsx_in_target_dir 2>/dev/null");
 print 'done.', "\n" if $verbose;
 
@@ -241,7 +293,7 @@ unless (-r $article_split_wsx_in_target_dir) {
   croak ('Error: the split form of the .wsx file for ', $article_basename, ' in ', $target_directory, ' at ', $article_split_wsx_in_target_dir, ' is unreadable.', "\n");
 }
 
-print 'Itemize...' if $verbose;
+print 'Itemize: ' if $verbose;
 my $xsltproc_itemize_status = system ("xsltproc --output $article_itemized_wsx_in_target_dir $itemize_stylesheet $article_split_wsx_in_target_dir 2>/dev/null");
 print 'done.', "\n" if $verbose;
 
@@ -313,7 +365,7 @@ sub list_as_token_string {
 
 sub fragment_number {
   my $fragment_path = shift;
-  if ($fragment_path =~ m{ \A ckb ([0-9]+) [.] }x) {
+  if ($fragment_path =~ m{ \A ckb ([0-9]+) ( $ | [.] ) }x) {
     my $fragment_number = $1;
     return $fragment_number;
   } else {
@@ -325,6 +377,17 @@ my @fragments = $itemized_article_doc->findnodes ('/Fragments/Text-Proper');
 
 if ($verbose && scalar @fragments == 0) {
   print 'Warning: there are 0 Fragment elements in the itemized wsx file for ', $article_basename, ' at ', $article_itemized_wsx_in_target_dir, '.', "\n";
+}
+
+# Our upper bound: 999.  This is because we may potentially add
+# 2-letter suffixes to the names of our fragments.  We use 'ckb' as
+# the prefix, followed by a number and maybe a two-letter constructor
+# property/correctness condition code, thus, 'ckb50' or 'ckb50ab'.  If
+# there are more than 999 fragments, then we could potentially use
+# names like 'ckb1000ab', which is too long for a Mizar article name
+# (these have to be at most 8 characters long).
+if (scalar @fragments > 999) {
+  croak ('Error: because of limitations in Mizar, we cannot itemize articles with more than 999 fragments.');
 }
 
 # Separate the XML for the fragments into separate files
@@ -342,17 +405,20 @@ foreach my $i (1 .. scalar @fragments) {
 chdir $target_directory
   or croak ('Error: unable to change directory to ', $target_directory, '.', "\n");
 
-print 'Constructing the environment, verifying, and exporting ', scalar @fragments, ' fragments...', "\n";
+print 'Generating ', scalar @fragments, ' Mizar fragments: ';
 
 foreach my $i (1 .. scalar @fragments) {
 
-  print 'Fragment ', $i, '...';
+  print '.';
 
   my $fragment = $fragments[$i - 1];
 
   my $fragment_path = "${target_directory}/fragment-${i}.wsx";
   my $fragment_evl = "${target_directory}/fragment-${i}.evl";
   my $fragment_miz = "${target_text_subdir}/ckb${i}.miz";
+  my $fragment_xml = "${target_text_subdir}/ckb${i}.xml";
+  my $fragment_xml_orig = "${target_text_subdir}/ckb${i}.xml.orig";
+  my $fragment_xml_exported = "${target_text_subdir}/ckb${i}.xml.exported";
 
   # Extend the evl of the initial article by inspecting the contents
   # of the prel subdirectory
@@ -430,7 +496,12 @@ foreach my $i (1 .. scalar @fragments) {
 
   if (run_mizar_tool ('accom', $fragment_miz)) {
     if (run_mizar_tool ('verifier', $fragment_miz)) {
+      # Save a copy of the XML -- exporter can modify it!
+      copy ($fragment_xml, $fragment_xml_orig)
+	or croak ('Error: unable to save a copy of ', $fragment_xml, ' to ', $fragment_xml_orig, '.', "\n");
       if (run_mizar_tool ('exporter', $fragment_miz)) {
+	copy ($fragment_xml, $fragment_xml_exported)
+	  or croak ('Error: unable to save a copy of the exported XML ', $fragment_xml, ' to ', $fragment_xml_exported, '.', "\n");
 	if (run_mizar_tool ('transfer', $fragment_miz)) {
 	  # nothing to do
 	} else {
@@ -443,6 +514,8 @@ foreach my $i (1 .. scalar @fragments) {
 	  print 'Warning: fragment number ', $i, ' of ', $article_basename, ' is not expotable.', "\n";
 	}
       }
+      copy ($fragment_xml_orig, $fragment_xml)
+	or croak ('Error: unable to restore the pre-exporter version of the XML at ', $fragment_xml_orig, ' to ', $fragment_xml, '.', "\n");
     } else {
       if ($verbose) {
 	print 'Warning: verifier did not exit cleanly when applied to fragment number ', $i, ' of ', $article_basename, '.', "\n";
@@ -453,9 +526,146 @@ foreach my $i (1 .. scalar @fragments) {
       print 'Warning: accom did not exit cleanly when applied to fragment number ', $i, ' of ', $article_basename, '.', "\n";
     }
   }
-
-  print 'done.', "\n";
 }
+
+print 'done.', "\n";
+
+# Now extract all correctness conditions and properties
+
+print 'Extracting correctness conditions and properties from definitions: ';
+
+my %conditions_and_properties_shortcuts
+  = ('existence' => 'ex',
+     'uniqueness' => 'un',
+     'coherence' => 'ch',
+     'correctness' => 'cr',
+     'abstractness' => 'ab',
+     'reflexivity' => 're',
+     'irreflexivity' => 'ir',
+     'symmetry' => 'sy',
+     'asymmetry' => 'as',
+     'connectedness' => 'cn',
+     'involutiveness' => 'in',
+     'projectivity' => 'pr',
+     'idempotence' => 'id',
+     'commutativity' => 'cm',
+     'compatibility' => 'cp');
+
+sub extension {
+  my $path = shift;
+  if ($path =~ /[.]([^.]+)$/) {
+    return $1;
+  } else {
+    croak ('Error: the path \'', $path, '\' does not have an extension.');
+  }
+}
+
+sub copy_fragment_to_new_prefix {
+  my $fragment_basename = shift;
+  my $new_prefix = shift;
+  my @old_files = glob "${target_text_subdir}/${fragment_basename}.*";
+  if ($debug) {
+    print {*STDERR} 'Files matching the name \'', $fragment_basename, '\':';
+    foreach my $file (@old_files) {
+      print {*STDERR} $file, "\n";
+    }
+  }
+  foreach my $file (@old_files) {
+    my $extension = extension ($file);
+    my $new_path = "${target_text_subdir}/${new_prefix}.${extension}";
+    copy ($file, $new_path)
+      or croak ('Error: unable to copy ', $file, ' to ', $new_path, '.', "\n");
+  }
+  return 1;
+}
+
+my @fragment_files = `find ${target_text_subdir} -mindepth 1 -maxdepth 1 -type f -name "ckb[1-9][0-9]*.miz"`;
+chomp @fragment_files;
+foreach my $fragment (@fragment_files) {
+
+  print '.';
+
+  my $fragment_basename = basename ($fragment, '.miz');
+  my $fragment_number = fragment_number ($fragment_basename);
+  my $fragment_xml = "${target_text_subdir}/${fragment_basename}.xml";
+
+  ensure_readable_file ($fragment_xml);
+
+  my $xsltproc_errors = tmpfile_path ();
+  my $xsltproc_output = tmpfile_path ();
+  my $xsltproc_status = system ("xsltproc $conditions_and_properties_stylesheet $fragment_xml > $xsltproc_output 2> $xsltproc_errors");
+  my $xsltproc_exit_code = $xsltproc_status >> 8;
+  if ($xsltproc_exit_code != 0) {
+    if (-e $xsltproc_errors && -z $xsltproc_errors) {
+      my @xsltproc_errors = `cat $xsltproc_errors`;
+      croak ('Error: xsltproc did not exit cleanly when applying the correctness-conditions-and-properties stylesheet to ', $fragment_xml, '.  The error output was:', "\n", @xsltproc_errors);
+    } else {
+      croak ('Error: xsltproc did not exit cleanly when applying the correctness-conditions-and-properties stylesheet to ', $fragment_xml, '.', "\n");
+    }
+  }
+
+  ensure_readable_file ($xsltproc_output);
+
+  my @correctness_conditions_and_properties = `cat $xsltproc_output`;
+  chomp @correctness_conditions_and_properties;
+
+  if ($debug) {
+    print {*STDERR} 'Fragment ', $fragment_basename, ' contains ', scalar @correctness_conditions_and_properties, ' correctness conditions and properties.', "\n";
+  }
+
+  foreach my $cc_or_p (@correctness_conditions_and_properties) {
+    if (defined $conditions_and_properties_shortcuts{$cc_or_p}) {
+      my $cc_or_p_code = $conditions_and_properties_shortcuts{$cc_or_p};
+      my $new_prefix = "ckb${fragment_number}${cc_or_p_code}";
+      copy_fragment_to_new_prefix ($fragment_basename, $new_prefix);
+
+      my $new_miz = "${target_text_subdir}/${new_prefix}.miz";
+      my $new_err = "${target_text_subdir}/${new_prefix}.err";
+      my $new_xml = "${target_text_subdir}/${new_prefix}.xml";
+      ensure_readable_file ($new_miz);
+      ensure_readable_file ($new_err);
+      ensure_readable_file ($new_xml);
+
+      my $new_xml_orig = "${target_text_subdir}/${new_prefix}.xml.orig";
+      my $new_xml_tmp = "${target_text_subdir}/${new_prefix}.xml.tmp";
+
+      # Save a copy of the old XML
+      copy ($new_xml, $new_xml_orig)
+	or croak ('Error: unable to save a copy of ', $new_xml, ' to ', $new_xml_orig, '.', "\n");
+
+      my $xsltproc_trim_status = system ("xsltproc --stringparam target-condition-or-property '${cc_or_p}' $trim_properties_and_conditions_stylesheet $new_xml > $new_xml_tmp");
+      my $xsltproc_trim_exit_code = $xsltproc_trim_status >> 8;
+      if ($xsltproc_trim_exit_code != 0) {
+	croak ('Error: something went wrong trimming the property ', $cc_or_p, ' from ', $new_xml, '.', "\n");
+      }
+
+      move ($new_xml_tmp, $new_xml)
+	or croak ('Error: error moving the temporary XML generated by strippping ', $cc_or_p, ' from fragment ', $fragment_number, '.', "\n");
+
+      if ($paranoid) {
+	if ($verbose) {
+	  print 'Checking that the result of trimming ', $cc_or_p, ' from fragment ', $fragment_number, ' is verifiable...';
+	}
+	my $verifier_status = system ("verifier -c -l -q -s $new_miz > /dev/null 2> /dev/null");
+	my $verifier_exit_code = $verifier_status >> 8;
+	if ($verifier_exit_code == 0 && -z $new_err) {
+	  if ($verbose) {
+	    print 'OK.', "\n";
+	  }
+	} else {
+	  croak ('Error: verifier rejected the trimming of ', $cc_or_p, ' from fragment ', $fragment_number, '; see ', $new_err, ' for details.', "\n");
+	}
+      }
+
+      # Now that we've trimmed the XML, minimize to throw away any
+      # spurious toplevel stuff that we don't really need.
+    } else {
+      croak ('Error: we are unable to find the short form of the correctness condition/constructor property \'', $cc_or_p, '\'.', "\n");
+    }
+  }
+}
+
+print 'done.', "\n";
 
 __END__
 

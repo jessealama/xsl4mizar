@@ -9,9 +9,39 @@ use Carp qw(croak);
 use XML::LibXML;
 use File::Copy qw(copy move);
 
+sub ensure_directory {
+  my $dir = shift;
+  if (! -e $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist.';
+  }
+
+  if (! -d $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist (as a directory).';
+  }
+  return 1;
+}
+
+sub ensure_readable_file {
+  my $file = shift;
+
+  if (! -e $file) {
+    croak ('Error: ', $file, ' does not exist.');
+  }
+  if (! -f $file) {
+    croak ('Error: ', $file, ' is not a file.');
+  }
+
+  if (! -r $file) {
+    croak ('Error: ', $file, ' is unreadable.');
+  }
+
+  return 1;
+}
+
 my $help = 0;
 my $man = 0;
 my $verbose = 0;
+my $checker_only = 0;
 my $debug = 0;
 my $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
@@ -19,6 +49,7 @@ my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 GetOptions('help|?' => \$help,
            'man' => \$man,
            'verbose'  => \$verbose,
+	   'checker-only' => \$checker_only,
 	   'debug' => \$debug,
 	   'stylesheet-home=s' => \$stylesheet_home)
   or pod2usage(2);
@@ -31,36 +62,13 @@ my $article = $ARGV[0];
 my $article_basename = basename ($article, '.miz');
 my $article_dirname = dirname ($article);
 my $article_miz = "${article_dirname}/${article_basename}.miz";
+my $article_miz_full = File::Spec->rel2abs ($article_miz);
 my $article_err = "${article_dirname}/${article_basename}.err";
 my $article_atr = "${article_dirname}/${article_basename}.atr";
 
-if (! -e $article_atr) {
-  croak ('Error: the .atr file for ', $article_basename, ' could not be found at the expected location', "\n", "\n", '  ', $article_atr, "\n");
-}
-
-if (! -f $article_atr) {
-  croak ('Error: the .atr file for ', $article_basename, ' could not be found at the expected location', "\n", "\n", '  ', $article_atr, "\n");
-}
-
-if (! -r $article_atr) {
-  croak ('Error: the .atr file for ', $article_basename, ' at', "\n", "\n", '  ', $article_atr, "\n", "\n", 'is unreadable.');
-}
-
-if (! -e $stylesheet_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n");
-}
-
-if (! -d $stylesheet_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n");
-}
-
-if (! -e $script_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary scripts does not exist.', "\n");
-}
-
-if (! -d $stylesheet_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary scripts is not actually a directory.', "\n");
-}
+ensure_readable_file ($article_atr);
+ensure_directory ($stylesheet_home);
+ensure_directory ($script_home);
 
 my %stylesheet_paths =
   ('properties-of-constructor' => "${stylesheet_home}/properties-of-constructor.xsl",
@@ -108,14 +116,45 @@ if (! -x $inferred_constructors_script) {
   croak ('Error: the inferred-constructors script at', "\n", "\n", '  ', $inferred_constructors_script, 'is not executable.',"\n");
 }
 
-my @inferred_constructors = `$inferred_constructors_script --stylesheet-home=${stylesheet_home} $article_miz`;
+my @inferred_constructors = `$inferred_constructors_script --stylesheet-home=${stylesheet_home} $article_miz_full`;
 chomp @inferred_constructors;
 
 # Make a copy of the atr
 my $article_atr_orig = "${article_dirname}/${article_basename}.atr.orig";
 copy ($article_atr, $article_atr_orig)
   or croak ('Error: unable to save a copy of the original .atr file at ', $article_atr, '.');
+
+# Dump all properties of all constructors that are not inferred
+my $inferred_constructors_token_list = join (',', @inferred_constructors);
+$inferred_constructors_token_list = ',' . $inferred_constructors_token_list . ',';
+$inferred_constructors_token_list =~ s/constructor//g;
+
+# DEBUG
+warn 'The inferred constructors token list is: ', "\n", $inferred_constructors_token_list;
+
+my $delete_properties_stylesheet = "${stylesheet_home}/delete-properties.xsl";
+
 my $article_atr_tmp = "${article_dirname}/${article_basename}.atr.tmp";
+my $xsltproc_delete_status = system ("xsltproc --stringparam constructors '$inferred_constructors_token_list' $delete_properties_stylesheet $article_atr > $article_atr_tmp");
+my $xsltproc_delete_exit_code = $xsltproc_delete_status >> 8;
+if ($xsltproc_delete_exit_code != 0) {
+  croak ('Error: xsltproc did not exit cleanly applying the delete-constructors stylesheet to ', $article_atr, '.', "\n");
+}
+move ($article_atr_tmp, $article_atr)
+  or croak ('Error: unable to rename ', $article_atr_tmp, ' to ', $article_atr, '.', "\n");
+
+# Paranoia: check that the article is still verifiable with the diminished atr file
+my $verifier_check_call = undef;
+if ($checker_only) {
+  $verifier_check_call = "verifier -c -q -s -l $article_miz > /dev/null 2> /dev/null";
+} else {
+  $verifier_check_call = "verifier -q -s -l $article_miz > /dev/null 2> /dev/null";
+}
+my $verifier_check_status = system ($verifier_check_call);
+my $verifier_check_exit_code = $verifier_check_status >> 8;
+if ($verifier_check_exit_code != 0 || -s $article_err) {
+  croak ('Error: we are unable to verify ', $article_basename, ' with its trimmed .atr file.');
+}
 
 my $xml_parser = XML::LibXML->new (suppress_warnings => 0,
 				   suppress_errors => 0);
@@ -131,6 +170,7 @@ if ($debug) {
 }
 
 my %needed_constructor_properties = ();
+my %unneeded_constructor_properties = ();
 
 # Let's do it
 
@@ -143,6 +183,7 @@ foreach my $constructor (@inferred_constructors) {
     }
     chomp @properties;
     foreach my $property (@properties) {
+      warn 'Considering property ', $property, ' of constructor ', $constructor;
       my $property_lc = lc $property;
       my $xsltproc_status = system ("xsltproc --stringparam 'kind' '${kind}' --stringparam 'nr' '${nr}' --stringparam 'aid' '${aid}' --stringparam 'property' '${property}' $strip_property_stylesheet $article_atr > $article_atr_tmp");
       my $xsltproc_exit_code = $xsltproc_status >> 8;
@@ -150,14 +191,25 @@ foreach my $constructor (@inferred_constructors) {
 	croak ('Error: xsltproc did not exit clearly when applying the strip-property stylesheet to ', $article_atr, '.  Its exit code was ', $xsltproc_exit_code, '.');
       }
       copy ($article_atr_tmp, $article_atr);
-      my $verifier_status = system ("verifier -q -s -l $article_miz > /dev/null 2>&1");
+
+      my $verifier_call;
+      if ($checker_only) {
+	$verifier_call = "verifier -c -q -s -l $article_miz > /dev/null 2>&1"
+      } else {
+	$verifier_call = "verifier -q -s -l $article_miz > /dev/null 2>&1"
+      }
+
+      my $verifier_status = system ($verifier_call);
       my $verifier_exit_code = $verifier_status >> 8;
       if ($verifier_exit_code == 0 && -z $article_err) {
 	if ($verbose) {
 	  print 'We can remove property ', $property, ' of ', $constructor, "\n";
 	}
-	$needed_constructor_properties{"${constructor}/${property_lc}"} = 0;
+	$unneeded_constructor_properties{"${constructor}[${property_lc}]"} = 0;
+	# copy ($article_atr, $article_atr_orig)
+	#   or croak ('Error: we were unable to update the .atr for ', $article_basename, ' to reflect its independence from the property ', $property, ' of constructor ', $constructor, '.', "\n");
       } else {
+	$needed_constructor_properties{"${constructor}[${property_lc}]"} = 0;
 	if ($verbose) {
 	  print 'We cannot remove property ', $property, ' of ', $constructor, "\n";
 	}
@@ -180,6 +232,19 @@ foreach my $constructor (@inferred_constructors) {
   }
 }
 
+# Restore the state of the article's environment
+my $verifier_call;
+if ($checker_only) {
+  $verifier_call = "verifier -c -q -s -l $article_miz > /dev/null 2>&1"
+} else {
+  $verifier_call = "verifier -q -s -l $article_miz > /dev/null 2>&1"
+}
+my $verifier_status = system ($verifier_call);
+my $verifier_exit_code = $verifier_status >> 8;
+if ($verifier_exit_code != 0 || -s $article_err) {
+  croak ('Error: after minimizing properties for ', $article_basename, ', we failed to verify it.');
+}
+
 foreach my $constructor_property (keys %needed_constructor_properties) {
   print $constructor_property, "\n";
 }
@@ -190,7 +255,7 @@ __END__
 
 =head1 minimize-properties.pl
 
-minimal.pl - Minimize the properties of imported constructors of a Mizar article
+minimize-properties.pl - Minimize the properties of imported constructors of a Mizar article
 
 =head1 SYNOPSIS
 

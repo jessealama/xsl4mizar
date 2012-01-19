@@ -1,0 +1,169 @@
+stylesheet "1.0";
+
+output method="xml" indent="no";
+
+//////////////////////////////////////////////////////////////////////
+// Identifying a property
+//////////////////////////////////////////////////////////////////////
+
+// The property or condition to which the definition will be trimmed.
+// Everything else will be dumped.
+#target-condition-or-property = { ""; }
+
+//////////////////////////////////////////////////////////////////////
+// Utilities
+//////////////////////////////////////////////////////////////////////
+
+$lcletters = { "abcdefghijklmnopqrstuvwxyz"; }
+$ucletters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+
+tpl lowercase (#string) { `translate($string, $ucletters, $lcletters)`; }
+tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
+
+//////////////////////////////////////////////////////////////////////
+// Document templates
+//////////////////////////////////////////////////////////////////////
+
+tpl [*] {
+  $n = `name (.)`;
+  <$n {
+    for-each [@*] { copy-of `.`; }
+    if [*] {
+      "\n";
+      for-each [*] {
+        apply [.];
+      }
+    }
+  }
+  "\n";
+}
+
+tpl [*] mode="copy" {
+  $n = `name (.)`;
+  <$n {
+    for-each [@*] { copy-of `.`; }
+    if [*] {
+      "\n";
+      for-each [*] {
+        apply [.] mode="copy";
+      }
+    }
+  }
+  "\n";
+}
+
+tpl [/] {
+  if [Article] {
+    apply [Article];
+  } else {
+    msg terminate="yes" "Error: the required Article document element is missing.";
+  }
+}
+
+tpl [Article] {
+  $num-definition-blocks = `count (DefinitionBlock)`;
+  if [$num-definition-blocks > 1] {
+    msg terminate="yes" "Error: this stylesheet assumes that we are working with an article that has at most on definition block.";
+  } else {
+    <Article {
+      @aid = `@aid`;
+      "\n";
+      apply [*];
+    }
+  }
+}
+
+tpl [DefTheorem] {
+  // dump
+}
+
+tpl [Definiens] {
+  // dump
+}
+
+tpl [DefinitionBlock] {
+  <DefinitionBlock {
+    for-each [@*] { copy-of `.`; }
+    "\n";
+    apply [*];
+  }
+  "\n";
+}
+
+tpl [Existence] {
+  if [$target-condition-or-property = "existence"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
+tpl [Abstractness] {
+  if [$target-condition-or-property = "abstractness"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
+tpl [Uniqueness] {
+  if [$target-condition-or-property = "uniqueness"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
+tpl [Coherence] {
+  if [$target-condition-or-property = "coherence"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
+tpl [Compatibility] {
+  if [$target-condition-or-property = "compatibility"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
+tpl [JustifiedProperty] {
+  $prop-name = `name(*[1])`;
+  $prop-name-lc = lowercase (#string = $prop-name);
+  if [$prop-name-lc = $target-condition-or-property] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
+tpl [Constructor[not(@kind = "V")]] {
+  // dump
+}
+
+tpl [Constructor[@kind = "V" and not(Properties/Abstractness)]] {
+  // dump
+}
+
+tpl [Constructor[@kind = "V" and Properties/Abstractness]] {
+  if [$target-condition-or-property = "abstractness"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
+tpl [Pattern] {
+  // dump
+}
+
+tpl [Registration] {
+  if [$target-condition-or-property = "abstractness"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
