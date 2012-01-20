@@ -558,4 +558,3 @@ tpl prevblocks(#el) { for-each [$el] {
          or (name() = "JustifiedProperty")]/*[(name() = "Proof") or
          (name() = "Now") or (name() = "SkippedProof") or (name() = "IterEquality")])`;
 }}}
-
