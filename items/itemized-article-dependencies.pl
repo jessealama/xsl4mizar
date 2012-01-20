@@ -6,7 +6,38 @@ use File::Basename qw(basename);
 use Getopt::Long;
 use Pod::Usage;
 use File::Temp qw(tempfile);
-use Carp qw(croak);
+use Carp qw(croak carp);
+use XML::LibXML;
+
+# Set up an XML parser that we might use
+my $xml_parser = XML::LibXML->new ();
+
+sub ensure_valid_xml_file {
+  my $xml_path = shift;
+  ensure_readable_file ($xml_path);
+  if (defined eval { $xml_parser->parse_file ($xml_path) }) {
+    return 1;
+  } else {
+    croak ('Error: ', $xml_path, ' is not a well-formed XML file.');
+  }
+}
+
+sub ensure_readable_file {
+  my $file = shift;
+
+  if (! -e $file) {
+    croak ('Error: ', $file, ' does not exist.');
+  }
+  if (! -f $file) {
+    croak ('Error: ', $file, ' is not a file.');
+  }
+
+  if (! -r $file) {
+    croak ('Error: ', $file, ' is unreadable.');
+  }
+
+  return 1;
+}
 
 sub tmpfile_path {
   # File::Temp's tempfile function returns a list of two values.  We
@@ -153,6 +184,12 @@ sub resolve_item {
     }
 
     my $item_fragment = "${article_basename}:fragment:${item_fragment_num}";
+    my $fragment_miz = "${article_dir}/text/ckb${item_fragment_num}.miz";
+    my $fragment_xml = "${article_dir}/text/ckb${item_fragment_num}.xml";
+    my $fragment_abs_xml = "${article_dir}/text/ckb${item_fragment_num}.xml1";
+
+    ensure_readable_file ($fragment_miz);
+    ensure_valid_xml_file ($fragment_abs_xml);
 
     if (defined $fragment_to_item_table{$item_fragment}) {
 
@@ -235,91 +272,172 @@ my %conditions_and_properties_shortcuts
      'projectivity' => 'pr',
      'idempotence' => 'id',
      'commutativity' => 'cm',
-     'compatibility' => 'cp');
+     'compatibility' => 'cp',
+     'sethood' => 'se');
 
 my $dependencies_script = $script_paths{'dependencies.pl'};
 foreach my $item (keys %item_to_fragment_table) {
-  my $fragment = $item_to_fragment_table{$item};
-  if ($fragment =~ m/^${article_basename}:fragment:([0-9]+)$/) {
-    my $fragment_number = $1;
-    my $fragment_miz = undef;
+  my %item_deps = ();
+  if ($item =~ /\A ([a-z0-9_]+) : ([^:]+) : ([0-9]+) /x) {
+    (my $item_article, my $item_kind, my $item_number) = ($1, $2, $3);
+    my $fragment = $item_to_fragment_table{$item};
+    if ($fragment =~ m/^${article_basename}:fragment:([0-9]+)$/) {
+      my $fragment_number = $1;
+      my $fragment_miz = undef;
 
-    # Resolve properties and correctness conditions
-    if ($item =~ / \[ ([a-z]+) \] \z /x) {
-      my $property_or_condition = $1;
+      # Resolve properties and correctness conditions
+      if ($item =~ / \[ ([a-z]+) \] \z /x) {
+	my $property_or_condition = $1;
 
-      my $p_or_c_code = $conditions_and_properties_shortcuts{$property_or_condition};
-      if (defined $p_or_c_code) {
-	$fragment_miz = "${article_dir}/text/ckb${fragment_number}${p_or_c_code}.miz";
+	my $p_or_c_code = $conditions_and_properties_shortcuts{$property_or_condition};
+	if (defined $p_or_c_code) {
+	  $fragment_miz = "${article_dir}/text/ckb${fragment_number}${p_or_c_code}.miz";
+	} else {
+	  croak ('Error: unknown property/condition \'', $property_or_condition, '\'.', "\n");
+	}
       } else {
-	croak ('Error: unknown property/condition \'', $property_or_condition, '\'.', "\n");
+	$fragment_miz = "${article_dir}/text/ckb${fragment_number}.miz";
       }
-    } else {
-      $fragment_miz = "${article_dir}/text/ckb${fragment_number}.miz";
-    }
 
-    unless (-e $fragment_miz) {
-      croak ('Error: the .miz file for fragment ', $fragment_number, ' of ', $article_basename, ' does not exist at the expected location (', $fragment_miz, ').');
-    }
-
-    my $dependencies_err = tmpfile_path ();
-    my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} $fragment_miz 2> $dependencies_err`;
-    my $dependencies_exit_code = $? >> 8;
-    if ($dependencies_exit_code != 0) {
-      my $dependencies_message = `cat $dependencies_err`;
-      print STDERR ('Error: something went wrong when calling the dependencies script on fragment ', $fragment_number, ' of ', $article_basename, ';', "\n");
-      print STDERR ('The exit code was ', $dependencies_exit_code, ' and the message was:', "\n");
-      croak ($dependencies_message);
-    }
-
-    print $item;
-    chomp @fragment_dependencies;
-    if (scalar @fragment_dependencies > 0) {
-      foreach my $dep (@fragment_dependencies) {
-	my $resolved_dep = resolve_item ($dep);
-
-	unless (defined $resolved_dep) {
-	  print "\n";
-	  croak ('Error: we were unable to resolve the item ', $dep, '.');
+      if (-e $fragment_miz) {
+	my $dependencies_err = tmpfile_path ();
+	my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} $fragment_miz 2> $dependencies_err`;
+	my $dependencies_exit_code = $? >> 8;
+	if ($dependencies_exit_code != 0) {
+	  my $dependencies_message = `cat $dependencies_err`;
+	  print STDERR ('Error: something went wrong when calling the dependencies script on fragment ', $fragment_number, ' of ', $article_basename, ';', "\n");
+	  print STDERR ('The exit code was ', $dependencies_exit_code, ' and the message was:', "\n");
+	  croak ($dependencies_message);
 	}
 
+	chomp @fragment_dependencies;
+	if (scalar @fragment_dependencies > 0) {
+	  foreach my $dep (@fragment_dependencies) {
+	    my $resolved_dep = resolve_item ($dep);
+	    if (! defined $resolved_dep) {
+	      croak ('Error: we were unable to resolve the item ', $dep, '.', "\n");
+	    }
+	    $item_deps{$resolved_dep} = 0;
+	  }
+	}
+
+      } else {
+
+	# This appears to be a property for a redefined
+	# constructor.  Check that that is indeed the case.  If
+	# so, the proeprty in question for the current
+	# constuctor depends (1) the coherence of the
+	# redefinition and (2) the original constructor
+	# property.
+
+	$fragment_miz = "${article_dir}/text/ckb${fragment_number}.miz";
+	my $fragment_abs_xml = "${article_dir}/text/ckb${fragment_number}.xml1";
+
+	ensure_valid_xml_file ($fragment_abs_xml);
+
+	my $fragment_doc = $xml_parser->parse_file ($fragment_abs_xml);
+	if ($fragment_doc->exists ('.//Definition[@redefinition = "true"]')) {
+	  if ($fragment_doc->exists ('.//Definiens')) {
+	    croak ('Error: the constructor property ', $item, ' seems to be coming from a redefinition, but we do not yet know how to handle this case fully.');
+	  } elsif ($fragment_doc->exists ('.//Constructor[@redefaid and @absredefnr]')) {
+	    (my $new_constructor) = $fragment_doc->findnodes ('.//Constructor[@redefaid and @absredefnr and @kind]');
+	    my $redef_kind = $new_constructor->findvalue ('@kind');
+	    my $redef_aid = $new_constructor->findvalue ('@redefaid');
+	    my $redef_nr = $new_constructor->findvalue ('@absredefnr');
+	    my $redef_kind_lc = lc $redef_kind;
+	    my $redef_aid_lc = lc $redef_aid;
+
+	    $item_deps{"${item_article}:${item_kind}:${item_number}[coherence]"} = 0;
+	  }
+	}
+      }
+
+      # Now print the dependencies
+      print $item;
+      foreach my $dep (keys %item_deps) {
 	# Special case: if we are computing the dependencies of a
 	# pattern, then print only constructors and other
 	# patterns.
-	if ($item =~ /:.pattern:/) {
-	  if ($resolved_dep =~ /:.pattern:/ || $resolved_dep =~ /:.constructor:/) {
-	    print ' ', $resolved_dep;
+	if ($item =~ / : . pattern : [0-9]+ \z /x) {
+	  if ($dep =~ / : . (pattern | constructor) : [0-9]+ \z /x) {
+	    print ' ', $dep;
+	  } else {
+	    # ignore
 	  }
 	} else {
-	  print ' ', $resolved_dep;
+
+ 	  # If $item depends on a pattern, determine whether the
+	  # pattern comes from a redefinition.  If it does, then the
+	  # item depends on either the coherence or compatibility
+	  # condition associated with the pattern.  If so, we need to
+	  # print this condition.  (We will also print the pattern.)
+	  if ($dep =~ /\A $item_article : (.) pattern : [0-9]+ \z/x) {
+	    my $pattern_kind = $1;
+	    my $fragment_of_dep_pattern = $item_to_fragment_table{$dep};
+	    if (defined $fragment_of_dep_pattern) {
+	      if ($fragment_of_dep_pattern =~ / : fragment : ([0-9]+) \z/x) {
+		my $dep_fragment_number = $1;
+		my $dep_fragment_abs_xml
+		  = "${article_dir}/text/ckb${dep_fragment_number}.xml1";
+		ensure_valid_xml_file ($dep_fragment_abs_xml);
+		my $dep_fragment_doc = $xml_parser->parse_file ($dep_fragment_abs_xml);
+		# sanity check
+		if ($dep_fragment_doc->exists ('Article/DefinitionBlock[Definition[@redefinition = "true" and Compatibility and not(Constructor)] and following-sibling::Definiens]')) {
+		  if (defined $fragment_to_item_table{$fragment_of_dep_pattern}) {
+		    my @dep_fragment_items = @{$fragment_to_item_table{$fragment_of_dep_pattern}};
+		    (my $compatibility_item)
+		      = grep { / \[ compatibility \] \z/x } @dep_fragment_items;
+		    if (defined $compatibility_item) {
+		      print ' ', $compatibility_item;
+		    } else {
+		      croak ('Error: we failed to find a suitable compatibility item generated by fragment ', $fragment_of_dep_pattern, '.', "\n");
+		    }
+		  } else {
+		    croak ('Error: when trying to look up whether the pattern dependency ', $dep, ' of ', $item, ' comes from a redefinition, we strangely failed to find any items generated by the fragment ', $fragment_of_dep_pattern, ' corresponding to ', $dep, '.', "\n");
+		  }
+		}
+	      } else {
+		croak ('Error: when dealing with the pattern case for the dependencies of ', $item, ', we are unable to make sense of the fragment ', $fragment_of_dep_pattern, '.', "\n");
+	      }
+	    } else {
+	      croak ('Error: when dealing with the pattern case for the dependencies of ', $item, ', we failed to look up what fragment the needed pattern ', $dep, ' comes from.', "\n");
+	    }
+	  }
+
+ 	  # Constructor case: make sure that if an item depends on a
+	  # consructor that it also depends on its coherence
+	  # condition, if there is one.
+	  if ($dep =~ / ([a-z0-9_]+) : kconstructor : ([0-9]+) \z/x) {
+	    my $dep_article = $1;
+	    if ($dep_article eq $item_article) {
+	      my $dep_fragment = $item_to_fragment_table{$dep};
+	      if (defined $dep_fragment) {
+		if ($dep_fragment =~ / : fragment : ([0-9]+) \z /x) {
+		  my $dep_fragment_number = $1;
+		  my @candidates = `find ${article_dir}/text -maxdepth 1 -mindepth 1 -type f -name "ckb${dep_fragment_number}ch.miz"`;
+		  if (scalar @candidates > 0) {
+		    print ' ', "${dep}[coherence]";
+		  }
+		} else {
+		  croak ('Error: unable to make sense of \'', $dep_fragment, '\' as a fragment.', "\n");
+		}
+	      } else {
+		croak ('Error: we failed to look up ', $dep, ' in the item-to-fragment table.', "\n");
+	      }
+	    }
+	  }
+
+	  print ' ', $dep;
+
 	}
       }
+      print "\n";
+
+    } else {
+      croak ('Error: we could not extract the article fragment number from the text', "\n", '  ', $fragment);
     }
-
-    # Function case: we depend on existence and uniqueness
-    if ($item =~ /\A [a-z0-9_]+ : kconstructor : [0-9]+ \z/x) {
-      print ' ', $item, '[existence]';
-      print ' ', $item, '[uniqueness]';
-    }
-
-    # Redefined constructor case: the redefined constructor depends on
-    # the associated compatibility condition
-    if ($item =~ /\A [a-z0-9_]+ : . constructor : [0-9]+ \z/x) {
-      if (defined $fragment_to_item_table{$item}) {
-	my @generated_items = @{$fragment_to_item_table{$item}};
-	(my $compatibility) = grep { / \[ compatibility \]\z/x } @generated_items;
-	if (defined $compatibility) {
-	  print ' ', $compatibility;
-	}
-      } else {
-	croak ('Error: the fragment-to-item table does not contain an entry for ', $item, '.', "\n")
-      }
-    }
-
-    print "\n";
-
   } else {
-    croak ('Error: we could not extract the article fragment number from the text', "\n", '  ', $fragment);
+    croak ('Error: we cannot make sense of the item \'', $item, '\'.', "\n");
   }
 }
 
