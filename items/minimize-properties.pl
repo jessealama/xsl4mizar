@@ -206,8 +206,8 @@ foreach my $constructor (@inferred_constructors) {
 	  print 'We can remove property ', $property, ' of ', $constructor, "\n";
 	}
 	$unneeded_constructor_properties{"${constructor}[${property_lc}]"} = 0;
-	# copy ($article_atr, $article_atr_orig)
-	#   or croak ('Error: we were unable to update the .atr for ', $article_basename, ' to reflect its independence from the property ', $property, ' of constructor ', $constructor, '.', "\n");
+	copy ($article_atr, $article_atr_orig)
+	   or croak ('Error: we were unable to update the .atr for ', $article_basename, ' to reflect its independence from the property ', $property, ' of constructor ', $constructor, '.', "\n");
       } else {
 	$needed_constructor_properties{"${constructor}[${property_lc}]"} = 0;
 	if ($verbose) {
