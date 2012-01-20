@@ -273,7 +273,7 @@ unless (-e $article_wsx_in_target_dir) {
   croak ('Error: the .wsx file for ', $article_basename, ' in ', $target_directory, ' does not exist.', "\n");
 }
 
-print 'Split: ' if $verbose;
+print 'Split: ';
 my $xsltproc_split_status = system ("xsltproc --output $article_split_wsx_in_target_dir $split_stylesheet $article_wsx_in_target_dir 2>/dev/null");
 print 'done.', "\n" if $verbose;
 
@@ -293,7 +293,9 @@ unless (-r $article_split_wsx_in_target_dir) {
   croak ('Error: the split form of the .wsx file for ', $article_basename, ' in ', $target_directory, ' at ', $article_split_wsx_in_target_dir, ' is unreadable.', "\n");
 }
 
-print 'Itemize: ' if $verbose;
+print 'done.', "\n";
+
+print 'Itemize: ';
 my $xsltproc_itemize_status = system ("xsltproc --output $article_itemized_wsx_in_target_dir $itemize_stylesheet $article_split_wsx_in_target_dir 2>/dev/null");
 print 'done.', "\n" if $verbose;
 
@@ -301,6 +303,8 @@ my $xsltproc_itemize_exit_code = $xsltproc_itemize_status >> 8;
 if ($xsltproc_itemize_exit_code != 0) {
   croak ('Error: xsltproc did not exit cleanly when applying the itemize stylesheet at ', $itemize_stylesheet, ' to ', $article_split_wsx_in_target_dir, '.', "\n");
 }
+
+print 'done.', "\n";
 
 # Load the article's environment
 
