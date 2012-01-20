@@ -553,7 +553,8 @@ my %conditions_and_properties_shortcuts
      'projectivity' => 'pr',
      'idempotence' => 'id',
      'commutativity' => 'cm',
-     'compatibility' => 'cp');
+     'compatibility' => 'cp',
+     'sethood' => 'se');
 
 sub extension {
   my $path = shift;
