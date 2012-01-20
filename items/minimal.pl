@@ -825,9 +825,9 @@ sub confirm_minimality_of_extension {
 
 # Let's do it
 
-unless ($confirm_only == 1) {
+if (! $confirm_only) {
 
-  if ($paranoid == 1) {
+  if ($paranoid) {
     my $verifier_call = undef;
     if ($checker_only) {
       $verifier_call = "verifier -c -q -l $article_miz > /dev/null 2>&1"
@@ -842,7 +842,7 @@ unless ($confirm_only == 1) {
       exit 1;
     }
 
-    if ($verbose == 1) {
+    if ($verbose) {
       print 'Paranoia: We have confirmed that, before minimization, ', $article_basename, ' is verifiable.', "\n";
     }
   }
