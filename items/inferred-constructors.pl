@@ -21,6 +21,23 @@ sub ensure_valid_xml_file {
   }
 }
 
+sub ensure_readable_file {
+  my $file = shift;
+
+  if (! -e $file) {
+    croak ('Error: ', $file, ' does not exist.');
+  }
+  if (! -f $file) {
+    croak ('Error: ', $file, ' is not a file.');
+  }
+
+  if (! -r $file) {
+    croak ('Error: ', $file, ' is unreadable.');
+  }
+
+  return 1;
+}
+
 my $help = 0;
 my $man = 0;
 my $verbose = 0;
