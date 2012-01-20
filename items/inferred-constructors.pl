@@ -62,23 +62,8 @@ my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
 my $absrefs_stylesheet = "${stylesheet_home}/addabsrefs.xsl";
 
-unless (-e $absrefs_stylesheet) {
-  print 'Error: the addabsrefs stylesheet does not exist at the expected location (', $absrefs_stylesheet, ').', "\n";
-  exit 1;
-}
-
-unless (-r $absrefs_stylesheet) {
-  print 'Error: the addabsrefs stylesheet at ', $absrefs_stylesheet, ' is unreadable.', "\n";
-  exit 1;
-}
-
-if  (! -e $article_xml) {
-  croak ('Error: the semantic XML for ', $article_basename, ' could not be found at the expected location (', $article_xml, ').', "\n");
-}
-
-if  (! -r $article_xml) {
-  croak ('Error: the semantic XML for ', $article_basename, ' at (', $article_xml, ') is unreadable.', "\n");
-}
+ensure_readable_file ($absrefs_stylesheet);
+ensure_readable_file ($article_xml);
 
 # We need to first ensure that we have the absolute form of everything relevant
 foreach my $extension ('xml', 'eno', 'dfs', 'ecl', 'eid', 'epr', 'erd', 'eth', 'esh') {
@@ -93,24 +78,26 @@ foreach my $extension ('xml', 'eno', 'dfs', 'ecl', 'eid', 'epr', 'erd', 'eth', '
   }
 }
 
-ensure_valid_xml_file ($article_xml);
+# ensure_valid_xml_file ($article_xml);
 ensure_valid_xml_file ($article_absolute_xml);
 
 my $inferred_constructors_stylesheet = '/Users/alama/sources/mizar/xsl4mizar/items/inferred-constructors.xsl';
 
-if (! -e $inferred_constructors_stylesheet) {
-  print 'Error: the inferred-constructors stylesheet does not exist at the expected location (', $inferred_constructors_stylesheet, ').', "\n";
+ensure_readable_file ($inferred_constructors_stylesheet);
+
+my %inferred_constructors_table = ();
+
+my @inferred_constructors = `xsltproc --stringparam 'article-directory' '${article_dirname_absolute}/' $inferred_constructors_stylesheet $article_absolute_xml`;
+chomp @inferred_constructors;
+
+foreach my $constructor (@inferred_constructors) {
+  $inferred_constructors_table{$constructor} = 0;
 }
 
-if (! -r $inferred_constructors_stylesheet) {
-  print 'Error: the inferred-constructors stylesheet at ', $inferred_constructors_stylesheet, ' is unreadable.', "\n";
-}
+# We may need to throw in equality, even if it is not mentioned
+# anywhere.  Specifically, we may need its properties (reflexivity and
+# symmetry).
 
-unless (-r $article_xml) {
-  print 'Error: the XML for ', $article_basename, ' at ', $article_xml, ' is unreadable.', "\n";
-  exit 1;
-}
+$inferred_constructors_table{'hidden:rconstructor:1'} = 0;
 
-my @inferred_constructors = `xsltproc --stringparam 'article-directory' '${article_dirname_absolute}/' $inferred_constructors_stylesheet $article_absolute_xml | sort -u | uniq`;
-
-print @inferred_constructors;
+print join ("\n", keys %inferred_constructors_table), "\n";
