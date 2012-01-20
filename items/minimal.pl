@@ -917,9 +917,9 @@ my $minimize_abstractness_exit_code = $minimize_abstractness_status >> 8;
 if ($minimize_abstractness_exit_code != 0) {
   if (-e $minimize_abstractness_errors && -r $minimize_abstractness_errors) {
     my @minimize_abstractness_errors = `cat $minimize_abstractness_errors`;
-    croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_abstractness_exit_code, '.  Here are the errors it emitted:', "\n", @minimize_abstractness_errors);
+    croak ('Error: the abstractness minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_abstractness_exit_code, '.  Here are the errors it emitted:', "\n", @minimize_abstractness_errors);
   } else {
-    croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_abstractness_exit_code, '.');
+    croak ('Error: the abstractness minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_abstractness_exit_code, '.');
   }
 }
 
