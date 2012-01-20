@@ -28,19 +28,20 @@ tpl [/] {
 }
 
 tpl print-everything (#except) {
-  apply [descendant::Pred[@aid and @kind and @absnr and not(@aid = $except)]];
-  apply [descendant::Func[@aid and @kind and @absnr and not(@aid = $except)]];
-  apply [descendant::Adjective[@aid and @kind and @absnr and not(@aid = $except)]];
-  apply [descendant::Typ[@aid and @kind and @absnr and not(@aid = $except)]];
+  apply [descendant::Pred[not(@aid = $except)]];
+  apply [descendant::Func[not(@aid = $except)]];
+  apply [descendant::Adjective[not(@aid = $except)]];
+  apply [descendant::Typ[not(@aid = $except)]];
 }
 
 tpl [Article[@aid]] {
   $aid = `@aid`;
   $aid-lc = lc (#s = $aid);
+  $aid-uc = uc (#s = $aid);
   print-everything (#except = $aid);
 
   // grab the patterns from the xml
-  apply [descendant::Pattern[@constraid and @constrkind and @absconstrnr and not(@constraid = $aid)]];
+  apply [descendant::Pattern[not(@aid = $aid)]];
 
   // inspect the .eno
   $eno = `concat ($aid-lc, ".eno1")`;
@@ -111,14 +112,22 @@ tpl [Article[@aid]] {
 
 }
 
-tpl [*[not(@absnr)]] {
-  msg terminate="yes" "Error: we found an element that lacks an absnr attribute.  This stylesheet must be applied to an absolutized mizar .xml.";
+tpl [*[not(@aid)]] {
+  $n = `name (.)`;
+  $message = `concat ("Error: we found a(n) ", $n, " element that lacks an aid attribute.")`;
+  msg terminate="yes" $message;
 }
 
-tpl [Pattern[@constraid and @constrkind and @absconstrnr]] {
-  $aid-lc = lc (#s = `@constraid`);
-  $kind-lc = lc (#s = `@constrkind`);
-  $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absconstrnr`; "\n";
+tpl [*[not(@absnr)]] {
+  $n = `name (.)`;
+  $message = `concat ("Error: we found a(n) ", $n, " element that lacks an absnr attribute.")`;
+  msg terminate="yes" $message;
+}
+
+tpl [*[not(@kind)]] {
+  $n = `name (.)`;
+  $message = `concat ("Error: we found a(n) ", $n, " element that lacks a kind attribute.")`;
+  msg terminate="yes" $message;
 }
 
 tpl [*[@aid and @kind and @absnr]] {
