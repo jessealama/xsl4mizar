@@ -87,6 +87,13 @@ tpl [Article[@aid]] {
     apply [ReductionRegistrations];
   }
 
+  // needed patterns
+  $eno = `concat ($aid-lc, ".eno")`;
+  $full-eno = `concat ($article-directory, $eno)`;
+  for-each [document ($eno, /)] {
+    apply [Notations];
+  }
+
   // needed property registrations
   $epr = `concat ($aid-lc, ".epr")`;
   $full-epr = `concat ($article-directory, $epr)`;
@@ -107,6 +114,18 @@ tpl [Ref[@kind = "T" and @aid and @absnr]] {
 tpl [Ref[@kind = "D" and @aid and @absnr]] {
   $aid-lc = lowercase (#string = `@aid`);
   $aid-lc; ":"; "deftheorem"; ":"; `@absnr`;
+}
+
+tpl [Notations] {
+  for-each [Pattern] {
+    apply [.]; "\n";
+  }
+}
+
+tpl [Pattern[@aid and @kind and @nr]] {
+  $aid-lc = lowercase (#string = `@aid`);
+  $kind-lc = lowercase (#string = `@kind`);
+  $aid-lc; ":"; $kind-lc; "pattern"; ":"; `@nr`;
 }
 
 tpl [Schemes] {
