@@ -29,13 +29,12 @@ tpl [DefinitionBlock] {
   }
 
   apply [Definition];
-
-  for-each [Correctness/Coherence] {
-    apply [.]; "\n";
-  }
 }
 
 tpl [Definition] {
+  for-each [Correctness/Coherence] {
+    apply [.]; "\n";
+  }
   for-each [Existence | Uniqueness | Compatibility ] {
     apply [.]; "\n";
   }
@@ -50,8 +49,16 @@ tpl [Definition] {
 	    | JustifiedProperty/Involutiveness
 	    | JustifiedProperty/Projectivity
 	    | JustifiedProperty/Idempotence
-	    | JustifiedProperty/Commutativity] {
+	    | JustifiedProperty/Commutativity
+	    | JustifiedProperty/Sethood] {
     apply [.]; "\n";
+  }
+
+  if [@kind = "K" and not(Existence)] {
+    "existence"; "\n";
+  }
+  if [@kind = "K" and not(Uniqueness)] {
+    "uniqueness"; "\n";
   }
 }
 
@@ -114,4 +121,8 @@ tpl [Idempotence] {
 
 tpl [Commutativity] {
   "commutativity";
+}
+
+tpl [Sethood] {
+  "sethood";
 }
