@@ -223,8 +223,14 @@ if (grep (/^$/, @constructor_deps)) {
   croak ('Error: the inferred-constructors stylesheet generated some junk output.');
 }
 
-foreach my $dep (@constructor_deps, @non_constructor_deps) {
-  print $dep, "\n";
+my %deps_table = ();
+
+foreach my $dep (@constructor_deps) {
+  $deps_table{$dep} = 0;
+}
+
+foreach my $dep (@non_constructor_deps) {
+  $deps_table{$dep} = 0;
 }
 
 # Print constructor property dependencies
@@ -244,11 +250,16 @@ foreach my $constructor (@constructor_deps) {
     }
     foreach my $property (@properties) {
       my $property_lc = lc $property;
-      print $constructor, '/', $property_lc, "\n";
+      my $property_key = "${constructor}[${property_lc}]";
+      $deps_table{$property_key} = 0;
     }
   } else {
     croak ('Error: unable to make sense of the constructor \'', $constructor, '\'.');
   }
+}
+
+foreach my $dep (keys %deps_table) {
+  print $dep, "\n";
 }
 
 __END__

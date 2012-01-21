@@ -28,88 +28,121 @@ tpl [/] {
 }
 
 tpl print-everything (#except) {
-  apply [descendant::Pred[@aid and @kind and @absnr and not(@aid = $except)]];
-  apply [descendant::Func[@aid and @kind and @absnr and not(@aid = $except)]];
-  apply [descendant::Adjective[@aid and @kind and @absnr and not(@aid = $except)]];
-  apply [descendant::Typ[@aid and @kind and @absnr and not(@aid = $except)]];
+  apply [descendant::Pred[not(@aid = $except)]];
+  apply [descendant::Func[not(@aid = $except)]];
+  apply [descendant::Adjective[not(@aid = $except)]];
+  apply [descendant::Typ[not(@aid = $except)]];
 }
 
 tpl [Article[@aid]] {
   $aid = `@aid`;
   $aid-lc = lc (#s = $aid);
+  $aid-uc = uc (#s = $aid);
   print-everything (#except = $aid);
 
   // grab the patterns from the xml
-  apply [descendant::Pattern[@constraid and @constrkind and @absconstrnr and not(@constraid = $aid)]];
+  apply [descendant::Pattern[not(@aid = $aid)]];
 
   // inspect the .eno
-  $eno = `concat ($aid-lc, ".eno")`;
+  $eno = `concat ($aid-lc, ".eno1")`;
   $full-eno = `concat ($article-directory, $eno)`;
   for-each [document ($full-eno, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .dfs
-  $dfs = `concat ($aid-lc, ".dfs")`;
+  $dfs = `concat ($aid-lc, ".dfs1")`;
   $full-dfs = `concat ($article-directory, $dfs)`;
   for-each [document ($full-dfs, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .ecl
-  $ecl = `concat ($aid-lc, ".ecl")`;
+  $ecl = `concat ($aid-lc, ".ecl1")`;
   $full-ecl = `concat ($article-directory, $ecl)`;
   for-each [document ($full-ecl, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .eid
-  $eid = `concat ($aid-lc, ".eid")`;
+  $eid = `concat ($aid-lc, ".eid1")`;
   $full-eid = `concat ($article-directory, $eid)`;
   for-each [document ($full-eid, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .epr
-  $epr = `concat ($aid-lc, ".epr")`;
+  $epr = `concat ($aid-lc, ".epr1")`;
   $full-epr = `concat ($article-directory, $epr)`;
   for-each [document ($full-epr, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .erd
-  $erd = `concat ($aid-lc, ".erd")`;
+  $erd = `concat ($aid-lc, ".erd1")`;
   $full-erd = `concat ($article-directory, $erd)`;
   for-each [document ($full-erd, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .esh
-  $esh = `concat ($aid-lc, ".esh")`;
+  $esh = `concat ($aid-lc, ".esh1")`;
   for-each [document ($esh, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .eth
-  $eth = `concat ($aid-lc, ".eth")`;
+  $eth = `concat ($aid-lc, ".eth1")`;
   for-each [document ($eth, /)] {
     print-everything (#except = $aid);
   }
 
+  // grab constructor with an abstractness property from the atr
+  $atr = `concat ($aid-lc, ".atr")`;
+  for-each [document ($atr, /)] {
+    for-each [Constructors] {
+      for-each [Constructor[@kind and @nr and @aid and Properties/Abstractness]] {
+        $this-kind = lc (#s = `@kind`);
+        $this-aid = lc (#s = `@aid`);
+        $this-nr = `@nr`;
+        $this-aid; ":"; $this-kind; "constructor"; ":"; $this-nr; "\n";
+      }
+    }
+  }
+
+}
+
+tpl [*[not(@aid)]] {
+  $n = `name (.)`;
+  $message = `concat ("Error: we found a(n) ", $n, " element that lacks an aid attribute.")`;
+  msg terminate="yes" $message;
 }
 
 tpl [*[not(@absnr)]] {
-  msg terminate="yes" "Error: we found an element that lacks an absnr attribute.  This stylesheet must be applied to an absolutized mizar .xml.";
+  $n = `name (.)`;
+  $message = `concat ("Error: we found a(n) ", $n, " element that lacks an absnr attribute.")`;
+  msg terminate="yes" $message;
 }
 
-tpl [Pattern[@constraid and @constrkind and @absconstrnr]] {
-  $aid-lc = lc (#s = `@constraid`);
-  $kind-lc = lc (#s = `@constrkind`);
-  $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absconstrnr`; "\n";
+tpl [*[not(@kind)]] {
+  $n = `name (.)`;
+  $message = `concat ("Error: we found a(n) ", $n, " element that lacks a kind attribute.")`;
+  msg terminate="yes" $message;
 }
 
 tpl [*[@aid and @kind and @absnr]] {
   $aid-lc = lc (#s = `@aid`);
   $kind-lc = lc (#s = `@kind`);
   $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absnr`; "\n";
+}
+
+
+// Used only to fish out constructors that have an abstractness property
+tpl [Constructors] {
+  for-each [Constructor[@kind and @nr and @aid and Properties/Abstractness]] {
+    $kind = lowercase (#string = `@kind`);
+    $aid = lowercase (#string = `@aid`);
+    $nr = `@nr`;
+    $aid; ":"; $kind-lc; "constructor"; ":"; $nr; "\n";
+  }
 }

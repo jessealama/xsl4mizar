@@ -442,9 +442,11 @@
       <xsl:copy-of select="@*"/>
       <xsl:if test="$ethprocess = 0">
         <xsl:variable name="k" select="@kind"/>
-        <xsl:attribute name="aid">
-          <xsl:value-of select="$aname"/>
-        </xsl:attribute>
+        <xsl:if test="not(@aid)">
+          <xsl:attribute name="aid">
+            <xsl:value-of select="$aname"/>
+          </xsl:attribute>
+        </xsl:if>
         <xsl:attribute name="nr">
           <xsl:value-of select="1 + count(preceding::*[(name()=$n) and (@kind=$k)])"/>
         </xsl:attribute>
