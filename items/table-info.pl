@@ -47,6 +47,56 @@ if (! defined $table_file && defined $ENV{'DEPENDENCY_TABLE'}) {
 
 ensure_readable_file ($table_file);
 
+my %table = ();
+my %all_items = ();
+my %dep_items = ();
+my %trivial_dep_items = (); # items that explicitly have no dependencies
+my %non_trivial_dep_items = (); # items that have at least item on which they depend
+my %used = (); # items that are used by at least one other item
+
+sub load_table {
+  open (my $table_fh, '<', $table_file)
+    or croak ('Error: unable to open the dependency table file at ', $table_file, '.', "\n");
+  while (defined (my $table_line = <$table_fh>)) {
+    chomp $table_line;
+
+    if ($table_line =~ / \s{2} /x) {
+      croak ('Error: a line in the supplied dependency table has multiple consecutive spaces.', "\n");
+    }
+    if ($table_line =~ /\A \s /x) {
+      croak ('Error: a line in the supplied dependency table begins with a space.', "\n");
+    }
+    if ($table_line =~ /\A \z/x) {
+      croak ('Error: there is a blank line in the supplied dependency table.', "\n");
+    }
+
+    my ($item, my @deps) = split (/ /, $table_line);
+    $dep_items{$item} = 0;
+    $all_items{$item} = 0;
+    $table{$item} = \@deps;
+    foreach my $dep (@deps) {
+      $all_items{$dep} = 0;
+      $used{$dep} = 0;
+    }
+    if (scalar @deps == 0) {
+      $trivial_dep_items{$item} = 0;
+    } else {
+      $non_trivial_dep_items{$item} = 0;
+    }
+  }
+  close $table_fh
+    or croak ('Error: unable to close the input filehandle for ', $table_file, '.', "\n");
+}
+
+sub escape_item {
+  my $item = shift;
+  $item =~ s/\[/\\[/;
+  $item =~ s/\]/\\]/;
+  return $item;
+}
+
+load_table ();
+
 my %command_dispatch_table =
   ('all' => \&all,
    'count-all' => \&count_all,
@@ -92,51 +142,7 @@ if (! defined $command_dispatch_table{$command}) {
 
 # Command line arguments seem to be valid; let's load the table.
 
-my %table = ();
-my %all_items = ();
-my %dep_items = ();
-my %trivial_dep_items = (); # items that explicitly have no dependencies
-my %non_trivial_dep_items = (); # items that have at least item on which they depend
-my %used = (); # items that are used by at least one other item
-
-open (my $table_fh, '<', $table_file)
-  or croak ('Error: unable to open the dependency table file at ', $table_file, '.', "\n");
-while (defined (my $table_line = <$table_fh>)) {
-  chomp $table_line;
-
-  if ($table_line =~ / \s{2} /x) {
-    croak ('Error: a line in the supplied dependency table has multiple consecutive spaces.', "\n");
-  }
-  if ($table_line =~ /\A \s /x) {
-    croak ('Error: a line in the supplied dependency table begins with a space.', "\n");
-  }
-  if ($table_line =~ /\A \z/x) {
-    croak ('Error: there is a blank line in the supplied dependency table.', "\n");
-  }
-
-  my ($item, my @deps) = split (/ /, $table_line);
-  $dep_items{$item} = 0;
-  $all_items{$item} = 0;
-  $table{$item} = \@deps;
-  foreach my $dep (@deps) {
-    $all_items{$dep} = 0;
-    $used{$dep} = 0;
-  }
-  if (scalar @deps == 0) {
-    $trivial_dep_items{$item} = 0;
-  } else {
-    $non_trivial_dep_items{$item} = 0;
-  }
-}
-close $table_fh
-  or croak ('Error: unable to close the input filehandle for ', $table_file, '.', "\n");
-
-sub escape_item {
-  my $item = shift;
-  $item =~ s/\[/\\[/;
-  $item =~ s/\]/\\]/;
-  return $item;
-}
+load_table ();
 
 sub all {
   print join ("\n", keys %all_items), "\n";
