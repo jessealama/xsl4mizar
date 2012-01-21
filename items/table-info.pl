@@ -73,7 +73,8 @@ my %command_dispatch_table =
    'truncate' => \&truncate_at_items,
    'inverse-truncate' => \&inverse_truncate_at_items,
    'generated-subgraph' => \&generated_subgraph,
-   'promote-to-axiom' => \&promote_to_axiom);
+   'promote-to-axiom' => \&promote_to_axiom,
+   'mizar-tests' => \&run_mizar_tests);
 
 if (scalar @ARGV == 0) {
   pod2usage (1);
@@ -706,6 +707,59 @@ sub promote_to_axiom {
       $handled{$item} = 0;
 
     }
+  }
+
+}
+
+sub is_constructor_item {
+  my $item = shift;
+  if (defined $item) {
+    if ($item =~ / \A [a-z0-9_]+ : . constructor : [0-9]+ \z /x) {
+      return 1;
+    } else {
+      return 0;
+    }
+  } else {
+    croak ('Error: we cannot determine whether an undefined value is a constructor item.', "\n");
+  }
+}
+
+sub is_pattern_item {
+  my $item = shift;
+  if (defined $item) {
+    if ($item =~ / \A [a-z0-9_]+ : . pattern : [0-9]+ \z /x) {
+      return 1;
+    } else {
+      return 0;
+    }
+  } else {
+    croak ('Error: we cannot determine whether an undefined value is a pattern item.', "\n");
+  }
+}
+
+sub run_mizar_tests {
+
+  # Patterns depend only on constructors
+  print 'Does every pattern depend only upon constructors? ';
+  my $already_said_no = 0;
+  foreach my $item (keys %non_trivial_dep_items) {
+    if (is_pattern_item ($item)) {
+      my @deps = @{$table{$item}};
+      foreach my $dep (@deps) {
+	if (! is_constructor_item ($dep)) {
+	  if ($already_said_no) {
+	    print '* ', $item, ' depends on ', $dep, "\n";
+	  } else {
+	    print 'No:', "\n";
+	    $already_said_no = 1;
+	  }
+	}
+      }
+    }
+  }
+
+  if (! $already_said_no) {
+    print 'Yes.', "\n";
   }
 
 }
