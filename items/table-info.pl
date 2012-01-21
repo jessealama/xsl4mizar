@@ -36,10 +36,13 @@ GetOptions('help|?' => \$help,
   or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
-# pod2usage(1) if (scalar @ARGV != 2);
 
-if (! defined $table_file) {
+if (! defined $table_file && ! defined $ENV{'DEPENDENCY_TABLE'}) {
   pod2usage (1);
+}
+
+if (! defined $table_file && defined $ENV{'DEPENDENCY_TABLE'}) {
+  $table_file = $ENV{'DEPENDENCY_TABLE'};
 }
 
 ensure_readable_file ($table_file);
