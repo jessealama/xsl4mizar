@@ -91,6 +91,12 @@ foreach my $i (1 .. scalar @dcos) {
     foreach my $property (@properties) {
       my $property_name = $property->nodeName ();
       my $property_name_lc = lc $property_name;
+
+      # I wish this would be fixed
+      if ($property_name_lc eq 'antisymmetry') {
+	$property_name_lc = 'asymmetry';
+      }
+
       my $property_key = "${article_basename}:${kind_lc}constructor:${num}[${property_name_lc}]";
       print $property_key, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
       $handled_constructor_properties{$property_key} = 0;
