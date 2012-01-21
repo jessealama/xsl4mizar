@@ -26,6 +26,18 @@ sub tmpfile_path {
   }
 }
 
+sub ensure_directory {
+  my $dir = shift;
+  if (! -e $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist.';
+  }
+
+  if (! -d $dir) {
+    die 'Error: the required directory ', $dir, ' does not exist (as a directory).';
+  }
+  return 1;
+}
+
 sub ensure_readable_file {
   my $file = shift;
 
