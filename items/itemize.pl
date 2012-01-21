@@ -81,13 +81,7 @@ unless (defined $ENV{"MIZFILES"}) {
 
 my $mizfiles = $ENV{"MIZFILES"};
 
-unless (-e $mizfiles) {
-  croak ('Error: the value of the MIZFILES environment variable, ', $mizfiles, ' is invalid because there is no file or directory there.', "\n");
-}
-
-unless (-d $mizfiles) {
-  croak ('Error: the value of the MIZFILES environment variable, ', $mizfiles, ' is invalid because it is not a directory.', "\n");
-}
+ensure_directory ($mizfiles);
 
 # Look for the required programs
 
@@ -117,25 +111,8 @@ my $article_miz = "${article_dirname}/${article_basename}.miz";
 my $article_err = "${article_dirname}/${article_basename}.err";
 my $article_evl = "${article_dirname}/${article_basename}.evl";
 
-unless (-e $article_miz) {
-  croak ('Error: there is no Mizar article at ', $article_miz, "\n");
-}
-
-if (-d $article_miz) {
-  croak ('Error: the supplied Mizar article ', $article_miz, ' is actually a directory.', "\n");
-}
-
-unless (-r $article_miz) {
-  croak ('Error: the Mizar article at ', $article_miz, ' is unreadable.', "\n");
-}
-
-unless (-e $stylesheet_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.', "\n");
-}
-
-unless (-d $stylesheet_home) {
-  croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.', "\n");
-}
+ensure_readable_file ($article_miz);
+ensure_directory ($stylesheet_home);
 
 my $split_stylesheet = "${stylesheet_home}/split.xsl";
 my $itemize_stylesheet = "${stylesheet_home}/itemize.xsl";
@@ -148,12 +125,7 @@ my @stylesheets = ('split', 'itemize', 'wsm', 'extend-evl', 'conditions-and-prop
 
 foreach my $stylesheet (@stylesheets) {
   my $stylesheet_path = "${stylesheet_home}/${stylesheet}.xsl";
-  unless (-e $stylesheet_path) {
-    croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').', "\n");
-  }
-  unless (-r $stylesheet_path) {
-    croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.', "\n");
-  }
+  ensure_readable_file ($stylesheet_path);
 }
 
 if (defined $target_directory) {
@@ -281,9 +253,7 @@ my $article_wsx_in_target_dir = "${target_directory}/${article_basename}.wsx";
 my $article_split_wsx_in_target_dir = "${article_wsx_in_target_dir}.split";
 my $article_itemized_wsx_in_target_dir = "${article_split_wsx_in_target_dir}.itemized";
 
-unless (-e $article_wsx_in_target_dir) {
-  croak ('Error: the .wsx file for ', $article_basename, ' in ', $target_directory, ' does not exist.', "\n");
-}
+ensure_readable_file ($article_itemized_wsx_in_target_dir);
 
 print 'Split: ';
 my $xsltproc_split_status = system ("xsltproc --output $article_split_wsx_in_target_dir $split_stylesheet $article_wsx_in_target_dir 2>/dev/null");
@@ -295,15 +265,7 @@ if ($xsltproc_split_exit_code != 0) {
   croak ('Error: xsltproc did not exit cleanly when applying the split stylesheet at ', $split_stylesheet, ' to ', $article_wsx_in_target_dir, '.', "\n");
 }
 
-# sanity check
-
-unless (-e $article_split_wsx_in_target_dir) {
-  croak ('Error: the split form of the .wsx file for ', $article_basename, ' in ', $target_directory, ' does not exist at the expected location (', $article_split_wsx_in_target_dir, ').', "\n");
-}
-
-unless (-r $article_split_wsx_in_target_dir) {
-  croak ('Error: the split form of the .wsx file for ', $article_basename, ' in ', $target_directory, ' at ', $article_split_wsx_in_target_dir, ' is unreadable.', "\n");
-}
+ensure_readable_file ($article_split_wsx_in_target_dir);
 
 print 'done.', "\n";
 
@@ -320,13 +282,7 @@ print 'done.', "\n";
 
 # Load the article's environment
 
-unless (-e $article_evl_in_target_dir) {
-  croak ('Error: the .evl file for ', $article_basename, ' does not exist.', "\n");
-}
-
-unless (-r $article_evl_in_target_dir) {
-  croak ('Error: the .evl file for ', $article_basename, ' is unreadable.', "\n");
-}
+ensure_readable_file ($article_evl_in_target_dir);
 
 my $xml_parser = XML::LibXML->new (suppress_warnings => 1,
 				   suppress_errors => 1);
