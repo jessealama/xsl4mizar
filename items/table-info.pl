@@ -7,6 +7,7 @@ use Pod::Usage;
 use Carp qw(croak);
 use File::Temp qw(tempfile);
 use List::Util qw(shuffle);
+use Graph;
 
 sub ensure_readable_file {
   my $file = shift;
@@ -45,10 +46,15 @@ ensure_readable_file ($table_file);
 
 my %command_dispatch_table =
   ('all' => \&all,
+   'count-all' => \&count_all,
    'dependent-items' => \&dependent_items,
+   'count-dependent-items' => \&count_dependent_items,
    'explicitly-independent-items' => \&explicitly_independent_items,
+   'count-explicitly-independent-items' => \&count_explicitly_independent_items,
    'implicitly-independent-items' => \&implicitly_independent_items,
+   'count-implicitly-independent-items' => \&count_implicitly_independent_items,
    'independent-items' => \&independent_items,
+   'count-independent-items' => \&count_independent_items,
    'dependencies-of' => \&dependencies_of,
    'items-depending-on' => \&items_depending_on,
    'random-item' => \&random_item,
@@ -60,7 +66,14 @@ my %command_dispatch_table =
    'sort' => \&sort_table,
    'shuffle' => \&shuffle_table,
    'complete' => \&complete_table,
-   'invert' => \&invert_table);
+   'invert' => \&invert_table,
+   'structural-check' => \&check_structurally,
+   'predecessors' => \&predecessors_of_item,
+   'successors' => \&successors_of_item,
+   'truncate' => \&truncate_at_items,
+   'inverse-truncate' => \&inverse_truncate_at_items,
+   'generated-subgraph' => \&generated_subgraph,
+   'promote-to-axiom' => \&promote_to_axiom);
 
 if (scalar @ARGV == 0) {
   pod2usage (1);
@@ -125,10 +138,18 @@ sub all {
   print join ("\n", keys %all_items), "\n";
 }
 
+sub count_all {
+  print scalar keys %all_items, "\n";
+}
+
 sub dependent_items {
   if (scalar keys %dep_items > 0) {
     print join ("\n", keys %dep_items), "\n";
   }
+}
+
+sub count_dependent_items {
+  print scalar keys %dep_items, "\n";
 }
 
 sub implicitly_independent_items {
@@ -139,15 +160,41 @@ sub implicitly_independent_items {
   }
 }
 
+sub count_implicitly_independent_items {
+  my $c = 0;
+  foreach my $item (keys %all_items) {
+    if (! defined $dep_items{$item}) {
+      $c++;
+    }
+  }
+  print $c, "\n";
+}
+
 sub explicitly_independent_items {
   if (scalar keys %trivial_dep_items > 0) {
     print join ("\n", keys %trivial_dep_items), "\n";
   }
 }
 
+sub count_explicitly_independent_items {
+  print scalar keys %trivial_dep_items, "\n";
+}
+
 sub independent_items {
   print join ("\n", keys %trivial_dep_items);
   implicitly_independent_items ();
+}
+
+sub count_independent_items {
+
+  my $c = 0;
+  foreach my $item (keys %all_items) {
+    if (! defined $dep_items{$item}) {
+      $c++;
+    }
+  }
+
+  print $c + scalar keys %trivial_dep_items, "\n";
 }
 
 sub dependencies_of {
@@ -369,6 +416,296 @@ sub invert_table {
       print ' ', join (' ', @inverse_deps);
     }
     print "\n";
+  }
+
+}
+
+sub load_graph {
+
+  my $g = Graph->new ();
+
+  foreach my $item (keys %all_items) {
+    $g->add_vertex ($item);
+  }
+
+  foreach my $item (keys %non_trivial_dep_items) {
+    my @deps = @{$table{$item}};
+    foreach my $dep (@deps) {
+      $g->add_edge ($dep, $item); # orient things this way to align
+                                  # our notion of dependence with the
+                                  # Graph module's notion of successor
+                                  # and predecessor.
+    }
+  }
+
+  return $g;
+
+}
+
+sub check_structurally {
+
+  my $g = load_graph ();
+
+  my @cycle = $g->find_a_cycle ();
+
+  if (scalar @cycle > 0) {
+    print $table_file, ' has a cycle:', "\n", join ("\n", @cycle), "\n";
+  } else {
+    print $table_file, ' is acyclic.', "\n";
+  }
+}
+
+sub predecessors_of_item {
+
+  if (scalar @ARGV != 2) {
+    pod2usage (1);
+  }
+  my $item = $ARGV[1];
+
+  if (! defined $all_items{$item}) {
+    croak ('Error: ', $item, ' is not present in ', $table_file, '.', "\n");
+  }
+
+  if (defined $non_trivial_dep_items{$item}) {
+    my $g = load_graph ();
+
+    my @preds = $g->all_predecessors ($item);
+
+    if (scalar @preds > 0) {
+      print join ("\n", @preds), "\n";
+    }
+  }
+
+}
+
+sub successors_of_item {
+
+  if (scalar @ARGV != 2) {
+    pod2usage (1);
+  }
+  my $item = $ARGV[1];
+
+  if (! defined $all_items{$item}) {
+    croak ('Error: ', $item, ' is not present in ', $table_file, '.', "\n");
+  }
+
+  my $g = load_graph ();
+
+  my @succs = $g->all_successors ($item);
+
+  if (scalar @succs > 0) {
+    print join ("\n", @succs), "\n";
+  }
+
+}
+
+sub truncate_at_items {
+
+  if (scalar @ARGV < 2) {
+    pod2usage (1);
+  }
+
+  my @items = @ARGV[1 .. scalar @ARGV - 1];
+
+  foreach my $item (@items) {
+    if (! defined $all_items{$item}) {
+      croak ('Error: ', $item, ' is not present in ', $table_file, '.', "\n");
+    }
+  }
+
+  my $g = load_graph ();
+
+  my @preds = $g->all_predecessors (@items);
+
+  my %pred_table = ();
+  foreach my $item (@items, @preds) {
+    $pred_table{$item} = 0;
+  }
+
+  my %handled = (); # to avoid printing items and their dependencies
+                    # multiple times
+
+  foreach my $item (@items, @preds) {
+    if (defined $handled{$item}) {
+      # we've seen this before; don't do anything
+    } else {
+      print $item;
+      if (defined $non_trivial_dep_items{$item}) {
+	my @deps = @{$table{$item}};
+	foreach my $dep (@deps) {
+	  if (defined $pred_table{$dep}) {
+	    print ' ', $dep;
+	  } else {
+	    # don't print $dep: there is no path from any of @items to it
+	  }
+	}
+      }
+      print "\n";
+
+      $handled{$item} = 0;
+
+    }
+  }
+
+}
+
+sub inverse_truncate_at_items {
+
+  if (scalar @ARGV < 2) {
+    pod2usage (1);
+  }
+
+  my @items = @ARGV[1 .. scalar @ARGV - 1];
+
+  foreach my $item (@items) {
+    if (! defined $all_items{$item}) {
+      croak ('Error: ', $item, ' is not present in ', $table_file, '.', "\n");
+    }
+  }
+
+  my $g = load_graph ();
+
+  my @succs = $g->all_successors (@items);
+
+  my %succ_table = ();
+  foreach my $item (@items, @succs) {
+    $succ_table{$item} = 0;
+  }
+
+  my %handled = (); # to avoid printing items and their dependencies
+                    # multiple times
+
+  foreach my $item (@items, @succs) {
+    if (defined $handled{$item}) {
+      # we've seen this before; don't do anything
+    } else {
+
+      print $item;
+      if (defined $non_trivial_dep_items{$item}) {
+	my @deps = @{$table{$item}};
+	foreach my $dep (@deps) {
+	  if (defined $succ_table{$dep}) {
+	    print ' ', $dep;
+	  } else {
+	    # don't print $dep: there is no path from it to any of @items
+	  }
+	}
+      }
+      print "\n";
+
+      $handled{$item} = 0;
+
+    }
+  }
+
+}
+
+sub generated_subgraph {
+
+  if (scalar @ARGV < 2) {
+    pod2usage (1);
+  }
+
+  my @items = @ARGV[1 .. scalar @ARGV - 1];
+
+  foreach my $item (@items) {
+    if (! defined $all_items{$item}) {
+      croak ('Error: ', $item, ' is not present in ', $table_file, '.', "\n");
+    }
+  }
+
+  my $g = load_graph ();
+
+  my @preds = $g->all_predecessors (@items);
+  my @succs = $g->all_successors (@items);
+
+  my %generated = ();
+  foreach my $item (@items, @preds, @succs) {
+    $generated{$item} = 0;
+  }
+
+  my %handled = (); # to avoid printing items and their dependencies
+                    # multiple times
+
+  foreach my $item (@items, @preds, @succs) {
+    if (defined $handled{$item}) {
+      # we've seen this before; don't do anything
+    } else {
+      print $item;
+      if (defined $non_trivial_dep_items{$item}) {
+	my @deps = @{$table{$item}};
+	foreach my $dep (@deps) {
+	  if (defined $generated{$dep}) {
+	    print ' ', $dep;
+	  } else {
+	    # don't print $dep: there is no path to it from it or to
+	    # that passes through a member of @items
+	  }
+	}
+      }
+      print "\n";
+
+      $handled{$item} = 0;
+
+    }
+  }
+
+}
+
+sub promote_to_axiom {
+
+  if (scalar @ARGV < 2) {
+    pod2usage (1);
+  }
+
+  my @items = @ARGV[1 .. scalar @ARGV - 1];
+
+  my %items_table = ();
+  foreach my $item (@items) {
+    if (! defined $all_items{$item}) {
+      croak ('Error: ', $item, ' is not present in ', $table_file, '.', "\n");
+    }
+    $items_table{$item} = 0;
+  }
+
+  my $g = load_graph ();
+
+  # Find the "frontier" items: the items that are not used by any
+  # other item
+  my %frontier = ();
+  foreach my $item ($g->vertices ()) {
+    if ($g->out_degree ($item) == 0) {
+      $frontier{$item} = 0;
+    }
+  }
+
+  my %handled = ();
+  my @envelope = keys %frontier;
+  while (@envelope) {
+    my $item = pop @envelope;
+    if (defined $handled{$item}) {
+      # we've handled this guy -- nothing to do
+    } else {
+
+      print $item;
+
+      if (defined $items_table{$item}) {
+	# stop: we've reached the new axiom
+      } else {
+	if (defined $non_trivial_dep_items{$item}) {
+	  my @deps = @{$table{$item}};
+	  foreach my $dep (@deps) {
+	    print ' ', $dep;
+	    push (@envelope, $dep);
+	  }
+	}
+      }
+
+      print "\n";
+
+      $handled{$item} = 0;
+
+    }
   }
 
 }
