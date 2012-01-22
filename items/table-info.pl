@@ -221,6 +221,24 @@ sub dependencies_of {
   }
 }
 
+sub used_items {
+  my %seen = ();
+  foreach my $item (keys %all_items) {
+    my $item_escaped = escape_item ($item);
+    foreach my $other_item (keys %non_trivial_dep_items) {
+      my @deps = @{$table{$other_item}};
+      if (grep { /\A $item_escaped \z/x } @deps) {
+	if (defined $seen{$item}) {
+	  # don't do anything: we've seen $item before
+	} else {
+	  print $item, "\n";
+	  $seen{$item} = 0;
+	}
+      }
+    }
+  }
+}
+
 sub items_depending_on {
   if (scalar @ARGV != 2) {
     pod2usage (1);
