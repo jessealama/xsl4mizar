@@ -158,103 +158,74 @@ my %fragment_to_item_table = ();
 foreach my $item_to_fragment_line (@item_to_fragment_lines) {
   # Easy: each item comes from exactly one fragment
   (my $item, my $fragment) = split / => /, $item_to_fragment_line;
-  $item_to_fragment_table{$item} = $fragment;
 
-  # Less easy: some fragments (specifically, definition blocks)
-  # generate multiple items
-  my @generated_items;
-  if (defined $fragment_to_item_table{$fragment}) {
-    @generated_items = @{$fragment_to_item_table{$fragment}};
-  } else {
-    @generated_items = ();
-  }
-  push (@generated_items, $item);
-  $fragment_to_item_table{$fragment} = \@generated_items;
+  # my $fragment = undef;
+
+  # if ($maybe_pseudo_fragment =~ / ([a-z0-9_]+) : ([^:]+) : ([0-9]+) \[ [a-z]{2} \] \z/x) {
+  #   $fragment = "${1}:${2}:${3}";
+  #   # DEBUG
+  #   warn 'pseudo-fragment ', $maybe_pseudo_fragment, ' comes from ', $fragment, '.';
+  # } else {
+  #   # This isn't a pseudo fragment after all
+  #   $fragment = $maybe_pseudo_fragment;
+  # }
+
+  $item_to_fragment_table{$item} = $fragment;
+  $fragment_to_item_table{$fragment} = $item;
+
+  # # Less easy: some fragments (specifically, definition blocks)
+  # # generate multiple items
+  # my @generated_items;
+  # if (defined $fragment_to_item_table{$fragment}) {
+  #   @generated_items = @{$fragment_to_item_table{$fragment}};
+  # } else {
+  #   @generated_items = ();
+  # }
+  # push (@generated_items, $item);
+  # $fragment_to_item_table{$fragment} = \@generated_items;
 }
+
+# DEBUG: print out the table
+# foreach my $fragment (keys %fragment_to_item_table) {
+#   my @deps = @{$fragment_to_item_table{$fragment}};
+#   # warn $fragment, ' generated ', join (' ', @deps);
+# }
 
 sub resolve_item {
   my $item = shift;
-  my $resolved;
-  if ($item =~ /^ckb([0-9]+):([^:]+):/) {
+
+  if ($item =~ /\A ckb ([0-9]+) : ([^:]+) : [0-9]+ /x) {
     (my $item_fragment_num, my $item_kind) = ($1, $2);
 
-    unless (defined $item_fragment_num && defined $item_kind) {
-      print "\n";
-      croak ('Error: we could not extract the fragment number and item kind from the string "', $item, '"');
+    my $item_fragment = undef;
+
+    if ($item =~ / (.) pattern : /x) {
+      my $pattern_kind = $1;
+      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${pattern_kind}p]";
+    } elsif ($item =~ / (.) definiens /x) {
+      my $definiens_kind = $1;
+      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${definiens_kind}f]";
+    } elsif ($item =~ / deftheorem /x) {
+      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[dt]";
+    } elsif ($item =~ / \[ existence \] /x ) {
+      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[ex]";
+    } elsif ($item =~ / (.) constructor /x) {
+      my $constructor_kind = $1;
+      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${constructor_kind}c]";
+    } else {
+      $item_fragment = "${article_basename}:fragment:${item_fragment_num}";
     }
-
-    my $item_fragment = "${article_basename}:fragment:${item_fragment_num}";
-    my $fragment_miz = "${article_dir}/text/ckb${item_fragment_num}.miz";
-    my $fragment_xml = "${article_dir}/text/ckb${item_fragment_num}.xml";
-    my $fragment_abs_xml = "${article_dir}/text/ckb${item_fragment_num}.xml1";
-
-    ensure_readable_file ($fragment_miz);
-    ensure_valid_xml_file ($fragment_abs_xml);
 
     if (defined $fragment_to_item_table{$item_fragment}) {
 
-      my @generated_items = @{$fragment_to_item_table{$item_fragment}};
+      return $fragment_to_item_table{$item_fragment};
 
-      if (scalar @generated_items == 0) {
-        print "\n";
-        croak ('Error: somehow the entry in the fragment-to-item table for ', $item_fragment, ' is an empty list.');
-      }
-
-      if (scalar @generated_items == 1) {
-        # Easy: the dependent fragment generated exactly one item;
-        # $item depends on it
-        $resolved = $generated_items[0];
-      } else {
-        # Less easy: the dependent item generated more than one
-        # item; we need to find the one that is congruent with
-        # $dep_fragment.
-
-        my @candidate_items = grep (/:${item_kind}:/, @generated_items);
-
-        if (scalar @candidate_items == 0) {
-          print "\n";
-          croak ('Error: there are no candidate matches for ', $item_fragment, ' in the fragment-to-item table.');
-        }
-
-	# This is (or ought to be) the case of constructor properties
-        if (scalar @candidate_items > 1) {
-	  if ($item =~ / \[ ([a-z]+) \] \z/x) {
-	    my $property = $1;
-
-	    # Annoying bug
-	    if ($property eq 'antisymmetry') {
-	      $property = 'asymmetry';
-	    }
-
-	    my @generated_properties = grep (/ \[ $property \] \z/x, @candidate_items);
-	    if (scalar @generated_properties == 0) {
-	      croak ('Error: it appears that fragment ', $item_fragment, ' does not generate a constructor property that is congruent with the one we are searching for (', $item, ').', "\n", 'This fragment generates the following items:', "\n", join ("\n", @candidate_items), "\n");
-	    } elsif (scalar @generated_properties > 1) {
-	      croak ('Error: it appears that fragment ', $item_fragment, '  generates multiple constructor property that are congruent with the one we are searching for (', $item, '):', join ("\n", @generated_properties), "\n", 'Which one should we choose?', "\n");
-	    } else {
-	      $resolved = $generated_properties[0];
-	    }
-	  } else {
-	    my @generated_non_properties = grep {!/ \[ /x} @candidate_items;
-	    if (scalar @generated_non_properties == 0) {
-	      croak ('Error: the non-property item ', $item, ' could not be resolved from the list ', @candidate_items, ' of candidates.', "\n");
-	    } elsif (scalar @generated_non_properties > 1) {
-	      croak ('Error: the non-property item ', $item, ' is congruent with multiple items generated by fragment ', $item_fragment, ':', "\n", join ("\n", @generated_non_properties), "\n", 'Which one should we choose?', "\n");
-	    } else {
-	      $resolved = $generated_non_properties[0];
-	    }
-	  }
-        } else {
-	  $resolved = $candidate_items[0];
-	}
-      }
     } else {
-      croak ('Error: the fragment-to-item table does not contain ', $item, '.');
+      croak ('Error: the fragment-to-item table does not contain ', $item_fragment, '.', "\n", 'The keys of the fragment-to-item table are:', "\n", join ("\n", keys %fragment_to_item_table), "\n");
     }
   } else {
-    $resolved = $item;
+    return $item;
   }
-  return $resolved;
 }
 
 my %conditions_and_properties_shortcuts
@@ -281,20 +252,18 @@ foreach my $item (keys %item_to_fragment_table) {
   if ($item =~ /\A ([a-z0-9_]+) : ([^:]+) : ([0-9]+) /x) {
     (my $item_article, my $item_kind, my $item_number) = ($1, $2, $3);
     my $fragment = $item_to_fragment_table{$item};
-    if ($fragment =~ m/^${article_basename}:fragment:([0-9]+)$/) {
+
+    if ($fragment =~ m/\A ${article_basename} : fragment : ([0-9]+) /x) {
       my $fragment_number = $1;
       my $fragment_miz = undef;
 
       # Resolve properties and correctness conditions
-      if ($item =~ / \[ ([a-z]+) \] \z /x) {
-	my $property_or_condition = $1;
-
-	my $p_or_c_code = $conditions_and_properties_shortcuts{$property_or_condition};
-	if (defined $p_or_c_code) {
-	  $fragment_miz = "${article_dir}/text/ckb${fragment_number}${p_or_c_code}.miz";
-	} else {
-	  croak ('Error: unknown property/condition \'', $property_or_condition, '\'.', "\n");
-	}
+      if ($fragment =~ / \[ ([a-z]+) \] \z /x) {
+	my $property_or_condition_code = $1;
+	$fragment_miz = "${article_dir}/text/ckb${fragment_number}${property_or_condition_code}.miz";
+      } elsif ($item =~ / : (.) constructor [0-9]+ \z /x) {
+	my $constructor_kind = $1;
+	$fragment_miz = "${article_dir}/text/ckb${fragment_number}${constructor_kind}c.miz";
       } else {
 	$fragment_miz = "${article_dir}/text/ckb${fragment_number}.miz";
       }
@@ -302,6 +271,10 @@ foreach my $item (keys %item_to_fragment_table) {
       if (-e $fragment_miz) {
 	my $dependencies_err = tmpfile_path ();
 	my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} $fragment_miz 2> $dependencies_err`;
+
+	# DEBUG
+	# warn $item, ' has ', scalar @fragment_dependencies, ' dependencies.';
+
 	my $dependencies_exit_code = $? >> 8;
 	if ($dependencies_exit_code != 0) {
 	  my $dependencies_message = `cat $dependencies_err`;
@@ -313,123 +286,23 @@ foreach my $item (keys %item_to_fragment_table) {
 	chomp @fragment_dependencies;
 	if (scalar @fragment_dependencies > 0) {
 	  foreach my $dep (@fragment_dependencies) {
-	    my $resolved_dep = resolve_item ($dep);
+	    my $resolved_dep = eval { resolve_item ($dep); };
+	    my $resolve_err = $@;
 	    if (! defined $resolved_dep) {
-	      croak ('Error: we were unable to resolve the item ', $dep, '.', "\n");
+	      croak ('Error: we were unable to resolve the dependency ', $dep, ' of the item ', $item, '.', "\n", 'The reported error was:', "\n", $resolve_err);
 	    }
 	    $item_deps{$resolved_dep} = 0;
 	  }
 	}
 
       } else {
-
-	# This appears to be a property for a redefined
-	# constructor.  Check that that is indeed the case.  If
-	# so, the proeprty in question for the current
-	# constuctor depends (1) the coherence of the
-	# redefinition and (2) the original constructor
-	# property.
-
-	$fragment_miz = "${article_dir}/text/ckb${fragment_number}.miz";
-	my $fragment_abs_xml = "${article_dir}/text/ckb${fragment_number}.xml1";
-
-	ensure_valid_xml_file ($fragment_abs_xml);
-
-	my $fragment_doc = $xml_parser->parse_file ($fragment_abs_xml);
-	if ($fragment_doc->exists ('.//Definition[@redefinition = "true"]')) {
-	  if ($fragment_doc->exists ('.//Definiens')) {
-	    croak ('Error: the constructor property ', $item, ' seems to be coming from a redefinition, but we do not yet know how to handle this case fully.');
-	  } elsif ($fragment_doc->exists ('.//Constructor[@redefaid and @absredefnr]')) {
-	    (my $new_constructor) = $fragment_doc->findnodes ('.//Constructor[@redefaid and @absredefnr and @kind]');
-	    my $redef_kind = $new_constructor->findvalue ('@kind');
-	    my $redef_aid = $new_constructor->findvalue ('@redefaid');
-	    my $redef_nr = $new_constructor->findvalue ('@absredefnr');
-	    my $redef_kind_lc = lc $redef_kind;
-	    my $redef_aid_lc = lc $redef_aid;
-
-	    $item_deps{"${item_article}:${item_kind}:${item_number}[coherence]"} = 0;
-	  }
-	}
+	croak ('Error: we cannot determine the dependencies of ', $item, ' because the fragment to which it corresponds, ', $fragment_miz, ', does not exist.');
       }
 
       # Now print the dependencies
       print $item;
       foreach my $dep (keys %item_deps) {
-	# Special case: if we are computing the dependencies of a
-	# pattern, then print only constructors and other
-	# patterns.
-	if ($item =~ / : . pattern : [0-9]+ \z /x) {
-	  if ($dep =~ / : . (pattern | constructor) : [0-9]+ \z /x) {
-	    print ' ', $dep;
-	  } else {
-	    # ignore
-	  }
-	} else {
-
- 	  # If $item depends on a pattern, determine whether the
-	  # pattern comes from a redefinition.  If it does, then the
-	  # item depends on either the coherence or compatibility
-	  # condition associated with the pattern.  If so, we need to
-	  # print this condition.  (We will also print the pattern.)
-	  if ($dep =~ /\A $item_article : (.) pattern : [0-9]+ \z/x) {
-	    my $pattern_kind = $1;
-	    my $fragment_of_dep_pattern = $item_to_fragment_table{$dep};
-	    if (defined $fragment_of_dep_pattern) {
-	      if ($fragment_of_dep_pattern =~ / : fragment : ([0-9]+) \z/x) {
-		my $dep_fragment_number = $1;
-		my $dep_fragment_abs_xml
-		  = "${article_dir}/text/ckb${dep_fragment_number}.xml1";
-		ensure_valid_xml_file ($dep_fragment_abs_xml);
-		my $dep_fragment_doc = $xml_parser->parse_file ($dep_fragment_abs_xml);
-		# sanity check
-		if ($dep_fragment_doc->exists ('Article/DefinitionBlock[Definition[@redefinition = "true" and Compatibility and not(Constructor)] and following-sibling::Definiens]')) {
-		  if (defined $fragment_to_item_table{$fragment_of_dep_pattern}) {
-		    my @dep_fragment_items = @{$fragment_to_item_table{$fragment_of_dep_pattern}};
-		    (my $compatibility_item)
-		      = grep { / \[ compatibility \] \z/x } @dep_fragment_items;
-		    if (defined $compatibility_item) {
-		      print ' ', $compatibility_item;
-		    } else {
-		      croak ('Error: we failed to find a suitable compatibility item generated by fragment ', $fragment_of_dep_pattern, '.', "\n");
-		    }
-		  } else {
-		    croak ('Error: when trying to look up whether the pattern dependency ', $dep, ' of ', $item, ' comes from a redefinition, we strangely failed to find any items generated by the fragment ', $fragment_of_dep_pattern, ' corresponding to ', $dep, '.', "\n");
-		  }
-		}
-	      } else {
-		croak ('Error: when dealing with the pattern case for the dependencies of ', $item, ', we are unable to make sense of the fragment ', $fragment_of_dep_pattern, '.', "\n");
-	      }
-	    } else {
-	      croak ('Error: when dealing with the pattern case for the dependencies of ', $item, ', we failed to look up what fragment the needed pattern ', $dep, ' comes from.', "\n");
-	    }
-	  }
-
- 	  # Constructor case: make sure that if an item depends on a
-	  # consructor that it also depends on its coherence
-	  # condition, if there is one.
-	  if ($dep =~ / ([a-z0-9_]+) : kconstructor : ([0-9]+) \z/x) {
-	    my $dep_article = $1;
-	    if ($dep_article eq $item_article) {
-	      my $dep_fragment = $item_to_fragment_table{$dep};
-	      if (defined $dep_fragment) {
-		if ($dep_fragment =~ / : fragment : ([0-9]+) \z /x) {
-		  my $dep_fragment_number = $1;
-		  my @candidates = `find ${article_dir}/text -maxdepth 1 -mindepth 1 -type f -name "ckb${dep_fragment_number}ch.miz"`;
-		  if (scalar @candidates > 0) {
-		    print ' ', "${dep}[coherence]";
-		  }
-		} else {
-		  croak ('Error: unable to make sense of \'', $dep_fragment, '\' as a fragment.', "\n");
-		}
-	      } else {
-		croak ('Error: we failed to look up ', $dep, ' in the item-to-fragment table.', "\n");
-	      }
-	    }
-	  }
-
-	  print ' ', $dep;
-
-	}
+	print ' ', $dep;
       }
       print "\n";
 
