@@ -84,6 +84,11 @@ tpl [Constructor[@aid and @nr and @kind]] (#target-kind, #target-aid, #target-nr
 tpl [Properties] {
   for-each [*] {
     $name-lc = lowercase (#string = `name (.)`);
-    $name-lc; "\n";
+    if [$name-lc = "antisymmetry"] {
+      "asymmetry";
+    } else {
+      $name-lc;
+    }
+    "\n";
   }
 }
