@@ -229,7 +229,9 @@ chomp @properties_and_conditions;
 foreach my $p_or_c_file (@properties_and_conditions) {
   if ($p_or_c_file =~ / \A ckb ([1-9][0-9]*) ([a-z]{2}) \z/x) {
     (my $fragment_number, my $condition_code) = ($1, $2);
-    if ($condition_code !~ /\A . c \z/x && $condition_code !~ /\A . p \z/x) {
+    if ($condition_code !~ /\A . c \z/x
+	&& $condition_code !~ /\A . p \z/x
+        && $condition_code !~ /\A . f \z/x) {
       my $resolved_condition = $conditions{$condition_code};
       if (defined $resolved_condition) {
 	if (defined $fragments_to_constructors{$fragment_number}) {
