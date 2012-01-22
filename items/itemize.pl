@@ -114,6 +114,7 @@ my $article_evl = "${article_dirname}/${article_basename}.evl";
 ensure_readable_file ($article_miz);
 ensure_directory ($stylesheet_home);
 
+my $rewrite_aid_stylesheet = "${stylesheet_home}/rewrite-aid.xsl";
 my $split_stylesheet = "${stylesheet_home}/split.xsl";
 my $itemize_stylesheet = "${stylesheet_home}/itemize.xsl";
 my $wsm_stylesheet = "${stylesheet_home}/wsm.xsl";
@@ -121,7 +122,7 @@ my $extend_evl_stylesheet = "${stylesheet_home}/extend-evl.xsl";
 my $conditions_and_properties_stylesheet = "${stylesheet_home}/conditions-and-properties.xsl";
 my $trim_properties_and_conditions_stylesheet = "${stylesheet_home}/trim-properties-and-conditions.xsl";
 
-my @stylesheets = ('split', 'itemize', 'wsm', 'extend-evl', 'conditions-and-properties', 'trim-properties-and-conditions');
+my @stylesheets = ('split', 'itemize', 'wsm', 'extend-evl', 'conditions-and-properties', 'trim-properties-and-conditions', 'rewrite-aid');
 
 foreach my $stylesheet (@stylesheets) {
   my $stylesheet_path = "${stylesheet_home}/${stylesheet}.xsl";
@@ -253,7 +254,7 @@ my $article_wsx_in_target_dir = "${target_directory}/${article_basename}.wsx";
 my $article_split_wsx_in_target_dir = "${article_wsx_in_target_dir}.split";
 my $article_itemized_wsx_in_target_dir = "${article_split_wsx_in_target_dir}.itemized";
 
-ensure_readable_file ($article_itemized_wsx_in_target_dir);
+ensure_readable_file ($article_wsx_in_target_dir);
 
 print 'Split: ';
 my $xsltproc_split_status = system ("xsltproc --output $article_split_wsx_in_target_dir $split_stylesheet $article_wsx_in_target_dir 2>/dev/null");
@@ -504,7 +505,7 @@ print 'done.', "\n";
 
 # Now extract all correctness conditions and properties
 
-print 'Extracting correctness conditions and properties from definitions: ';
+print 'Extracting patterns, constructors, properties, and correctness conditions from definitions: ';
 
 my %conditions_and_properties_shortcuts
   = ('existence' => 'ex',
@@ -522,7 +523,17 @@ my %conditions_and_properties_shortcuts
      'idempotence' => 'id',
      'commutativity' => 'cm',
      'compatibility' => 'cp',
-     'sethood' => 'se');
+     'sethood' => 'se',
+     'kpattern' => 'kp',
+     'kconstructor' => 'kc',
+     'rpattern' => 'rp',
+     'rconstructor' => 'rc',
+     'vconstructor' => 'vc',
+     'vpattern' => 'vp',
+     'deftheorem' => 'dt',
+     'rdefiniens' => 'rf',
+     'kdefiniens' => 'kf',
+     'vdefiniens' => 'vf');
 
 sub extension {
   my $path = shift;
@@ -537,12 +548,12 @@ sub copy_fragment_to_new_prefix {
   my $fragment_basename = shift;
   my $new_prefix = shift;
   my @old_files = glob "${target_text_subdir}/${fragment_basename}.*";
-  if ($debug) {
-    print {*STDERR} 'Files matching the name \'', $fragment_basename, '\':';
-    foreach my $file (@old_files) {
-      print {*STDERR} $file, "\n";
-    }
-  }
+  # if ($debug) {
+  #   print {*STDERR} 'Files matching the name \'', $fragment_basename, '\':';
+  #   foreach my $file (@old_files) {
+  #     print {*STDERR} $file, "\n";
+  #    }
+  # }
   foreach my $file (@old_files) {
     my $extension = extension ($file);
     my $new_path = "${target_text_subdir}/${new_prefix}.${extension}";
@@ -552,7 +563,7 @@ sub copy_fragment_to_new_prefix {
   return 1;
 }
 
-my @fragment_files = `find ${target_text_subdir} -mindepth 1 -maxdepth 1 -type f -name "ckb[1-9][0-9]*.miz"`;
+my @fragment_files = glob "${target_text_subdir}/ckb[0-9]*.miz";
 chomp @fragment_files;
 foreach my $fragment (@fragment_files) {
 
@@ -583,58 +594,72 @@ foreach my $fragment (@fragment_files) {
   chomp @correctness_conditions_and_properties;
 
   if ($debug) {
-    print {*STDERR} 'Fragment ', $fragment_basename, ' contains ', scalar @correctness_conditions_and_properties, ' correctness conditions and properties.', "\n";
+    print {*STDERR} 'Fragment ', $fragment_basename, ' contains ', scalar @correctness_conditions_and_properties, ' correctness conditions and properties:', "\n", join ("\n", @correctness_conditions_and_properties), "\n";
   }
 
   foreach my $cc_or_p (@correctness_conditions_and_properties) {
-    if (defined $conditions_and_properties_shortcuts{$cc_or_p}) {
-      my $cc_or_p_code = $conditions_and_properties_shortcuts{$cc_or_p};
-      my $new_prefix = "ckb${fragment_number}${cc_or_p_code}";
-      copy_fragment_to_new_prefix ($fragment_basename, $new_prefix);
+    my $cc_or_p_code = $conditions_and_properties_shortcuts{$cc_or_p};
 
-      my $new_miz = "${target_text_subdir}/${new_prefix}.miz";
-      my $new_err = "${target_text_subdir}/${new_prefix}.err";
-      my $new_xml = "${target_text_subdir}/${new_prefix}.xml";
-      ensure_readable_file ($new_miz);
-      ensure_readable_file ($new_err);
-      ensure_readable_file ($new_xml);
-
-      my $new_xml_orig = "${target_text_subdir}/${new_prefix}.xml.orig";
-      my $new_xml_tmp = "${target_text_subdir}/${new_prefix}.xml.tmp";
-
-      # Save a copy of the old XML
-      copy ($new_xml, $new_xml_orig)
-	or croak ('Error: unable to save a copy of ', $new_xml, ' to ', $new_xml_orig, '.', "\n");
-
-      my $xsltproc_trim_status = system ("xsltproc --stringparam target-condition-or-property '${cc_or_p}' $trim_properties_and_conditions_stylesheet $new_xml > $new_xml_tmp");
-      my $xsltproc_trim_exit_code = $xsltproc_trim_status >> 8;
-      if ($xsltproc_trim_exit_code != 0) {
-	croak ('Error: something went wrong trimming the property ', $cc_or_p, ' from ', $new_xml, '.', "\n");
-      }
-
-      move ($new_xml_tmp, $new_xml)
-	or croak ('Error: error moving the temporary XML generated by strippping ', $cc_or_p, ' from fragment ', $fragment_number, '.', "\n");
-
-      if ($paranoid) {
-	if ($verbose) {
-	  print 'Checking that the result of trimming ', $cc_or_p, ' from fragment ', $fragment_number, ' is verifiable...';
-	}
-	my $verifier_status = system ("verifier -c -l -q -s $new_miz > /dev/null 2> /dev/null");
-	my $verifier_exit_code = $verifier_status >> 8;
-	if ($verifier_exit_code == 0 && -z $new_err) {
-	  if ($verbose) {
-	    print 'OK.', "\n";
-	  }
-	} else {
-	  croak ('Error: verifier rejected the trimming of ', $cc_or_p, ' from fragment ', $fragment_number, '; see ', $new_err, ' for details.', "\n");
-	}
-      }
-
-      # Now that we've trimmed the XML, minimize to throw away any
-      # spurious toplevel stuff that we don't really need.
-    } else {
+    if (! defined $conditions_and_properties_shortcuts{$cc_or_p}) {
       croak ('Error: we are unable to find the short form of the correctness condition/constructor property \'', $cc_or_p, '\'.', "\n");
     }
+
+    my $new_prefix = "ckb${fragment_number}${cc_or_p_code}";
+    copy_fragment_to_new_prefix ($fragment_basename, $new_prefix);
+
+    my $new_miz = "${target_text_subdir}/${new_prefix}.miz";
+    my $new_err = "${target_text_subdir}/${new_prefix}.err";
+    my $new_xml = "${target_text_subdir}/${new_prefix}.xml";
+    my $new_xml_tmp = "${target_text_subdir}/${new_prefix}.xml.tmp";
+    ensure_readable_file ($new_miz);
+    ensure_readable_file ($new_err);
+    ensure_readable_file ($new_xml);
+
+    # We need to rewrite the aid of the article; otherwise the external
+    # dependencies stylesheet will sniff through the original whole article
+    my $xsltproc_rewrite_aid_status = system ("xsltproc --stringparam new-aid '${new_prefix}' $rewrite_aid_stylesheet $new_xml > $new_xml_tmp 2> /dev/null");
+    my $xsltproc_rewrite_aid_exit_code = $xsltproc_rewrite_aid_status >> 8;
+    if ($xsltproc_rewrite_aid_status != 0) {
+      if ($verbose) {
+	print "\n";
+      }
+      croak ('Error: xsltproc did not exit cleanly applying aid-rewriting stylesheet to ', $new_xml, '.');
+    }
+    move ($new_xml_tmp, $new_xml)
+      or croak ('Error: unable to rename ', $new_xml_tmp, ' to ', $new_xml, '.');
+
+    my $new_xml_orig = "${target_text_subdir}/${new_prefix}.xml.orig";
+
+    # Save a copy of the old XML
+    copy ($new_xml, $new_xml_orig)
+      or croak ('Error: unable to save a copy of ', $new_xml, ' to ', $new_xml_orig, '.', "\n");
+
+    my $xsltproc_trim_status = system ("xsltproc --stringparam target-condition-or-property '${cc_or_p}' $trim_properties_and_conditions_stylesheet $new_xml > $new_xml_tmp");
+    my $xsltproc_trim_exit_code = $xsltproc_trim_status >> 8;
+    if ($xsltproc_trim_exit_code != 0) {
+      croak ('Error: something went wrong trimming the property ', $cc_or_p, ' from ', $new_xml, '.', "\n");
+    }
+
+    move ($new_xml_tmp, $new_xml)
+      or croak ('Error: error moving the temporary XML generated by strippping ', $cc_or_p, ' from fragment ', $fragment_number, '.', "\n");
+
+    if ($paranoid) {
+      if ($verbose) {
+	print 'Checking that the result of trimming ', $cc_or_p, ' from fragment ', $fragment_number, ' is verifiable...';
+      }
+      my $verifier_status = system ("verifier -c -l -q -s $new_miz > /dev/null 2> /dev/null");
+      my $verifier_exit_code = $verifier_status >> 8;
+      if ($verifier_exit_code == 0 && -z $new_err) {
+	if ($verbose) {
+	  print 'OK.', "\n";
+	}
+      } else {
+	croak ('Error: verifier rejected the trimming of ', $cc_or_p, ' from fragment ', $fragment_number, '; see ', $new_err, ' for details.', "\n");
+      }
+    }
+
+    # Now that we've trimmed the XML, minimize to throw away any
+    # spurious toplevel stuff that we don't really need.
   }
 }
 
