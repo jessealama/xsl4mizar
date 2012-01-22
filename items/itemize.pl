@@ -194,7 +194,7 @@ my $article_evl_in_target_dir = "${target_directory}/${article_basename}.evl";
 my $article_msm_in_target_dir = "${target_directory}/${article_basename}.msm";
 my $article_tpr_in_target_dir = "${target_directory}/${article_basename}.tpr";
 
-print 'Rewriting text: ';
+print 'Rewriting the text of ', $article_basename, ': ';
 
 my $accom_ok = run_mizar_tool ('accom', $article_miz_in_target_dir);
 if ($accom_ok == 0) {
@@ -256,7 +256,7 @@ my $article_itemized_wsx_in_target_dir = "${article_split_wsx_in_target_dir}.ite
 
 ensure_readable_file ($article_wsx_in_target_dir);
 
-print 'Split: ';
+print 'Split ', $article_basename, ': ';
 my $xsltproc_split_status = system ("xsltproc --output $article_split_wsx_in_target_dir $split_stylesheet $article_wsx_in_target_dir 2>/dev/null");
 print 'done.', "\n" if $verbose;
 
@@ -270,7 +270,7 @@ ensure_readable_file ($article_split_wsx_in_target_dir);
 
 print 'done.', "\n";
 
-print 'Itemize: ';
+print 'Itemize ', $article_basename, ': ';
 my $xsltproc_itemize_status = system ("xsltproc --output $article_itemized_wsx_in_target_dir $itemize_stylesheet $article_split_wsx_in_target_dir 2>/dev/null");
 print 'done.', "\n" if $verbose;
 
@@ -378,7 +378,7 @@ foreach my $i (1 .. scalar @fragments) {
 chdir $target_directory
   or croak ('Error: unable to change directory to ', $target_directory, '.', "\n");
 
-print 'Generating ', scalar @fragments, ' Mizar fragments: ';
+print 'Generating ', scalar @fragments, ' Mizar fragments from ', $article_basename, ': ';
 
 foreach my $i (1 .. scalar @fragments) {
 
@@ -505,7 +505,7 @@ print 'done.', "\n";
 
 # Now extract all correctness conditions and properties
 
-print 'Extracting patterns, constructors, properties, and correctness conditions from definitions: ';
+print 'Extracting patterns, constructors, properties, and correctness conditions from definitions of ', $article_basename, ': ';
 
 my %conditions_and_properties_shortcuts
   = ('existence' => 'ex',
