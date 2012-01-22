@@ -244,7 +244,14 @@ my %conditions_and_properties_shortcuts
      'idempotence' => 'id',
      'commutativity' => 'cm',
      'compatibility' => 'cp',
-     'sethood' => 'se');
+     'sethood' => 'se',
+     'pattern' => 'pa');
+
+my %full_name_of_shortcut = ();
+foreach my $long_name (keys %conditions_and_properties_shortcuts) {
+  my $shortcut = $conditions_and_properties_shortcuts{$long_name};
+  $full_name_of_shortcut{$shortcut} = $long_name;
+}
 
 my $dependencies_script = $script_paths{'dependencies.pl'};
 foreach my $item (keys %item_to_fragment_table) {
