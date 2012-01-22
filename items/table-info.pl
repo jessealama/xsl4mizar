@@ -193,7 +193,7 @@ sub count_explicitly_independent_items {
 }
 
 sub independent_items {
-  print join ("\n", keys %trivial_dep_items);
+  print join ("\n", keys %trivial_dep_items), "\n";
   implicitly_independent_items ();
 }
 
