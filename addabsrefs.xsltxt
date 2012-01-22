@@ -240,7 +240,7 @@ tpl [Scheme|Definiens](#s)
     copy-of `@*`;
     if [$ethprocess = 0]
     {
-      @aid = $aname;
+      if [@aid] { @aid = `@aid`; } else { @aid = $aname; }
       @nr = `1 + count(preceding::*[(name()=$n)])`;
       if [($n = "Definiens")] { abs(#k=`@constrkind`,#nr=`@constrnr`,#r="2"); }
     }
