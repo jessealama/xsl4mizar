@@ -145,10 +145,22 @@ tpl [Definientia] {
   }
 }
 
-tpl [Definiens[@aid and @constrkind and @defnr]] {
+tpl [Definiens[not(@aid)]] {
+  msg terminate="yes" "Error: unable to deal with a Definiens element that lacks an aid attribute.";
+}
+
+tpl [Definiens[not(@constrkind)]] {
+  msg terminate="yes" "Error: unable to deal with a Definiens element that lacks a constrkind attribute.";
+}
+
+tpl [Definiens[not(@absconstrnr)]] {
+  msg terminate="yes" "Error: unable to deal with a Definiens element that lacks an absconstrnr attribute.";
+}
+
+tpl [Definiens[@aid and @constrkind and @absconstrnr]] {
   $aid-lc = lowercase (#string = `@aid`);
   $kind-lc = lowercase (#string = `@constrkind`);
-  $aid-lc; ":"; $kind-lc; "definiens"; ":"; `@defnr`;
+  $aid-lc; ":"; $kind-lc; "definiens"; ":"; `@absconstrnr`;
 }
 
 tpl [Registrations] {
