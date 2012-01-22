@@ -60,42 +60,42 @@ tpl [Article[@aid]] {
   }
 
   // needed definientia
-  $dfs = `concat ($aid-lc, ".dfs")`;
+  $dfs = `concat ($aid-lc, ".dfs1")`;
   $full-dfs = `concat ($article-directory, $dfs)`;
   for-each [document ($full-dfs, /)] {
     apply [Definientia];
   }
 
   // needed clusters
-  $ecl = `concat ($aid-lc, ".ecl")`;
+  $ecl = `concat ($aid-lc, ".ecl1")`;
   $full-ecl = `concat ($article-directory, $ecl)`;
   for-each [document ($full-ecl, /)] {
     apply [Clusters];
   }
 
   // needed identifications
-  $eid = `concat ($aid-lc, ".eid")`;
+  $eid = `concat ($aid-lc, ".eid1")`;
   $full-eid = `concat ($article-directory, $eid)`;
   for-each [document ($full-eid, /)] {
     apply [IdentifyRegistrations];
   }
 
   // needed reductions
-  $erd = `concat ($aid-lc, ".erd")`;
+  $erd = `concat ($aid-lc, ".erd1")`;
   $full-erd = `concat ($article-directory, $erd)`;
   for-each [document ($full-erd, /)] {
     apply [ReductionRegistrations];
   }
 
   // needed patterns
-  $eno = `concat ($aid-lc, ".eno")`;
+  $eno = `concat ($aid-lc, ".eno1")`;
   $full-eno = `concat ($article-directory, $eno)`;
   for-each [document ($full-eno, /)] {
     apply [Notations];
   }
 
   // needed property registrations
-  $epr = `concat ($aid-lc, ".epr")`;
+  $epr = `concat ($aid-lc, ".epr1")`;
   $full-epr = `concat ($article-directory, $epr)`;
   for-each [document ($full-epr, /)] {
     apply [PropertyRegistrations];
