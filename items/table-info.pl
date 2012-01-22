@@ -750,7 +750,7 @@ sub is_pattern_item {
 
 sub run_mizar_tests {
 
-  # Patterns depend only on constructors
+  # Patterns depend only on patterns and constructors
   print 'Does every pattern depend only upon constructors? ';
   my $already_said_no = 0;
   foreach my $item (keys %non_trivial_dep_items) {
