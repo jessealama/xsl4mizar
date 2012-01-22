@@ -41,7 +41,7 @@ tpl [Article[@aid]] {
   print-everything (#except = $aid);
 
   // grab the patterns from the xml
-  apply [descendant::Pattern[not(@aid = $aid)]];
+  // apply [descendant::Pattern[not(@aid = $aid)]];
 
   // inspect the .eno
   $eno = `concat ($aid-lc, ".eno1")`;
