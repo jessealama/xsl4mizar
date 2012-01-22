@@ -24,19 +24,23 @@ tpl uppercase (#string) { `translate($string, $lcletters, $ucletters)`; }
 // Document templates
 //////////////////////////////////////////////////////////////////////
 
-tpl [*] {
-  $n = `name (.)`;
-  <$n {
-    for-each [@*] { copy-of `.`; }
-    if [*] {
-      "\n";
-      for-each [*] {
-        apply [.];
-      }
-    }
-  }
-  "\n";
-}
+// tpl [*] {
+//   $n = `name (.)`;
+//   <$n {
+//     for-each [@*] { copy-of `.`; }
+//     if [*] {
+//       "\n";
+//       for-each [*] {
+//         apply [.];
+//       }
+//     }
+//   }
+//   "\n";
+// }
+
+
+// By default, ignore things
+tpl [*] { }
 
 tpl [*] mode="copy" {
   $n = `name (.)`;
@@ -218,9 +222,125 @@ tpl [DefinitionBlock] {
   <DefinitionBlock {
     for-each [@*] { copy-of `.`; }
     "\n";
-    apply [*];
+
+    // In the case of justified properties and correctness conditions,
+    // we may need to include some of the "toplevel" stuff in the
+    // definition block preceding the property.
+    //
+    // This introduces some potential false positive dependencies: it
+    // may be that not all of the definition's toplevel items are
+    // needed.
+    if [$target-condition-or-property = "commutativity"
+        or $target-condition-or-property = "idempotence"
+        or $target-condition-or-property = "involutiveness"
+	or $target-condition-or-property = "projectivity"
+	or $target-condition-or-property = "symmetry"
+	or $target-condition-or-property = "asymmetry"
+	or $target-condition-or-property = "connectedness"
+	or $target-condition-or-property = "reflexivity"
+	or $target-condition-or-property = "irreflexivity"
+	or $target-condition-or-property = "existence"
+	or $target-condition-or-property = "uniqueness"
+	or $target-condition-or-property = "coherence"] {
+      for-each [Definition] {
+        for-each [preceding-sibling::*] {
+          apply [.] mode="copy";
+        }
+      }
+    }
+
+    apply [Definition];
+    apply [EndPosition] mode="copy";
+
   }
   "\n";
+}
+
+tpl [NotationBlock] {
+  <NotationBlock {
+    for-each [@*] { copy-of `.`; }
+    "\n";
+    apply [Pattern];
+    apply [EndPosition] mode="copy";
+  }
+  "\n";
+}
+
+tpl [Definition] {
+  choose {
+    when [$target-condition-or-property = "kpattern"
+          or $target-condition-or-property = "rpattern"
+          or $target-condition-or-property = "vpattern"] {
+      <Definition {
+        for-each [@*] { copy-of `.`; }
+        "\n";
+        apply [Pattern] mode="copy";
+      }
+      "\n";
+    }
+    when [$target-condition-or-property = "kconstructor"
+          or $target-condition-or-property = "rconstructor"
+          or $target-condition-or-property = "vconstructor"
+	  or $target-condition-or-property = "deftheorem"] {
+      <Definition {
+        for-each [@*] { copy-of `.`; }
+        "\n";
+        apply [Constructor] mode="copy";
+      }
+      "\n";
+    }
+
+    when [$target-condition-or-property = "coherence"] {
+      <Definition {
+        for-each [@*] { copy-of `.`; }
+        "\n";
+        apply [Coherence] mode="copy";
+      }
+      "\n";
+    }
+
+    when [$target-condition-or-property = "existence"] {
+      <Definition {
+        for-each [@*] { copy-of `.`; }
+        "\n";
+        apply [Existence] mode="copy";
+      }
+      "\n";
+    }
+
+    when [$target-condition-or-property = "uniqueness"] {
+      <Definition {
+        for-each [@*] { copy-of `.`; }
+        "\n";
+        apply [Uniqueness] mode="copy";
+      }
+      "\n";
+    }
+
+    when [$target-condition-or-property = "commutativity"
+          or $target-condition-or-property = "idempotence"
+	  or $target-condition-or-property = "involutiveness"
+	  or $target-condition-or-property = "projectivity"
+	  or $target-condition-or-property = "symmetry"
+	  or $target-condition-or-property = "asymmetry"
+	  or $target-condition-or-property = "connectedness"
+	  or $target-condition-or-property = "reflexivity"
+	  or $target-condition-or-property = "irreflexivity"] {
+      <Definition {
+        for-each [@*] { copy-of `.`; }
+        "\n";
+        // for justified properties we may need to copy some toplevel stuff
+        for-each [JustifiedProperty] {
+          apply [.];
+        }
+      }
+      "\n";
+    }
+
+    otherwise {
+      // dump
+    }
+  }
 }
 
 tpl [Pattern[not(@kind)]] {
@@ -303,10 +423,17 @@ tpl [Compatibility] {
 tpl [JustifiedProperty] {
   $prop-name = `name(*[1])`;
   $prop-name-lc = lowercase (#string = $prop-name);
-  if [$prop-name-lc = $target-condition-or-property] {
-    apply [.] mode="copy";
-  } else {
-    // dump
+  choose {
+    when [$prop-name-lc = "antisymmetry"
+          and $target-condition-or-property = "asymmetry"] {
+      apply [.] mode="copy";
+    }
+    when [$prop-name-lc = $target-condition-or-property] {
+      apply [.] mode="copy";
+    }
+    otherwise {
+      // dump
+    }
   }
 }
 
