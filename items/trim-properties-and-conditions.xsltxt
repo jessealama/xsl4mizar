@@ -53,6 +53,129 @@ tpl [*] mode="copy" {
 }
 
 tpl [/] {
+
+  // Sanity check to make sure that $target-condition-or-property has
+  // a sensible value
+
+  if [not($target-condition-or-property = "")] {
+    // Explicitly enumerate the kinds of patterns/conditions we accept
+    choose {
+
+      //////////////////////////////////////////////////
+      // Patterns
+      //////////////////////////////////////////////////
+      when [$target-condition-or-property = "kpattern"] {
+        // OK
+      }
+      when [$target-condition-or-property = "rpattern"] {
+        // OK
+      }
+      when [$target-condition-or-property = "vpattern"] {
+        // OK
+      }
+
+      //////////////////////////////////////////////////
+      // Constructors
+      //////////////////////////////////////////////////
+      when [$target-condition-or-property = "kconstructor"] {
+        // OK
+      }
+      when [$target-condition-or-property = "rconstructor"] {
+        // OK
+      }
+      when [$target-condition-or-property = "vconstructor"] {
+        // OK
+      }
+
+      //////////////////////////////////////////////////
+      // Conditions
+      //////////////////////////////////////////////////
+      when [$target-condition-or-property = "existence"] {
+        // OK
+      }
+      when [$target-condition-or-property = "uniqueness"] {
+        // OK
+      }
+      when [$target-condition-or-property = "coherence"] {
+        // OK
+      }
+      when [$target-condition-or-property = "compatibility"] {
+        // OK
+      }
+      when [$target-condition-or-property = "correctness"] {
+        // OK
+      }
+
+      //////////////////////////////////////////////////
+      // Definitional theorems/definientia
+      //////////////////////////////////////////////////
+      when [$target-condition-or-property = "deftheorem"] {
+        // OK
+      }
+      when [$target-condition-or-property = "rdefiniens"] {
+        // OK
+      }
+      when [$target-condition-or-property = "vdefiniens"] {
+        // OK
+      }
+      when [$target-condition-or-property = "kdefiniens"] {
+        // OK
+      }
+
+      //////////////////////////////////////////////////
+      // Constructor properties
+      //////////////////////////////////////////////////
+
+      ////////////////////////////////////////
+      // Function properties
+      ////////////////////////////////////////
+      when [$target-condition-or-property = "commutativity"] {
+        // OK
+      }
+      when [$target-condition-or-property = "idempotence"] {
+        // OK
+      }
+      when [$target-condition-or-property = "involutiveness"] {
+        // OK
+      }
+      when [$target-condition-or-property = "projectivity"] {
+        // OK
+      }
+
+
+      ////////////////////////////////////////
+      // Relation properties
+      ////////////////////////////////////////
+      when [$target-condition-or-property = "symmetry"] {
+        // OK
+      }
+      when [$target-condition-or-property = "asymmetry"] {
+        // OK
+      }
+      when [$target-condition-or-property = "connectedness"] {
+        // OK
+      }
+      when [$target-condition-or-property = "reflexivity"] {
+        // OK
+      }
+      when [$target-condition-or-property = "irreflexivity"] {
+        // OK
+      }
+
+      ////////////////////////////////////////
+      // 'strict'
+      ////////////////////////////////////////
+      when [$target-condition-or-property = "abstractness"] {
+        // OK
+      }
+
+      otherwise {
+        $message = `concat ("Error: the string '", $target-condition-or-property, "' is not an acceptable value for the target-condition-or-property stylesheet parameter.")`;
+        msg terminate="yes" $message;
+      }
+    }
+  }
+
   if [Article] {
     apply [Article];
   } else {
@@ -74,11 +197,21 @@ tpl [Article] {
 }
 
 tpl [DefTheorem] {
-  // dump
+  if [$target-condition-or-property = "deftheorem"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
 }
 
 tpl [Definiens] {
-  // dump
+  if [$target-condition-or-property = "rdefiniens"
+      or $target-condition-or-property = "kdefiniens"
+      or $target-condition-or-property = "vdefiniens"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
 }
 
 tpl [DefinitionBlock] {
@@ -88,6 +221,35 @@ tpl [DefinitionBlock] {
     apply [*];
   }
   "\n";
+}
+
+tpl [Pattern[not(@kind)]] {
+  msg terminate="yes" "Error: we found a Pattern element that lacks a kind attribute!";
+}
+
+tpl [Pattern[@kind]] {
+  $kind = lowercase (#string = `@kind`);
+  $match = `concat ($kind, "pattern")`;
+  if [$match = $target-condition-or-property] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
+tpl [Constructor] {
+  if [$target-condition-or-property = "kconstructor"
+      or $target-condition-or-property = "rconstructor"
+      or $target-condition-or-property = "vconstructor"
+      or $target-condition-or-property = "kdefiniens"
+      or $target-condition-or-property = "rdefiniens"
+      or $target-condition-or-property = "vdefiniens"
+      or $target-condition-or-property = "deftheorem"
+      or $target-condition-or-property = "abstractness"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
 }
 
 tpl [Existence] {
@@ -122,6 +284,14 @@ tpl [Coherence] {
   }
 }
 
+tpl [Correctness] {
+  if [$target-condition-or-property = "correctness"] {
+    apply [.] mode="copy";
+  } else {
+    // dump
+  }
+}
+
 tpl [Compatibility] {
   if [$target-condition-or-property = "compatibility"] {
     apply [.] mode="copy";
@@ -138,26 +308,6 @@ tpl [JustifiedProperty] {
   } else {
     // dump
   }
-}
-
-tpl [Constructor[not(@kind = "V")]] {
-  // dump
-}
-
-tpl [Constructor[@kind = "V" and not(Properties/Abstractness)]] {
-  // dump
-}
-
-tpl [Constructor[@kind = "V" and Properties/Abstractness]] {
-  if [$target-condition-or-property = "abstractness"] {
-    apply [.] mode="copy";
-  } else {
-    // dump
-  }
-}
-
-tpl [Pattern] {
-  // dump
 }
 
 tpl [Registration] {
