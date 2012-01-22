@@ -173,6 +173,8 @@ if (-e $article_xml) {
   ensure_valid_xml_file ($article_xml);
 }
 
+my $absrefs_stylesheet = $stylesheet_paths{'absrefs'};
+
 if (-e $article_absolute_xml) {
   ensure_valid_xml_file ($article_absolute_xml);
 } else {
@@ -181,7 +183,6 @@ if (-e $article_absolute_xml) {
     print 'The absolute form of the XML for ', $article_basename, ' does not exist.  Generating...';
   }
 
-  my $absrefs_stylesheet = $stylesheet_paths{'absrefs'};
   my $absrefs_errors_path = tmpfile_path ();
   my $xsltproc_status = system ("xsltproc --output $article_absolute_xml $absrefs_stylesheet $article_xml 2> $absrefs_errors_path");
   my $xsltproc_exit_code = $xsltproc_status >> 8;
@@ -201,6 +202,21 @@ if (-e $article_absolute_xml) {
     print 'done.', "\n";
   }
 
+}
+
+# Ensure that the absolute forms of the article's environment XMLs are
+# available
+my @extensions = ('eno', 'erd', 'epr', 'dfs', 'eid', 'ecl', 'esh', 'eth');
+foreach my $extension (@extensions) {
+  my $env_xml = "${article_dirname}/${article_basename}.${extension}";
+  if (-e $env_xml) {
+    my $env_abs_xml = "${article_dirname}/${article_basename}.${extension}1";
+    my $xsltproc_status = system ("xsltproc $absrefs_stylesheet $env_xml > $env_abs_xml 2> /dev/null");
+    my $xsltproc_exit_code = $xsltproc_status >> 8;
+    if ($xsltproc_exit_code != 0) {
+      croak ('Error: xsltproc died applying the absolutizer stylesheet to ', $env_xml, '.', "\n");
+    }
+  }
 }
 
 my $dependencies_stylesheet = $stylesheet_paths{'dependencies'};
