@@ -210,7 +210,6 @@ if ($debug) {
 # First, internally minimize
 
 foreach my $p_or_c (@properties_and_conditions) {
-  warn 'Internally minimizing ', $p_or_c, '...';
   my $minimize_internally_status = system ("$minimize_internally_script $p_or_c");
   my $minimize_internally_exit_code = $minimize_internally_status >> 8;
   if ($minimize_internally_status != 0) {
@@ -221,7 +220,6 @@ foreach my $p_or_c (@properties_and_conditions) {
 # Now minimize the envionment of the property and correctness condition guys
 
 foreach my $p_or_c (@properties_and_conditions) {
-  warn 'Externally minimizing ', $p_or_c, '...';
   my $minimize_status = system ("$minimize_script --checker-only --paranoid --verbose $p_or_c");
   my $minimize_exit_code = $minimize_status >> 8;
   if ($minimize_status != 0) {
