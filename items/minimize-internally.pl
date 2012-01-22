@@ -251,6 +251,11 @@ sub aid_for_element {
 }
 
 my @elements = $xml_doc->findnodes ('Article/*');
+
+if (scalar @elements == 0) {
+  croak ('Error: the minimize-internally script makes sense only when there is a final node in the document.  But ', $article_xml, ' has no child nodes at all.');
+}
+
 my %needed = ();
 foreach my $i (0 .. scalar @elements - 1) {
   $needed{$i} = 0;
