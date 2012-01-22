@@ -110,6 +110,7 @@ my %command_dispatch_table =
    'count-independent-items' => \&count_independent_items,
    'dependencies-of' => \&dependencies_of,
    'users-of' => \&items_depending_on,
+   'used-items' => \&used_items,
    'random-item' => \&random_item,
    'dependencies-of-random-item' => \&dependencies_of_random_item,
    'topological-sort' => \&tsort,
