@@ -118,6 +118,11 @@ tpl [Definition] {
       apply [.]; "\n";
     }
   }
+
+  if [Coherence] {
+    "coherence"; "\n";
+  }
+
   for-each [Existence | Uniqueness | Compatibility ] {
     apply [.]; "\n";
   }
@@ -137,12 +142,12 @@ tpl [Definition] {
     apply [.]; "\n";
   }
 
-  if [@kind = "K" and not(Existence)] {
-    "existence"; "\n";
-  }
-  if [@kind = "K" and not(Uniqueness)] {
-    "uniqueness"; "\n";
-  }
+  // if [@kind = "K" and not(Existence)] {
+  //   "existence"; "\n";
+  // }
+  // if [@kind = "K" and not(Uniqueness)] {
+  //   "uniqueness"; "\n";
+  // }
 
 }
 
