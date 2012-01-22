@@ -299,6 +299,18 @@ foreach my $item (keys %item_to_fragment_table) {
 	      croak ('Error: we were unable to resolve the dependency ', $dep, ' of the item ', $item, '.', "\n", 'The reported error was:', "\n", $resolve_err);
 	    }
 	    $item_deps{$resolved_dep} = 0;
+
+ 	    # Ensure that items that depend on functor constructors
+	    # depend directly on the corresponding existence and
+	    # uniqueness items for the constructor.
+
+	    if ($resolved_dep =~ / : kconstructor : [0-9]+ \z /x) {
+	      my $existence_item = "${resolved_dep}[existence]";
+	      my $uniqueness_item = "${resolved_dep}[uniqueness]";
+	      $item_deps{$existence_item} = 0;
+	      $item_deps{$uniqueness_item} = 0;
+	    }
+
 	  }
 	}
 
@@ -318,6 +330,27 @@ foreach my $item (keys %item_to_fragment_table) {
     }
   } else {
     croak ('Error: we cannot make sense of the item \'', $item, '\'.', "\n");
+  }
+}
+
+# Esnure that function constructors that lack existence and uniqueness
+# conditions, but do have a coherence condition, generate existence
+# and uniqueness items that depend on the constructor
+
+foreach my $item (keys %item_to_fragment_table) {
+  if ($item =~ / : kconstructor : [0-9]+ \z /x ) {
+    my $existence_condition = "${item}[existence]";
+    my $uniqueness_condition = "${item}[uniqueness]";
+    if (! defined $item_to_fragment_table{$existence_condition}
+      && ! defined $item_to_fragment_table{$uniqueness_condition}) {
+      my $coherence_condition = "${item}[coherence]";
+      if (defined $item_to_fragment_table{$coherence_condition}) {
+	print $existence_condition, ' ', $coherence_condition, "\n";
+	print $uniqueness_condition, ' ', $coherence_condition, "\n";
+      } else {
+	croak ('Error: the function constructor ', $item, ' lacks known existence and uniqueness conditions, as well as a known coherence condition.', "\n");
+      }
+    }
   }
 }
 
