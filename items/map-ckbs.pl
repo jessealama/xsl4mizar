@@ -5,7 +5,7 @@ use File::Basename qw(basename);
 use XML::LibXML;
 use Getopt::Long;
 use Pod::Usage;
-use Carp qw(croak);
+use Carp qw(croak carp);
 
 sub ensure_directory {
   my $dir = shift;
@@ -45,7 +45,41 @@ my $article_basename = basename ($article_dir);
 
 my $xml_parser = XML::LibXML->new();
 
-# Constructors and constructor properties
+# Constructors, patterns and constructor properties
+
+my %conditions
+  = ('ex' => 'existence',
+     'un' => 'uniqueness',
+     'ch' => 'coherence',
+     'cr' => 'correctness',
+     'ab' => 'abstractness',
+     're' => 'reflexivity',
+     'ir' => 'irreflexivity',
+     'sy' => 'symmetry',
+     'as' => 'asymmetry',
+     'cn' => 'connectedness',
+     'in' => 'involutiveness',
+     'pr' => 'projectivity',
+     'id' => 'idempotence',
+     'cm' => 'commutativity',
+     'cp' => 'compatibility',
+     'se' => 'sethood',
+     # 'vc' => 'vconstructor',
+     # 'rc' => 'rconstructor',
+     # 'kc' => 'kconstructor',
+     'kf' => 'kdefiniens',
+     'rf' => 'rdefiniens',
+     'vf' => 'vdefiniens',
+     'vp' => 'vpattern',
+     'kp' => 'kpattern',
+     'rp' => 'rpattern',
+     'dt' => 'deftheorem');
+
+my %code_of_property = ();
+foreach my $condition (keys %conditions) {
+  my $property = $conditions{$condition};
+  $code_of_property{$property} = $condition;
+}
 
 my @dcos = `find $prel_subdir -name "*.dco" -exec basename {} .dco ';' | sed -e 's/ckb//' | sort --numeric-sort`;
 chomp @dcos;
@@ -82,7 +116,7 @@ foreach my $i (1 .. scalar @dcos) {
     }
     my $constructor_key = "${article_basename}:${kind_lc}constructor:${num}";
     my $fragment_number = $dco;
-    print $article_basename, ':', $kind_lc, 'constructor', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
+    print $article_basename, ':', $kind_lc, 'constructor', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dco, '[', $kind_lc, 'c', ']', "\n";
 
     $fragments_to_constructors{$fragment_number} = $constructor_key;
 
@@ -97,12 +131,49 @@ foreach my $i (1 .. scalar @dcos) {
 	$property_name_lc = 'asymmetry';
       }
 
+      my $property_code = $code_of_property{$property_name_lc};
+
       my $property_key = "${article_basename}:${kind_lc}constructor:${num}[${property_name_lc}]";
-      print $property_key, ' => ', $article_basename, ':', 'fragment', ':', $dco, "\n";
+      print $property_key, ' => ', $article_basename, ':', 'fragment', ':', $dco, '[', $property_code, ']', "\n";
       $handled_constructor_properties{$property_key} = 0;
      }
 
   }
+}
+
+# Notations
+
+my @dnos = `find $prel_subdir -name "*.dno" -exec basename {} .dno ';' | sed -e 's/ckb//' | sort --numeric-sort`;
+chomp @dnos;
+
+my %patterns = ();
+my %fragments_to_patterns = ();
+
+foreach my $i (1 .. scalar @dnos) {
+  my $dno = $dnos[$i - 1];
+  my $dno_path = "$prel_subdir/ckb${dno}.dno";
+  my $pattern_line = `grep '<Pattern ' $dno_path`;
+  chomp $pattern_line;
+  $pattern_line =~ m/ constrkind=\"(.)\"/;
+  my $constrkind = $1;
+  if (! defined $constrkind) {
+    print STDERR ('Error: we failed to extract a kind attribute from dno Pattern XML element', "\n", "\n", '  ', $pattern_line, "\n");
+  }
+  my $constrkind_lc = lc $constrkind;
+  my $num;
+  if (defined $patterns{$constrkind}) {
+    $num = $patterns{$constrkind};
+    $patterns{$constrkind} = $num + 1;
+  } else {
+    $num = 1;
+    $patterns{$constrkind} = 2;
+  }
+
+  my $pattern_key = "${article_basename}:${constrkind_lc}pattern:${num}";
+  my $fragment_number = $dno;
+  $fragments_to_patterns{$fragment_number} = $pattern_key;
+
+  print $article_basename, ':', $constrkind_lc, 'pattern', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dno, '[', $constrkind_lc, 'p', ']', "\n";
 }
 
 # Definientia
@@ -144,7 +215,7 @@ foreach my $i (1 .. scalar @defs) {
     $definiens{$constrkind} = 2;
   }
 
-  print $article_basename, ':', $constrkind_lc, 'definiens', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $def, "\n";
+  print $article_basename, ':', $constrkind_lc, 'definiens', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $def, '[', $constrkind_lc, 'f', ']', "\n";
 
   my $definiens_key = "${article_basename}:${constrkind_lc}definiens:${num}";
   $fragments_to_definientia{$def} = $definiens_key;
@@ -152,53 +223,26 @@ foreach my $i (1 .. scalar @defs) {
 
 # Constructor properties and definition correctness conditions
 
-my %conditions
-  = ('ex' => 'existence',
-     'un' => 'uniqueness',
-     'ch' => 'coherence',
-     'cr' => 'correctness',
-     'ab' => 'abstractness',
-     're' => 'reflexivity',
-     'ir' => 'irreflexivity',
-     'sy' => 'symmetry',
-     'as' => 'asymmetry',
-     'cn' => 'connectedness',
-     'in' => 'involutiveness',
-     'pr' => 'projectivity',
-     'id' => 'idempotence',
-     'cm' => 'commutativity',
-     'cp' => 'compatibility',
-     'se' => 'sethood');
-
-my @properties_and_conditions = `find ${text_subdir} -maxdepth 1 -mindepth 1 -type f -name "ckb[1-9][0-9]*[a-z][a-z].miz" -exec basename {} .miz ';'`;
+my @properties_and_conditions = `find ${text_subdir} -maxdepth 1 -mindepth 1 -type f -name "ckb[0-9]*[a-z][a-z].miz" -exec basename {} .miz ';'`;
 chomp @properties_and_conditions;
 
 foreach my $p_or_c_file (@properties_and_conditions) {
   if ($p_or_c_file =~ / \A ckb ([1-9][0-9]*) ([a-z]{2}) \z/x) {
     (my $fragment_number, my $condition_code) = ($1, $2);
-    my $resolved_condition = $conditions{$condition_code};
-    if (defined $resolved_condition) {
-
-      if (defined $fragments_to_constructors{$fragment_number}) {
-	my $constructor = $fragments_to_constructors{$fragment_number};
-	my $property_key = "${constructor}[${resolved_condition}]";
-	if (! defined $handled_constructor_properties{$property_key}) {
-	  print $property_key, ' => ', $article_basename, ':', 'fragment', ':', $fragment_number, "\n";
-	}
-      } elsif (defined $fragments_to_definientia{$fragment_number}) {
-	my $definiens = $fragments_to_definientia{$fragment_number};
-	my $property_key = "${definiens}[${resolved_condition}]";
-	if (! defined $handled_constructor_properties{$property_key}) {
-	  print $property_key, ' => ', $article_basename, ':', 'fragment', ':', $fragment_number, "\n";
+    if ($condition_code !~ /.c/) {
+      my $resolved_condition = $conditions{$condition_code};
+      if (defined $resolved_condition) {
+	if (defined $fragments_to_constructors{$fragment_number}) {
+	  my $constructor = $fragments_to_constructors{$fragment_number};
+	  my $property_key = "${constructor}[${resolved_condition}]";
+	  if (! defined $handled_constructor_properties{$property_key}) {
+	    print $property_key, ' => ', $article_basename, ':', 'fragment', ':', $fragment_number, '[', $condition_code, ']', "\n";
+	  }
 	}
       } else {
-	croak ('Error: unable to determine the constructor generated by fragment ', $fragment_number, '.', "\n");
+	carp ('Warning: unable to make sense of the condition code \'', $condition_code, '\'.', "\n");
       }
-    } else {
-      croak ('Error: unable to make sense of the condition code \'', $condition_code, '\'.', "\n");
     }
-  } else {
-    croak ('Error: unable to make sense of the condition-or-property file \'', $p_or_c_file, '\'.', "\n");
   }
 }
 
@@ -211,7 +255,7 @@ my %deftheorems = ();
 
 foreach my $i (1 .. scalar @thes) {
   my $the = $thes[$i - 1];
-  print $article_basename, ':', 'deftheorem' , ':', $i, ' => ', $article_basename, ':', 'fragment', ':', $the, "\n";
+  print $article_basename, ':', 'deftheorem' , ':', $i, ' => ', $article_basename, ':', 'fragment', ':', $the, '[dt]', "\n";
 }
 
 # Schemes
@@ -267,35 +311,6 @@ foreach my $i (1 .. scalar @dcls) {
     $clusters{$kind} = 2;
   }
   print $article_basename, ':', $kind_lc, 'cluster', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dcl, "\n";
-}
-
-# Notations
-
-my @dnos = `find $prel_subdir -name "*.dno" -exec basename {} .dno ';' | sed -e 's/ckb//' | sort --numeric-sort`;
-chomp @dnos;
-
-my %patterns = ();
-
-foreach my $i (1 .. scalar @dnos) {
-  my $dno = $dnos[$i - 1];
-  my $dno_path = "$prel_subdir/ckb${dno}.dno";
-  my $pattern_line = `grep '<Pattern ' $dno_path`;
-  chomp $pattern_line;
-  $pattern_line =~ m/ constrkind=\"(.)\"/;
-  my $constrkind = $1;
-  if (! defined $constrkind) {
-    print STDERR ('Error: we failed to extract a kind attribute from dno Pattern XML element', "\n", "\n", '  ', $pattern_line, "\n");
-  }
-  my $constrkind_lc = lc $constrkind;
-  my $num;
-  if (defined $patterns{$constrkind}) {
-    $num = $patterns{$constrkind};
-    $patterns{$constrkind} = $num + 1;
-  } else {
-    $num = 1;
-    $patterns{$constrkind} = 2;
-  }
-  print $article_basename, ':', $constrkind_lc, 'pattern', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dno, "\n";
 }
 
 # Identifications
