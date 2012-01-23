@@ -217,7 +217,9 @@ sub dependencies_of {
   my $item = $ARGV[1];
   if (defined $table{$item}) {
     my @deps = @{$table{$item}};
-    print join ("\n", @deps), "\n";
+    if (@deps) {
+      print join ("\n", @deps), "\n";
+    }
   }
 }
 
