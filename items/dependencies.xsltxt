@@ -53,7 +53,7 @@ tpl [Article[@aid]] {
   }
 
   // schemes
-  $esh = `concat ($aid-lc, ".esh")`;
+  $esh = `concat ($aid-lc, ".esh1")`;
   $full-esh = `concat ($article-directory, $esh)`;
   for-each [document ($full-esh, /)] {
     apply [Schemes];
