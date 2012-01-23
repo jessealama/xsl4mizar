@@ -255,8 +255,94 @@ foreach my $long_name (keys %conditions_and_properties_shortcuts) {
   $full_name_of_shortcut{$shortcut} = $long_name;
 }
 
+# Esnure that function constructors that lack existence and uniqueness
+# conditions, but do have a coherence condition, generate existence
+# and uniqueness items that depend on the constructor
+
+foreach my $item (keys %item_to_fragment_table) {
+  if ($item =~ / : kconstructor : [0-9]+ \z /x ) {
+    my $existence_condition = "${item}[existence]";
+    my $uniqueness_condition = "${item}[uniqueness]";
+    if (! defined $item_to_fragment_table{$existence_condition}
+      && ! defined $item_to_fragment_table{$uniqueness_condition}) {
+      my $coherence_condition = "${item}[coherence]";
+      if (defined $item_to_fragment_table{$coherence_condition}) {
+	print $existence_condition, ' ', $coherence_condition, "\n";
+	print $uniqueness_condition, ' ', $coherence_condition, "\n";
+      } else {
+	croak ('Error: the function constructor ', $item, ' lacks known existence and uniqueness conditions, as well as a known coherence condition.', "\n");
+      }
+    }
+  }
+}
+
+# Deal with properties copied into redefined constructors.  Let's
+# declare that they depend on the original constructor property.
+
+sub fragment_is_redefined_constructor {
+    my $fragment = shift;
+    if ($fragment =~ / : fragment : ([0-9]+) /x) {
+	my $fragment_number = $1;
+	my $fragment_abs_xml = "${article_dir}/text/ckb${fragment_number}.xml1";
+	if (-e $fragment_abs_xml) {
+	    ensure_valid_xml_file ($fragment_abs_xml);
+	    my $fragment_doc = $xml_parser->parse_file ($fragment_abs_xml);
+	    (my $constructor) = $fragment_doc->findnodes ('.//Constructor[@redefaid and @absredefnr]');
+	    defined $constructor ? return 1
+	                         : return 0;
+	} else {
+	    croak ('Error: unable to determine whether the fragment ', $fragment, ' corresponds to a redefined constructor because the absolutized XML  corresponding to it (', $fragment_abs_xml, ') does not exist.', "\n");
+	}
+    } else {
+	croak ('Error: unable to make sense of the fragment \'', $fragment, '\'.', "\n");
+    }
+}
+
+memoize ('original_constructor');
+sub original_constructor {
+    my $fragment = shift;
+    if ($fragment =~ / : fragment : ([0-9]+) /x) {
+	my $fragment_number = $1;
+	my $fragment_abs_xml = "${article_dir}/text/ckb${fragment_number}.xml1";
+	if (-e $fragment_abs_xml) {
+	    ensure_valid_xml_file ($fragment_abs_xml);
+	    my $fragment_doc = $xml_parser->parse_file ($fragment_abs_xml);
+	    (my $constructor) = $fragment_doc->findnodes ('.//Constructor[@redefaid and @absredefnr and @kind]');
+	    if (defined $constructor) {
+		my $kind = $constructor->findvalue ('@kind');
+		my $kind_lc = lc $kind;
+		my $redefaid = $constructor->findvalue ('@redefaid');
+		my $redefaid_lc = lc $redefaid;
+		my $absredefnr = $constructor->findvalue ('@absredefnr');
+		return "${redefaid_lc}:${kind_lc}constructor:${absredefnr}";
+	    } else {
+		croak ('Error: we assumed that the fragment ', $fragment, ' is a redefinition with a new constructor, but it seems not to be.', "\n");
+	    }
+	} else {
+	    croak ('Error: unable to determine whether the fragment ', $fragment, ' corresponds to a redefined constructor because the absolutized XML  corresponding to it (', $fragment_abs_xml, ') does not exist.', "\n");
+	}
+    } else {
+	croak ('Error: unable to make sense of the fragment \'', $fragment, '\'.', "\n");
+    }
+}
+
+foreach my $item (keys %item_to_fragment_table) {
+    if ($item =~ / : (.) constructor : [0-9]+ \[ ([a-z]+) \] \z /x) {
+	my $property = $2;
+	if ($property ne 'coherence') {
+	    my $fragment = $item_to_fragment_table{$item};
+	    if (fragment_is_redefined_constructor ($fragment)) {
+		my $original = original_constructor ($fragment);
+		my $original_resolved = resolve_item ($original);
+		print $item, ' ', $original_resolved, '[', $property, ']', "\n";
+	    }
+	}
+    }
+}
+
 my $dependencies_script = $script_paths{'dependencies.pl'};
 foreach my $item (keys %item_to_fragment_table) {
+
   my %item_deps = ();
   if ($item =~ /\A ([a-z0-9_]+) : ([^:]+) : ([0-9]+) /x) {
     (my $item_article, my $item_kind, my $item_number) = ($1, $2, $3);
