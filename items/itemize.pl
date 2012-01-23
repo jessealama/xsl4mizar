@@ -672,14 +672,11 @@ print 'done.', "\n";
 print 'Absolutizing the fragment XMLs...';
 
 my @fragment_xmls = glob "${target_text_subdir}/ckb[0-9]*.xml";
-chomp @fragment_xmls;
-foreach my $fragment_xml (@fragment_xmls) {
-    my $fragment_abs_xml = "${fragment_xml}1";
-    my $xsltproc_status = system ("xsltproc ${absrefs_stylesheet} ${fragment_xml} > ${fragment_abs_xml} 2>/dev/null");
-    my $xsltproc_exit_code = $xsltproc_status >> 8;
-    if ($xsltproc_exit_code != 0) {
-	croak ('Error: xsltproc did not exit cleanly applying the absolutizer stylesheet to ', $fragment_xml, '.', "\n");
-    }
+my $fragment_xmls_with_space = join (' ', @fragment_xmls);
+my $parallel_status = system ("parallel 'xsltproc --output {.}.xml1 ${absrefs_stylesheet} {} 2> /dev/null' ::: ${fragment_xmls_with_space}");
+my $parallel_exit_code = $parallel_status >> 8;
+if ($parallel_exit_code != 0) {
+    croak ('Error: parallel did not exit cleanly when absolutizing the fragment XMLs for ', $article_basename, '; its exit code was ', $parallel_exit_code, '.', "\n");
 }
 
 print 'done.', "\n";
