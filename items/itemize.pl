@@ -528,11 +528,14 @@ my %conditions_and_properties_shortcuts
      'kconstructor' => 'kc',
      'rpattern' => 'rp',
      'rconstructor' => 'rc',
+     'mpattern' => 'mp',
+     'mconstructor' => 'mc',
      'vconstructor' => 'vc',
      'vpattern' => 'vp',
      'deftheorem' => 'dt',
-     'rdefiniens' => 'rf',
      'kdefiniens' => 'kf',
+     'mdefiniens' => 'mf',
+     'rdefiniens' => 'rf',
      'vdefiniens' => 'vf');
 
 sub extension {
