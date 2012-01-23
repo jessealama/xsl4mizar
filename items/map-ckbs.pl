@@ -68,11 +68,13 @@ my %conditions
      # 'rc' => 'rconstructor',
      # 'kc' => 'kconstructor',
      'kf' => 'kdefiniens',
+     'mf' => 'mdefiniens',
      'rf' => 'rdefiniens',
      'vf' => 'vdefiniens',
-     'vp' => 'vpattern',
      'kp' => 'kpattern',
      'rp' => 'rpattern',
+     'mp' => 'mpattern',
+     'vp' => 'vpattern',
      'dt' => 'deftheorem');
 
 my %code_of_property = ();
