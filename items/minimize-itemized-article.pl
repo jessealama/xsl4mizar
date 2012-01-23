@@ -209,22 +209,27 @@ if ($debug) {
 
 # First, internally minimize
 
-foreach my $p_or_c (@properties_and_conditions) {
-  my $minimize_internally_status = system ("$minimize_internally_script $p_or_c");
-  my $minimize_internally_exit_code = $minimize_internally_status >> 8;
-  if ($minimize_internally_status != 0) {
-    croak ('Error: the internal minimization script did not exit cleanly when working with ', $p_or_c, '.', "\n");
-  }
+my $parallel_minimize_internally_status
+    = system ('parallel '
+	      . $minimize_internally_script
+	      . ' ::: ' . join (' ', @properties_and_conditions));
+my $parallel_minimize_internally_exit_code
+    = $parallel_minimize_internally_status >> 8;
+if ($parallel_minimize_internally_exit_code != 0) {
+    croak ('Error: parallel died internally minimizing the properties and conditions articles for ', $itemized_article_basename, '.');
 }
 
 # Now minimize the envionment of the property and correctness condition guys
 
-foreach my $p_or_c (@properties_and_conditions) {
-  my $minimize_status = system ("$minimize_script --checker-only --paranoid --verbose $p_or_c");
-  my $minimize_exit_code = $minimize_status >> 8;
-  if ($minimize_status != 0) {
-    croak ('Error: the minimization script did not exit cleanly when working with ', $p_or_c, '.', "\n");
-  }
+my $parallel_minimize_ps_and_cs_status
+    = system ('parallel '
+	      . $minimize_script
+	      . ' --checker-only '
+	      . ' ::: ' . join (' ', @properties_and_conditions));
+my $parallel_minimize_ps_and_cs_exit_code
+    = $parallel_minimize_ps_and_cs_status >> 8;
+if ($parallel_minimize_ps_and_cs_exit_code != 0) {
+    croak ('Error: parallel died minimizing the properties and conditions articles for ', $itemized_article_basename, '.');
 }
 
 if ($paranoid == 1) {
