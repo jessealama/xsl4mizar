@@ -122,10 +122,10 @@ tpl [Notations] {
   }
 }
 
-tpl [Pattern[@aid and @kind and @nr]] {
+tpl [Pattern[@aid and @kind and @absconstrnr]] {
   $aid-lc = lowercase (#string = `@aid`);
   $kind-lc = lowercase (#string = `@kind`);
-  $aid-lc; ":"; $kind-lc; "pattern"; ":"; `@nr`;
+  $aid-lc; ":"; $kind-lc; "pattern"; ":"; `@absconstrnr`;
 }
 
 tpl [Schemes] {
