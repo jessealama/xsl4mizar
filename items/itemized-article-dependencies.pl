@@ -8,6 +8,7 @@ use Pod::Usage;
 use File::Temp qw(tempfile);
 use Carp qw(croak carp);
 use XML::LibXML;
+use Memoize qw(memoize);
 
 # Set up an XML parser that we might use
 my $xml_parser = XML::LibXML->new ();
@@ -191,6 +192,7 @@ foreach my $item_to_fragment_line (@item_to_fragment_lines) {
 #   # warn $fragment, ' generated ', join (' ', @deps);
 # }
 
+memoize ('resolve_item');
 sub resolve_item {
   my $item = shift;
 
