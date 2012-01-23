@@ -114,6 +114,7 @@ my $article_evl = "${article_dirname}/${article_basename}.evl";
 ensure_readable_file ($article_miz);
 ensure_directory ($stylesheet_home);
 
+my $absrefs_stylesheet = "${stylesheet_home}/addabsrefs.xsl";
 my $rewrite_aid_stylesheet = "${stylesheet_home}/rewrite-aid.xsl";
 my $split_stylesheet = "${stylesheet_home}/split.xsl";
 my $itemize_stylesheet = "${stylesheet_home}/itemize.xsl";
@@ -664,6 +665,21 @@ foreach my $fragment (@fragment_files) {
     # Now that we've trimmed the XML, minimize to throw away any
     # spurious toplevel stuff that we don't really need.
   }
+}
+
+print 'done.', "\n";
+
+print 'Absolutizing the fragment XMLs...';
+
+my @fragment_xmls = glob "${target_text_subdir}/ckb[0-9]*.xml";
+chomp @fragment_xmls;
+foreach my $fragment_xml (@fragment_xmls) {
+    my $fragment_abs_xml = "${fragment_xml}1";
+    my $xsltproc_status = system ("xsltproc ${absrefs_stylesheet} ${fragment_xml} > ${fragment_abs_xml} 2>/dev/null");
+    my $xsltproc_exit_code = $xsltproc_status >> 8;
+    if ($xsltproc_exit_code != 0) {
+	croak ('Error: xsltproc did not exit cleanly applying the absolutizer stylesheet to ', $fragment_xml, '.', "\n");
+    }
 }
 
 print 'done.', "\n";
