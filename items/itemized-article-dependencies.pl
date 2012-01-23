@@ -281,9 +281,6 @@ foreach my $item (keys %item_to_fragment_table) {
 	my $dependencies_err = tmpfile_path ();
 	my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} $fragment_miz 2> $dependencies_err`;
 
-	# DEBUG
-	# warn $item, ' has ', scalar @fragment_dependencies, ' dependencies.';
-
 	my $dependencies_exit_code = $? >> 8;
 	if ($dependencies_exit_code != 0) {
 	  my $dependencies_message = `cat $dependencies_err`;
