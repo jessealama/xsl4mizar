@@ -73,15 +73,20 @@ sub load_table {
     my ($item, my @deps) = split (/ /, $table_line);
     $dep_items{$item} = 0;
     $all_items{$item} = 0;
-    $table{$item} = \@deps;
+    if (defined $table{$item}) {
+	my @original_deps = @{$table{$item}};
+	push (@original_deps, @deps);
+    } else {
+	$table{$item} = \@deps;
+    }
     foreach my $dep (@deps) {
-      $all_items{$dep} = 0;
-      $used{$dep} = 0;
+	$all_items{$dep} = 0;
+	$used{$dep} = 0;
     }
     if (scalar @deps == 0) {
-      $trivial_dep_items{$item} = 0;
+	$trivial_dep_items{$item} = 0;
     } else {
-      $non_trivial_dep_items{$item} = 0;
+	$non_trivial_dep_items{$item} = 0;
     }
   }
   close $table_fh
