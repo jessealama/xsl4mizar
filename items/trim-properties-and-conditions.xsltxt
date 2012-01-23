@@ -71,6 +71,9 @@ tpl [/] {
       when [$target-condition-or-property = "kpattern"] {
         // OK
       }
+      when [$target-condition-or-property = "mpattern"] {
+        // OK
+      }
       when [$target-condition-or-property = "rpattern"] {
         // OK
       }
@@ -82,6 +85,9 @@ tpl [/] {
       // Constructors
       //////////////////////////////////////////////////
       when [$target-condition-or-property = "kconstructor"] {
+        // OK
+      }
+      when [$target-condition-or-property = "mconstructor"] {
         // OK
       }
       when [$target-condition-or-property = "rconstructor"] {
@@ -116,13 +122,16 @@ tpl [/] {
       when [$target-condition-or-property = "deftheorem"] {
         // OK
       }
+      when [$target-condition-or-property = "kdefiniens"] {
+        // OK
+      }
+      when [$target-condition-or-property = "mdefiniens"] {
+        // OK
+      }
       when [$target-condition-or-property = "rdefiniens"] {
         // OK
       }
       when [$target-condition-or-property = "vdefiniens"] {
-        // OK
-      }
-      when [$target-condition-or-property = "kdefiniens"] {
         // OK
       }
 
@@ -163,6 +172,13 @@ tpl [/] {
         // OK
       }
       when [$target-condition-or-property = "irreflexivity"] {
+        // OK
+      }
+
+      ////////////////////////////////////////
+      // Mode properties
+      ////////////////////////////////////////
+      when [$target-condition-or-property = "sethood"] {
         // OK
       }
 
@@ -270,7 +286,8 @@ tpl [Definition] {
   choose {
     when [$target-condition-or-property = "kpattern"
           or $target-condition-or-property = "rpattern"
-          or $target-condition-or-property = "vpattern"] {
+          or $target-condition-or-property = "vpattern"
+	  or $target-condition-or-property = "mpattern"] {
       <Definition {
         for-each [@*] { copy-of `.`; }
         "\n";
@@ -281,6 +298,7 @@ tpl [Definition] {
     when [$target-condition-or-property = "kconstructor"
           or $target-condition-or-property = "rconstructor"
           or $target-condition-or-property = "vconstructor"
+	  or $target-condition-or-property = "mconstructor"
 	  or $target-condition-or-property = "deftheorem"] {
       <Definition {
         for-each [@*] { copy-of `.`; }
