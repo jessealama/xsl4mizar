@@ -257,7 +257,7 @@ foreach my $long_name (keys %conditions_and_properties_shortcuts) {
 
 # Esnure that function constructors that lack existence and uniqueness
 # conditions, but do have a coherence condition, generate existence
-# and uniqueness items that depend on the constructor
+# and uniqueness items that depend on the coherence condition
 
 foreach my $item (keys %item_to_fragment_table) {
   if ($item =~ / : kconstructor : [0-9]+ \z /x ) {
