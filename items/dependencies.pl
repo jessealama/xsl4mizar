@@ -220,24 +220,28 @@ foreach my $extension (@extensions) {
 }
 
 my $dependencies_stylesheet = $stylesheet_paths{'dependencies'};
-my @non_constructor_deps = `xsltproc $dependencies_stylesheet $article_absolute_xml`;
-chomp @non_constructor_deps;
 
-# Sanity check: the stylsheet didn't produce any junk output
-if (grep (/^$/, @non_constructor_deps)) {
-  croak ('Error: the dependencies stylesheet generated some junk output (a blank line).');
+my $xsltproc_out = File::Temp->new ();
+my $xsltproc_err = File::Temp->new ();
+
+my $xsltproc_non_constructor_deps_status
+    = system ("xsltproc ${dependencies_stylesheet} ${article_absolute_xml} > $xsltproc_out 2> $xsltproc_err");
+my $xsltproc_non_constructor_deps_exit_code
+    = $xsltproc_non_constructor_deps_status >> 8;
+
+if ($xsltproc_non_constructor_deps_exit_code != 0) {
+    my $err = `cat $xsltproc_err`;
+    croak ('Error: xsltproc did not exit cleanly when applying the dependencies stylesheet to ', $article_absolute_xml, ':', "\n", $err, "\n");
 }
+
+my @non_constructor_deps = `cat $xsltproc_out`;
+chomp @non_constructor_deps;
 
 # Constructors are a special case
 
 my $inferred_constructors_stylesheet = $stylesheet_paths{'inferred-constructors'};
 my @constructor_deps = `xsltproc $inferred_constructors_stylesheet $article_absolute_xml | sort -u | uniq`;
 chomp @constructor_deps;
-
-# Sanity check: the stylesheet didn't produce any junk output
-if (grep (/^$/, @constructor_deps)) {
-  croak ('Error: the inferred-constructors stylesheet generated some junk output.');
-}
 
 my %deps_table = ();
 
