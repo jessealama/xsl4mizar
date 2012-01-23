@@ -28,10 +28,18 @@ tpl [/] {
 }
 
 tpl print-everything (#except) {
-  apply [descendant::Pred[not(@aid = $except)]];
-  apply [descendant::Func[not(@aid = $except)]];
-  apply [descendant::Adjective[not(@aid = $except)]];
-  apply [descendant::Typ[not(@aid = $except)]];
+  for-each [descendant::Pred[@aid and @kind and @absnr and not(@aid = $except)]] {
+    apply [.]; "\n";
+  }
+  for-each [descendant::Func[@aid and @kind and @absnr and not(@aid = $except)]] {
+    apply [.]; "\n";
+  }
+  for-each [descendant::Adjective[@aid and @kind and @absnr and not(@aid = $except)]] {
+    apply [.]; "\n";
+  }
+  for-each [descendant::Typ[@aid and @kind and @absnr and not(@aid = $except)]] {
+    apply [.]; "\n";
+  }
 }
 
 tpl [Article[@aid]] {
@@ -87,13 +95,15 @@ tpl [Article[@aid]] {
 
   // inspect the .esh
   $esh = `concat ($aid-lc, ".esh1")`;
-  for-each [document ($esh, /)] {
+  $full-esh = `concat ($article-directory, $esh)`;
+  for-each [document ($full-esh, /)] {
     print-everything (#except = $aid);
   }
 
   // inspect the .eth
   $eth = `concat ($aid-lc, ".eth1")`;
-  for-each [document ($eth, /)] {
+  $full-eth = `concat ($article-directory, $eth)`;
+  for-each [document ($full-eth, /)] {
     print-everything (#except = $aid);
   }
 
@@ -112,28 +122,10 @@ tpl [Article[@aid]] {
 
 }
 
-tpl [*[not(@aid)]] {
-  $n = `name (.)`;
-  $message = `concat ("Error: we found a(n) ", $n, " element that lacks an aid attribute.")`;
-  msg terminate="yes" $message;
-}
-
-tpl [*[not(@absnr)]] {
-  $n = `name (.)`;
-  $message = `concat ("Error: we found a(n) ", $n, " element that lacks an absnr attribute.")`;
-  msg terminate="yes" $message;
-}
-
-tpl [*[not(@kind)]] {
-  $n = `name (.)`;
-  $message = `concat ("Error: we found a(n) ", $n, " element that lacks a kind attribute.")`;
-  msg terminate="yes" $message;
-}
-
 tpl [*[@aid and @kind and @absnr]] {
   $aid-lc = lc (#s = `@aid`);
   $kind-lc = lc (#s = `@kind`);
-  $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absnr`; "\n";
+  $aid-lc; ":"; $kind-lc; "constructor"; ":"; `@absnr`;
 }
 
 
