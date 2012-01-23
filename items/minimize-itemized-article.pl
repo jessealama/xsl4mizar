@@ -199,8 +199,13 @@ if ($parallel_minimize_exit_code != 0) {
 
 # Now check for conditions and constructor properties
 
-my @properties_and_conditions = `find ${real_text_dir} -maxdepth 1 -mindepth 1 -type f -name "ckb*.miz" | grep --invert-match 'ckb[1-9][0-9]*.miz'`;
-chomp @properties_and_conditions;
+opendir my $text_dir_fh, $real_text_dir
+    or croak ('Error: unable to open the directory ', $real_text_dir, '.');
+my @ps_and_cs
+    = grep { -f "${real_text_dir}/$_"
+		 && / ckb[0-9]+[a-z]{2}.miz \z/x } readdir $text_dir_fh;
+closedir $text_dir_fh;
+my @properties_and_conditions = map { "${real_text_dir}/$_" } @ps_and_cs;
 
 if ($debug) {
   print {*STDERR} 'There are ', scalar @properties_and_conditions, ' properties/conditions:', join ("\n", @properties_and_conditions), "\n";
