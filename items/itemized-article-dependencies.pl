@@ -343,7 +343,18 @@ foreach my $item (keys %item_to_fragment_table) {
 my $dependencies_script = $script_paths{'dependencies.pl'};
 foreach my $item (keys %item_to_fragment_table) {
 
-  my %item_deps = ();
+    my %item_deps = ();
+
+    # Ensure that functor constructors depend directly on their
+    # corresponding existence and uniqueness conditions.
+
+    if ($item =~ / : kconstructor : [0-9]+ \z /x) {
+	my $existence_item = "${item}[existence]";
+	my $uniqueness_item = "${item}[uniqueness]";
+	$item_deps{$existence_item} = 0;
+	$item_deps{$uniqueness_item} = 0;
+    }
+
   if ($item =~ /\A ([a-z0-9_]+) : ([^:]+) : ([0-9]+) /x) {
     (my $item_article, my $item_kind, my $item_number) = ($1, $2, $3);
     my $fragment = $item_to_fragment_table{$item};
@@ -384,17 +395,6 @@ foreach my $item (keys %item_to_fragment_table) {
 	      croak ('Error: we were unable to resolve the dependency ', $dep, ' of the item ', $item, '.', "\n", 'The reported error was:', "\n", $resolve_err);
 	    }
 	    $item_deps{$resolved_dep} = 0;
-
- 	    # Ensure that items that depend on functor constructors
-	    # depend directly on the corresponding existence and
-	    # uniqueness items for the constructor.
-
-	    if ($resolved_dep =~ / : kconstructor : [0-9]+ \z /x) {
-	      my $existence_item = "${resolved_dep}[existence]";
-	      my $uniqueness_item = "${resolved_dep}[uniqueness]";
-	      $item_deps{$existence_item} = 0;
-	      $item_deps{$uniqueness_item} = 0;
-	    }
 
 	  }
 	}
