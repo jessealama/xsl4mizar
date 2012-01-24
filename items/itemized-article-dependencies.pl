@@ -314,7 +314,40 @@ sub miz_path_for_item {
     }
 }
 
+# Build a list of files on which we will compute their dependencies
+
 my $dependencies_script = path_for_script ('dependencies.pl');
+
+# my @items = keys %item_to_fragment_table;
+# my @item_paths = map { miz_path_for_item ($_); } @items;
+
+# my @parallel_call = ('parallel',
+# 		     '--keep',
+# 		     "/bin/echo -n '{}: '; ${dependencies_script} --stylesheet-home=${stylesheet_home} --oneline {}; /bin/echo",
+# 		     ':::',
+# 		     @item_paths);
+
+# my $parallel_out = '';
+# my $parallel_err = '';
+# run (\@parallel_call,
+#      '>', \$parallel_out,
+#      '2>', \$parallel_err)
+#     or croak ('Error: parallel did not exit cleanly when computing the dependencies of the fragments for ', $article_basename, '.  The error output was:', "\n", $parallel_err);
+
+# my @unresolved_deps = split ("\n", $parallel_out);
+
+# # DEBUG
+# warn 'Wow: parallel output (nresolved deps) was:', "\n", $parallel_out;
+# warn 'There are ', scalar @unresolved_deps, ' dep lines';
+
+# if (scalar @unresolved_deps == scalar @items) {
+#     warn 'Holy crap, they are equal!';
+# }
+# else {
+#     warn 'Rats.';
+# }
+
+
 foreach my $item (keys %item_to_fragment_table) {
 
     my %item_deps = ();
