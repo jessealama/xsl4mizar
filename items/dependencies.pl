@@ -13,6 +13,7 @@ use File::Basename qw(basename dirname);
 use Carp qw(croak);
 use Regexp::DefaultFlags;
 use Xsltproc qw(apply_stylesheet);
+use Utils qw(ensure_directory);
 
 my $stylesheet_home = undef;
 my $verbose         = 0;
@@ -62,19 +63,6 @@ sub mizar_file_with_extension {
 my $article_atr          = mizar_file_with_extension('atr');
 my $article_xml          = mizar_file_with_extension('xml');
 my $article_absolute_xml = mizar_file_with_extension('xml1');
-
-sub ensure_directory {
-    my $dir = shift;
-    if ( !-e $dir ) {
-        die 'Error: the required directory ', $dir, ' does not exist.';
-    }
-
-    if ( !-d $dir ) {
-        die 'Error: the required directory ', $dir,
-            ' does not exist (as a directory).';
-    }
-    return 1;
-}
 
 my $dependencies_stylesheet = path_for_stylesheet('dependencies');
 my $absrefs_stylesheet      = path_for_stylesheet('addabsrefs');
