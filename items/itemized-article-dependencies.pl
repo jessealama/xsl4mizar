@@ -282,6 +282,8 @@ sub miz_path_for_item {
 
     my $item = shift;
 
+    my $path = undef;
+
     if ($item =~ /\A ([a-z0-9_]+) : ([^:]+) : ([0-9]+) /) {
 	(my $item_article, my $item_kind, my $item_number) = ($1, $2, $3);
 	my $fragment = $item_to_fragment_table{$item};
@@ -290,12 +292,12 @@ sub miz_path_for_item {
 	    # Possibly resolve properties and correctness conditions
 	    if ($fragment =~ / \[ ([a-z]+) \] \z /) {
 		my $property_or_condition_code = $1;
-		return "${article_dir}/text/ckb${fragment_number}${property_or_condition_code}.miz";
+		$path = "${article_dir}/text/ckb${fragment_number}${property_or_condition_code}.miz";
 	    } elsif ($item =~ / : (.) constructor [0-9]+ \z /) {
 		my $constructor_kind = $1;
-		return "${article_dir}/text/ckb${fragment_number}${constructor_kind}c.miz";
+		$path = "${article_dir}/text/ckb${fragment_number}${constructor_kind}c.miz";
 	    } else {
-		return "${article_dir}/text/ckb${fragment_number}.miz";
+		$path = "${article_dir}/text/ckb${fragment_number}.miz";
 	    }
 	} else {
 	    croak ('Error: we could not extract the article fragment number from the text', "\n", '  ', $fragment);
@@ -305,6 +307,11 @@ sub miz_path_for_item {
 	croak ('Error: we cannot make sense of the item \'', $item, '\'.', "\n");
     }
 
+    if (-e $path) {
+	return $path;
+    } else {
+	return undef;
+    }
 }
 
 my $dependencies_script = path_for_script ('dependencies.pl');
