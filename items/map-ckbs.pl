@@ -7,6 +7,17 @@ use Getopt::Long;
 use Pod::Usage;
 use Carp qw(croak carp);
 
+my $xml_parser = XML::LibXML->new(); # for our XML processing needs
+
+sub ensure_valid_xml_file {
+  my $xml_path = shift;
+  if (defined eval { $xml_parser->parse_file ($xml_path) }) {
+    return 1;
+  } else {
+    croak ('Error: ', $xml_path, ' is not a well-formed XML file.');
+  }
+}
+
 sub ensure_directory {
   my $dir = shift;
   if (! -e $dir) {
@@ -42,8 +53,6 @@ ensure_directory ($prel_subdir);
 ensure_directory ($text_subdir);
 
 my $article_basename = basename ($article_dir);
-
-my $xml_parser = XML::LibXML->new();
 
 # Constructors, patterns and constructor properties
 
@@ -135,6 +144,10 @@ foreach my $i (1 .. scalar @dcos) {
 	my $property_code = $code_of_property{$property_name_lc};
 
 	my $property_key = "${article_basename}:${kind_lc}constructor:${num}[${property_name_lc}]";
+
+	#DEBUG
+	# warn 'handling ',  $property_key;
+
 	print $property_key, ' => ', $article_basename, ':', 'fragment', ':', $dco, '[', $property_code, ']', "\n";
 	$handled_constructor_properties{$property_key} = 0;
     }
@@ -150,30 +163,41 @@ my %patterns = ();
 my %fragments_to_patterns = ();
 
 foreach my $i (1 .. scalar @dnos) {
-  my $dno = $dnos[$i - 1];
-  my $dno_path = "$prel_subdir/ckb${dno}.dno";
-  my $pattern_line = `grep '<Pattern ' $dno_path`;
-  chomp $pattern_line;
-  $pattern_line =~ m/ constrkind=\"(.)\"/;
-  my $constrkind = $1;
-  if (! defined $constrkind) {
-    print STDERR ('Error: we failed to extract a kind attribute from dno Pattern XML element', "\n", "\n", '  ', $pattern_line, "\n");
-  }
-  my $constrkind_lc = lc $constrkind;
-  my $num;
-  if (defined $patterns{$constrkind}) {
-    $num = $patterns{$constrkind};
-    $patterns{$constrkind} = $num + 1;
-  } else {
-    $num = 1;
-    $patterns{$constrkind} = 2;
-  }
+    my $dno = $dnos[$i - 1];
+    my $dno_path = "$prel_subdir/ckb${dno}.dno";
+    my $dno_doc = $xml_parser->parse_file ($dno_path);
+    my @patterns = $dno_doc->findnodes ('Notations/Pattern');
+    foreach my $pattern (@patterns) {
+	if ($pattern->exists ('@constrkind') &&
+		$pattern->exists ('@constrnr') &&
+		    $pattern->exists ('@aid')) {
+	    my $constrkind = $pattern->findvalue ('@constrkind');
+	    my $constrkind_lc = lc $constrkind;
+	    my $constrnr = $pattern->findvalue ('@constrnr');
+	    my $aid = $pattern->findvalue ('@aid');
+	    my $aid_lc = lc $aid;
 
-  my $pattern_key = "${article_basename}:${constrkind_lc}pattern:${num}";
-  my $fragment_number = $dno;
-  $fragments_to_patterns{$fragment_number} = $pattern_key;
+	    my $num = undef;
+	    if (defined $patterns{$constrkind}) {
+		$num = $patterns{$constrkind};
+		$patterns{$constrkind} = $num + 1;
+	    } else {
+		$num = 1;
+		$patterns{$constrkind} = 2;
+	    }
 
-  print $article_basename, ':', $constrkind_lc, 'pattern', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dno, '[', $constrkind_lc, 'p', ']', "\n";
+	    my $pattern_key = "${article_basename}:${constrkind_lc}pattern:${num}";
+	    my $fragment_number = $dno;
+	    $fragments_to_patterns{$fragment_number} = $pattern_key;
+
+	    print $article_basename, ':', $constrkind_lc, 'pattern', ':', $num, ' => ', $article_basename, ':', 'fragment', ':', $dno, '[', $constrkind_lc, 'p', ']', "\n";
+
+	} else {
+	    croak ('Error: Unable to make sense of a Pattern node in an eno file that does not have a constrkind, constrnr, and aid attribute.');
+	}
+
+    }
+
 }
 
 # Definientia
@@ -231,7 +255,8 @@ foreach my $p_or_c_file (@properties_and_conditions) {
     (my $fragment_number, my $condition_code) = ($1, $2);
     if ($condition_code !~ /\A . c \z/x
 	&& $condition_code !~ /\A . p \z/x
-        && $condition_code !~ /\A . f \z/x) {
+        && $condition_code !~ /\A . f \z/x
+        && $condition_code ne 'ab') {
       my $resolved_condition = $conditions{$condition_code};
       if (defined $resolved_condition) {
 	if (defined $fragments_to_constructors{$fragment_number}) {
