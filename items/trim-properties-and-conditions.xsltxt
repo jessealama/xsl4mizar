@@ -68,13 +68,25 @@ tpl [/] {
       //////////////////////////////////////////////////
       // Patterns
       //////////////////////////////////////////////////
+      when [$target-condition-or-property = "gpattern"] {
+        // OK
+      }
+      when [$target-condition-or-property = "jpattern"] {
+        // OK
+      }
       when [$target-condition-or-property = "kpattern"] {
+        // OK
+      }
+      when [$target-condition-or-property = "lpattern"] {
         // OK
       }
       when [$target-condition-or-property = "mpattern"] {
         // OK
       }
       when [$target-condition-or-property = "rpattern"] {
+        // OK
+      }
+      when [$target-condition-or-property = "upattern"] {
         // OK
       }
       when [$target-condition-or-property = "vpattern"] {
@@ -84,13 +96,25 @@ tpl [/] {
       //////////////////////////////////////////////////
       // Constructors
       //////////////////////////////////////////////////
+      when [$target-condition-or-property = "gconstructor"] {
+        // OK
+      }
+      when [$target-condition-or-property = "jconstructor"] {
+        // OK
+      }
       when [$target-condition-or-property = "kconstructor"] {
+        // OK
+      }
+      when [$target-condition-or-property = "lconstructor"] {
         // OK
       }
       when [$target-condition-or-property = "mconstructor"] {
         // OK
       }
       when [$target-condition-or-property = "rconstructor"] {
+        // OK
+      }
+      when [$target-condition-or-property = "uconstructor"] {
         // OK
       }
       when [$target-condition-or-property = "vconstructor"] {
@@ -284,26 +308,68 @@ tpl [NotationBlock] {
 
 tpl [Definition] {
   choose {
-    when [$target-condition-or-property = "kpattern"
+    when [$target-condition-or-property = "gpattern"
+    	  or $target-condition-or-property = "jpattern"
+    	  or $target-condition-or-property = "kpattern"
+    	  or $target-condition-or-property = "lpattern"
+	  or $target-condition-or-property = "mpattern"
           or $target-condition-or-property = "rpattern"
-          or $target-condition-or-property = "vpattern"
-	  or $target-condition-or-property = "mpattern"] {
+          or $target-condition-or-property = "upattern"
+          or $target-condition-or-property = "vpattern"] {
       <Definition {
         for-each [@*] { copy-of `.`; }
         "\n";
-        apply [Pattern] mode="copy";
+
+        // weird case: the rcluster preceding patterns needs to be
+	// present when dealing with structure definitions.
+	// Otherwise, the verifier (7.12.01) dies.  I don't know why.
+	// Including the cluster might introduce some false positive
+	// dependencies.
+        if [$target-condition-or-property = "gpattern"
+	    or $target-condition-or-property = "jpattern"
+	    or $target-condition-or-property = "lpattern"
+	    or $target-condition-or-property = "upattern"
+	    or $target-condition-or-property = "vpattern"] {
+          if [Registration] {
+            apply [Registration] mode="copy";
+          }
+        }
+
+        for-each [Pattern] {
+          apply [.];
+        }
       }
       "\n";
     }
-    when [$target-condition-or-property = "kconstructor"
-          or $target-condition-or-property = "rconstructor"
-          or $target-condition-or-property = "vconstructor"
+    when [$target-condition-or-property = "gconstructor"
+          or $target-condition-or-property = "kconstructor"
+          or $target-condition-or-property = "lconstructor"
 	  or $target-condition-or-property = "mconstructor"
+          or $target-condition-or-property = "rconstructor"
+	  or $target-condition-or-property = "uconstructor"
+          or $target-condition-or-property = "vconstructor"
 	  or $target-condition-or-property = "deftheorem"] {
       <Definition {
         for-each [@*] { copy-of `.`; }
         "\n";
-        apply [Constructor] mode="copy";
+        for-each [Constructor] {
+          apply [.];
+        }
+
+        // weird case: the rcluster following a constructor needs to
+        // be present when dealing with structure definitions.
+        // Otherwise, the verifier (7.12.01) dies.  I don't know why.
+        // Including the cluster might introduce some false positive
+        // dependencies.
+        if [$target-condition-or-property = "gconstructor"
+	    or $target-condition-or-property = "lconstructor"
+	    or $target-condition-or-property = "uconstructor"
+	    or $target-condition-or-property = "vconstructor"] {
+          if [Registration] {
+            apply [Registration] mode="copy";
+          }
+        }
+
       }
       "\n";
     }
@@ -331,6 +397,25 @@ tpl [Definition] {
         for-each [@*] { copy-of `.`; }
         "\n";
         apply [Uniqueness] mode="copy";
+      }
+      "\n";
+    }
+
+    when [$target-condition-or-property = "abstractness"] {
+      <Definition {
+        for-each [@*] { copy-of `.`; }
+        "\n";
+        apply [Constructor[Properties/Abstractness]] mode="copy";
+
+        // weird case: the rcluster following a constructor with the
+        // abstractness property needs to be present when dealing with
+        // structure definitions.  Otherwise, the verifier (7.12.01)
+        // dies.  I don't know why.  Including the cluster might
+        // introduce some false positive dependencies.
+        if [Registration] {
+          apply [Registration] mode="copy";
+        }
+
       }
       "\n";
     }
@@ -375,16 +460,19 @@ tpl [Pattern[@kind]] {
   }
 }
 
-tpl [Constructor] {
-  if [$target-condition-or-property = "kconstructor"
-      or $target-condition-or-property = "rconstructor"
-      or $target-condition-or-property = "vconstructor"
-      or $target-condition-or-property = "kdefiniens"
-      or $target-condition-or-property = "rdefiniens"
-      or $target-condition-or-property = "vdefiniens"
-      or $target-condition-or-property = "deftheorem"
-      or $target-condition-or-property = "abstractness"] {
-    apply [.] mode="copy";
+tpl [Constructor[not(@kind)]] {
+  msg terminate="yes" "Error: we found a Constructor node that lacks a kind attribute; don't know how to proceed.";
+}
+
+tpl [Constructor[@kind]] {
+  if [contains ($target-condition-or-property, "constructor")] {
+    $target-kind = `substring-before ($target-condition-or-property, "constructor")`;
+    $this-kind = lowercase (#string = `@kind`);
+    if [$target-kind = $this-kind] {
+      apply [.] mode="copy";
+    } else {
+      // skip
+    }
   } else {
     // dump
   }
