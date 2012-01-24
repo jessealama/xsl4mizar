@@ -9,50 +9,13 @@ use File::Temp qw(tempfile);
 use Carp qw(croak carp);
 use XML::LibXML;
 use Memoize qw(memoize);
+use Regexp::DefaultFlags;
+use IPC::Run qw(run);
+use charnames qw( :full );
+use Utils qw(ensure_readable_file ensure_directory ensure_executable);
 
 # Set up an XML parser that we might use
 my $xml_parser = XML::LibXML->new ();
-
-sub ensure_valid_xml_file {
-  my $xml_path = shift;
-  ensure_readable_file ($xml_path);
-  if (defined eval { $xml_parser->parse_file ($xml_path) }) {
-    return 1;
-  } else {
-    croak ('Error: ', $xml_path, ' is not a well-formed XML file.');
-  }
-}
-
-sub ensure_readable_file {
-  my $file = shift;
-
-  if (! -e $file) {
-    croak ('Error: ', $file, ' does not exist.');
-  }
-  if (! -f $file) {
-    croak ('Error: ', $file, ' is not a file.');
-  }
-
-  if (! -r $file) {
-    croak ('Error: ', $file, ' is unreadable.');
-  }
-
-  return 1;
-}
-
-sub tmpfile_path {
-  # File::Temp's tempfile function returns a list of two values.  We
-  # want the second (the path of the temprary file) and don't care
-  # about the first (a filehandle for the temporary file).  See
-  # http://search.cpan.org/~tjenness/File-Temp-0.22/Temp.pm for more
-  (undef, my $path) = eval { tempfile (); };
-  my $tempfile_err = $@;
-  if (defined $path) {
-    return $path;
-  } else {
-    croak ('Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err);
-  }
-}
 
 my $stylesheet_home = undef;
 my $script_home = undef;
@@ -65,194 +28,166 @@ GetOptions('help|?' => \$help,
            'verbose'  => \$verbose,
 	   'stylesheet-home=s' => \$stylesheet_home,
 	   'script-home=s', \$script_home)
-  or pod2usage(2);
+    or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 pod2usage(1) if (scalar @ARGV != 1);
 
-if (defined $stylesheet_home) {
-  if (! -e $stylesheet_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
-  }
-  if (! -d $stylesheet_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
-  }
-} else {
-  $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
-  if (! -e $stylesheet_home) {
-    croak ('Error: the default directory in which we look for stylesheets', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'does not exist.  Consider using the --stylesheet-home option.');
-  }
-  if (! -d $stylesheet_home) {
-    croak ('Error: the default directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --stylesheet-home option.');
-  }
+
+if (! defined $stylesheet_home) {
+    $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 }
 
-if (defined $script_home) {
-  if (! -e $script_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary scripts does not exist.');
-  }
-  if (! -d $script_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for needed auxiliary is not actually a directory.');
-  }
-} else {
-  $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
-  if (! -e $script_home) {
-    croak ('Error: the default directory in which we look for needed auxiliary scripts', "\n", "\n", '  ', $script_home, "\n", "\n", 'does not exist.  Consider using the --script-home option.');
-  }
-  if (! -d $script_home) {
-    croak ('Error: the default directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --script-home option.');
-  }
+if (! defined $script_home) {
+    $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 }
 
 my $article_dir = $ARGV[0];
 
-unless (-d $article_dir) {
-  croak ('Error: ', $article_dir, ' is not a directory.');
+sub ensure_sensible_commandline {
+
+    if (not ensure_directory ($article_dir)) {
+	croak ('Error: the supplied directory', "\n", "\n", '  ', $article_dir, "\n", "\n", 'does not exist.');
+    }
+
+    if (not ensure_directory ($stylesheet_home)) {
+	croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets could not be found.');
+    }
+
+    if (not ensure_directory ($script_home)) {
+	croak ('Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts could not be found.');
+    }
+
+    return 1;
 }
+
+ensure_sensible_commandline ();
 
 my $article_basename = basename ($article_dir);
 
-my %script_paths = ('map-ckbs.pl' => "${script_home}/map-ckbs.pl",
-		    'dependencies.pl' => "${script_home}/dependencies.pl");
-
-foreach my $script (keys %script_paths) {
-  my $script_path = $script_paths{$script};
-  if (! -e $script_path) {
-    croak ('Error: the needed auxiliary script', "\n", "\n", '  ', $script, "\n", "\n", 'does not exist at the expected location', "\n", "\n", '  ', $script_path);
-  }
-  if (! -r $script_path) {
-    croak ('Error: the needed auxiliary script', "\n", "\n", '  ', $script, "\n", "\n", 'at', "\n", "\n", '  ', $script_path, "\n", "\n", 'is unreadable.');
-  }
-  if (! -x $script_path) {
-    croak ('Error: the needed auxiliary script', "\n", "\n", '  ', $script, 'at', "\n", "\n", '  ', $script_path, 'is not executable.');
-  }
+sub path_for_stylesheet {
+    my $sheet = shift;
+    my $path  = "${stylesheet_home}/${sheet}.xsl";
+    if (ensure_readable_file ($path)) {
+	return $path;
+    } else {
+        croak( 'Error: the ', $sheet,
+	       ' stylesheet does not exist at the expected location (',
+	       $path, ') or is unreadable.' );
+    }
 }
 
-my $map_ckb_script = $script_paths{'map-ckbs.pl'};
-my $map_ckb_err_file = tmpfile_path ();
-my @item_to_fragment_lines = `$map_ckb_script $article_dir 2> $map_ckb_err_file`;
-
-my $item_to_fragment_exit_code = $? >> 8;
-if ($item_to_fragment_exit_code != 0) {
-  if (-z $map_ckb_err_file) {
-    croak ('Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, the map-ckb script did not produce any error output.)');
-  } elsif (! -r $map_ckb_err_file) {
-    croak ('Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", '(Curiously, we are unable to read the error output file of the map-ckb script.)');
-  } else {
-    print STDERR ('Error: something went wrong computing the item-to-fragment table; the exit code was ', $item_to_fragment_exit_code, '.', "\n", 'Here is the error output produced by the map-ckb script:', "\n");
-    print '----------------------------------------------------------------------', "\n";
-    system ('cat', $map_ckb_err_file);
-    print '----------------------------------------------------------------------', "\n";
-    croak;
-  }
+sub path_for_script {
+    my $script = shift;
+    my $path  = "${script_home}/${script}";
+    if (ensure_executable ($script)) {
+	return $path;
+    } else {
+        croak( 'Error: the ', $script,
+	       ' script does not exist at the expected location (',
+	       $path, ') or is not readable and executable.' );
+    }
 }
-
-if (scalar @item_to_fragment_lines == 0) {
-  warn 'Warning: there are 0 fragments under ', $article_dir, '.';
-}
-
-chomp @item_to_fragment_lines;
 
 my %item_to_fragment_table = ();
 my %fragment_to_item_table = ();
 
-foreach my $item_to_fragment_line (@item_to_fragment_lines) {
-  # Easy: each item comes from exactly one fragment
-  (my $item, my $fragment) = split / => /, $item_to_fragment_line;
+sub load_fragment_item_tables {
 
-  # my $fragment = undef;
+    my $map_ckb_script = path_for_script ('map-ckbs.pl');
+    my @map_ckb_call = ($map_ckb_script, $article_dir);
+    my $map_ckb_err = '';
+    my $map_ckb_out = '';
+    run (\@map_ckb_call,
+	 '>', \$map_ckb_out,
+	 '2>', \$map_ckb_err)
+	or croak ('Error: something went wrong computing the item-to-fragment table.', "\n", , 'Here is the error output produced by the map-ckb script:', "\n", $map_ckb_err);
 
-  # if ($maybe_pseudo_fragment =~ / ([a-z0-9_]+) : ([^:]+) : ([0-9]+) \[ [a-z]{2} \] \z/x) {
-  #   $fragment = "${1}:${2}:${3}";
-  #   # DEBUG
-  #   warn 'pseudo-fragment ', $maybe_pseudo_fragment, ' comes from ', $fragment, '.';
-  # } else {
-  #   # This isn't a pseudo fragment after all
-  #   $fragment = $maybe_pseudo_fragment;
-  # }
+    chomp $map_ckb_out;
+    my @item_to_fragment_lines = split ("\n", $map_ckb_out);
+    chomp @item_to_fragment_lines;
+    if (scalar @item_to_fragment_lines == 0) {
+	carp ('Warning: there are 0 fragments under ', $article_dir, '.');
+    }
 
-  $item_to_fragment_table{$item} = $fragment;
-  $fragment_to_item_table{$fragment} = $item;
+    foreach my $item_to_fragment_line (@item_to_fragment_lines) {
+	if ($item_to_fragment_line =~ /\A ([a-z0-9_]+ : [^:]+ : [0-9]+ ( \[ [a-z]+ \] )?) [\N{SPACE}] => [\N{SPACE}] ([a-z0-9_]+ : fragment : [0-9]+ (\[ [a-z]+ \])?) \z/) {
+	    (my $item, my $fragment) = ($1, $3);
+	    $item_to_fragment_table{$item} = $fragment;
+	    $fragment_to_item_table{$fragment} = $item;
+	} else {
+	    croak ('Error: Unable to make sense of the mapping \'', $item_to_fragment_line, '\'.');
+	}
+    }
 
-  # # Less easy: some fragments (specifically, definition blocks)
-  # # generate multiple items
-  # my @generated_items;
-  # if (defined $fragment_to_item_table{$fragment}) {
-  #   @generated_items = @{$fragment_to_item_table{$fragment}};
-  # } else {
-  #   @generated_items = ();
-  # }
-  # push (@generated_items, $item);
-  # $fragment_to_item_table{$fragment} = \@generated_items;
+    return 1;
+
 }
 
-# DEBUG: print out the table
-# foreach my $fragment (keys %fragment_to_item_table) {
-#   my @deps = @{$fragment_to_item_table{$fragment}};
-#   # warn $fragment, ' generated ', join (' ', @deps);
-# }
+load_fragment_item_tables ();
+
 
 memoize ('resolve_item');
 sub resolve_item {
-  my $item = shift;
+    my $item = shift;
 
-  if ($item =~ /\A ckb ([0-9]+) : ([^:]+) : [0-9]+ /x) {
-    (my $item_fragment_num, my $item_kind) = ($1, $2);
+    if ($item =~ /\A ckb ([0-9]+) : ([^:]+) : [0-9]+ /) {
+	(my $item_fragment_num, my $item_kind) = ($1, $2);
 
-    my $item_fragment = undef;
+	my $item_fragment = undef;
 
-    if ($item =~ / (.) pattern : /x) {
-      my $pattern_kind = $1;
-      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${pattern_kind}p]";
-    } elsif ($item =~ / (.) definiens /x) {
-      my $definiens_kind = $1;
-      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${definiens_kind}f]";
-    } elsif ($item =~ / deftheorem /x) {
-      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[dt]";
-    } elsif ($item =~ / \[ existence \] /x ) {
-      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[ex]";
-    } elsif ($item =~ / (.) constructor /x) {
-      my $constructor_kind = $1;
-      $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${constructor_kind}c]";
+	if ($item =~ / (.) pattern : /) {
+	    my $pattern_kind = $1;
+	    $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${pattern_kind}p]";
+	} elsif ($item =~ / (.) definiens /) {
+	    my $definiens_kind = $1;
+	    $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${definiens_kind}f]";
+	} elsif ($item =~ / deftheorem /) {
+	    $item_fragment = "${article_basename}:fragment:${item_fragment_num}[dt]";
+	} elsif ($item =~ / \[ existence \] / ) {
+	    $item_fragment = "${article_basename}:fragment:${item_fragment_num}[ex]";
+	} elsif ($item =~ / (.) constructor /) {
+	    my $constructor_kind = $1;
+	    $item_fragment = "${article_basename}:fragment:${item_fragment_num}[${constructor_kind}c]";
+	} else {
+	    $item_fragment = "${article_basename}:fragment:${item_fragment_num}";
+	}
+
+	if (defined $fragment_to_item_table{$item_fragment}) {
+
+	    return $fragment_to_item_table{$item_fragment};
+
+	} else {
+	    croak ('Error: the fragment-to-item table does not contain ', $item_fragment, '.', "\n", 'The keys of the fragment-to-item table are:', "\n", join ("\n", keys %fragment_to_item_table), "\n");
+	}
     } else {
-      $item_fragment = "${article_basename}:fragment:${item_fragment_num}";
+	return $item;
     }
-
-    if (defined $fragment_to_item_table{$item_fragment}) {
-
-      return $fragment_to_item_table{$item_fragment};
-
-    } else {
-      croak ('Error: the fragment-to-item table does not contain ', $item_fragment, '.', "\n", 'The keys of the fragment-to-item table are:', "\n", join ("\n", keys %fragment_to_item_table), "\n");
-    }
-  } else {
-    return $item;
-  }
 }
 
 my %conditions_and_properties_shortcuts
-  = ('existence' => 'ex',
-     'uniqueness' => 'un',
-     'coherence' => 'ch',
-     'correctness' => 'cr',
-     'abstractness' => 'ab',
-     'reflexivity' => 're',
-     'irreflexivity' => 'ir',
-     'symmetry' => 'sy',
-     'asymmetry' => 'as',
-     'connectedness' => 'cn',
-     'involutiveness' => 'in',
-     'projectivity' => 'pr',
-     'idempotence' => 'id',
-     'commutativity' => 'cm',
-     'compatibility' => 'cp',
-     'sethood' => 'se',
-     'pattern' => 'pa');
+    = ('existence' => 'ex',
+       'uniqueness' => 'un',
+       'coherence' => 'ch',
+       'correctness' => 'cr',
+       'abstractness' => 'ab',
+       'reflexivity' => 're',
+       'irreflexivity' => 'ir',
+       'symmetry' => 'sy',
+       'asymmetry' => 'as',
+       'connectedness' => 'cn',
+       'involutiveness' => 'in',
+       'projectivity' => 'pr',
+       'idempotence' => 'id',
+       'commutativity' => 'cm',
+       'compatibility' => 'cp',
+       'sethood' => 'se',
+       'pattern' => 'pa');
 
 my %full_name_of_shortcut = ();
 foreach my $long_name (keys %conditions_and_properties_shortcuts) {
-  my $shortcut = $conditions_and_properties_shortcuts{$long_name};
-  $full_name_of_shortcut{$shortcut} = $long_name;
+    my $shortcut = $conditions_and_properties_shortcuts{$long_name};
+    $full_name_of_shortcut{$shortcut} = $long_name;
 }
 
 # Esnure that function constructors that lack existence and uniqueness
@@ -260,66 +195,69 @@ foreach my $long_name (keys %conditions_and_properties_shortcuts) {
 # and uniqueness items that depend on the coherence condition
 
 foreach my $item (keys %item_to_fragment_table) {
-  if ($item =~ / : kconstructor : [0-9]+ \z /x ) {
-    my $existence_condition = "${item}[existence]";
-    my $uniqueness_condition = "${item}[uniqueness]";
-    if (! defined $item_to_fragment_table{$existence_condition}
-      && ! defined $item_to_fragment_table{$uniqueness_condition}) {
-      my $coherence_condition = "${item}[coherence]";
-      if (defined $item_to_fragment_table{$coherence_condition}) {
-	print $existence_condition, ' ', $coherence_condition, "\n";
-	print $uniqueness_condition, ' ', $coherence_condition, "\n";
-      } else {
-	croak ('Error: the function constructor ', $item, ' lacks known existence and uniqueness conditions, as well as a known coherence condition.', "\n");
-      }
+    if ($item =~ / : kconstructor : [0-9]+ \z / ) {
+	my $existence_condition = "${item}[existence]";
+	my $uniqueness_condition = "${item}[uniqueness]";
+	if (! defined $item_to_fragment_table{$existence_condition}
+		&& ! defined $item_to_fragment_table{$uniqueness_condition}) {
+	    my $coherence_condition = "${item}[coherence]";
+	    if (defined $item_to_fragment_table{$coherence_condition}) {
+		print $existence_condition, ' ', $coherence_condition, "\n";
+		print $uniqueness_condition, ' ', $coherence_condition, "\n";
+	    } else {
+		croak ('Error: the function constructor ', $item, ' lacks known existence and uniqueness conditions, as well as a known coherence condition.', "\n");
+	    }
+	}
     }
-  }
 }
 
 # Deal with properties copied into redefined constructors.  Let's
 # declare that they depend on the original constructor property.
 
+memoize ('fragment_is_redefined_constructor');
 sub fragment_is_redefined_constructor {
     my $fragment = shift;
-    if ($fragment =~ / : fragment : ([0-9]+) /x) {
+    if ($fragment =~ / : fragment : ([0-9]+) /) {
 	my $fragment_number = $1;
 	my $fragment_abs_xml = "${article_dir}/text/ckb${fragment_number}.xml1";
 	if (-e $fragment_abs_xml) {
-	    ensure_valid_xml_file ($fragment_abs_xml);
-	    my $fragment_doc = $xml_parser->parse_file ($fragment_abs_xml);
-	    (my $constructor) = $fragment_doc->findnodes ('.//Constructor[@redefaid and @absredefnr]');
-	    defined $constructor ? return 1
-	                         : return 0;
+	    if (defined (my $fragment_doc = $xml_parser->parse_file ($fragment_abs_xml))) {
+		(my $constructor) = $fragment_doc->findnodes ('.//Constructor[@redefaid and @absredefnr]');
+		defined $constructor ? return 1
+		    : return 0;
+	    } else {
+		croak ('Error: the XML file at ', $fragment_abs_xml, ' is either unreadable or contains invalid XML.');
+	    }
 	} else {
-	    croak ('Error: unable to determine whether the fragment ', $fragment, ' corresponds to a redefined constructor because the absolutized XML  corresponding to it (', $fragment_abs_xml, ') does not exist.', "\n");
+	    croak ('Error: unable to make sense of the fragment \'', $fragment, '\'.', "\n");
 	}
-    } else {
-	croak ('Error: unable to make sense of the fragment \'', $fragment, '\'.', "\n");
     }
 }
 
 memoize ('original_constructor');
 sub original_constructor {
     my $fragment = shift;
-    if ($fragment =~ / : fragment : ([0-9]+) /x) {
+    if ($fragment =~ / : fragment : ([0-9]+) /) {
 	my $fragment_number = $1;
 	my $fragment_abs_xml = "${article_dir}/text/ckb${fragment_number}.xml1";
-	if (-e $fragment_abs_xml) {
-	    ensure_valid_xml_file ($fragment_abs_xml);
-	    my $fragment_doc = $xml_parser->parse_file ($fragment_abs_xml);
-	    (my $constructor) = $fragment_doc->findnodes ('.//Constructor[@redefaid and @absredefnr and @kind]');
-	    if (defined $constructor) {
-		my $kind = $constructor->findvalue ('@kind');
-		my $kind_lc = lc $kind;
-		my $redefaid = $constructor->findvalue ('@redefaid');
-		my $redefaid_lc = lc $redefaid;
-		my $absredefnr = $constructor->findvalue ('@absredefnr');
-		return "${redefaid_lc}:${kind_lc}constructor:${absredefnr}";
+	if (ensure_readable_file ($fragment_abs_xml)) {
+	    if (defined (my $fragment_doc = $xml_parser->parse_file ($fragment_abs_xml))) {
+		(my $constructor) = $fragment_doc->findnodes ('.//Constructor[@redefaid and @absredefnr and @kind]');
+		if (defined $constructor) {
+		    my $kind = $constructor->findvalue ('@kind');
+		    my $kind_lc = lc $kind;
+		    my $redefaid = $constructor->findvalue ('@redefaid');
+		    my $redefaid_lc = lc $redefaid;
+		    my $absredefnr = $constructor->findvalue ('@absredefnr');
+		    return "${redefaid_lc}:${kind_lc}constructor:${absredefnr}";
+		} else {
+		    croak ('Error: we assumed that the fragment ', $fragment, ' is a redefinition with a new constructor, but it seems not to be.', "\n");
+		}
 	    } else {
-		croak ('Error: we assumed that the fragment ', $fragment, ' is a redefinition with a new constructor, but it seems not to be.', "\n");
+		croak ('Error: the XML file at ', $fragment_abs_xml, ' either does not exist or contains invalid XML.');
 	    }
 	} else {
-	    croak ('Error: unable to determine whether the fragment ', $fragment, ' corresponds to a redefined constructor because the absolutized XML  corresponding to it (', $fragment_abs_xml, ') does not exist.', "\n");
+	    croak ('Error: the absolute form of ', $fragment, ' does not exist.');
 	}
     } else {
 	croak ('Error: unable to make sense of the fragment \'', $fragment, '\'.', "\n");
@@ -327,7 +265,7 @@ sub original_constructor {
 }
 
 foreach my $item (keys %item_to_fragment_table) {
-    if ($item =~ / : (.) constructor : [0-9]+ \[ ([a-z]+) \] \z /x) {
+    if ($item =~ / : (.) constructor : [0-9]+ \[ ([a-z]+) \] \z /) {
 	my $property = $2;
 	if ($property ne 'coherence') {
 	    my $fragment = $item_to_fragment_table{$item};
@@ -340,7 +278,36 @@ foreach my $item (keys %item_to_fragment_table) {
     }
 }
 
-my $dependencies_script = $script_paths{'dependencies.pl'};
+sub miz_path_for_item {
+
+    my $item = shift;
+
+    if ($item =~ /\A ([a-z0-9_]+) : ([^:]+) : ([0-9]+) /) {
+	(my $item_article, my $item_kind, my $item_number) = ($1, $2, $3);
+	my $fragment = $item_to_fragment_table{$item};
+	if ($fragment =~ m/\A ${article_basename} : fragment : ([0-9]+) /) {
+	    my $fragment_number = $1;
+	    # Possibly resolve properties and correctness conditions
+	    if ($fragment =~ / \[ ([a-z]+) \] \z /) {
+		my $property_or_condition_code = $1;
+		return "${article_dir}/text/ckb${fragment_number}${property_or_condition_code}.miz";
+	    } elsif ($item =~ / : (.) constructor [0-9]+ \z /) {
+		my $constructor_kind = $1;
+		return "${article_dir}/text/ckb${fragment_number}${constructor_kind}c.miz";
+	    } else {
+		return "${article_dir}/text/ckb${fragment_number}.miz";
+	    }
+	} else {
+	    croak ('Error: we could not extract the article fragment number from the text', "\n", '  ', $fragment);
+	}
+
+    } else {
+	croak ('Error: we cannot make sense of the item \'', $item, '\'.', "\n");
+    }
+
+}
+
+my $dependencies_script = path_for_script ('dependencies.pl');
 foreach my $item (keys %item_to_fragment_table) {
 
     my %item_deps = ();
@@ -348,74 +315,46 @@ foreach my $item (keys %item_to_fragment_table) {
     # Ensure that functor constructors depend directly on their
     # corresponding existence and uniqueness conditions.
 
-    if ($item =~ / : kconstructor : [0-9]+ \z /x) {
+    if ($item =~ / : kconstructor : [0-9]+ \z /) {
 	my $existence_item = "${item}[existence]";
 	my $uniqueness_item = "${item}[uniqueness]";
 	$item_deps{$existence_item} = 0;
 	$item_deps{$uniqueness_item} = 0;
     }
 
-  if ($item =~ /\A ([a-z0-9_]+) : ([^:]+) : ([0-9]+) /x) {
-    (my $item_article, my $item_kind, my $item_number) = ($1, $2, $3);
-    my $fragment = $item_to_fragment_table{$item};
+    my $item_miz = miz_path_for_item ($item);
 
-    if ($fragment =~ m/\A ${article_basename} : fragment : ([0-9]+) /x) {
-      my $fragment_number = $1;
-      my $fragment_miz = undef;
+    if (-e $item_miz) { # in the case of redefinitions, there may be
+                        # no .miz for $item
+	my $dependencies_out = '';
+	my $dependencies_err = '';
+	my @dependencies_call = ($dependencies_script, "--stylesheet-home=${stylesheet_home}", $item_miz);
+	run (\@dependencies_call,
+	     '>', \$dependencies_out,
+	     '2>', \$dependencies_err)
+	    or croak ('Error: the article dependencies script did not exit cleanly whe working on the item ', $item_miz, ' of ', $article_basename, '; the error output was: ', "\n", $dependencies_err);
 
-      # Resolve properties and correctness conditions
-      if ($fragment =~ / \[ ([a-z]+) \] \z /x) {
-	my $property_or_condition_code = $1;
-	$fragment_miz = "${article_dir}/text/ckb${fragment_number}${property_or_condition_code}.miz";
-      } elsif ($item =~ / : (.) constructor [0-9]+ \z /x) {
-	my $constructor_kind = $1;
-	$fragment_miz = "${article_dir}/text/ckb${fragment_number}${constructor_kind}c.miz";
-      } else {
-	$fragment_miz = "${article_dir}/text/ckb${fragment_number}.miz";
-      }
-
-      if (-e $fragment_miz) {
-	my $dependencies_err = tmpfile_path ();
-	my @fragment_dependencies = `$dependencies_script --stylesheet-home=${stylesheet_home} $fragment_miz 2> $dependencies_err`;
-
-	my $dependencies_exit_code = $? >> 8;
-	if ($dependencies_exit_code != 0) {
-	  my $dependencies_message = `cat $dependencies_err`;
-	  print STDERR ('Error: something went wrong when calling the dependencies script on fragment ', $fragment_number, ' of ', $article_basename, ';', "\n");
-	  print STDERR ('The exit code was ', $dependencies_exit_code, ' and the message was:', "\n");
-	  croak ($dependencies_message);
-	}
-
+	chomp $dependencies_out;
+	my @fragment_dependencies = split ("\n", $dependencies_out);
 	chomp @fragment_dependencies;
-	if (scalar @fragment_dependencies > 0) {
-	  foreach my $dep (@fragment_dependencies) {
+	foreach my $dep (@fragment_dependencies) {
 	    my $resolved_dep = eval { resolve_item ($dep); };
 	    my $resolve_err = $@;
 	    if (! defined $resolved_dep) {
-	      croak ('Error: we were unable to resolve the dependency ', $dep, ' of the item ', $item, '.', "\n", 'The reported error was:', "\n", $resolve_err);
+		croak ('Error: we were unable to resolve the dependency ', $dep, ' of the item ', $item, '.', "\n", 'The reported error was:', "\n", $resolve_err);
 	    }
 	    $item_deps{$resolved_dep} = 0;
 
-	  }
 	}
-
-      } else {
-	  carp ('Warning: we cannot determine the dependencies of ', $item, ' because the fragment to which it corresponds, ', $fragment_miz, ', does not exist.  (Is this a redefined constructor?)');
-      }
-
-      # Now print the dependencies
-      print $item;
-      foreach my $dep (keys %item_deps) {
-	print ' ', $dep;
-      }
-      print "\n";
-
-    } else {
-      croak ('Error: we could not extract the article fragment number from the text', "\n", '  ', $fragment);
     }
-  } else {
-    croak ('Error: we cannot make sense of the item \'', $item, '\'.', "\n");
-  }
+
+    # Now print the dependencies
+    print $item;
+    foreach my $dep (keys %item_deps) {
+	print ' ', $dep;
+    }
+    print "\n";
+
 }
 
 __END__
