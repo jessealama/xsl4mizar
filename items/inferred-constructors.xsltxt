@@ -40,6 +40,9 @@ tpl print-everything (#except) {
   for-each [descendant::Typ[@aid and @kind and @absnr and not(@aid = $except)]] {
     apply [.]; "\n";
   }
+  for-each [descendant::Field[@aid and @kind and @absnr and not(@aid = $except)]] {
+    apply [.]; "\n";
+  }
 }
 
 tpl [Article[@aid]] {
