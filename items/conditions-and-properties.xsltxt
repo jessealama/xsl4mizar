@@ -94,18 +94,24 @@ tpl [NotationBlock] {
 tpl [Definition] {
 
   // Sanity check: there aren't multiple patterns here
-  if [count (Pattern) > 1] {
-    msg terminate="yes" "Error: there are multiple Pattern children of the current Definition node.  Why?";
-  }
+  //
+  // With structures, there can be multiple patterns.
+
+  // if [count (Pattern) > 1] {
+  //   msg terminate="yes" "Error: there are multiple Pattern children of the current Definition node.  Why?";
+  // }
 
   for-each [Pattern] {
     apply [.]; "\n";
   }
 
   // Sanity check: there aren't multiple constructors
-  if [count (Constructor) > 1] {
-    msg terminate="yes" "Error: there are multiple Constructor children of the current Definition node.  Why?";
-  }
+  //
+  // With structure definitions, there can be multiple constructors.
+
+  // if [count (Constructor) > 1] {
+  //   msg terminate="yes" "Error: there are multiple Constructor children of the current Definition node.  Why?";
+  // }
 
   for-each [Constructor] {
     apply [.]; "\n";
