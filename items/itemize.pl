@@ -259,7 +259,6 @@ ensure_readable_file ($article_wsx_in_target_dir);
 
 print 'Split ', $article_basename, ': ';
 my $xsltproc_split_status = system ("xsltproc --output $article_split_wsx_in_target_dir $split_stylesheet $article_wsx_in_target_dir 2>/dev/null");
-print 'done.', "\n" if $verbose;
 
 my $xsltproc_split_exit_code = $xsltproc_split_status >> 8;
 
@@ -273,7 +272,6 @@ print 'done.', "\n";
 
 print 'Itemize ', $article_basename, ': ';
 my $xsltproc_itemize_status = system ("xsltproc --output $article_itemized_wsx_in_target_dir $itemize_stylesheet $article_split_wsx_in_target_dir 2>/dev/null");
-print 'done.', "\n" if $verbose;
 
 my $xsltproc_itemize_exit_code = $xsltproc_itemize_status >> 8;
 if ($xsltproc_itemize_exit_code != 0) {
