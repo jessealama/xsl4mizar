@@ -2,284 +2,192 @@
 
 use strict;
 use warnings;
+
+# Set up our location
+use FindBin;
+use lib "$FindBin::Bin";
+
 use Getopt::Long;
 use Pod::Usage;
 use File::Basename qw(basename dirname);
-use File::Temp qw(tempfile);
 use Carp qw(croak);
-use XML::LibXML;
+use Regexp::DefaultFlags;
+use Xsltproc qw(apply_stylesheet);
 
 my $stylesheet_home = undef;
-my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
-my $verbose = 0;
-my $debug = 0;
-my $man = 0;
-my $help = 0;
+my $verbose         = 0;
+my $debug           = 0;
+my $man             = 0;
+my $help            = 0;
 
-sub tmpfile_path {
-  # File::Temp's tempfile function returns a list of two values.  We
-  # want the second (the path of the temprary file) and don't care
-  # about the first (a filehandle for the temporary file).  See
-  # http://search.cpan.org/~tjenness/File-Temp-0.22/Temp.pm for more
-  (undef, my $path) = eval { tempfile (); };
-  my $tempfile_err = $@;
-  if (defined $path) {
-    return $path;
-  } else {
-    croak ('Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err);
-  }
+GetOptions(
+    'help|?'            => \$help,
+    'man'               => \$man,
+    'verbose'           => \$verbose,
+    'debug'             => \$debug,
+    'stylesheet-home=s' => \$stylesheet_home
+) or pod2usage(2);
+
+if ($help) {
+    pod2usage(1);
 }
 
-GetOptions('help|?' => \$help,
-           'man' => \$man,
-           'verbose'  => \$verbose,
-	   'debug' => \$debug,
-	   'stylesheet-home=s' => \$stylesheet_home,
-	   'script-home=s' => \$script_home)
-  or pod2usage(2);
-pod2usage(1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
-pod2usage(1) unless (scalar @ARGV == 1);
-
-if (defined $stylesheet_home) {
-  if (! -e $stylesheet_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets does not exist.');
-  }
-  if (! -d $stylesheet_home) {
-    croak ('Error: the supplied directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.');
-  }
-} else {
-  $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
-  if (! -e $stylesheet_home) {
-    croak ('Error: the default directory in which we look for stylesheets', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'does not exist.  Consider using the --stylesheet-home option.');
-  }
-  if (! -d $stylesheet_home) {
-    croak ('Error: the default directory', "\n", "\n", '  ', $stylesheet_home, "\n", "\n", 'in which we look for stylesheets is not actually a directory.  Consider using the --stylesheet-home option.');
-  }
+if ($man) {
+    pod2usage(
+        -exitstatus => 0,
+        -verbose    => 2
+    );
 }
+
+if ( scalar @ARGV != 1 ) {
+    pod2usage(1);
+}
+
+if ( !defined $stylesheet_home ) {
+    $stylesheet_home = '/Users/alama/sources/mizar/xsl4mizar/items';
+}
+
+ensure_directory($stylesheet_home);
 
 my $article = $ARGV[0];
 
-my $article_basename = basename ($article, '.miz');
-my $article_dirname = dirname ($article);
-my $article_miz = "${article_dirname}/${article_basename}.miz";
-my $article_atr = "${article_dirname}/${article_basename}.atr";
-my $article_xml = "${article_dirname}/${article_basename}.xml";
-my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
+my $article_basename = basename( $article, '.miz' );
+my $article_dirname = dirname($article);
 
-if (! -e $article_miz) {
-  croak ('Error: ', $article_miz, ' does not exist.');
+sub mizar_file_with_extension {
+    my $extension = shift;
+    return "${article_dirname}/${article_basename}.${extension}";
 }
 
-my %stylesheet_paths =
-  ('absrefs' => "${stylesheet_home}/addabsrefs.xsl",
-   'inferred-constructors' => "${stylesheet_home}/inferred-constructors.xsl",
-   'dependencies' => "${stylesheet_home}/dependencies.xsl",
-   'properties-of-constructor' => "${stylesheet_home}/properties-of-constructor.xsl");
+my $article_atr          = mizar_file_with_extension('atr');
+my $article_xml          = mizar_file_with_extension('xml');
+my $article_absolute_xml = mizar_file_with_extension('xml1');
 
-foreach my $stylesheet (keys %stylesheet_paths) {
-  my $stylesheet_path = $stylesheet_paths{$stylesheet};
-  if (! -e $stylesheet_path) {
-    croak ('Error: the ', $stylesheet, ' stylesheet does not exist at the expected location (', $stylesheet_path, ').');
-  }
-  if (! -r $stylesheet_path) {
-    croak ('Error: the ', $stylesheet, ' stylesheet at ', $stylesheet_path, ' is unreadable.');
-  }
-}
-
-if (! -e $script_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts does not exist.', "\n";
-  exit 1;
-}
-
-if (! -d $script_home) {
-  print 'Error: the supplied directory', "\n", "\n", '  ', $script_home, "\n", "\n", 'in which we look for auxiliary scripts is not actually a directory.', "\n";
-  exit 1;
-}
-
-sub ensure_sensible_mizar_environment {
-  # MIZFILES is set and refers to an existing directory
-  if (! defined $ENV{'MIZFILES'}) {
-    croak ('Error: we were asked to ensure a sensible Mizar environment, but the MIZFILES environment variable appears not to be set.');
-  }
-  my $mizfiles = $ENV{'MIZFILES'};
-  if (! -e $mizfiles) {
-    croak ('Error: we were asked to ensure a sensible Mizar environment, but the value of the MIZFILES environment variable,', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'does not exist.');
-  }
-  if (! -d $mizfiles) {
-    croak ('Error: we were asked to ensure a sensible Mizar environment, but the value of the MIZFILES environment variable,', "\n", "\n", '  ', $mizfiles, "\n", "\n", 'is not a directory.');
-  }
-  my @mizar_tools = ('accom', 'verifier');
-  foreach my $tool (@mizar_tools) {
-    my $which_status = system ("which $tool > /dev/null 2>&1");
-    my $which_exit_code = $which_status >> 8;
-    if ($which_exit_code != 0) {
-      croak ('Error: we were asked to ensure a sensible Mizar environment, but the needed Mizar tool ', $tool, ' could not be found (or is not executable).');
+sub ensure_directory {
+    my $dir = shift;
+    if ( !-e $dir ) {
+        die 'Error: the required directory ', $dir, ' does not exist.';
     }
-  }
-  return 1;
-}
 
-sub run_mizar_tool {
-  my $tool = shift;
-  my $article_err = "${article_dirname}/${article_basename}.err";
-  my $tool_status = system ("$tool $article_miz > /dev/null 2>&1");
-  my $tool_exit_code = $tool_status >> 8;
-  unless ($tool_exit_code == 0 && -z $article_err) {
-    if ($verbose) {
-      print 'Error: the ', $tool, ' Mizar tool did not exit cleanly when applied to ', $article_miz, ' (or the .err file is non-empty).', "\n";
+    if ( !-d $dir ) {
+        die 'Error: the required directory ', $dir,
+            ' does not exist (as a directory).';
     }
-    return 0;
-  }
-  return 1;
-}
-
-sub accom {
-  my $article = shift;
-  return (run_mizar_tool ('accom -s -l -q'));
-}
-
-sub verifier {
-  my $article = shift;
-  return (run_mizar_tool ('verifier -s -l -q'));
-}
-
-my $xml_parser = XML::LibXML->new (suppress_warnings =>1,
-				   suppress_errors => 1);
-
-sub ensure_valid_xml_file {
-  my $xml_path = shift;
-  if (defined eval { $xml_parser->parse_file ($xml_path) }) {
     return 1;
-  } else {
-    croak ('Error: ', $xml_path, ' is not a well-formed XML file.');
-  }
 }
 
-if (-e $article_xml) {
-  ensure_valid_xml_file ($article_xml);
-} else {
-  if ($verbose) {
-    print 'The semantic XML for ', $article_basename, ' does not exist.  Generating...';
-  }
-  ensure_sensible_mizar_environment ();
-  if (accom ($article_miz)) {
-    if (! verifier ($article_miz)) {
-      croak ('Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to verify the article.');
+my $dependencies_stylesheet = path_for_stylesheet('dependencies');
+my $absrefs_stylesheet      = path_for_stylesheet('addabsrefs');
+
+sub ensure_absolute_xml {
+
+    if ( !-e $article_xml ) {
+        croak( 'Error: the semantic XML for ',
+            $article_basename, ' does not exist.' );
     }
-  } else {
-    croak ('Error: the semantic XML for ', $article_basename, ' could not be found, so we tried generating it.  But we failed to accommodate the article.')
-  }
-  ensure_valid_xml_file ($article_xml);
-}
 
-my $absrefs_stylesheet = $stylesheet_paths{'absrefs'};
+    if ( !-e $article_absolute_xml ) {
 
-if (-e $article_absolute_xml) {
-  ensure_valid_xml_file ($article_absolute_xml);
-} else {
+        if ($verbose) {
+            print 'The absolute form of the XML for ', $article_basename,
+                ' does not exist.  Generating...';
+        }
 
-  if ($verbose) {
-    print 'The absolute form of the XML for ', $article_basename, ' does not exist.  Generating...';
-  }
+        apply_stylesheet( $absrefs_stylesheet, $article_xml,
+            $article_absolute_xml );
 
-  my $absrefs_errors_path = tmpfile_path ();
-  my $xsltproc_status = system ("xsltproc --output $article_absolute_xml $absrefs_stylesheet $article_xml 2> $absrefs_errors_path");
-  my $xsltproc_exit_code = $xsltproc_status >> 8;
-
-  if ($xsltproc_exit_code != 0) {
-    if (-e $absrefs_errors_path) {
-      my @absrefs_errors = `cat $absrefs_errors_path 2> /dev/null`;
-      croak ('Error: xsltproc did not exit cleanly when applying the absolutizer stylesheet to ', $article_xml, '.  Its exit code was ', $xsltproc_exit_code, '; here are the errors that were printed:', "\n", @absrefs_errors, "\n");
-    } else {
-      croak ('Error: xsltproc did not exit cleanly when applying the absolutizer stylesheet to ', $article_xml, '.  Its exit code was ', $xsltproc_exit_code, '.');
+        if ($verbose) {
+            print 'done.', "\n";
+        }
     }
-  }
 
-  ensure_valid_xml_file ($article_absolute_xml);
-
-  if ($verbose) {
-    print 'done.', "\n";
-  }
-
+    return 1;
 }
+
+sub path_for_stylesheet {
+    my $sheet = shift;
+    my $path  = "${stylesheet_home}/${sheet}.xsl";
+    if ( -e $path ) {
+        if ( -r $path ) {
+            return $path;
+        }
+        else {
+            croak( 'Error: the ', $sheet, ' stylesheet at ',
+                $path, ' is unreadable.' );
+        }
+    }
+    else {
+        croak( 'Error: the ', $sheet,
+            ' stylesheet does not exist at the expected location (',
+            $path, ').' );
+    }
+}
+
+ensure_absolute_xml();
 
 # Ensure that the absolute forms of the article's environment XMLs are
 # available
-my @extensions = ('eno', 'erd', 'epr', 'dfs', 'eid', 'ecl', 'esh', 'eth');
+my @extensions = (
+    qw{eno}, qw{erd}, qw{epr}, qw{dfs}, qw{eid}, qw{ecl}, qw{esh}, qw{eth},
+);
 foreach my $extension (@extensions) {
-  my $env_xml = "${article_dirname}/${article_basename}.${extension}";
-  if (-e $env_xml) {
-    my $env_abs_xml = "${article_dirname}/${article_basename}.${extension}1";
-    my $xsltproc_status = system ("xsltproc $absrefs_stylesheet $env_xml > $env_abs_xml 2> /dev/null");
-    my $xsltproc_exit_code = $xsltproc_status >> 8;
-    if ($xsltproc_exit_code != 0) {
-      croak ('Error: xsltproc died applying the absolutizer stylesheet to ', $env_xml, '.', "\n");
+    my $env_xml     = mizar_file_with_extension($extension);
+    my $env_abs_xml = mizar_file_with_extension("${extension}1");
+    if ( -e $env_xml && !-e $env_abs_xml ) {
+        apply_stylesheet( $absrefs_stylesheet, $env_xml, $env_abs_xml );
     }
-  }
 }
 
-my $dependencies_stylesheet = $stylesheet_paths{'dependencies'};
-
-my $xsltproc_out = File::Temp->new ();
-my $xsltproc_err = File::Temp->new ();
-
-my $xsltproc_non_constructor_deps_status
-    = system ("xsltproc ${dependencies_stylesheet} ${article_absolute_xml} > $xsltproc_out 2> $xsltproc_err");
-my $xsltproc_non_constructor_deps_exit_code
-    = $xsltproc_non_constructor_deps_status >> 8;
-
-if ($xsltproc_non_constructor_deps_exit_code != 0) {
-    my $err = `cat $xsltproc_err`;
-    croak ('Error: xsltproc did not exit cleanly when applying the dependencies stylesheet to ', $article_absolute_xml, ':', "\n", $err, "\n");
-}
-
-my @non_constructor_deps = `cat $xsltproc_out`;
-chomp @non_constructor_deps;
+my @non_constructor_deps =
+    apply_stylesheet( $dependencies_stylesheet, $article_absolute_xml );
 
 # Constructors are a special case
+my $inferred_constructors_stylesheet =
+    path_for_stylesheet('inferred-constructors');
 
-my $inferred_constructors_stylesheet = $stylesheet_paths{'inferred-constructors'};
-my @constructor_deps = `xsltproc $inferred_constructors_stylesheet $article_absolute_xml | sort -u | uniq`;
-chomp @constructor_deps;
+my @inferred_constructors =
+    apply_stylesheet( $inferred_constructors_stylesheet,
+    $article_absolute_xml );
 
 my %deps_table = ();
 
-foreach my $dep (@constructor_deps) {
-  $deps_table{$dep} = 0;
-}
-
-foreach my $dep (@non_constructor_deps) {
-  $deps_table{$dep} = 0;
+foreach ( @non_constructor_deps, @inferred_constructors ) {
+    $deps_table{$_} = 0;
 }
 
 # Print constructor property dependencies
 
-my $properties_of_constructor_stylesheet = $stylesheet_paths{'properties-of-constructor'};
+my $properties_of_constructor_stylesheet =
+    path_for_stylesheet('properties-of-constructor');
 
-foreach my $constructor (@constructor_deps) {
-  if ($constructor =~ /\A ([a-z0-9_]+) : (.) constructor : ([0-9]+) \z/x) {
-    (my $aid, my $kind, my $nr) = ($1, $2, $3);
-    if ($debug) {
-      print STDERR ('Looking for properties of the inferred constructor ', $constructor, '...', "\n");
+foreach my $constructor (@inferred_constructors) {
+    if ( $constructor
+        =~ /\A ([ _ [:lower:] \d ]+) : (.) constructor : (\d+) \z/ )
+    {
+        ( my $aid, my $kind, my $nr ) = ( $1, $2, $3 );
+        my %stylesheet_parameters = (
+            'kind' => $kind,
+            'nr'   => $nr,
+            'aid'  => $aid,
+        );
+        my @properties =
+            apply_stylesheet( $properties_of_constructor_stylesheet,
+            $article_atr, undef, \%stylesheet_parameters );
+
+        foreach my $property (@properties) {
+            my $property_lc  = lc $property;
+            my $property_key = "${constructor}[${property_lc}]";
+            $deps_table{$property_key} = 0;
+        }
     }
-    my @properties = `xsltproc --stringparam kind '${kind}' --stringparam nr '${nr}' --stringparam aid '${aid}' $properties_of_constructor_stylesheet $article_atr`;
-    chomp @properties;
-    if ($debug) {
-      print STDERR ('We found ', scalar @properties, ' properties for ', $constructor, '.', "\n");
+    else {
+        croak( 'Error: unable to make sense of the constructor \'',
+            $constructor, '\'.' );
     }
-    foreach my $property (@properties) {
-      my $property_lc = lc $property;
-      my $property_key = "${constructor}[${property_lc}]";
-      $deps_table{$property_key} = 0;
-    }
-  } else {
-    croak ('Error: unable to make sense of the constructor \'', $constructor, '\'.');
-  }
 }
 
-foreach my $dep (keys %deps_table) {
-  print $dep, "\n";
+foreach ( keys %deps_table ) {
+    print $_, "\n";
 }
 
 __END__
