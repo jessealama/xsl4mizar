@@ -20,12 +20,14 @@ my $verbose         = 0;
 my $debug           = 0;
 my $man             = 0;
 my $help            = 0;
+my $one_line_output = 0;
 
 GetOptions(
     'help|?'            => \$help,
     'man'               => \$man,
     'verbose'           => \$verbose,
     'debug'             => \$debug,
+    'oneline'           => \$one_line_output,
     'stylesheet-home=s' => \$stylesheet_home
 ) or pod2usage(2);
 
@@ -174,8 +176,20 @@ foreach my $constructor (@inferred_constructors) {
     }
 }
 
-foreach ( keys %deps_table ) {
-    print $_, "\n";
+if ($one_line_output) {
+    my @items = keys %deps_table;
+    if (@items) {
+	print $items[0];
+	shift @items;
+	foreach my $item (@items) {
+	    print ' ', $item;
+	}
+    }
+}
+else {
+    foreach ( keys %deps_table ) {
+	print $_, "\n";
+    }
 }
 
 __END__
