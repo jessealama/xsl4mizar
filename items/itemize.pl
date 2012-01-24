@@ -625,18 +625,18 @@ foreach my $fragment (@fragment_files) {
     ensure_readable_file ($new_err);
     ensure_readable_file ($new_xml);
 
-    # We need to rewrite the aid of the article; otherwise the external
-    # dependencies stylesheet will sniff through the original whole article
-    my $xsltproc_rewrite_aid_status = system ("xsltproc --stringparam new-aid '${new_prefix}' $rewrite_aid_stylesheet $new_xml > $new_xml_tmp 2> /dev/null");
-    my $xsltproc_rewrite_aid_exit_code = $xsltproc_rewrite_aid_status >> 8;
-    if ($xsltproc_rewrite_aid_status != 0) {
-      if ($verbose) {
-	print "\n";
-      }
-      croak ('Error: xsltproc did not exit cleanly applying aid-rewriting stylesheet to ', $new_xml, '.');
-    }
-    move ($new_xml_tmp, $new_xml)
-      or croak ('Error: unable to rename ', $new_xml_tmp, ' to ', $new_xml, '.');
+    # # We need to rewrite the aid of the article; otherwise the external
+    # # dependencies stylesheet will sniff through the original whole article
+    # my $xsltproc_rewrite_aid_status = system ("xsltproc --stringparam new-aid '${new_prefix}' $rewrite_aid_stylesheet $new_xml > $new_xml_tmp 2> /dev/null");
+    # my $xsltproc_rewrite_aid_exit_code = $xsltproc_rewrite_aid_status >> 8;
+    # if ($xsltproc_rewrite_aid_status != 0) {
+    #   if ($verbose) {
+    # 	print "\n";
+    #   }
+    #   croak ('Error: xsltproc did not exit cleanly applying aid-rewriting stylesheet to ', $new_xml, '.');
+    # }
+    # move ($new_xml_tmp, $new_xml)
+    #   or croak ('Error: unable to rename ', $new_xml_tmp, ' to ', $new_xml, '.');
 
     my $new_xml_orig = "${target_text_subdir}/${new_prefix}.xml.orig";
 
@@ -685,6 +685,16 @@ if ($parallel_exit_code != 0) {
     croak ('Error: parallel did not exit cleanly when absolutizing the fragment XMLs for ', $article_basename, '; its exit code was ', $parallel_exit_code, '.', "\n");
 }
 
+# Need to rewrite -- again!  addabsrefs can smash my precious bogus aid's
+
+my @fragment_abs_xmls = glob "${target_text_subdir}/ckb[0-9]*.xml1";
+foreach my $fragment_abs_xml (@fragment_abs_xmls) {
+    my $fragment_basename = basename ($fragment_abs_xml, '.xml1');
+    warn 'Rewriting all aids in ', $fragment_abs_xml, ' to ', $fragment_basename, '...';
+    my $fragment_tmp = "${fragment_abs_xml}2";
+    system ("xsltproc --stringparam new-aid '${fragment_basename}' $rewrite_aid_stylesheet $fragment_abs_xml > $fragment_tmp");
+    move ($fragment_tmp, $fragment_abs_xml);
+}
 print 'done.', "\n";
 
 __END__
