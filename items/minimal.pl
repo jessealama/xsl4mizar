@@ -9,7 +9,8 @@ use Getopt::Long;
 use Pod::Usage;
 use Carp qw(croak);
 use File::Spec qw();
-use File::Temp qw(tempfile);
+use IPC::Run;
+use Utils qw(ensure_directory ensure_readable_file);
 
 my $paranoid = 0;
 my $verbose = 0;
@@ -21,49 +22,6 @@ my $checker_only = 0;
 my $script_home = '/Users/alama/sources/mizar/xsl4mizar/items';
 my $fast_theorems = 0;
 my $fast_schemes = 0;
-
-sub ensure_directory {
-  my $dir = shift;
-  if (! -e $dir) {
-    die 'Error: the required directory ', $dir, ' does not exist.';
-  }
-
-  if (! -d $dir) {
-    die 'Error: the required directory ', $dir, ' does not exist (as a directory).';
-  }
-  return 1;
-}
-
-sub ensure_readable_file {
-  my $file = shift;
-
-  if (! -e $file) {
-    croak ('Error: ', $file, ' does not exist.');
-  }
-  if (! -f $file) {
-    croak ('Error: ', $file, ' is not a file.');
-  }
-
-  if (! -r $file) {
-    croak ('Error: ', $file, ' is unreadable.');
-  }
-
-  return 1;
-}
-
-sub tmpfile_path {
-  # File::Temp's tempfile function returns a list of two values.  We
-  # want the second (the path of the temprary file) and don't care
-  # about the first (a filehandle for the temporary file).  See
-  # http://search.cpan.org/~tjenness/File-Temp-0.22/Temp.pm for more
-  (undef, my $path) = eval { tempfile (); };
-  my $tempfile_err = $@;
-  if (defined $path) {
-    return $path;
-  } else {
-    croak ('Error: we could not create a temporary file!  The error message was:', "\n", "\n", '  ', $tempfile_err);
-  }
-}
 
 GetOptions('help|?' => \$help,
            'man' => \$man,
@@ -862,62 +820,47 @@ if (! $confirm_only) {
   foreach my $extension_to_minimize (@extensions_to_minimize) {
     minimize_extension ($extension_to_minimize);
   }
-}
 
-# Restore
-verify ()
-    or croak ('Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing constructor properties.');
+  # Restore
+  verify ()
+      or croak ('Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing constructor properties.');
 
-my $minimize_properties_output = tmpfile_path ();
-my $minimize_properties_errors = tmpfile_path ();
-my $minimize_properties_call = undef;
-
-if ($checker_only) {
-  $minimize_properties_call = "$minimize_properties_script --checker-only $article_miz > $minimize_properties_output 2> $minimize_properties_errors";
-} else {
-  $minimize_properties_call = "$minimize_properties_script $article_miz > $minimize_properties_output 2> $minimize_properties_errors"
-}
-
-my $minimize_properties_status = system ($minimize_properties_call);
-my $minimize_properties_exit_code = $minimize_properties_status >> 8;
-if ($minimize_properties_exit_code != 0) {
-  if (-e $minimize_properties_errors && -r $minimize_properties_errors) {
-    my @minimize_properties_errors = `cat $minimize_properties_errors`;
-    croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_properties_exit_code, '.  Here are the errors it emitted:', "\n", @minimize_properties_errors);
-  } else {
-    croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_properties_exit_code, '.');
+my $minimize_properties_out = '';
+  my $minimize_properties_err = '';
+  my @minimize_properties_call = ($minimize_properties_script);
+  if ($checker_only) {
+      push (@minimize_properties_call, '--checker-only');
   }
-}
+  push (@minimize_properties_call, $article_miz);
 
-# We are pretty close to the end.  But there might be spurious
-# dependencies on abstractness properties.  Dump as many as we can.
+  run (\@minimize_properties_call,
+       '>', \undef,
+       '2>', \$minimize_properties_err)
+      or croak ('Error: the property minimization script did not exit cleanly for ', $article_basename, '.  Here are the errors it emitted:', "\n", $minimize_properties_err);
 
-# Restore
-verify ()
-    or croak ('Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing abstractness properties.');
+  # We are pretty close to the end.  But there might be spurious
+  # dependencies on abstractness properties.  Dump as many as we can.
 
-my $minimize_abstractness_output = tmpfile_path ();
-my $minimize_abstractness_errors = tmpfile_path ();
-my $minimize_abstractness_call = undef;
+  # Restore
+  verify ()
+      or croak ('Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing abstractness properties.');
 
-if ($checker_only) {
-  $minimize_abstractness_call = "$minimize_abstractness_script --checker-only $article_miz > $minimize_abstractness_output 2> $minimize_abstractness_errors";
-} else {
-  $minimize_abstractness_call = "$minimize_abstractness_script $article_miz > $minimize_abstractness_output 2> $minimize_abstractness_errors"
-}
-
-my $minimize_abstractness_status = system ($minimize_abstractness_call);
-my $minimize_abstractness_exit_code = $minimize_abstractness_status >> 8;
-if ($minimize_abstractness_exit_code != 0) {
-  if (-e $minimize_abstractness_errors && -r $minimize_abstractness_errors) {
-    my @minimize_abstractness_errors = `cat $minimize_abstractness_errors`;
-    croak ('Error: the abstractness minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_abstractness_exit_code, '.  Here are the errors it emitted:', "\n", @minimize_abstractness_errors);
-  } else {
-    croak ('Error: the abstractness minimization script did not exit cleanly for ', $article_basename, '; its exit code was ', $minimize_abstractness_exit_code, '.');
+  my $minimize_abstractness_out = '';
+  my $minimize_abstractness_err  ='';
+  my @minimize_abstractness_call = ('$minimize_abstractness_script');
+  if ($checker_only) {
+      push (@minimize_abstractness_call, '--checker-only');
   }
+  push (@minimize_abstractness_call, $article_miz);
+
+  run (\@minimize_abstractness_call,
+       '>', \undef,
+       '2>', \$minimize_abstractness_err)
+      or croak ('Error: the abstractness minimization script did not exit cleanly for ', $article_basename, '.  Here are the errors it emitted:', "\n", $minimize_abstractness_err);
+
 }
 
-if ($paranoid == 1 or $confirm_only == 1) {
+if ($paranoid or $confirm_only) {
 
   # Check that the XML is valid
   if (! defined eval { $xml_parser->parse_file ($article_xml) } ) {
@@ -937,9 +880,6 @@ if ($paranoid == 1 or $confirm_only == 1) {
     }
 
     my @removable = @{confirm_minimality_of_extension ($extension)};
-
-    # DEBUG
-    # print 'We found ', scalar @removable, ' removable elements.', "\n";
 
     $removable_by_extension{$extension} = \@removable;
 
@@ -961,11 +901,6 @@ if ($paranoid == 1 or $confirm_only == 1) {
 
   if ($some_extension_unminimized == 1) {
     exit 1;
-  }
-
-  # Check that the XML is valid
-  if (! defined eval { $xml_parser->parse_file ($article_xml) } ) {
-    croak ('Error: after confirming the minimality of the environment, we are left with an invalid XML file at ', $article_xml, '.', "\n");
   }
 
 }
