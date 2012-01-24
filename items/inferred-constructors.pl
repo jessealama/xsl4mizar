@@ -57,6 +57,7 @@ my $article = $ARGV[0];
 my $article_dirname = dirname ($article);
 my $article_dirname_absolute = File::Spec->rel2abs ($article_dirname);
 my $article_basename = basename ($article, '.miz');
+my $article_basename_uc = uc $article_basename;
 my $article_xml = "${article_dirname}/${article_basename}.xml";
 my $article_absolute_xml = "${article_dirname}/${article_basename}.xml1";
 
@@ -96,7 +97,7 @@ foreach my $constructor (@inferred_constructors) {
 
 # We may need to throw in equality, even if it is not mentioned
 # anywhere.  Specifically, we may need its properties (reflexivity and
-# symmetry).
+# symmetry).  Later on we can try to eliminate it.
 
 $inferred_constructors_table{'hidden:rconstructor:1'} = 0;
 
