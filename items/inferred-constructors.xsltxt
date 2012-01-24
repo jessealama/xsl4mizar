@@ -115,10 +115,13 @@ tpl [Article[@aid]] {
   for-each [document ($atr, /)] {
     for-each [Constructors] {
       for-each [Constructor[@kind and @nr and @aid and Properties/Abstractness]] {
-        $this-kind = lc (#s = `@kind`);
-        $this-aid = lc (#s = `@aid`);
-        $this-nr = `@nr`;
-        $this-aid; ":"; $this-kind; "constructor"; ":"; $this-nr; "\n";
+        $this-aid = `@aid`;
+        if [not($this-aid = $aid)] {
+          $this-kind-lc = lc (#s = `@kind`);
+          $this-aid-lc = lc (#s = `@aid`);
+          $this-nr = `@nr`;
+          $this-aid-lc; ":"; $this-kind-lc; "constructor"; ":"; $this-nr; "\n";
+        }
       }
     }
   }
