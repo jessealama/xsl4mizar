@@ -865,11 +865,8 @@ if (! $confirm_only) {
 }
 
 # Restore
-my $verifier_ok_before_properties = verify ();
-if ($verifier_ok_before_properties == 0) {
-  print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing constructor properties.', "\n";
-  exit 1;
-}
+verify ()
+    or croak ('Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing constructor properties.');
 
 my $minimize_properties_output = tmpfile_path ();
 my $minimize_properties_errors = tmpfile_path ();
@@ -896,11 +893,8 @@ if ($minimize_properties_exit_code != 0) {
 # dependencies on abstractness properties.  Dump as many as we can.
 
 # Restore
-my $verifier_ok_before_abstractness = verify ();
-if ($verifier_ok_before_abstractness == 0) {
-  print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing abstractness properties.', "\n";
-  exit 1;
-}
+verify ()
+    or croak ('Error: we are unable to verify ', $article_basename, ' in its newly minimized environment, before minimizing abstractness properties.');
 
 my $minimize_abstractness_output = tmpfile_path ();
 my $minimize_abstractness_errors = tmpfile_path ();
@@ -976,11 +970,8 @@ if ($paranoid == 1 or $confirm_only == 1) {
 
 }
 
-my $verifier_ok = verify ();
-if ($verifier_ok == 0) {
-  print 'Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.', "\n";
-  exit 1;
-}
+verify ()
+    or croak ('Error: we are unable to verify ', $article_basename, ' in its newly minimized environment.');
 
 __END__
 
